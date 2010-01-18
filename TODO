@@ -1,0 +1,19 @@
+Radios:
+	Needs to un-select itself after a tap
+	Needs to update the selected value in the root
+	Support a hook to do something on selection
+
+Sliders:
+	Render the left/right image
+
+Sections:
+	Support for rendering icons
+
+Widgets:
+	Support checkbox (more than one item checked)
+	Image Chooser
+	Text Entry
+	Password Entry
+
+Reflection binder:
+	Create the Element tree and then set the values back after editing.
