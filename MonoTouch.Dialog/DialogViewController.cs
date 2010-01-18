@@ -55,6 +55,23 @@ namespace MonoTouch.Dialog
 				var section = root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
 
+				if (element is RadioElement){
+					var re = element as RadioElement;
+					
+					// Hook to do something interesting with it.
+					re.Clicked ();
+
+					if (re.RadioIdx != root.radio.Selected){
+						var cell = tableView.CellAt (root.PathForRadio (root.radio.Selected));
+						cell.Accessory = UITableViewCellAccessory.None;
+						cell = tableView.CellAt (indexPath);
+						cell.Accessory = UITableViewCellAccessory.Checkmark;
+						root.radio.Selected = re.RadioIdx;
+					}
+					
+					tableView.DeselectRow (indexPath, true);
+				}
+				
 				if (!(element is RootElement))
 					return;
 				

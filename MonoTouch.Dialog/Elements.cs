@@ -167,6 +167,14 @@ namespace MonoTouch.Dialog
 			Group = group;
 		}
 		
+		public void Clicked ()
+		{
+			if (Tapped != null)
+				Tapped (this, EventArgs.Empty);
+		}
+		
+		public event EventHandler Tapped;
+		
 		public RadioElement (string caption) : base (caption)
 		{
 		}
@@ -185,6 +193,11 @@ namespace MonoTouch.Dialog
 			
 			cell.TextLabel.Text = Caption;
 			return cell;
+		}
+
+		public override string Summary ()
+		{
+			return Caption;
 		}
 
 	}
@@ -267,6 +280,29 @@ namespace MonoTouch.Dialog
 			this.radio = radio;
 		}
 		
+		internal NSIndexPath PathForRadio (int idx)
+		{
+			if (radio == null)
+				return null;
+			
+			uint current = 0, section = 0;
+			foreach (Section s in Sections){
+				uint row = 0;
+				
+				foreach (Element e in s.Elements){
+					if (!(e is RadioElement))
+						continue;
+					
+					if (current == idx)
+						return new NSIndexPath ().FromIndexes (new uint [] { section, row});
+					row++;
+					current++;
+				}
+				section++;
+			}
+			return null;
+		}
+			
 		internal void Prepare ()
 		{
 			if (radio == null)

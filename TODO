@@ -1,8 +1,3 @@
-Radios:
-	Needs to un-select itself after a tap
-	Needs to update the selected value in the root
-	Support a hook to do something on selection
-
 Sliders:
 	Render the left/right image
 
