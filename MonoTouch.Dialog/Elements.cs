@@ -42,6 +42,10 @@ namespace MonoTouch.Dialog
 		{
 			return "";
 		}
+		
+		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+		}
 	}
 
 	public class BooleanElement : Element {
@@ -150,10 +154,49 @@ namespace MonoTouch.Dialog
 
 	public class HtmlElement : Element {
 		public string Url;
-
+		static NSString hkey = new NSString ("HtmlElement");
+		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
 			Url = url;
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (hkey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, hkey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+			}
+			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+			
+			cell.TextLabel.Text = Caption;
+			return cell;
+		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			var vc = new UIViewController ();
+			var web = new UIWebView (UIScreen.MainScreen.ApplicationFrame){
+				BackgroundColor = UIColor.White,
+				ScalesPageToFit = true,
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+			};
+			web.LoadStarted += delegate {
+				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
+			};
+			web.LoadFinished += delegate {
+				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
+			};
+			web.LoadError += (webview, args) => {
+				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
+				web.LoadHtmlString (String.Format ("<html><center><font size=+5 color='red'>An error occurred:<br>{0}</font></center></html>", args.Error.LocalizedDescription), null);
+			};
+			vc.NavigationItem.Title = Caption;
+			vc.View.AddSubview (web);
+			
+			dvc.ActivateController (vc);
+			web.LoadRequest (NSUrlRequest.FromUrl (new NSUrl (Url)));
 		}
 	}
 
@@ -165,12 +208,6 @@ namespace MonoTouch.Dialog
 		public RadioElement (string caption, string group) : base (caption)
 		{
 			Group = group;
-		}
-		
-		public void Clicked ()
-		{
-			if (Tapped != null)
-				Tapped (this, EventArgs.Empty);
 		}
 		
 		public event EventHandler Tapped;
@@ -199,7 +236,23 @@ namespace MonoTouch.Dialog
 		{
 			return Caption;
 		}
-
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
+			if (Tapped != null)
+				Tapped (this, EventArgs.Empty);
+			
+			RootElement root = (RootElement) Parent.Parent;
+			if (RadioIdx != root.RadioSelected){
+				var cell = tableView.CellAt (root.PathForRadio (root.RadioSelected));
+				cell.Accessory = UITableViewCellAccessory.None;
+				cell = tableView.CellAt (indexPath);
+				cell.Accessory = UITableViewCellAccessory.Checkmark;
+				root.RadioSelected = RadioIdx;
+			}
+			
+			tableView.DeselectRow (indexPath, true);
+		}
 	}
 	
 	public class Section : Element, IEnumerable {
@@ -332,6 +385,18 @@ namespace MonoTouch.Dialog
 				yield return s;
 		}
 
+		public int RadioSelected {
+			get {
+				if (radio != null)
+					return radio.Selected;
+				return -1;
+			}
+			set {
+				if (radio != null)
+					radio.Selected = value;
+			}
+		}
+		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (rkey);
@@ -368,6 +433,12 @@ namespace MonoTouch.Dialog
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			
 			return cell;
+		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			var newDvc = new DialogViewController (this, true);
+			dvc.ActivateController (newDvc);
 		}
 	}
 }

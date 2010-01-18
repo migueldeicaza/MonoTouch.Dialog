@@ -73,7 +73,9 @@ namespace Sample
 						}
 					}
 				},
-				new Section (),
+				new Section () {
+					new HtmlElement ("About", "http://monotouch.net")
+				}
 			};
 				
 			var dv = new DialogViewController (root);
