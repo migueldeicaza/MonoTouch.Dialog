@@ -68,5 +68,6 @@
   <ItemGroup>
     <Compile Include="Elements.cs" />
     <Compile Include="DialogViewController.cs" />
+    <Compile Include="Reflect.cs" />
   </ItemGroup>
 </Project>
