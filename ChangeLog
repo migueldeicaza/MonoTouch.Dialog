@@ -1,0 +1,12 @@
+2010-01-18  Miguel de Icaza  <miguel@novell.com>
+
+	* Elements.cs: Add IDisposable pattern to release resources on
+	demand. 
+
+	* StringElement.cs: New element that can show text plus its value;
+	RadioElement now derives from this.
+
+	* EntryElement.cs: New element that allows for entering text.
+
+	Expanded the sample.
+

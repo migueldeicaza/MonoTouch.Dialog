@@ -17,7 +17,7 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
-	public class Element {
+	public class Element : IDisposable {
 		public Element Parent;
 		public string Caption;
 		
@@ -25,6 +25,15 @@ namespace MonoTouch.Dialog
 		{
 			this.Caption = caption;
 		}	
+		
+		public void Dispose ()
+		{
+			Dispose (true);
+		}
+
+		protected virtual void Dispose (bool disposing)
+		{
+		}
 		
 		public virtual UITableViewCell GetCell (UITableView tv)
 		{
@@ -88,6 +97,14 @@ namespace MonoTouch.Dialog
 		{
 			return Value ? "On" : "Off";
 		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing){
+				sw.Dispose ();
+				sw = null;
+			}
+		}
 	}
 
 	public class FloatElement : Element {
@@ -136,20 +153,14 @@ namespace MonoTouch.Dialog
 		{
 			return Value.ToString ();
 		}
-	}
-
-	public class StringElement : Element {
-		public string Value;
 		
-		public StringElement (string caption, string value) : base (caption)
+		protected override void Dispose (bool disposing)
 		{
-			Value = value;
-		}
-		
-		public override string Summary ()
-		{
-			return Value;
-		}
+			if (disposing){
+				slider.Dispose ();
+				slider = null;
+			}
+		}		
 	}
 
 	public class HtmlElement : Element {
@@ -200,35 +211,38 @@ namespace MonoTouch.Dialog
 		}
 	}
 
-	public class RadioElement : Element {
-		public string Group;
-		static NSString rkey = new NSString ("RadioElement");
-		internal int RadioIdx;
+	public class StringElement : Element {
+		static NSString skey = new NSString ("StringElement");
+		public string Value;
+		public UITextAlignment Alignment = UITextAlignment.Left;
 		
-		public RadioElement (string caption, string group) : base (caption)
+		public StringElement (string caption) : base (caption) {}
+		
+		public StringElement (string caption, string value) : base (caption)
 		{
-			Group = group;
+			Value = value;
+		}
+		
+		public StringElement (string caption, EventHandler tapped) : base (caption)
+		{
+			Tapped += tapped;
 		}
 		
 		public event EventHandler Tapped;
 		
-		public RadioElement (string caption) : base (caption)
-		{
-		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (rkey);
+			var cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, rkey);
+				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
-			var root = (RootElement) Parent.Parent;
-			
-			bool selected = RadioIdx == root.radio.Selected;
-			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
-			
+			cell.Accessory = UITableViewCellAccessory.None;
 			cell.TextLabel.Text = Caption;
+			cell.TextLabel.TextAlignment = Alignment;
+			if (Value != null)
+				cell.DetailTextLabel.Text = Value;
 			return cell;
 		}
 
@@ -241,7 +255,37 @@ namespace MonoTouch.Dialog
 		{
 			if (Tapped != null)
 				Tapped (this, EventArgs.Empty);
+			tableView.DeselectRow (indexPath, true);
+		}
+	}
+	
+	public class RadioElement : StringElement {
+		public string Group;
+		static NSString rkey = new NSString ("RadioElement");
+		internal int RadioIdx;
+		
+		public RadioElement (string caption, string group) : base (caption)
+		{
+			Group = group;
+		}
+				
+		public RadioElement (string caption) : base (caption)
+		{
+		}
+
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = base.GetCell (tv);			
+			var root = (RootElement) Parent.Parent;
 			
+			bool selected = RadioIdx == root.radio.Selected;
+			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+
+			return cell;
+		}
+
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
 			RootElement root = (RootElement) Parent.Parent;
 			if (RadioIdx != root.RadioSelected){
 				var cell = tableView.CellAt (root.PathForRadio (root.RadioSelected));
@@ -251,14 +295,119 @@ namespace MonoTouch.Dialog
 				root.RadioSelected = RadioIdx;
 			}
 			
-			tableView.DeselectRow (indexPath, true);
+			base.Selected (dvc, tableView, indexPath);
+		}
+	}
+	
+	public class EntryElement : Element {
+		public string Value;
+		static NSString ekey = new NSString ("EntryElement");
+		bool isPassword;
+		UILabel label; UITextField entry;
+		string placeholder;
+		static UIFont font = UIFont.BoldSystemFontOfSize (17);
+		
+		public EntryElement (string caption, string placeholder, string value) : base (caption)
+		{
+			Value = value;
+			this.placeholder = placeholder;
+		}
+		
+		public EntryElement (string caption, string placeholder, string value, bool isPassword) : base (caption)
+		{
+			Value = value;
+			this.isPassword = isPassword;
+			this.placeholder = placeholder;
+		}
+
+		public override string Summary ()
+		{
+			return Value;
+		}
+
+		// 
+		// Computes the X position for the entry by aligning all the entries in the Section
+		//
+		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
+		{
+			Section s = Parent as Section;
+			if (s.EntryAlignment.Width != 0)
+				return s.EntryAlignment;
+			
+			SizeF max = new SizeF (-1, -1);
+			foreach (var e in s.Elements){
+				var ee = e as EntryElement;
+				if (ee == null)
+					continue;
+				
+				var size = tv.StringSize (ee.Caption, font);
+				if (size.Width > max.Width)
+					max = size;				
+			}
+			s.EntryAlignment = new SizeF (25 + Math.Min (max.Width, 160), max.Height);
+			return s.EntryAlignment;
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (ekey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, ekey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			} else 
+				RemoveTag (cell, 1);
+			
+			if (entry == null){
+				SizeF size = ComputeEntryPosition (tv, cell);
+				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
+					Tag = 1,
+					Placeholder = placeholder
+		
+				};
+				
+				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
+					UIViewAutoresizing.FlexibleLeftMargin;
+				
+				entry.ShouldReturn += delegate {
+					Value = entry.Text;
+					
+					EntryElement focus = null;
+					foreach (var e in (Parent as Section).Elements){
+						if (e == this)
+							focus = this;
+						else if (focus != null && e is EntryElement)
+							focus = e as EntryElement;
+					}
+					if (focus != this)
+						focus.entry.BecomeFirstResponder ();
+					else
+						focus.entry.ResignFirstResponder ();
+					
+					return true;
+				};
+			}
+			
+			cell.TextLabel.Text = Caption;
+			cell.ContentView.AddSubview (entry);
+			return cell;
+		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing){
+				entry.Dispose ();
+				entry = null;
+			}
 		}
 	}
 	
 	public class Section : Element, IEnumerable {
 		public string Header, Footer;
 		public List<Element> Elements = new List<Element> ();
-
+		
+		// X corresponds to the alignment, Y to the height of the password
+		internal SizeF EntryAlignment;
+		
 		public Section () : base (null) {}
 		
 		public Section (string caption) : base (caption)
@@ -362,12 +511,15 @@ namespace MonoTouch.Dialog
 				return;
 			
 			int current = 0;
-			foreach (Section s in Sections)
+			foreach (Section s in Sections){
+				int maxEntryWidth = -1;
+				
 				foreach (Element e in s.Elements){
 					var re = e as RadioElement;
 					if (re != null)
 						re.RadioIdx = current++;
 				}
+			}
 		}
 		
 		public void Add (Section section)

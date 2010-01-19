@@ -4,6 +4,11 @@ Sliders:
 Sections:
 	Support for rendering icons
 
+Web View:
+	Cache the web browser across instances?
+		Perhaps in the Root?
+	Dispose the web browser after use?
+
 Widgets:
 	Support checkbox (more than one item checked)
 	Image Chooser

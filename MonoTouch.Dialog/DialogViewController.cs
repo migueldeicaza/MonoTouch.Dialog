@@ -45,7 +45,6 @@ namespace MonoTouch.Dialog
 			{
 				var section = root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
-				Console.WriteLine ("at {0}, {1} -> {2}", indexPath.Section, indexPath.Row, element.GetType ());
 				
 				return element.GetCell (tableView);
 			}
