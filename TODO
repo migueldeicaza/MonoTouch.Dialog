@@ -1,3 +1,6 @@
+Controls:
+	Add DateTime editing for UIPicker's
+
 Sliders:
 	Render the left/right image
 
@@ -11,8 +14,9 @@ Web View:
 Widgets:
 	Support checkbox (more than one item checked)
 	Image Chooser
-	Text Entry
-	Password Entry
 
 Reflection binder:
 	Create the Element tree and then set the values back after editing.
+
+Ponder:
+	When to support pickers?
