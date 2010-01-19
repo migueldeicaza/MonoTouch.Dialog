@@ -17,10 +17,31 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
+	/// <summary>
+	/// Base class for all elements in MonoTouch.Dialog
+	/// </summary>
 	public class Element : IDisposable {
+		/// <summary>
+		///  Handle to the container object.
+		/// </summary>
+		/// <remarks>
+		/// For sections this points to a RootElement, for every
+		/// other object this points to a Section and it is null
+		/// for the root RootElement.
+		/// </remarks>
 		public Element Parent;
+		
+		/// <summary>
+		///  The caption to display for this given element
+		/// </summary>
 		public string Caption;
 		
+		/// <summary>
+		///  Initializes the element with the given caption.
+		/// </summary>
+		/// <param name="caption">
+		/// The caption.
+		/// </param>
 		public Element (string caption)
 		{
 			this.Caption = caption;
@@ -47,16 +68,38 @@ namespace MonoTouch.Dialog
 				viewToRemove.RemoveFromSuperview ();
 		}
 		
+		/// <summary>
+		/// Returns a summary of the value represented by this object, suitable 
+		/// for rendering as the result of a RootElement with child objects.
+		/// </summary>
+		/// <returns>
+		/// The return value must be a short description of the value.
+		/// </returns>
 		public virtual string Summary ()
 		{
 			return "";
 		}
 		
+		/// <summary>
+		/// Invoked when the given element has been tapped by the user.
+		/// </summary>
+		/// <param name="dvc">
+		/// The <see cref="DialogViewController"/> where the selection took place
+		/// </param>
+		/// <param name="tableView">
+		/// The <see cref="UITableView"/> that contains the element.
+		/// </param>
+		/// <param name="path">
+		/// The <see cref="NSIndexPath"/> that contains the Section and Row for the element.
+		/// </param>
 		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 		}
 	}
 
+	/// <summary>
+	/// Used to display switch on the screen.
+	/// </summary>
 	public class BooleanElement : Element {
 		public bool Value;
 		static NSString bkey = new NSString ("BooleanElement");
@@ -107,6 +150,9 @@ namespace MonoTouch.Dialog
 		}
 	}
 
+	/// <summary>
+	///  Used to display a slider on the screen.
+	/// </summary>
 	public class FloatElement : Element {
 		public float Value;
 		public float MinValue, MaxValue;
@@ -163,9 +209,13 @@ namespace MonoTouch.Dialog
 		}		
 	}
 
+	/// <summary>
+	///  Used to display a cell that will launch a web browser when selected.
+	/// </summary>
 	public class HtmlElement : Element {
 		public string Url;
 		static NSString hkey = new NSString ("HtmlElement");
+		UIWebView web;
 		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
@@ -184,24 +234,53 @@ namespace MonoTouch.Dialog
 			cell.TextLabel.Text = Caption;
 			return cell;
 		}
+
+		static bool NetworkActivity {
+			set {
+				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = value;
+			}
+		}
+		
+		// We use this class to dispose the web control when it is not
+		// in use, as it could be a bit of a pig, and we do not want to
+		// wait for the GC to kick-in.
+		class WebViewController : UIViewController {
+			HtmlElement container;
+			
+			public WebViewController (HtmlElement container) : base ()
+			{
+				this.container = container;
+			}
+			
+			public override void ViewWillDisappear (bool animated)
+			{
+				base.ViewWillDisappear (animated);
+				NetworkActivity = false;
+				container.web.StopLoading ();
+				container.web.Dispose ();
+				container.web = null;
+			}
+
+		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var vc = new UIViewController ();
-			var web = new UIWebView (UIScreen.MainScreen.ApplicationFrame){
+			var vc = new WebViewController (this);
+			web = new UIWebView (UIScreen.MainScreen.ApplicationFrame){
 				BackgroundColor = UIColor.White,
 				ScalesPageToFit = true,
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
 			};
 			web.LoadStarted += delegate {
-				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
+				NetworkActivity = true;
 			};
 			web.LoadFinished += delegate {
-				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
+				NetworkActivity = false;
 			};
 			web.LoadError += (webview, args) => {
-				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
-				web.LoadHtmlString (String.Format ("<html><center><font size=+5 color='red'>An error occurred:<br>{0}</font></center></html>", args.Error.LocalizedDescription), null);
+				NetworkActivity = false;
+				if (web != null)
+					web.LoadHtmlString (String.Format ("<html><center><font size=+5 color='red'>An error occurred:<br>{0}</font></center></html>", args.Error.LocalizedDescription), null);
 			};
 			vc.NavigationItem.Title = Caption;
 			vc.View.AddSubview (web);
@@ -299,6 +378,14 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
+	/// <summary>
+	/// An element that can be used to enter text.
+	/// </summary>
+	/// <remarks>
+	/// This element can be used to enter text both regular and password protected entries. 
+	///     
+	/// The Text fields in a given section are aligned with each other.
+	/// </remarks>
 	public class EntryElement : Element {
 		public string Value;
 		static NSString ekey = new NSString ("EntryElement");
@@ -307,12 +394,39 @@ namespace MonoTouch.Dialog
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 		
+		/// <summary>
+		/// Constructs an EntryElement with the given caption, placeholder and initial value.
+		/// </summary>
+		/// <param name="caption">
+		/// The caption to use
+		/// </param>
+		/// <param name="placeholder">
+		/// Placeholder to display.
+		/// </param>
+		/// <param name="value">
+		/// Initial value.
+		/// </param>
 		public EntryElement (string caption, string placeholder, string value) : base (caption)
 		{
 			Value = value;
 			this.placeholder = placeholder;
 		}
 		
+		/// <summary>
+		/// Constructs  an EntryElement for password entry with the given caption, placeholder and initial value.
+		/// </summary>
+		/// <param name="caption">
+		/// The caption to use
+		/// </param>
+		/// <param name="placeholder">
+		/// Placeholder to display.
+		/// </param>
+		/// <param name="value">
+		/// Initial value.
+		/// </param>
+		/// <param name="isPassword">
+		/// True if this should be used to enter a password.
+		/// </param>
 		public EntryElement (string caption, string placeholder, string value, bool isPassword) : base (caption)
 		{
 			Value = value;
@@ -401,6 +515,9 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
+	/// <summary>
+	/// Sections contain individual Element instances that are rendered by MonoTouch.Dialog
+	/// </summary>
 	public class Section : Element, IEnumerable {
 		public string Header, Footer;
 		public List<Element> Elements = new List<Element> ();
@@ -408,17 +525,41 @@ namespace MonoTouch.Dialog
 		// X corresponds to the alignment, Y to the height of the password
 		internal SizeF EntryAlignment;
 		
+		/// <summary>
+		///  Constructs a Section without header or footers.
+		/// </summary>
 		public Section () : base (null) {}
 		
+		/// <summary>
+		///  Constructs a Section with the specified header
+		/// </summary>
+		/// <param name="caption">
+		/// The header to display
+		/// </param>
 		public Section (string caption) : base (caption)
 		{
 		}
-
+		
+		/// <summary>
+		/// Constructs a Section with a header and a footer
+		/// </summary>
+		/// <param name="caption">
+		/// The caption to display (or null to not display a caption)
+		/// </param>
+		/// <param name="footer">
+		/// The footer to display.
+		/// </param>
 		public Section (string caption, string footer) : base (caption)
 		{
 			Footer = footer;
 		}
 
+		/// <summary>
+		/// Adds a new child Element to the Section
+		/// </summary>
+		/// <param name="element">
+		/// An element to add to the section.
+		/// </param>
 		public void Add (Element element)
 		{
 			if (element == null)
@@ -428,6 +569,12 @@ namespace MonoTouch.Dialog
 			element.Parent = this;
 		}
 
+		/// <summary>
+		/// Enumerator to get all the elements in the Section.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="IEnumerator"/>
+		/// </returns>
 		public IEnumerator GetEnumerator ()
 		{
 			foreach (var e in Elements)
@@ -443,6 +590,9 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
+	/// <summary>
+	/// Captures the information about mutually exclusive elements in a RootElement
+	/// </summary>
 	public class RadioGroup {
 		public string Key;
 		public int Selected;
@@ -459,29 +609,82 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
+	/// <summary>
+	///    RootElements are responsible for showing a full configuration page.
+	/// </summary>
+	/// <remarks>
+	///    At least one RootElement is required to start the MonoTouch.Dialogs
+	///    process.   
+	/// 
+	///    RootElements can also be used inside Sections to trigger
+	///    loading a new nested configuration page.   When used in this mode
+	///    the caption provided is used while rendered inside a section and
+	///    is also used as the Title for the subpage.
+	/// 
+	///    If a RootElement is initialized with a section/element value then
+	///    this value is used to locate a child Element that will provide
+	///    a summary of the configuration which is rendered on the right-side
+	///    of the display.
+	/// 
+	///    RootElements are also used to coordinate radio elements.  The
+	///    RadioElement members can span multiple Sections (for example to
+	///    implement something similar to the ring tone selector and separate
+	///    custom ring tones from system ringtones).
+	/// 
+	///    Sections are added by calling the Add method which supports the
+	///    C# 4.0 syntax to initialize a RootElement in one pass.
+	/// </remarks>
 	public class RootElement : Element, IEnumerable {
 		static NSString rkey = new NSString ("RootElement");
-		public List<Section> Sections = new List<Section> ();
 		int summarySection, summaryElement;
 		internal RadioGroup radio;
 		
+		/// <summary>
+		///  Initializes a RootSection with a caption
+		/// </summary>
+		/// <param name="caption">
+		///  The caption to render.
+		/// </param>
 		public RootElement (string caption) : base (caption)
 		{
 			summarySection = -1;
 			Sections = new List<Section> ();
 		}
 
+		/// <summary>
+		///   Initializes a RootElement with a caption with a summary fetched from the specified section and leement
+		/// </summary>
+		/// <param name="caption">
+		/// The caption to render cref="System.String"/>
+		/// </param>
+		/// <param name="section">
+		/// The section that contains the element with the summary.
+		/// </param>
+		/// <param name="element">
+		/// The element index inside the section that contains the summary for this RootSection.
+		/// </param>
 		public RootElement (string caption, int section, int element) : base (caption)
 		{
 			summarySection = section;
 			summaryElement = element;
 		}
 		
+		/// <summary>
+		/// Initializes a RootElement that renders the summary based on the radio settings of the contained elements. 
+		/// </summary>
+		/// <param name="caption">
+		/// The caption to ender
+		/// </param>
+		/// <param name="radio">
+		/// The radio group that contains the radio information
+		/// </param>
 		public RootElement (string caption, RadioGroup radio) : base (caption)
 		{
 			this.radio = radio;
 		}
 		
+		internal List<Section> Sections = new List<Section> ();
+
 		internal NSIndexPath PathForRadio (int idx)
 		{
 			if (radio == null)
@@ -522,6 +725,12 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		/// <summary>
+		/// Adds a new section to this RootElement
+		/// </summary>
+		/// <param name="section">
+		/// The section to add
+		/// </param>
 		public void Add (Section section)
 		{
 			if (section == null)
@@ -531,12 +740,21 @@ namespace MonoTouch.Dialog
 			section.Parent = this;
 		}
 
+		/// <summary>
+		/// Enumerator that returns all the sections in the RootElement.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="IEnumerator"/>
+		/// </returns>
 		public IEnumerator GetEnumerator ()
 		{
 			foreach (var s in Sections)
 				yield return s;
 		}
 
+		/// <summary>
+		/// The currently selected Radio item in the whole Root.
+		/// </summary>
 		public int RadioSelected {
 			get {
 				if (radio != null)
