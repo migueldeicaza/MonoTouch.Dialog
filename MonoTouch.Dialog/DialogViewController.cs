@@ -9,6 +9,7 @@ namespace MonoTouch.Dialog
 		UITableView tableView;
 		RootElement root;
 		bool pushing;
+		bool dirty;
 		
 		class Source : UITableViewSource {
 			DialogViewController container;
@@ -60,6 +61,8 @@ namespace MonoTouch.Dialog
 
 		public void ActivateController (UIViewController controller)
 		{
+			dirty = true;
+			
 			var parent = ParentViewController;
 			var nav = parent as UINavigationController;
 			if (nav != null)
@@ -85,6 +88,10 @@ namespace MonoTouch.Dialog
 			NavigationItem.HidesBackButton = !pushing;
 			if (root.Caption != null)
 				NavigationItem.Title = root.Caption;
+			if (dirty){
+				tableView.ReloadData ();
+				dirty = false;
+			}
 		}
 
 		void PrepareRoot (RootElement root)
