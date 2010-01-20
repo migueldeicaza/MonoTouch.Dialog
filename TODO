@@ -19,10 +19,6 @@ Widgets:
 	Image Chooser
 
 Reflection binder:
-	Create the Element tree and then set the values back after editing.
-
-	Support enums and map those to radio buttons.
-
 	Support Collections as a source that becomes a radio button
 	And support a [RadioSelect] property on an int to map
 	that to the selected value
