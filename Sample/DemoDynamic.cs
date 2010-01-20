@@ -19,6 +19,7 @@ namespace Sample
 	public partial class AppDelegate 
 	{
 		DialogViewController dynamic;
+		BindingContext context;
 		AccountInfo account;
 		
 		class AccountInfo {
@@ -35,14 +36,25 @@ namespace Sample
 			public string Login;
 		}
 		
-		static void SetBusy (bool activity)
-		{
-			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = activity;
+		bool Busy {
+			get {
+				return UIApplication.SharedApplication.NetworkActivityIndicatorVisible;
+			}
+			set {
+				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = value;
+			}
 		}
 		
 		public void FetchTweets ()
 		{
-			SetBusy (true);
+			if (Busy)
+				return;
+			
+			Busy = true;
+
+			// Fetch the edited values.
+			context.Fetch ();
+			
 			var request = (HttpWebRequest)WebRequest.Create ("http://twitter.com/statuses/friends_timeline.xml");
 			request.Credentials = new NetworkCredential (account.Username, account.Password);
 			request.BeginGetResponse (TimeLineLoaded, request);
@@ -63,7 +75,7 @@ namespace Sample
 					new Section ("Profile"){
 						new StringElement ("Screen name", users [i].XPathSelectElement ("./screen_name").Value),
 						new StringElement ("Name", people [i]),
-						new StringElement ("Followers:", users [i].XPathSelectElement ("./followers_count").Value)
+						new StringElement ("oFllowers:", users [i].XPathSelectElement ("./followers_count").Value)
 					},
 					new Section ("Tweet"){
 						new StringElement (texts [i])
@@ -78,10 +90,12 @@ namespace Sample
 		void TimeLineLoaded (IAsyncResult result)
 		{
 			var request = result.AsyncState as HttpWebRequest;
+			Busy = false;
+				
 			try {
 				var response = request.EndGetResponse (result);
 				var stream = response.GetResponseStream ();
-				SetBusy (false);
+
 				
 				var root = CreateDynamicContent (XDocument.Load (new XmlTextReader (stream)));
 				InvokeOnMainThread (delegate {
@@ -102,12 +116,12 @@ namespace Sample
 		{
 			account = new AccountInfo ();
 			
-			var bc = new BindingContext (this, account, "Settings");
+			context = new BindingContext (this, account, "Settings");
 
 			if (dynamic != null)
 				dynamic.Dispose ();
 			
-			dynamic = new DialogViewController (bc.Root, true);
+			dynamic = new DialogViewController (context.Root, true);
 			navigation.PushViewController (dynamic, true);				
 		}
 	}

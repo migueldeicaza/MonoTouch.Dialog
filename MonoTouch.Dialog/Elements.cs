@@ -482,9 +482,10 @@ namespace MonoTouch.Dialog
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
-				entry.ShouldReturn += delegate {
+				entry.Ended += delegate {
 					Value = entry.Text;
-					
+				};
+				entry.ShouldReturn += delegate {
 					EntryElement focus = null;
 					foreach (var e in (Parent as Section).Elements){
 						if (e == this)
@@ -561,12 +562,12 @@ namespace MonoTouch.Dialog
 			return picker;
 		}
 		                                                                                                                                
-        static RectangleF PickerFrameWithSize (SizeF size)                                                                                          
-        {                                                                                                                                    
-                var screenRect = UIScreen.MainScreen.ApplicationFrame;                                                                       
-                return new RectangleF (0f, screenRect.Height - 84f - size.Height, size.Width, size.Height);                                  
-        }                                                                                                                                    
-                 
+		static RectangleF PickerFrameWithSize (SizeF size)
+		{                                                                                                                                    
+			var screenRect = UIScreen.MainScreen.ApplicationFrame;
+			return new RectangleF (0f, screenRect.Height - 84f - size.Height, size.Width, size.Height);
+		}                                                                                                                                    
+
 		class MyViewController : UIViewController {
 			DateTimeElement container;
 			
@@ -635,6 +636,14 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Sections contain individual Element instances that are rendered by MonoTouch.Dialog
 	/// </summary>
+	/// <remarks>
+	/// Sections are used to group elements in the screen and they are the
+	/// only valid direct child of the RootElement.    Sections can contain
+	/// any of the standard elements, including new RootElements.
+	/// 
+	/// RootElements embedded in a section are used to navigate to a new
+	/// deeper level.
+	/// </remarks>
 	public class Section : Element, IEnumerable {
 		public string Header, Footer;
 		public List<Element> Elements = new List<Element> ();

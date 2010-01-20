@@ -74,6 +74,15 @@ namespace MonoTouch.Dialog
 		public string Caption, Footer;
 	}
 
+	public class RangeAttribute : Attribute {
+		public RangeAttribute (float low, float high)
+		{
+			Low = low;
+			High = high;
+		}
+		public float Low, High;
+	}
+
 	public class BindingContext : IDisposable {
 		public RootElement Root;
 		Dictionary<Element,MemberAndInstance> mappings;
@@ -216,7 +225,16 @@ namespace MonoTouch.Dialog
 					if (invoke != null)
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
-					element = new FloatElement (null, null, (float) GetValue (mi, o));
+					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
+					element = floatElement;
+					
+					foreach (object attr in attrs){
+						if (attr is RangeAttribute){
+							var ra = attr as RangeAttribute;
+							floatElement.MinValue = ra.Low;
+							floatElement.MaxValue = ra.High;
+						}
+					}
 				} else if (mType == typeof (bool)){
 					element = new BooleanElement (caption, (bool) GetValue (mi, o));
 				} else if (mType == typeof (DateTime)){
