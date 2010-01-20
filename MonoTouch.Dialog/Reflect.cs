@@ -194,6 +194,10 @@ namespace MonoTouch.Dialog
 						if (attr is OnTapAttribute){
 							string mname = ((OnTapAttribute) attr).Method;
 							
+							if (callbacks == null){
+								throw new Exception ("Your class contains [OnTap] attributes, but you passed a null object for `context' in the constructor");
+							}
+							
 							var method = callbacks.GetType ().GetMethod (mname);
 							if (method == null)
 								throw new Exception ("Did not find method " + mname);
