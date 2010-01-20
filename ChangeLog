@@ -5,6 +5,8 @@
 
 	* Main.cs: Use our own dialogs as a menu selector.
 
+	* Reflect.cs: Add support for rendering enumerations as radios.
+					 
 	* Reflect.cs: Add Reflecting API.
 
 2010-01-18  Miguel de Icaza  <miguel@novell.com>
