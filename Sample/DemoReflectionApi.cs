@@ -37,12 +37,12 @@ namespace Sample
 	
 	public partial class AppDelegate 
 	{
-		Settings s;
+		Settings settings;
 		
 		public void DemoReflectionApi ()
 		{	
-			if (s == null){
-				s = new Settings () {
+			if (settings == null){
+				settings = new Settings () {
 					AccountEnabled = true,
 					Login = "postmater@localhost.com",
 					Appointment = DateTime.Now,
@@ -51,7 +51,7 @@ namespace Sample
 					FavoriteType = TypeCode.Int32
 				};
 			}
-			var bc = new BindingContext (s, "Settings");
+			var bc = new BindingContext (null, settings, "Settings");
 			
 			var dv = new DialogViewController (bc.Root, true);
 			
@@ -70,8 +70,8 @@ namespace Sample
 				    "Birthday:       {4}\n" +
 				    "Alarm:          {5}\n" +
 				    "Favorite Type:  {6}\n", 
-				    s.AccountEnabled, s.Login, s.Password, 
-				    s.Appointment, s.Birthday, s.Alarm, s.FavoriteType);
+				    settings.AccountEnabled, settings.Login, settings.Password, 
+				    settings.Appointment, settings.Birthday, settings.Alarm, settings.FavoriteType);
 			};
 			navigation.PushViewController (dv, true);	
 		}

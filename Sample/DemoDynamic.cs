@@ -1,3 +1,10 @@
+//
+// This sample shows how to create data dynamically based on the
+// responses from a remote server.
+//
+// It uses the BindingContext API for the login screen (we might
+// as well) and the Element tree API for the actual tweet contents
+//
 using System;
 using System.Net;
 using System.Linq;

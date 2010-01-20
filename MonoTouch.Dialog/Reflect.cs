@@ -40,6 +40,15 @@ namespace MonoTouch.Dialog
 	}
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class OnTapAttribute : Attribute {
+		public OnTapAttribute (string method)
+		{
+			Method = method;
+		}
+		public string Method;
+	}
+	
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class CaptionAttribute : Attribute {
 		public CaptionAttribute (string caption)
 		{
@@ -134,8 +143,11 @@ namespace MonoTouch.Dialog
 			return null;
 		}
 		
-		public BindingContext (object o, string title)
+		public BindingContext (object callbacks, object o, string title)
 		{
+			if (o == null)
+				throw new ArgumentNullException ("o");
+			
 			mappings = new Dictionary<Element,MemberAndInstance> ();
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
@@ -171,12 +183,24 @@ namespace MonoTouch.Dialog
 				if (mType == typeof (string)){
 					PasswordAttribute pa = null;
 					EntryAttribute ea = null;
+					NSAction invoke = null;
 					
 					foreach (object attr in attrs){
 						if (attr is PasswordAttribute)
 							pa = attr as PasswordAttribute;
 						else if (attr is EntryAttribute)
 							ea = attr as EntryAttribute;
+						
+						if (attr is OnTapAttribute){
+							string mname = ((OnTapAttribute) attr).Method;
+							
+							var method = callbacks.GetType ().GetMethod (mname);
+							if (method == null)
+								throw new Exception ("Did not find method " + mname);
+							invoke = delegate {
+								method.Invoke (method.IsStatic ? null : callbacks, new object [0]);
+							};
+						}
 					}
 					
 					if (pa != null)
@@ -185,6 +209,8 @@ namespace MonoTouch.Dialog
 						element = new EntryElement (caption, ea.Placeholder, (string) GetValue (mi, o));
 					else
 						element = new StringElement (caption, (string) GetValue (mi, o));
+					if (invoke != null)
+						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
 					element = new FloatElement (null, null, (float) GetValue (mi, o));
 				} else if (mType == typeof (bool)){

@@ -25,3 +25,6 @@ Reflection binder:
 
 Ponder:
 	When to support pickers?
+
+Add an Element that supports multi-line text
+Add an Element that supports dingus-clicking with multi-line text.
