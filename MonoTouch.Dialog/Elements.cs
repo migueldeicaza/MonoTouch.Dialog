@@ -302,12 +302,12 @@ namespace MonoTouch.Dialog
 			Value = value;
 		}
 		
-		public StringElement (string caption, EventHandler tapped) : base (caption)
+		public StringElement (string caption,  NSAction tapped) : base (caption)
 		{
 			Tapped += tapped;
 		}
 		
-		public event EventHandler Tapped;
+		public event NSAction Tapped;
 		
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -333,7 +333,7 @@ namespace MonoTouch.Dialog
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
 		{
 			if (Tapped != null)
-				Tapped (this, EventArgs.Empty);
+				Tapped ();
 			tableView.DeselectRow (indexPath, true);
 		}
 	}
@@ -475,10 +475,10 @@ namespace MonoTouch.Dialog
 				SizeF size = ComputeEntryPosition (tv, cell);
 				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
-					Placeholder = placeholder
-		
+					Placeholder = placeholder,
+					SecureTextEntry = isPassword
 				};
-				
+				entry.Text = Value ?? "";
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
@@ -512,6 +512,123 @@ namespace MonoTouch.Dialog
 				entry.Dispose ();
 				entry = null;
 			}
+		}
+	}
+	
+	public class DateTimeElement : StringElement {
+		public DateTime DateValue;
+		public UIDatePicker datePicker;
+		protected internal NSDateFormatter fmt = new NSDateFormatter () {
+			DateStyle = NSDateFormatterStyle.Short
+		};
+		
+		public DateTimeElement (string caption, DateTime date) : base (caption)
+		{
+			DateValue = date;
+			Value = FormatDate (date);
+		}	
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			Value = FormatDate (DateValue);
+			return base.GetCell (tv);
+		}
+ 
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+			if (disposing){
+				fmt.Dispose ();
+				fmt = null;
+				if (datePicker != null){
+					datePicker.Dispose ();
+					datePicker = null;
+				}
+			}
+		}
+		
+		public virtual string FormatDate (DateTime dt)
+		{
+			return fmt.ToString (dt) + " " + dt.ToLocalTime ().ToShortTimeString ();
+		}
+		
+		public virtual UIDatePicker CreatePicker ()
+		{
+			var picker = new UIDatePicker (RectangleF.Empty){
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
+				Mode = UIDatePickerMode.Date
+			};
+			return picker;
+		}
+		                                                                                                                                
+        static RectangleF PickerFrameWithSize (SizeF size)                                                                                          
+        {                                                                                                                                    
+                var screenRect = UIScreen.MainScreen.ApplicationFrame;                                                                       
+                return new RectangleF (0f, screenRect.Height - 84f - size.Height, size.Width, size.Height);                                  
+        }                                                                                                                                    
+                 
+		class MyViewController : UIViewController {
+			DateTimeElement container;
+			
+			public MyViewController (DateTimeElement container)
+			{
+				this.container = container;
+			}
+			
+			public override void ViewWillDisappear (bool animated)
+			{
+				base.ViewWillDisappear (animated);
+				container.DateValue = container.datePicker.Date;
+			}
+		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			var vc = new MyViewController (this);
+			datePicker = CreatePicker ();
+			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
+			                            
+			vc.View.BackgroundColor = UIColor.Black;
+			vc.View.AddSubview (datePicker);
+			dvc.ActivateController (vc);
+		}
+	}
+	
+	public class DateElement : DateTimeElement {
+		public DateElement (string caption, DateTime date) : base (caption, date)
+		{
+			fmt.DateStyle = NSDateFormatterStyle.Medium;
+		}
+		
+		public override string FormatDate (DateTime dt)
+		{
+			return fmt.ToString (dt);
+		}
+		
+		public override UIDatePicker CreatePicker ()
+		{
+			var picker = base.CreatePicker ();
+			picker.Mode = UIDatePickerMode.Date;
+			return picker;
+		}
+	}
+	
+	public class TimeElement : DateTimeElement {
+		public TimeElement (string caption, DateTime date) : base (caption, date)
+		{
+		}
+		
+		public override string FormatDate (DateTime dt)
+		{
+			Console.WriteLine (dt.ToShortTimeString () + " - " + dt.ToLongTimeString ());
+			return dt.ToLocalTime ().ToShortTimeString ();
+		}
+		
+		public override UIDatePicker CreatePicker ()
+		{
+			var picker = base.CreatePicker ();
+			picker.Mode = UIDatePickerMode.Time;
+			return picker;
 		}
 	}
 	

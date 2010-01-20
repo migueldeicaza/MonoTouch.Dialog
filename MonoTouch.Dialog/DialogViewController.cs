@@ -85,6 +85,7 @@ namespace MonoTouch.Dialog
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			
 			NavigationItem.HidesBackButton = !pushing;
 			if (root.Caption != null)
 				NavigationItem.Title = root.Caption;
@@ -93,6 +94,16 @@ namespace MonoTouch.Dialog
 				dirty = false;
 			}
 		}
+		
+		public event EventHandler ViewDissapearing;
+		
+		public override void ViewWillDisappear (bool animated)
+		{
+			base.ViewWillDisappear (animated);
+			if (ViewDissapearing != null)
+				ViewDissapearing (this, EventArgs.Empty);
+		}
+
 
 		void PrepareRoot (RootElement root)
 		{
@@ -105,7 +116,7 @@ namespace MonoTouch.Dialog
 			PrepareRoot (root);
 		}
 		
-		internal DialogViewController (RootElement root, bool pushing)
+		public DialogViewController (RootElement root, bool pushing)
 		{
 			PrepareRoot (root);
 			this.pushing = pushing;

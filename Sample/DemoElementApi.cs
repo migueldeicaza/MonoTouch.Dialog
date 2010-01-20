@@ -13,8 +13,8 @@ namespace Sample
 		{
 			var root = CreateRoot ();
 				
-			var dv = new DialogViewController (root);
-			navigation.PushViewController (dv, false);				
+			var dv = new DialogViewController (root, true);
+			navigation.PushViewController (dv, true);				
 		}
 
 		RootElement CreateRoot ()
@@ -40,6 +40,8 @@ namespace Sample
 				new Section () {
 					new EntryElement ("Login", "Your login name", "miguel"),
 					new EntryElement ("Password", "Your password", "password", true),
+					new DateElement ("Select Date", DateTime.Now),
+					new TimeElement ("Select Time", DateTime.Now),
 				},
 				new Section () {
 					CreateGeneralSection (),		

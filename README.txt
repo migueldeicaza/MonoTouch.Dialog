@@ -11,6 +11,7 @@ navigation controllers that support:
 	* Password Entry
 	* Jump to HTML page
 	* Radio elements.
+	* Dates, Times and Dates+Times.
 
 There are two layers, one is the tree API in Element.cs and a
 second layer will be map .NET classes that have been decoared with
@@ -26,6 +27,8 @@ variable name (the fields airplaneMode, AirplaneMode and airplane_mode
 all become "Airplane Mode").   Attributes are used to create sections
 in the class:
 
+	enum SeatPreference { Window, Aisle, MiddleSeat }
+
 	class Settings {
 		[Section]
 		bool AirplaneMode;
@@ -37,6 +40,9 @@ in the class:
 		
 		[Caption ("Password"), Password ("Enter your password")]
 		string passwd;
+
+		[Caption ("An Enumeration")]
+		SeatPreference preference;
 	}
 
 

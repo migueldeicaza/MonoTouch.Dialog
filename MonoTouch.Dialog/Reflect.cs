@@ -123,6 +123,16 @@ namespace MonoTouch.Dialog
 			}
 			return sb.ToString ();
 		}
+
+		// Returns the type for fields and properties and null for everything else
+		static Type GetTypeForMember (MemberInfo mi)
+		{				
+			if (mi is FieldInfo)
+				return ((FieldInfo) mi).FieldType;
+			else if (mi is PropertyInfo)
+				return ((PropertyInfo) mi).PropertyType;
+			return null;
+		}
 		
 		public BindingContext (object o, string title)
 		{
@@ -134,13 +144,9 @@ namespace MonoTouch.Dialog
 			Section section = null;
 			
 			foreach (var mi in members){
-				Type mType;
+				Type mType = GetTypeForMember (mi);
 
-				if (mi is FieldInfo)
-					mType = ((FieldInfo) mi).FieldType;
-				else if (mi is PropertyInfo)
-					mType = ((PropertyInfo) mi).PropertyType;
-				else
+				if (mType == null)
 					continue;
 
 				string caption = null;
@@ -200,6 +206,23 @@ namespace MonoTouch.Dialog
 						element = new TimeElement (caption, dateTime);
 					else
 						 element = new DateTimeElement (caption, dateTime);
+				} else if (mType.IsEnum){
+					var csection = new Section ();
+					ulong evalue = Convert.ToUInt64 (GetValue (mi, o), null);
+					int idx = 0;
+					int selected = 0;
+					
+					foreach (var fi in mType.GetFields (BindingFlags.Public | BindingFlags.Static)){
+						ulong v = Convert.ToUInt64 (GetValue (fi, null));
+						
+						if (v == evalue)
+							selected = idx;
+						
+						csection.Add (new RadioElement (fi.Name));
+						idx++;
+					}
+					
+					element = new RootElement (caption, new RadioGroup (null, selected)) { csection };
 				}
 				
 				if (element == null)
@@ -240,6 +263,15 @@ namespace MonoTouch.Dialog
 					SetValue (mi, obj, ((BooleanElement) element).Value);
 				else if (element is EntryElement)
 					SetValue (mi, obj, ((EntryElement) element).Value);
+				else if (element is RootElement){
+					var re = element as RootElement;
+					if (re.radio != null){
+						var mType = GetTypeForMember (mi);
+						var fi = mType.GetFields (BindingFlags.Public | BindingFlags.Static) [re.RadioSelected];
+						
+						SetValue (mi, obj, fi.GetValue (null));
+					}
+				}
 			}
 		}
 	}
