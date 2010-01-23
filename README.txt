@@ -153,7 +153,16 @@ These are the current widgets supported by the Reflection API:
 		public string passwd;
 
     On/off switches
-	Use a bool value to store an on/off setting.
+	Use a bool value to store an on/off setting, by default you
+	will get an On/off switch, but you can change this behavior to
+	just show a checkbox instead by using the [Checkbox] attribute:
+
+	Examples:
+
+		bool OnOffSwitch;
+
+		[Checkbox]
+		bool ReadyToRun;
 
     Float values
 	Using a float in your source will provide a slider on the 
@@ -281,10 +290,16 @@ of the display.
 RootElements are also used to coordinate radio elements.  The
 RadioElement members can span multiple Sections (for example to
 implement something similar to the ring tone selector and separate
-custom ring tones from system ringtones).
+custom ring tones from system ringtones).   The summary view will show
+the radio element that is currently selected.
 
 Sections are added by calling the Add method which supports the
 C# 4.0 syntax to initialize a RootElement in one pass.
+
+If you create the RootElement with a Group instance (instead of a
+RadioGroup) the summary value of the RootElement when displayed in a
+Section will be the cummulative count of all the BooleanElements and
+CheckboxElements that have the same key as the Group.Key value.
 
 Sections
 --------
@@ -303,6 +318,7 @@ MonoTouch.Dialog comes with various standard elements that you can
 use:
 
 	* BooleanElement
+	* CheckboxElement
 	* FloatElement
 	* HtmlElement (to load web pages)
 	* StringElement

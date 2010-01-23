@@ -226,8 +226,21 @@ namespace Sample
 							new BooleanElement ("\".\" Shortcut", true),
 						},
 						new Section (){
-							// Missing feature: multiple-checkboxes
-							new StringElement ("International Keyboards", "2")
+							new RootElement ("International Keyboards", new Group ("kbd")){
+								new Section ("Using Checkboxes"){
+									new CheckboxElement ("English", true, "kbd"),
+									new CheckboxElement ("Spanish", false, "kbd"),
+									new CheckboxElement ("French", false, "kbd"),
+								},
+								new Section ("Using BooleanElement"){
+									new BooleanElement ("Portuguese", true, "kbd"),
+									new BooleanElement ("German", false, "kbd"),
+								},
+								new Section ("Or mixing them"){
+									new BooleanElement ("Italian", true, "kbd"),
+									new CheckboxElement ("Czech", true, "kbd"),
+								}
+							}
 						}
 					}
 				}

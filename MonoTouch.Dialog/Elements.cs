@@ -102,12 +102,18 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class BooleanElement : Element {
 		public bool Value;
+		public string Key;
 		static NSString bkey = new NSString ("BooleanElement");
 		UISwitch sw;
 		
 		public BooleanElement (string caption, bool value) : base (caption)
 		{
 			Value = value;
+		}
+		
+		public BooleanElement (string caption, bool value, string key) : this (caption, value)
+		{
+			Key = key;
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -132,7 +138,7 @@ namespace MonoTouch.Dialog
 		
 			cell.TextLabel.Text = Caption;
 			cell.ContentView.AddSubview (sw);
-			
+
 			return cell;
 		}
 		
@@ -357,7 +363,10 @@ namespace MonoTouch.Dialog
 			var cell = base.GetCell (tv);			
 			var root = (RootElement) Parent.Parent;
 			
-			bool selected = RadioIdx == root.radio.Selected;
+			if (!(root.group is RadioGroup))
+				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
+			
+			bool selected = RadioIdx == ((RadioGroup)(root.group)).Selected;
 			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
 
 			return cell;
@@ -376,6 +385,42 @@ namespace MonoTouch.Dialog
 			
 			base.Selected (dvc, tableView, indexPath);
 		}
+	}
+	
+	public class CheckboxElement : StringElement {
+		public bool Value;
+		public string Group;
+		
+		public CheckboxElement (string caption) : base (caption) {}
+		public CheckboxElement (string caption, bool value) : base (caption)
+		{
+			Value = value;
+		}
+		
+		public CheckboxElement (string caption, bool value, string group) : this (caption, value)
+		{
+			Group = group;
+		}
+		
+		UITableViewCell ConfigCell (UITableViewCell cell)
+		{
+			cell.Accessory = Value ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			return cell;
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			return  ConfigCell (base.GetCell (tv));
+		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			Value = !Value;
+			var cell = tableView.CellAt (path);
+			ConfigCell (cell);
+			base.Selected (dvc, tableView, path);
+		}
+
 	}
 	
 	/// <summary>
@@ -717,19 +762,29 @@ namespace MonoTouch.Dialog
 	}
 	
 	/// <summary>
+	/// Used by root elements to fetch information when they need to
+	/// render a summary (Checkbox count or selected radio group).
+	/// </summary>
+	public class Group {
+		public string Key;
+		public Group (string key)
+		{
+			Key = key;
+		}
+	}
+	/// <summary>
 	/// Captures the information about mutually exclusive elements in a RootElement
 	/// </summary>
-	public class RadioGroup {
+	public class RadioGroup : Group {
 		public string Key;
 		public int Selected;
 		
-		public RadioGroup (string key, int selected)
+		public RadioGroup (string key, int selected) : base (key)
 		{
-			Key = key;
 			Selected = selected;
 		}
 		
-		public RadioGroup (int selected)
+		public RadioGroup (int selected) : base (null)
 		{
 			Selected = selected;
 		}
@@ -763,7 +818,7 @@ namespace MonoTouch.Dialog
 	public class RootElement : Element, IEnumerable {
 		static NSString rkey = new NSString ("RootElement");
 		int summarySection, summaryElement;
-		internal RadioGroup radio;
+		internal Group group;
 		
 		/// <summary>
 		///  Initializes a RootSection with a caption
@@ -801,18 +856,20 @@ namespace MonoTouch.Dialog
 		/// <param name="caption">
 		/// The caption to ender
 		/// </param>
-		/// <param name="radio">
-		/// The radio group that contains the radio information
+		/// <param name="group">
+		/// The group that contains the checkbox or radio information.  This is used to display
+		/// the summary information when a RootElement is rendered inside a section.
 		/// </param>
-		public RootElement (string caption, RadioGroup radio) : base (caption)
+		public RootElement (string caption, Group group) : base (caption)
 		{
-			this.radio = radio;
+			this.group = group;
 		}
 		
 		internal List<Section> Sections = new List<Section> ();
 
 		internal NSIndexPath PathForRadio (int idx)
 		{
+			RadioGroup radio = group as RadioGroup;
 			if (radio == null)
 				return null;
 			
@@ -824,8 +881,9 @@ namespace MonoTouch.Dialog
 					if (!(e is RadioElement))
 						continue;
 					
-					if (current == idx)
+					if (current == idx){
 						return new NSIndexPath ().FromIndexes (new uint [] { section, row});
+					}
 					row++;
 					current++;
 				}
@@ -836,6 +894,7 @@ namespace MonoTouch.Dialog
 			
 		internal void Prepare ()
 		{
+			var radio = group as RadioGroup;
 			if (radio == null)
 				return;
 			
@@ -883,11 +942,13 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public int RadioSelected {
 			get {
+				var radio = group as RadioGroup;
 				if (radio != null)
 					return radio.Selected;
 				return -1;
 			}
 			set {
+				var radio = group as RadioGroup;
 				if (radio != null)
 					radio.Selected = value;
 			}
@@ -904,6 +965,7 @@ namespace MonoTouch.Dialog
 			} 
 		
 			cell.TextLabel.Text = Caption;
+			var radio = group as RadioGroup;
 			if (radio != null){
 				int selected = radio.Selected;
 				int current = 0;
@@ -920,11 +982,31 @@ namespace MonoTouch.Dialog
 						current++;
 					}
 				}
+			} else if (group != null){
+				int count = 0;
+				
+				foreach (var s in Sections){
+					foreach (var e in s.Elements){
+						var ce = e as CheckboxElement;
+						if (ce != null){
+							if (ce.Value)
+								count++;
+							continue;
+						}
+						var be = e as BooleanElement;
+						if (be != null){
+							if (be.Value)
+								count++;
+							continue;
+						}
+					}
+				}
+				cell.DetailTextLabel.Text = count.ToString ();
 			} else if (summarySection != -1 && summarySection < Sections.Count){
 					var s = Sections [summarySection];
 					if (summaryElement < s.Elements.Count)
 						cell.DetailTextLabel.Text = s.Elements [summaryElement].Summary ();
-			}
+			} 
 		le:
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			

@@ -35,6 +35,9 @@ namespace MonoTouch.Dialog
 	public class TimeAttribute : Attribute { }
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class CheckboxAttribute : Attribute {}
+	
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class PasswordAttribute : EntryAttribute {
 		public PasswordAttribute (string placeholder) : base (placeholder) {}
 	}
@@ -236,7 +239,16 @@ namespace MonoTouch.Dialog
 						}
 					}
 				} else if (mType == typeof (bool)){
-					element = new BooleanElement (caption, (bool) GetValue (mi, o));
+					bool checkbox = false;
+					foreach (object attr in attrs){
+						if (attr is CheckboxAttribute)
+							checkbox = true;
+					}
+					
+					if (checkbox)
+						element = new CheckboxElement (caption, (bool) GetValue (mi, o));
+					else
+						element = new BooleanElement (caption, (bool) GetValue (mi, o));
 				} else if (mType == typeof (DateTime)){
 					var dateTime = (DateTime) GetValue (mi, o);
 					bool asDate = false, asTime = false;
@@ -309,11 +321,13 @@ namespace MonoTouch.Dialog
 					SetValue (mi, obj, ((FloatElement) element).Value);
 				else if (element is BooleanElement)
 					SetValue (mi, obj, ((BooleanElement) element).Value);
+				else if (element is CheckboxElement)
+					SetValue (mi, obj, ((CheckboxElement) element).Value);
 				else if (element is EntryElement)
 					SetValue (mi, obj, ((EntryElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;
-					if (re.radio != null){
+					if (re.group as RadioGroup != null){
 						var mType = GetTypeForMember (mi);
 						var fi = mType.GetFields (BindingFlags.Public | BindingFlags.Static) [re.RadioSelected];
 						

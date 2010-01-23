@@ -33,6 +33,13 @@ namespace Sample
 		
 		[Caption ("Favorite CLR type")]
 		public TypeCode FavoriteType;
+		
+	[Section ("Checkboxes")]
+		[Checkbox]
+		bool English;
+		
+		[Checkbox]
+		bool Spanish = true;
 	}
 	
 	public partial class AppDelegate 
