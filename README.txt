@@ -208,6 +208,14 @@ These are the current widgets supported by the Reflection API:
 	    [Caption ("Seat Preference")]
 	    SeatPreference seat;
 
+    Images
+	Variables with type UIImage will render the image as a 
+	thumbnail and will invoke the image picker if tapped on.
+
+	Examples:
+
+		UIImage ProfilePicture;
+
 Creating a Dialog From the Object
 ---------------------------------
 
@@ -321,6 +329,7 @@ use:
 	* CheckboxElement
 	* FloatElement
 	* HtmlElement (to load web pages)
+	* ImageElement (to pick images)
 	* StringElement
 	  To render static strings
 	  To render strings with a read-only value.
