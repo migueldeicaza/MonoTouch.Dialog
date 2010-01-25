@@ -87,4 +87,7 @@
       <Properties InternalTargetFrameworkVersion="IPhone" />
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <Content Include="monodevelop-32.png" />
+  </ItemGroup>
 </Project>

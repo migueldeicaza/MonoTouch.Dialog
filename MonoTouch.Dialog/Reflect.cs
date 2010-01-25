@@ -283,6 +283,8 @@ namespace MonoTouch.Dialog
 					}
 					
 					element = new RootElement (caption, new RadioGroup (null, selected)) { csection };
+				} else if (mType == typeof (UIImage)){
+					element = new ImageElement ((UIImage) GetValue (mi, o));
 				}
 				
 				if (element == null)
@@ -325,6 +327,8 @@ namespace MonoTouch.Dialog
 					SetValue (mi, obj, ((CheckboxElement) element).Value);
 				else if (element is EntryElement)
 					SetValue (mi, obj, ((EntryElement) element).Value);
+				else if (element is ImageElement)
+					SetValue (mi, obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;
 					if (re.group as RadioGroup != null){

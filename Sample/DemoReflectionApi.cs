@@ -40,6 +40,11 @@ namespace Sample
 		
 		[Checkbox]
 		bool Spanish = true;
+		
+	[Section ("Image Selection")]
+		public UIImage Top;
+		public UIImage Middle;
+		public UIImage Bottom;
 	}
 	
 	public partial class AppDelegate 
@@ -49,13 +54,18 @@ namespace Sample
 		public void DemoReflectionApi ()
 		{	
 			if (settings == null){
+				var image = UIImage.FromFile ("monodevelop-32.png");
+				
 				settings = new Settings () {
 					AccountEnabled = true,
 					Login = "postmater@localhost.com",
 					Appointment = DateTime.Now,
 					Birthday = new DateTime (1980, 6, 24),
 					Alarm = new DateTime (2000, 1, 1, 7, 30, 0, 0),
-					FavoriteType = TypeCode.Int32
+					FavoriteType = TypeCode.Int32,
+					Top = image,
+					Middle = image,
+					Bottom = image
 				};
 			}
 			var bc = new BindingContext (null, settings, "Settings");

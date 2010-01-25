@@ -12,6 +12,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
 
@@ -421,6 +422,142 @@ namespace MonoTouch.Dialog
 			base.Selected (dvc, tableView, path);
 		}
 
+	}
+	
+	public class ImageElement : Element {
+		public UIImage Value;
+		static RectangleF rect = new RectangleF (0, 0, dim, dim);
+		static NSString ikey = new NSString ("ikey");
+		UIImage scaled;
+		
+		// Apple leaks this one, so share across all.
+		static UIImagePickerController picker;
+		
+		// Height for rows
+		const int dim = 43;
+		
+		// radius for rounding
+		const int rad = 10;
+		
+		static UIImage MakeEmpty ()
+		{
+			using (var cs = CGColorSpace.CreateDeviceRGB ()){
+				using (var bit = new CGBitmapContext (IntPtr.Zero, dim, dim, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
+					bit.SetRGBStrokeColor (1, 0, 0, 0.5f);
+					bit.FillRect (new RectangleF (0, 0, dim, dim));
+					
+					return UIImage.FromImage (bit.ToImage ());
+				}
+			}
+		}
+		
+		UIImage Scale (UIImage source)
+		{
+			UIGraphics.BeginImageContext (new SizeF (dim, dim));
+			var ctx = UIGraphics.GetCurrentContext ();
+			
+			var size = source.Size;
+			ctx.TranslateCTM (0, dim);
+			ctx.ScaleCTM (1, -1);
+
+
+			ctx.DrawImage (rect, source.CGImage);
+			var ret = UIGraphics.GetImageFromCurrentImageContext ();
+			UIGraphics.EndImageContext ();
+			return ret;
+		}
+		
+		public ImageElement (UIImage image) : base ("")
+		{
+			if (image == null){
+				Value = MakeEmpty ();
+				scaled = Value;
+			} else {
+				Value = image;			
+				scaled = Scale (Value);
+			}
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (ikey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, ikey);
+			}
+			
+			if (scaled == null)
+				return cell;
+			
+			Section psection = Parent as Section;
+			bool roundTop = psection.Elements [0] == this;
+			bool roundBottom = psection.Elements [psection.Elements.Count-1] == this;
+			UIImage result;
+			
+			using (var cs = CGColorSpace.CreateDeviceRGB ()){
+				using (var bit = new CGBitmapContext (IntPtr.Zero, dim, dim, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
+					// Clipping path for the image, different on top, middle and bottom.
+					if (roundBottom){
+						bit.AddArc (rad, rad, rad, (float) Math.PI, (float) (3*Math.PI/2), false);
+					} else {
+						bit.MoveTo (0, rad);
+						bit.AddLineToPoint (0, 0);
+					}
+					bit.AddLineToPoint (dim, 0);
+					bit.AddLineToPoint (dim, dim);
+					
+					if (roundTop){
+						bit.AddArc (rad, dim-rad, rad, (float) (Math.PI/2), (float) Math.PI, false);
+						bit.AddLineToPoint (0, rad);
+					} else {
+						bit.AddLineToPoint (0, dim);
+					}
+					bit.Clip ();
+					bit.DrawImage (rect, scaled.CGImage);
+					
+					cell.ImageView.Image = UIImage.FromImage (bit.ToImage ());
+				}
+			}			
+			return cell;
+		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing){
+				scaled.Dispose ();
+				Value.Dispose ();
+			}
+			base.Dispose (disposing);
+		}
+
+		class MyDelegate : UIImagePickerControllerDelegate {
+			ImageElement container;
+			public MyDelegate (ImageElement container)
+			{
+				this.container = container;
+			}
+			
+			public override void FinishedPickingImage (UIImagePickerController picker, UIImage image, NSDictionary editingInfo)
+			{
+				container.Picked (image);
+			}
+		}
+		
+		void Picked (UIImage image)
+		{
+			Value = image;
+			scaled = Scale (image);
+			currentController.DismissModalViewControllerAnimated (true);
+		}
+		
+		UIViewController currentController;
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			if (picker == null)
+				picker = new UIImagePickerController ();
+			picker.Delegate = new MyDelegate (this);
+			dvc.ActivateController (picker);
+			currentController = dvc;
+		}
 	}
 	
 	/// <summary>

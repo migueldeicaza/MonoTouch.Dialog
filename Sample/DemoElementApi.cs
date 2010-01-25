@@ -36,6 +36,13 @@ namespace Sample
 							new BooleanElement ("Auto-brightness", false),
 						}
 					},
+					new RootElement ("Wallpaper"){
+						new Section (){
+							new ImageElement (null),
+							new ImageElement (null),
+							new ImageElement (null)
+						}
+					}
 				},
 				new Section () {
 					new EntryElement ("Login", "Your login name", "miguel"),

@@ -65,7 +65,9 @@ namespace MonoTouch.Dialog
 			
 			var parent = ParentViewController;
 			var nav = parent as UINavigationController;
-			if (nav != null)
+			
+			// We can not push a nav controller into a nav controller
+			if (nav != null && !(controller is UINavigationController))
 				nav.PushViewController (controller, true);
 			else
 				PresentModalViewController (controller, true);
