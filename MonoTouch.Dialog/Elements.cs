@@ -426,7 +426,7 @@ namespace MonoTouch.Dialog
 	
 	public class ImageElement : Element {
 		public UIImage Value;
-		static RectangleF rect = new RectangleF (0, 0, dim, dim);
+		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ikey");
 		UIImage scaled;
 		
@@ -434,7 +434,8 @@ namespace MonoTouch.Dialog
 		static UIImagePickerController picker;
 		
 		// Height for rows
-		const int dim = 43;
+		const int dimx = 48;
+		const int dimy = 43;
 		
 		// radius for rounding
 		const int rad = 10;
@@ -442,9 +443,9 @@ namespace MonoTouch.Dialog
 		static UIImage MakeEmpty ()
 		{
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
-				using (var bit = new CGBitmapContext (IntPtr.Zero, dim, dim, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
+				using (var bit = new CGBitmapContext (IntPtr.Zero, dimx, dimy, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
 					bit.SetRGBStrokeColor (1, 0, 0, 0.5f);
-					bit.FillRect (new RectangleF (0, 0, dim, dim));
+					bit.FillRect (new RectangleF (0, 0, dimx, dimy));
 					
 					return UIImage.FromImage (bit.ToImage ());
 				}
@@ -453,13 +454,12 @@ namespace MonoTouch.Dialog
 		
 		UIImage Scale (UIImage source)
 		{
-			UIGraphics.BeginImageContext (new SizeF (dim, dim));
+			UIGraphics.BeginImageContext (new SizeF (dimx, dimy));
 			var ctx = UIGraphics.GetCurrentContext ();
 			
 			var size = source.Size;
-			ctx.TranslateCTM (0, dim);
+			ctx.TranslateCTM (0, dimy);
 			ctx.ScaleCTM (1, -1);
-
 
 			ctx.DrawImage (rect, source.CGImage);
 			var ret = UIGraphics.GetImageFromCurrentImageContext ();
@@ -494,7 +494,7 @@ namespace MonoTouch.Dialog
 			UIImage result;
 			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
-				using (var bit = new CGBitmapContext (IntPtr.Zero, dim, dim, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
+				using (var bit = new CGBitmapContext (IntPtr.Zero, dimx, dimy, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
 					// Clipping path for the image, different on top, middle and bottom.
 					if (roundBottom){
 						bit.AddArc (rad, rad, rad, (float) Math.PI, (float) (3*Math.PI/2), false);
@@ -502,14 +502,14 @@ namespace MonoTouch.Dialog
 						bit.MoveTo (0, rad);
 						bit.AddLineToPoint (0, 0);
 					}
-					bit.AddLineToPoint (dim, 0);
-					bit.AddLineToPoint (dim, dim);
+					bit.AddLineToPoint (dimx, 0);
+					bit.AddLineToPoint (dimx, dimy);
 					
 					if (roundTop){
-						bit.AddArc (rad, dim-rad, rad, (float) (Math.PI/2), (float) Math.PI, false);
+						bit.AddArc (rad, dimy-rad, rad, (float) (Math.PI/2), (float) Math.PI, false);
 						bit.AddLineToPoint (0, rad);
 					} else {
-						bit.AddLineToPoint (0, dim);
+						bit.AddLineToPoint (0, dimy);
 					}
 					bit.Clip ();
 					bit.DrawImage (rect, scaled.CGImage);
