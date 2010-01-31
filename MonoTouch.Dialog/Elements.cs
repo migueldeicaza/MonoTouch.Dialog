@@ -456,7 +456,7 @@ namespace MonoTouch.Dialog
 		{
 			UIGraphics.BeginImageContext (new SizeF (dimx, dimy));
 			var ctx = UIGraphics.GetCurrentContext ();
-			
+		
 			var size = source.Size;
 			ctx.TranslateCTM (0, dimy);
 			ctx.ScaleCTM (1, -1);
