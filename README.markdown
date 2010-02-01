@@ -132,6 +132,9 @@ These are the current widgets supported by the Reflection API:
   You can add the [OnTap] attribute to your string 
   to invoke a method on demand.
 
+  You can add the [Multiline] attribute to your string
+  to make the cell render in multiple lines.
+
   Examples:
 
         public string Version = "1.2.3";
@@ -142,8 +145,9 @@ These are the current widgets supported by the Reflection API:
         [Caption ("(C) FooBar, Inc")]
         string copyright;
 
-	[Caption ("This is a\nmultiline caption")]
-	string multiline;
+        [Caption ("This is a\nmultiline caption")]
+        [Multiline]
+        string multiline;
 
 ### Text Entry and Password Entries.###
 
