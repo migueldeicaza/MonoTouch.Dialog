@@ -12,8 +12,8 @@ namespace MonoTouch.Dialog
 		bool dirty;
 		
 		class Source : UITableViewSource {
-			DialogViewController container;
-			RootElement root;
+			protected DialogViewController container;
+			protected RootElement root;
 			
 			public Source (DialogViewController container)
 			{
@@ -56,9 +56,29 @@ namespace MonoTouch.Dialog
 				var element = section.Elements [indexPath.Row];
 
 				element.Selected (container, tableView, indexPath);
-			}
+			}			
 		}
 
+		//
+		// Performance trick, if we expose GetHeightForRow, the UITableView will
+		// probe *every* row for its size;   Avoid this by creating a separate
+		// model that is used only when we have items that require resizing
+		//
+		class SizingSource : Source {
+			public SizingSource (DialogViewController controller) : base (controller) {}
+			
+			public override float GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			{
+				var section = root.Sections [indexPath.Section];
+				var element = section.Elements [indexPath.Row];
+				
+				var sizable = element as IElementSizing;
+				if (sizable == null)
+					return tableView.RowHeight;
+				return sizable.GetHeight (tableView, indexPath);
+			}
+		}
+			
 		public void ActivateController (UIViewController controller)
 		{
 			dirty = true;
@@ -80,7 +100,7 @@ namespace MonoTouch.Dialog
 				AutosizesSubviews = true
 			};
 
-			tableView.Source = new Source (this);
+			tableView.Source = root.UnevenRows ? new SizingSource (this) : new Source (this);
 			View = tableView;
 		}
 

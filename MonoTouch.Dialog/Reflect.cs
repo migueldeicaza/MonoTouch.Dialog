@@ -36,6 +36,9 @@ namespace MonoTouch.Dialog
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class CheckboxAttribute : Attribute {}
+
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class MultilineAttribute : Attribute {}
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class PasswordAttribute : EntryAttribute {
@@ -196,12 +199,15 @@ namespace MonoTouch.Dialog
 					PasswordAttribute pa = null;
 					EntryAttribute ea = null;
 					NSAction invoke = null;
+					bool multi = false;
 					
 					foreach (object attr in attrs){
 						if (attr is PasswordAttribute)
 							pa = attr as PasswordAttribute;
 						else if (attr is EntryAttribute)
 							ea = attr as EntryAttribute;
+						else if (attr is MultilineAttribute)
+							multi = true;
 						
 						if (attr is OnTapAttribute){
 							string mname = ((OnTapAttribute) attr).Method;
@@ -219,12 +225,16 @@ namespace MonoTouch.Dialog
 						}
 					}
 					
+					string value = (string) GetValue (mi, o);
 					if (pa != null)
-						element = new EntryElement (caption, pa.Placeholder, (string) GetValue (mi, o), true);
+						element = new EntryElement (caption, pa.Placeholder, value, true);
 					else if (ea != null)
-						element = new EntryElement (caption, ea.Placeholder, (string) GetValue (mi, o));
+						element = new EntryElement (caption, ea.Placeholder, value);
+					else if (multi)
+						element = new MultilineElement (caption, value);
 					else
-						element = new StringElement (caption, (string) GetValue (mi, o));
+						element = new StringElement (caption, value);
+					
 					if (invoke != null)
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){

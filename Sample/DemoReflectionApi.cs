@@ -45,6 +45,11 @@ namespace Sample
 		public UIImage Top;
 		public UIImage Middle;
 		public UIImage Bottom;
+		
+	[Section ("Multiline")]
+		[Caption ("This is a\nmultiline string\nall you need is the\n[Multiline] attribute")]
+		[Multiline]
+		public string multi;
 	}
 	
 	public partial class AppDelegate 

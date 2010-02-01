@@ -327,8 +327,11 @@ namespace MonoTouch.Dialog
 			cell.Accessory = UITableViewCellAccessory.None;
 			cell.TextLabel.Text = Caption;
 			cell.TextLabel.TextAlignment = Alignment;
-			if (Value != null)
-				cell.DetailTextLabel.Text = Value;
+			
+			// The check is needed because the cell might have been recycled.
+			if (cell.DetailTextLabel != null)
+				cell.DetailTextLabel.Text = Value == null ? "" : Value;
+			
 			return cell;
 		}
 
@@ -342,6 +345,43 @@ namespace MonoTouch.Dialog
 			if (Tapped != null)
 				Tapped ();
 			tableView.DeselectRow (indexPath, true);
+		}
+	}
+	
+	public interface IElementSizing {
+		float GetHeight (UITableView tableView, NSIndexPath indexPath);
+	}
+	
+	public class MultilineElement : StringElement, IElementSizing {
+		static NSString mkey = new NSString ("mkey");
+		
+		public MultilineElement (string caption) : base (caption)
+		{
+		}
+		
+		public MultilineElement (string caption, string value) : base (caption, value)
+		{
+		}
+		
+		public MultilineElement (string caption, NSAction tapped) : base (caption, tapped)
+		{
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = base.GetCell (tv);				
+			var tl = cell.TextLabel;
+			tl.LineBreakMode = UILineBreakMode.WordWrap;
+			tl.Lines = 0;
+
+			return cell;
+		}
+		
+		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		{
+			SizeF size = new SizeF (280, float.MaxValue);
+			using (var font = UIFont.FromName ("Helvetica", 17f))
+				return tableView.StringSize (Caption, font, size, UILineBreakMode.WordWrap).Height + 10;
 		}
 	}
 	
@@ -956,6 +996,7 @@ namespace MonoTouch.Dialog
 		static NSString rkey = new NSString ("RootElement");
 		int summarySection, summaryElement;
 		internal Group group;
+		public bool UnevenRows;
 		
 		/// <summary>
 		///  Initializes a RootSection with a caption
@@ -1031,10 +1072,6 @@ namespace MonoTouch.Dialog
 			
 		internal void Prepare ()
 		{
-			var radio = group as RadioGroup;
-			if (radio == null)
-				return;
-			
 			int current = 0;
 			foreach (Section s in Sections){
 				int maxEntryWidth = -1;
@@ -1043,6 +1080,8 @@ namespace MonoTouch.Dialog
 					var re = e as RadioElement;
 					if (re != null)
 						re.RadioIdx = current++;
+					if (UnevenRows == false && e is IElementSizing)
+						UnevenRows = true;
 				}
 			}
 		}

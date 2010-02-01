@@ -61,7 +61,8 @@ namespace Sample
 					//new RootElement ("Store"), 
 				},
 				new Section () {
-					new HtmlElement ("About", "http://monotouch.net")
+					new HtmlElement ("About", "http://monotouch.net"),
+					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day")
 				}
 			};		
 		}

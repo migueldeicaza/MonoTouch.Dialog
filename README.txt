@@ -132,6 +132,9 @@ These are the current widgets supported by the Reflection API:
 		[Caption ("(C) FooBar, Inc")]
 		string copyright;
 
+		[Caption ("This is a\nmultiline caption")]
+		string multiline;
+
     Text Entry and Password Entries.
         Use the string type for your field and annotate the 
 	string with the [Entry] attribute.   If you provide
@@ -334,6 +337,9 @@ use:
 	  To render static strings
 	  To render strings with a read-only value.
 	  To be used as "buttons", pass a delegate for this.
+	* MultilineElement
+	  Derives from StringElement, used to render multi-line
+	  cells.
 	* RadioElements (to provide a radio-button feature).
 	* EntryElement (to enter one-line text or passwords)
 	* DateTimeElement (to edit dates and times).
