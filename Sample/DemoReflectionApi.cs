@@ -21,13 +21,7 @@ namespace Sample
 		
 	[Section ("Time Editing")]
 		
-		public DateTime Appointment;
-		
-		[Date]
-		public DateTime Birthday;
-		
-		[Time]
-		public DateTime Alarm;
+		public TimeSettings TimeSamples;
 		
 	[Section ("Enumerations")]
 		
@@ -51,6 +45,16 @@ namespace Sample
 		[Multiline]
 		public string multi;
 	}
+
+	public class TimeSettings {
+		public DateTime Appointment;
+		
+		[Date]
+		public DateTime Birthday;
+		
+		[Time]
+		public DateTime Alarm;
+	}
 	
 	public partial class AppDelegate 
 	{
@@ -64,9 +68,11 @@ namespace Sample
 				settings = new Settings () {
 					AccountEnabled = true,
 					Login = "postmater@localhost.com",
-					Appointment = DateTime.Now,
-					Birthday = new DateTime (1980, 6, 24),
-					Alarm = new DateTime (2000, 1, 1, 7, 30, 0, 0),
+					TimeSamples = new TimeSettings () {
+						Appointment = DateTime.Now,
+						Birthday = new DateTime (1980, 6, 24),
+						Alarm = new DateTime (2000, 1, 1, 7, 30, 0, 0)
+					},
 					FavoriteType = TypeCode.Int32,
 					Top = image,
 					Middle = image,
@@ -93,7 +99,7 @@ namespace Sample
 				    "Alarm:          {5}\n" +
 				    "Favorite Type:  {6}\n", 
 				    settings.AccountEnabled, settings.Login, settings.Password, 
-				    settings.Appointment, settings.Birthday, settings.Alarm, settings.FavoriteType);
+				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, settings.TimeSamples.Alarm, settings.FavoriteType);
 			};
 			navigation.PushViewController (dv, true);	
 		}

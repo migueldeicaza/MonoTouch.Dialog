@@ -239,6 +239,38 @@ These are the current widgets supported by the Reflection API:
 
         UIImage ProfilePicture;
 
+### Nested Dialogs ###
+
+  To create nested dialogs just use a nested class, the reflection
+  binder will create the necessary navigation bits based on the
+  container model.
+
+  The value for a nested dialog must not be null.
+
+  Examples:
+
+        class MainSettings {
+	    string Subject;
+	    string RoomName;
+	    TimeRange Time;
+	}
+
+	class TimeRange {
+	    [Time] DateTime Start;
+	    [Time] DateTime End;
+	}
+
+	To initialize:
+
+	new MainSettings () {
+	    Subject = "Review designs",
+	    RoomName = "Conference Room II",
+	    Time = new TimeRange {
+	        Start = DateTime.Now,
+		End   = DateTime.Now
+	    }
+        }
+
 Creating a Dialog From the Object
 ---------------------------------
 

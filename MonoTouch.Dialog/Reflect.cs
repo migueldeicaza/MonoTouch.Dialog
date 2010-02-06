@@ -164,10 +164,16 @@ namespace MonoTouch.Dialog
 				throw new ArgumentNullException ("o");
 			
 			mappings = new Dictionary<Element,MemberAndInstance> ();
+			
+			Root = new RootElement (title);
+			Populate (callbacks, o, Root);
+		}
+		
+		void Populate (object callbacks, object o, RootElement root)
+		{
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
 
-			Root = new RootElement (title);
 			Section section = null;
 			
 			foreach (var mi in members){
@@ -295,6 +301,13 @@ namespace MonoTouch.Dialog
 					element = new RootElement (caption, new RadioGroup (null, selected)) { csection };
 				} else if (mType == typeof (UIImage)){
 					element = new ImageElement ((UIImage) GetValue (mi, o));
+				} else {
+					var nested = GetValue (mi, o);
+					if (nested != null){
+						var newRoot = new RootElement (caption);
+						Populate (callbacks, nested, newRoot);
+						element = newRoot;
+					}
 				}
 				
 				if (element == null)
@@ -302,7 +315,7 @@ namespace MonoTouch.Dialog
 				section.Add (element);
 				mappings [element] = new MemberAndInstance (mi, o);
 			}
-			Root.Add (section);
+			root.Add (section);
 		}
 		
 		public void Dispose ()
