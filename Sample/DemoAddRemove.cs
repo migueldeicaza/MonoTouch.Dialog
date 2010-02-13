@@ -34,8 +34,6 @@ namespace Sample
 		
 		void AddElements ()
 		{
-			int pos = region.Elements.Count;
-
 			region.Insert (rnd.Next (0, region.Elements.Count),
 			               UITableViewRowAnimation.Fade,
 			               new StringElement ("Ding " + count++),

@@ -4,9 +4,14 @@
 using System;
 using MonoTouch.Dialog;
 using MonoTouch.UIKit;
+using MonoTouch.Foundation;
 
 namespace Sample
 {
+	// Use the preserve attribute to inform the linker that even if I do not
+	// use the fields, to not try to optimize them away.
+	
+	[Preserve]
 	class Settings {
 	[Section]
 		public bool AccountEnabled;
@@ -30,10 +35,10 @@ namespace Sample
 		
 	[Section ("Checkboxes")]
 		[Checkbox]
-		bool English;
+		bool English = true;
 		
 		[Checkbox]
-		bool Spanish = true;
+		bool Spanish;
 		
 	[Section ("Image Selection")]
 		public UIImage Top;

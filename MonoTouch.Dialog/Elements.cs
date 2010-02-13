@@ -163,8 +163,8 @@ namespace MonoTouch.Dialog
 	public class FloatElement : Element {
 		public float Value;
 		public float MinValue, MaxValue;
-		UIImage Left, Right;
 		static NSString skey = new NSString ("FloatElement");
+		UIImage Left, Right;
 		UISlider slider;
 		
 		public FloatElement (UIImage left, UIImage right, float value) : base (null)
@@ -353,8 +353,6 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class MultilineElement : StringElement, IElementSizing {
-		static NSString mkey = new NSString ("mkey");
-		
 		public MultilineElement (string caption) : base (caption)
 		{
 		}
@@ -387,7 +385,6 @@ namespace MonoTouch.Dialog
 	
 	public class RadioElement : StringElement {
 		public string Group;
-		static NSString rkey = new NSString ("RadioElement");
 		internal int RadioIdx;
 		
 		public RadioElement (string caption, string group) : base (caption)
@@ -429,7 +426,7 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class CheckboxElement : StringElement {
-		public bool Value;
+		public new bool Value;
 		public string Group;
 		
 		public CheckboxElement (string caption) : base (caption) {}
@@ -497,7 +494,6 @@ namespace MonoTouch.Dialog
 			UIGraphics.BeginImageContext (new SizeF (dimx, dimy));
 			var ctx = UIGraphics.GetCurrentContext ();
 		
-			var size = source.Size;
 			var img = source.CGImage;
 			ctx.TranslateCTM (0, dimy);
 			if (img.Width > img.Height)
@@ -536,7 +532,6 @@ namespace MonoTouch.Dialog
 			Section psection = Parent as Section;
 			bool roundTop = psection.Elements [0] == this;
 			bool roundBottom = psection.Elements [psection.Elements.Count-1] == this;
-			UIImage result;
 			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
 				using (var bit = new CGBitmapContext (IntPtr.Zero, dimx, dimy, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
@@ -617,7 +612,7 @@ namespace MonoTouch.Dialog
 		public string Value;
 		static NSString ekey = new NSString ("EntryElement");
 		bool isPassword;
-		UILabel label; UITextField entry;
+		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 		
@@ -1059,7 +1054,6 @@ namespace MonoTouch.Dialog
 	/// Captures the information about mutually exclusive elements in a RootElement
 	/// </summary>
 	public class RadioGroup : Group {
-		public string Key;
 		public int Selected;
 		
 		public RadioGroup (string key, int selected) : base (key)
@@ -1197,9 +1191,7 @@ namespace MonoTouch.Dialog
 		internal void Prepare ()
 		{
 			int current = 0;
-			foreach (Section s in Sections){
-				int maxEntryWidth = -1;
-				
+			foreach (Section s in Sections){				
 				foreach (Element e in s.Elements){
 					var re = e as RadioElement;
 					if (re != null)
