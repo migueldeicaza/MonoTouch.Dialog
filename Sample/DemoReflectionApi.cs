@@ -11,7 +11,7 @@ namespace Sample
 	// Use the preserve attribute to inform the linker that even if I do not
 	// use the fields, to not try to optimize them away.
 	
-	[Preserve]
+	[Preserve (AllMembers=true)]
 	class Settings {
 	[Section]
 		public bool AccountEnabled;
