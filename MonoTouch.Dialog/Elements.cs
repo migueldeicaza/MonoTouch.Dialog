@@ -1218,9 +1218,17 @@ namespace MonoTouch.Dialog
 			if (TableView == null)
 				return;
 			
-			TableView.InsertSections (NSIndexSet.FromNSRange (new NSRange (Sections.Count-1, 1)), UITableViewRowAnimation.None);
+			TableView.InsertSections (MakeIndexSet (Sections.Count-1, 1), UITableViewRowAnimation.None);
 		}
 
+		NSIndexSet MakeIndexSet (int start, int count)
+		{
+			NSRange range;
+			range.Location = start;
+			range.Length = count;
+			return NSIndexSet.FromNSRange (range);
+		}
+		
 		/// <summary>
 		/// Inserts a new section into the RootElement
 		/// </summary>
@@ -1253,7 +1261,7 @@ namespace MonoTouch.Dialog
 			if (TableView == null)
 				return;
 			
-			TableView.InsertSections (NSIndexSet.FromNSRange (new NSRange (idx, newSections.Length)), anim);
+			TableView.InsertSections (MakeIndexSet (idx, newSections.Length), anim);
 		}
 		
 		/// <summary>
