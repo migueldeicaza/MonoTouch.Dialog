@@ -25,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
+    <MtouchExtraArgs>--nostrip</MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -33,7 +34,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>Full</MtouchLink>
+    <MtouchExtraArgs>--nostrip</MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,7 +57,7 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>Full</MtouchLink>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -72,6 +74,7 @@
     <Compile Include="DemoElementApi.cs" />
     <Compile Include="DemoReflectionApi.cs" />
     <Compile Include="DemoDynamic.cs" />
+    <Compile Include="DemoAddRemove.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />

@@ -102,6 +102,7 @@ namespace MonoTouch.Dialog
 
 			tableView.Source = root.UnevenRows ? new SizingSource (this) : new Source (this);
 			View = tableView;
+			root.TableView = tableView;
 		}
 
 		public override void ViewWillAppear (bool animated)
@@ -138,6 +139,17 @@ namespace MonoTouch.Dialog
 			PrepareRoot (root);
 		}
 		
+		/// <summary>
+		///     Creates a new DialogViewController from a RootElement and sets the push status
+		/// </summary>
+		/// <param name="root">
+		/// The <see cref="RootElement"/> containing the information to render.
+		/// </param>
+		/// <param name="pushing">
+		/// A <see cref="System.Boolean"/> describing whether this is being pushed 
+		/// (NavigationControllers) or not.   If pushing is true, then the back button 
+		/// will be shown, allowing the user to go back to the previous controller
+		/// </param>
 		public DialogViewController (RootElement root, bool pushing)
 		{
 			PrepareRoot (root);

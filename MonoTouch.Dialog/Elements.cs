@@ -498,10 +498,15 @@ namespace MonoTouch.Dialog
 			var ctx = UIGraphics.GetCurrentContext ();
 		
 			var size = source.Size;
+			var img = source.CGImage;
 			ctx.TranslateCTM (0, dimy);
-			ctx.ScaleCTM (1, -1);
+			if (img.Width > img.Height)
+				ctx.ScaleCTM (1, -img.Width/dimy);
+			else
+				ctx.ScaleCTM (img.Height/dimx, -1);
 
 			ctx.DrawImage (rect, source.CGImage);
+			
 			var ret = UIGraphics.GetImageFromCurrentImageContext ();
 			UIGraphics.EndImageContext ();
 			return ret;
@@ -915,8 +920,109 @@ namespace MonoTouch.Dialog
 			
 			Elements.Add (element);
 			element.Parent = this;
+			
+			if (Parent != null)
+				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
 
+		/// <summary>
+		/// Inserts a series of elements into the Section using the specified animation
+		/// </summary>
+		/// <param name="idx">
+		/// The index where the elements are inserted
+		/// </param>
+		/// <param name="anim">
+		/// The animation to use
+		/// </param>
+		/// <param name="newElements">
+		/// A series of elements.
+		/// </param>
+		public void Insert (int idx, UITableViewRowAnimation anim, params Element [] newElements)
+		{
+			if (newElements == null)
+				return;
+			
+			int pos = idx;
+			foreach (var e in newElements){
+				Elements.Insert (pos++, e);
+				e.Parent = this;
+			}
+			
+			if (Parent != null)
+				InsertVisual (idx, anim, newElements.Length);
+		}
+
+		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
+		{
+			var root = Parent as RootElement;
+			
+			if (root == null || root.TableView == null)
+				return;
+			
+			int sidx = root.IndexOf (this);
+			var paths = new NSIndexPath [count];
+			for (int i = 0; i < count; i++)
+				paths [i] = NSIndexPath.FromRowSection (idx+i, sidx);
+			
+			root.TableView.InsertRows (paths, anim);
+		}
+		
+		public void Insert (int index, params Element [] newElements)
+		{
+			Insert (index, UITableViewRowAnimation.None, newElements);
+		}
+		
+		/// <summary>
+		/// Removes a range of elements from the Section
+		/// </summary>
+		/// <param name="start">
+		/// Starting position
+		/// </param>
+		/// <param name="count">
+		/// Number of elements to remove from the section
+		/// </param>
+		public void RemoveRange (int start, int count)
+		{
+			RemoveRange (start, count, UITableViewRowAnimation.Fade);
+		}
+
+		/// <summary>
+		/// Remove a range of elements from the section with the given animation
+		/// </summary>
+		/// <param name="start">
+		/// Starting position
+		/// </param>
+		/// <param name="count">
+		/// Number of elements to remove form the section
+		/// </param>
+		/// <param name="anim">
+		/// The animation to use while removing the elements
+		/// </param>
+		public void RemoveRange (int start, int count, UITableViewRowAnimation anim)
+		{
+			if (start < 0 || start >= Elements.Count)
+				return;
+			if (count == 0)
+				return;
+			
+			if (start+count > Elements.Count)
+				count = Elements.Count-start;
+			
+			Elements.RemoveRange (start, count);
+			
+			// Now do the GUI part
+			var root = Parent as RootElement;
+			
+			if (root == null || root.TableView == null)
+				return;
+			
+			int sidx = root.IndexOf (this);
+			var paths = new NSIndexPath [count];
+			for (int i = 0; i < count; i++)
+				paths [i] = NSIndexPath.FromRowSection (start+i, sidx);
+			root.TableView.DeleteRows (paths, anim);
+		}
+		
 		/// <summary>
 		/// Enumerator to get all the elements in the Section.
 		/// </summary>
@@ -997,6 +1103,7 @@ namespace MonoTouch.Dialog
 		int summarySection, summaryElement;
 		internal Group group;
 		public bool UnevenRows;
+		internal UITableView TableView;
 		
 		/// <summary>
 		///  Initializes a RootSection with a caption
@@ -1069,6 +1176,23 @@ namespace MonoTouch.Dialog
 			}
 			return null;
 		}
+		
+		public int Count { 
+			get {
+				return Sections.Count;
+			}
+		}
+		
+		internal int IndexOf (Section target)
+		{
+			int idx = 0;
+			foreach (Section s in Sections){
+				if (s == target)
+					return idx;
+				idx++;
+			}
+			return -1;
+		}
 			
 		internal void Prepare ()
 		{
@@ -1090,7 +1214,7 @@ namespace MonoTouch.Dialog
 		/// Adds a new section to this RootElement
 		/// </summary>
 		/// <param name="section">
-		/// The section to add
+		/// The section to add, if the root is visible, the section is inserted with no animation
 		/// </param>
 		public void Add (Section section)
 		{
@@ -1099,8 +1223,115 @@ namespace MonoTouch.Dialog
 			
 			Sections.Add (section);
 			section.Parent = this;
+			if (TableView == null)
+				return;
+			
+			TableView.InsertSections (NSIndexSet.FromNSRange (new NSRange (Sections.Count-1, 1)), UITableViewRowAnimation.None);
 		}
 
+		/// <summary>
+		/// Inserts a new section into the RootElement
+		/// </summary>
+		/// <param name="idx">
+		/// The index where the section is added <see cref="System.Int32"/>
+		/// </param>
+		/// <param name="anim">
+		/// The <see cref="UITableViewRowAnimation"/> type.
+		/// </param>
+		/// <param name="newSections">
+		/// A <see cref="Section[]"/> list of sections to insert
+		/// </param>
+		/// <remarks>
+		///    This inserts the specified list of sections (a params argument) into the
+		///    root using the specified animation.
+		/// </remarks>
+		public void Insert (int idx, UITableViewRowAnimation anim, params Section [] newSections)
+		{
+			if (idx < 0 || idx > Sections.Count)
+				return;
+			if (newSections == null)
+				return;
+			
+			int pos = idx;
+			foreach (var s in newSections){
+				s.Parent = this;
+				Sections.Insert (pos++, s);
+			}
+			
+			if (TableView == null)
+				return;
+			
+			TableView.InsertSections (NSIndexSet.FromNSRange (new NSRange (idx, newSections.Length)), anim);
+		}
+		
+		/// <summary>
+		/// Inserts a new section into the RootElement
+		/// </summary>
+		/// <param name="idx">
+		/// The index where the section is added <see cref="System.Int32"/>
+		/// </param>
+		/// <param name="newSections">
+		/// A <see cref="Section[]"/> list of sections to insert
+		/// </param>
+		/// <remarks>
+		///    This inserts the specified list of sections (a params argument) into the
+		///    root using the Fade animation.
+		/// </remarks>
+		public void Insert (int idx, Section section)
+		{
+			Insert (idx, UITableViewRowAnimation.None, section);
+		}
+		
+		/// <summary>
+		/// Removes a section at a specified location
+		/// </summary>
+		public void RemoveAt (int idx)
+		{
+			RemoveAt (idx, UITableViewRowAnimation.Fade);
+		}
+
+		/// <summary>
+		/// Removes a section at a specified location using the specified animation
+		/// </summary>
+		/// <param name="idx">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <param name="anim">
+		/// A <see cref="UITableViewRowAnimation"/>
+		/// </param>
+		public void RemoveAt (int idx, UITableViewRowAnimation anim)
+		{
+			if (idx < 0 || idx >= Sections.Count)
+				return;
+			
+			Sections.RemoveAt (idx);
+			
+			if (TableView == null)
+				return;
+			
+			TableView.DeleteSections (NSIndexSet.FromIndex (idx), anim);
+		}
+			
+		public void Remove (Section s)
+		{
+			if (s == null)
+				return;
+			int idx = Sections.IndexOf (s);
+			if (idx == -1)
+				return;
+			RemoveAt (idx, UITableViewRowAnimation.Fade);
+		}
+		
+		public void Remove (Section s, UITableViewRowAnimation anim)
+		{
+			if (s == null)
+				return;
+			int idx = Sections.IndexOf (s);
+			if (idx == -1)
+				return;
+			RemoveAt (idx, anim);
+		}
+		
 		/// <summary>
 		/// Enumerator that returns all the sections in the RootElement.
 		/// </summary>

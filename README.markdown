@@ -356,8 +356,9 @@ implement something similar to the ring tone selector and separate
 custom ring tones from system ringtones).   The summary view will show
 the radio element that is currently selected.
 
-Sections are added by calling the Add method which supports the
-C# 4.0 syntax to initialize a RootElement in one pass.
+Sections are added by calling the Add method or using the C# 4
+initializer syntax.  The Insert methods are provided to insert
+sections with an animation.
 
 If you create the RootElement with a Group instance (instead of a
 RadioGroup) the summary value of the RootElement when displayed in a
