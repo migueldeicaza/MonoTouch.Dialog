@@ -63,6 +63,13 @@ account page is as trivial as:
         var bc = new BindingContext (this, account, "Seat Selection");
     }
 
+Which produces this UI:
+
+![Rendering of AccountInfo](sample.png)
+
+To create nested UIs that provide automatic navigation, you would just
+create an instance of that class.  
+
 Samples Included
 ----------------
 
