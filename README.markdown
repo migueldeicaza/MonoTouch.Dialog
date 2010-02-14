@@ -65,7 +65,10 @@ account page is as trivial as:
 
 Which produces this UI:
 
-![Rendering of AccountInfo](sample.png)
+![Rendering of AccountInfo](migueldeicaza/MonoTouch.Dialog/sample.png)
+
+Also see this [screenshot](http://tirania.org/tmp/a.png) was created
+with [this code](http://gist.github.com/281469)
 
 To create nested UIs that provide automatic navigation, you would just
 create an instance of that class.  
