@@ -65,7 +65,7 @@ account page is as trivial as:
 
 Which produces this UI:
 
-![Rendering of AccountInfo](MonoTouch.Dialog/blob/master/sample.png)
+![Rendering of AccountInfo](MonoTouch.Dialog/raw/master/sample.png)
 
 Also see this [screenshot](http://tirania.org/tmp/a.png) was created
 with [this code](http://gist.github.com/281469)
