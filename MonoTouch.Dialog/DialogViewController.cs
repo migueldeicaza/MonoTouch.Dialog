@@ -160,7 +160,8 @@ namespace MonoTouch.Dialog
 		void PrepareRoot (RootElement root)
 		{
 			this.root = root;
-			root.Prepare ();
+			if (root != null)
+				root.Prepare ();
 		}
 		
 		public DialogViewController (RootElement root)

@@ -7,7 +7,9 @@
 	Plain).
 
 	* Element.cs: Support Clear() on Sections and Root, and make
-	Disposable Dispose the children. 
+	Disposable Dispose the children.
+
+	Updates sample.
 
 2010-01-19  Miguel de Icaza  <miguel@novell.com>
 

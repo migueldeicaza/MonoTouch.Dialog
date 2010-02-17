@@ -15,24 +15,32 @@ namespace Sample {
 	[MonoTouch.Foundation.Register("AppDelegate")]
 	public partial class AppDelegate {
 		
+		private MonoTouch.UIKit.UIWindow __mt_window;
+		
+		private MonoTouch.UIKit.UINavigationController __mt_navigation;
+		
 		#pragma warning disable 0169
 		[MonoTouch.Foundation.Connect("window")]
 		private MonoTouch.UIKit.UIWindow window {
 			get {
-				return ((MonoTouch.UIKit.UIWindow)(this.GetNativeField("window")));
+				this.__mt_window = ((MonoTouch.UIKit.UIWindow)(this.GetInstanceVariable("window")));
+				return this.__mt_window;
 			}
 			set {
-				this.SetNativeField("window", value);
+				this.__mt_window = value;
+				this.SetInstanceVariable("window", value);
 			}
 		}
 		
 		[MonoTouch.Foundation.Connect("navigation")]
 		private MonoTouch.UIKit.UINavigationController navigation {
 			get {
-				return ((MonoTouch.UIKit.UINavigationController)(this.GetNativeField("navigation")));
+				this.__mt_navigation = ((MonoTouch.UIKit.UINavigationController)(this.GetInstanceVariable("navigation")));
+				return this.__mt_navigation;
 			}
 			set {
-				this.SetNativeField("navigation", value);
+				this.__mt_navigation = value;
+				this.SetInstanceVariable("navigation", value);
 			}
 		}
 	}
