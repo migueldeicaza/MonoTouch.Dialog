@@ -6,10 +6,23 @@ namespace MonoTouch.Dialog
 {
 	public class DialogViewController : UITableViewController
 	{
+		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		UITableView tableView;
 		RootElement root;
 		bool pushing;
 		bool dirty;
+
+		public RootElement Root {
+			get {
+				return root;
+			}
+			set {
+				if (root == value)
+					return;
+				root = value;
+				ReloadData ();
+			}
+		} 
 		
 		class Source : UITableViewSource {
 			protected DialogViewController container;
@@ -92,15 +105,15 @@ namespace MonoTouch.Dialog
 			else
 				PresentModalViewController (controller, true);
 		}
-		
+
 		public override void LoadView ()
 		{
-			tableView = new UITableView (UIScreen.MainScreen.Bounds, UITableViewStyle.Grouped) {
+			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) {
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin,
 				AutosizesSubviews = true
 			};
 
-			tableView.Source = root.UnevenRows ? new SizingSource (this) : new Source (this);
+			UpdateSource ();
 			View = tableView;
 			root.TableView = tableView;
 		}
@@ -108,6 +121,7 @@ namespace MonoTouch.Dialog
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			root.Prepare ();
 			
 			NavigationItem.HidesBackButton = !pushing;
 			if (root.Caption != null)
@@ -116,6 +130,22 @@ namespace MonoTouch.Dialog
 				tableView.ReloadData ();
 				dirty = false;
 			}
+		}
+
+		void UpdateSource ()
+		{
+			tableView.Source = root.UnevenRows ? new SizingSource (this) : new Source (this);
+		}
+
+		public void ReloadData ()
+		{
+			bool wasUneven = root.UnevenRows;
+			root.Prepare ();
+			if (wasUneven != root.UnevenRows)
+				UpdateSource ();
+			if (tableView != null)
+				tableView.ReloadData ();
+			dirty = false;
 		}
 		
 		public event EventHandler ViewDissapearing;
@@ -127,15 +157,14 @@ namespace MonoTouch.Dialog
 				ViewDissapearing (this, EventArgs.Empty);
 		}
 
-
 		void PrepareRoot (RootElement root)
 		{
 			this.root = root;
-			root.Prepare ();	
+			root.Prepare ();
 		}
 		
 		public DialogViewController (RootElement root)
-		{			
+		{
 			PrepareRoot (root);
 		}
 		
@@ -152,8 +181,8 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public DialogViewController (RootElement root, bool pushing)
 		{
-			PrepareRoot (root);
 			this.pushing = pushing;
+			PrepareRoot (root);
 		}
 	}
 }

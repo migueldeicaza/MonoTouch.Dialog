@@ -407,7 +407,8 @@ use:
   * DateTimeElement (to edit dates and times).
   * DateElement (to edit just dates)
   * TimeElement (to edit just times)
-
+  * BadgeElement 
+    To render images (57x57) or calendar entries next to the text.
 
 Creating Your Own Elements
 --------------------------

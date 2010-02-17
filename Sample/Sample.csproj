@@ -76,6 +76,7 @@
     <Compile Include="DemoReflectionApi.cs" />
     <Compile Include="DemoDynamic.cs" />
     <Compile Include="DemoAddRemove.cs" />
+    <Compile Include="DemoDate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />
@@ -94,5 +95,6 @@
   </ProjectExtensions>
   <ItemGroup>
     <Content Include="monodevelop-32.png" />
+    <Content Include="caltemplate.png" />
   </ItemGroup>
 </Project>

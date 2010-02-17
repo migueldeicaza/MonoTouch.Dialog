@@ -297,6 +297,10 @@ namespace MonoTouch.Dialog
 		}
 	}
 
+	/// <summary>
+	///   The string element can be used to render some text in a cell 
+	///   that can optionally respond to tap events.
+	/// </summary>
 	public class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
 		public string Value;
@@ -920,6 +924,12 @@ namespace MonoTouch.Dialog
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
 
+		public void Add (IEnumerable<Element> elements)
+		{
+			foreach (var e in elements)
+				Add (e);
+		}
+		
 		/// <summary>
 		/// Inserts a series of elements into the Section using the specified animation
 		/// </summary>
@@ -1030,6 +1040,38 @@ namespace MonoTouch.Dialog
 				yield return e;
 		}
 
+		public int Count {
+			get {
+				return Elements.Count;
+			}
+		}
+
+		public Element this [int idx] {
+			get {
+				return Elements [idx];
+			}
+		}
+
+		public void Clear ()
+		{
+			foreach (var e in Elements)
+				e.Dispose ();
+			Elements = new List<Element> ();
+
+			var root = Parent as RootElement;
+			if (root != null && root.TableView != null)
+				root.TableView.ReloadData ();
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing){
+				Parent = null;
+				Clear ();
+				Elements = null;
+			}
+		}
+			
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = new UITableViewCell (UITableViewCellStyle.Default, "");
@@ -1174,6 +1216,12 @@ namespace MonoTouch.Dialog
 		public int Count { 
 			get {
 				return Sections.Count;
+			}
+		}
+
+		public Section this [int idx] {
+			get {
+				return Sections [idx];
 			}
 		}
 		
@@ -1330,6 +1378,24 @@ namespace MonoTouch.Dialog
 			if (idx == -1)
 				return;
 			RemoveAt (idx, anim);
+		}
+
+		public void Clear ()
+		{
+			foreach (var s in Sections)
+				s.Dispose ();
+			Sections = new List<Section> ();
+			if (TableView != null)
+				TableView.ReloadData ();
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing){
+				TableView = null;
+				Clear ();
+				Sections = null;
+			}
 		}
 		
 		/// <summary>

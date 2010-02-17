@@ -35,7 +35,9 @@ namespace MonoTouch.Dialog
 	public class BadgeElement : Element, IElementSizing {
 		static NSString ckey = new NSString ("badgeKey");
 		public event NSAction Tapped;
-		public bool MultiLine;
+		public UILineBreakMode LineBreakMode = UILineBreakMode.TailTruncation;
+		public UIViewContentMode ContentMode = UIViewContentMode.Left;
+		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		UIImage image;
 		UIFont font;
@@ -79,11 +81,10 @@ namespace MonoTouch.Dialog
 			cell.Accessory = Accessory;
 			var tl = cell.TextLabel;
 			tl.Text = Caption;
-			tl.Font = font;
-			if (MultiLine){
-				tl.LineBreakMode = UILineBreakMode.WordWrap;
-				tl.Lines = 0;
-			}
+			tl.Font = Font;
+			tl.LineBreakMode = LineBreakMode;
+			tl.Lines = Lines;
+			tl.ContentMode = ContentMode;
 			
 			cell.ImageView.Image = image;
 			
@@ -98,7 +99,7 @@ namespace MonoTouch.Dialog
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (280, float.MaxValue);
-			float height = tableView.StringSize (Caption, Font, size, MultiLine ? UILineBreakMode.WordWrap : UILineBreakMode.Clip).Height + 10;
+			float height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
 			
 			// Image is 57 pixels tall, add some padding
 			return Math.Max (height, 63);
@@ -127,6 +128,10 @@ namespace MonoTouch.Dialog
 					context.SetTextDrawingMode (CGTextDrawingMode.Invisible);
 					context.ShowText (smallText);
 					var width = context.TextPosition.X - start;
+					
+					var ns = new NSString (smallText);
+					UIFont ff = UIFont.FromName ("Helvetica", 10);
+					
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
 					context.ShowTextAtPoint ((57-width)/2, 46, smallText);
 					

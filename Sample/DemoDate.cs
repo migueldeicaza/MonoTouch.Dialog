@@ -28,7 +28,7 @@ namespace Sample
 				new BadgeElement (badgeImage, "Valentine's Day"),
 				
 				new BadgeElement (badgeImage, longString) {
-					MultiLine = true,
+					Lines = 3,
 					Font = UIFont.FromName ("Helvetica", 12f)
 				}
 			};
@@ -36,19 +36,28 @@ namespace Sample
 			//
 			// Use the MakeCalendarBadge API
 			//
-			var calendarSection = new Section ("Date sample"){
-				new BadgeElement (
-					BadgeElement.MakeCalendarBadge (badgeImage, "February", "14"),
-				                  "Valentine's Day.   Do not forget to hug your sysadmin"){
-					Font = UIFont.FromName ("Helvetica", 16f)
-				}
+			var font = UIFont.FromName ("Helvetica", 14f);
+			var dates = new string [][] {
+				new string [] { "January", "1", "Hangover day" },
+				new string [] { "February", "14", "Valentine's Day" },
+				new string [] { "March", "3", "Third day of March" },
+				new string [] { "March", "31", "Prank Preparation day" },
+				new string [] { "April", "1", "Pranks" },
 			};
+			var calendarSection = new Section ("Date sample");
+			foreach (string [] date in dates){
+				calendarSection.Add (new BadgeElement (BadgeElement.MakeCalendarBadge (badgeImage, date [0], date [1]), date [2]){
+					Font = font
+				});
+			}
 			
 			var root = new RootElement ("Date sample") {
 				calendarSection,
 				badgeSection
 			};
 			var dvc = new DialogViewController (root, true);
+			dvc.Style = UITableViewStyle.Plain;
+			
 			navigation.PushViewController (dvc, true);
 		}
 	}
