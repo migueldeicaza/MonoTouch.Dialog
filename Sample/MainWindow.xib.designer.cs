@@ -23,24 +23,24 @@ namespace Sample {
 		[MonoTouch.Foundation.Connect("window")]
 		private MonoTouch.UIKit.UIWindow window {
 			get {
-				this.__mt_window = ((MonoTouch.UIKit.UIWindow)(this.GetInstanceVariable("window")));
+				this.__mt_window = ((MonoTouch.UIKit.UIWindow)(this.GetNativeField("window")));
 				return this.__mt_window;
 			}
 			set {
 				this.__mt_window = value;
-				this.SetInstanceVariable("window", value);
+				this.SetNativeField("window", value);
 			}
 		}
 		
 		[MonoTouch.Foundation.Connect("navigation")]
 		private MonoTouch.UIKit.UINavigationController navigation {
 			get {
-				this.__mt_navigation = ((MonoTouch.UIKit.UINavigationController)(this.GetInstanceVariable("navigation")));
+				this.__mt_navigation = ((MonoTouch.UIKit.UINavigationController)(this.GetNativeField("navigation")));
 				return this.__mt_navigation;
 			}
 			set {
 				this.__mt_navigation = value;
-				this.SetInstanceVariable("navigation", value);
+				this.SetNativeField("navigation", value);
 			}
 		}
 	}
