@@ -1486,9 +1486,14 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
+		protected virtual void PrepareDialogViewController (DialogViewController dvc)
+		{
+		}
+		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			var newDvc = new DialogViewController (this, true);
+			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
 		}
 	}

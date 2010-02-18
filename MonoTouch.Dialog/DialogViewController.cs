@@ -132,19 +132,21 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+		Source TableSource;
+		
 		void UpdateSource ()
 		{
-			tableView.Source = root.UnevenRows ? new SizingSource (this) : new Source (this);
+			TableSource = root.UnevenRows ? new SizingSource (this) : new Source (this);
+			tableView.Source = TableSource;
 		}
 
 		public void ReloadData ()
 		{
-			bool wasUneven = root.UnevenRows;
 			root.Prepare ();
-			if (wasUneven != root.UnevenRows)
+			if (tableView != null){
 				UpdateSource ();
-			if (tableView != null)
 				tableView.ReloadData ();
+			}
 			dirty = false;
 		}
 		

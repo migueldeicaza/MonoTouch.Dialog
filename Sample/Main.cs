@@ -25,6 +25,9 @@ namespace Sample
 		// This method is invoked when the application has loaded its UI and its ready to run
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
+			var Last = new DateTime (2010, 10, 7);
+			Console.WriteLine (Last);
+			
 			window.AddSubview (navigation.View);
 
 			var menu = new RootElement ("Demos"){
