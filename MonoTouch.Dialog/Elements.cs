@@ -1269,6 +1269,18 @@ namespace MonoTouch.Dialog
 			TableView.InsertSections (MakeIndexSet (Sections.Count-1, 1), UITableViewRowAnimation.None);
 		}
 
+		//
+		// This makes things LINQ friendly;  You can now create RootElements
+		// with an embedded LINQ expression, like this:
+		// new RootElement ("Title") {
+		//     from x in names
+		//         select new Section (x) { new StringElement ("Sample") }
+		//
+		public void Add (IEnumerable<Section> sections)
+		{
+			foreach (var s in sections)
+				Add (s);
+		}
 		NSIndexSet MakeIndexSet (int start, int count)
 		{
 			NSRange range;

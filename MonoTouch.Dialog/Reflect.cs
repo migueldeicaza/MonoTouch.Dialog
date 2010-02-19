@@ -294,7 +294,7 @@ namespace MonoTouch.Dialog
 						if (v == evalue)
 							selected = idx;
 						
-						csection.Add (new RadioElement (fi.Name));
+						csection.Add (new RadioElement (MakeCaption (fi.Name)));
 						idx++;
 					}
 					
