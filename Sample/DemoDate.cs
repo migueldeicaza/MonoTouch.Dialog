@@ -16,10 +16,10 @@ namespace Sample
 		
 		UIImage badgeImage;
 		
-		public void DemoDate ()
+		public void DemoDate ()	
 		{
 			if (badgeImage == null)
-				badgeImage = UIImage.FromFile ("caltemplate.png");
+				badgeImage = UIImage.FromFile ("jakub-calendar.png");
 			
 			var badgeSection = new Section ("Basic Badge Properties"){
 				new BadgeElement (badgeImage, "New Movie Day") {

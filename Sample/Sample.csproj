@@ -96,5 +96,6 @@
   <ItemGroup>
     <Content Include="monodevelop-32.png" />
     <Content Include="caltemplate.png" />
+    <Content Include="jakub-calendar.png" />
   </ItemGroup>
 </Project>
