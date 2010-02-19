@@ -20,6 +20,7 @@ namespace MonoTouch.Dialog
 				if (root == value)
 					return;
 				root = value;
+				root.TableView = tableView;					
 				ReloadData ();
 			}
 		} 
@@ -115,6 +116,9 @@ namespace MonoTouch.Dialog
 
 			UpdateSource ();
 			View = tableView;
+			if (root == null)
+				return;
+			
 			root.TableView = tableView;
 		}
 
@@ -136,6 +140,9 @@ namespace MonoTouch.Dialog
 		
 		void UpdateSource ()
 		{
+			if (root == null)
+				return;
+			
 			TableSource = root.UnevenRows ? new SizingSource (this) : new Source (this);
 			tableView.Source = TableSource;
 		}
