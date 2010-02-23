@@ -71,6 +71,34 @@ namespace MonoTouch.Dialog
 
 				element.Selected (container, tableView, indexPath);
 			}			
+			
+			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
+			{
+				var section = root.Sections [sectionIdx];
+				return section.HeaderView;
+			}
+
+			public override float GetHeightForHeader (UITableView tableView, int sectionIdx)
+			{
+				var section = root.Sections [sectionIdx];
+				if (section.HeaderView == null)
+					return -1;
+				return section.HeaderView.Frame.Height;
+			}
+
+			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
+			{
+				var section = root.Sections [sectionIdx];
+				return section.FooterView;
+			}
+			
+			public override float GetHeightForFooter (UITableView tableView, int sectionIdx)
+			{
+				var section = root.Sections [sectionIdx];
+				if (section.FooterView == null)
+					return -1;
+				return section.FooterView.Frame.Height;
+			}
 		}
 
 		//

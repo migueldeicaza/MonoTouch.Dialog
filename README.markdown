@@ -249,6 +249,14 @@ These are the current widgets supported by the Reflection API:
 
         UIImage ProfilePicture;
 
+### Ignoring Some Fields ###
+
+  If you want to ignore a particular field just apply the [Skip]
+  attribute to the field.   
+
+  Examples:
+        [Skip] Guid UniquId;
+
 ### Nested Dialogs ###
 
   To create nested dialogs just use a nested class, the reflection
@@ -350,11 +358,6 @@ RootElements are responsible for showing a full configuration page.
 At least one RootElement is required to start the MonoTouch.Dialogs
 process.
 
-RootElements can also be used inside Sections to trigger
-loading a new nested configuration page.   When used in this mode
-the caption provided is used while rendered inside a section and
-is also used as the Title for the subpage.
-
 If a RootElement is initialized with a section/element value then
 this value is used to locate a child Element that will provide
 a summary of the configuration which is rendered on the right-side
@@ -363,12 +366,50 @@ of the display.
 RootElements are also used to coordinate radio elements.  The
 RadioElement members can span multiple Sections (for example to
 implement something similar to the ring tone selector and separate
-custom ring tones from system ringtones).   The summary view will show
-the radio element that is currently selected.
+custom ring tones from system ringtones).  The summary view will show
+the radio element that is currently selected.  To use this, create
+the Root element with the Group constructor, like this:
+
+       var root = new RootElement ("Meals", new RadioGroup ("myGroup", 0))
+
+The name of the group in RadioGroup is used to show the selected value
+in the containing page (if any) and the value, which is zero in this
+case, is the index of the first selected item. 
+
+Root elements can also be used inside Sections to trigger
+loading a new nested configuration page.   When used in this mode
+the caption provided is used while rendered inside a section and
+is also used as the Title for the subpage.   For example:
+
+	var root = new RootElement ("Meals") {
+	    new Section ("Dinner"){
+                new RootElement ("Desert", new RadioGroup ("desert", 0) {
+                    new Section () {
+                        new RadioElement ("Ice Cream", "desert"),
+                        new RadioElement ("Milkshake", "desert"),
+                        new RadioElement ("Chocolate Cake", "desert")
+                    }
+                }
+            }
+        }
+
+In the above example, when the user taps on "Desert", MonoTouch.Dialog
+will create a new page and navigate to it with the root being "Desert"
+and having a radio group with three values.
 
 Sections are added by calling the Add method or using the C# 4
 initializer syntax.  The Insert methods are provided to insert
 sections with an animation.
+
+Additionally, you can create RootElement by using LINQ, like this:
+
+        new RootElement ("LINQ root") {
+            from x in new string [] { "one", "two", "three" }
+               select new Section (x) {
+                  from y in "Hello:World".Split (':')
+                    select (Element) new StringElement (y)
+               }
+        }
 
 If you create the RootElement with a Group instance (instead of a
 RadioGroup) the summary value of the RootElement when displayed in a
@@ -384,6 +425,19 @@ any of the standard elements, including new RootElements.
 
 RootElements embedded in a section are used to navigate to a new
 deeper level.
+
+Sections can have headers and footers either as strings, or as
+UIViews.  Typically you will just use the strings, but to create
+custom UIs you can use any UIView as the header or the footer.  You
+can either use a string or a view, you would create them like this:
+
+	var section = new Section ("Header", "Footer")
+
+To use views, just pass the views to the constructor:
+
+        var header = new UIImageView (Image.FromFile ("sample.png"));
+        var section = new Section (image)
+
 
 Standard Elements
 -----------------

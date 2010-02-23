@@ -41,6 +41,9 @@ namespace MonoTouch.Dialog
 	public class MultilineAttribute : Attribute {}
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class SkipAttribute : Attribute {}
+	
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class PasswordAttribute : EntryAttribute {
 		public PasswordAttribute (string placeholder) : base (placeholder) {}
 	}
@@ -184,7 +187,10 @@ namespace MonoTouch.Dialog
 
 				string caption = null;
 				object [] attrs = mi.GetCustomAttributes (false);
+				bool skip = false;
 				foreach (var attr in attrs){
+					if (attr is SkipAttribute)
+						skip = true;
 					if (attr is CaptionAttribute)
 						caption = ((CaptionAttribute) attr).Caption;
 					else if (attr is SectionAttribute){
@@ -194,6 +200,9 @@ namespace MonoTouch.Dialog
 						section = new Section (sa.Caption, sa.Footer);
 					}
 				}
+				if (skip)
+					continue;
+				
 				if (caption == null)
 					caption = MakeCaption (mi.Name);
 				

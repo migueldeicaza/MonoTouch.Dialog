@@ -39,6 +39,9 @@ namespace Sample
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)
+				},
+				new Section ("Other"){
+					new StringElement ("Headers and Footers", DemoHeadersFooters)
 				}
 			};
 

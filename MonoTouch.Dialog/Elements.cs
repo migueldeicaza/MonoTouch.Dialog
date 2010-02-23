@@ -869,11 +869,15 @@ namespace MonoTouch.Dialog
 	/// 
 	/// RootElements embedded in a section are used to navigate to a new
 	/// deeper level.
+	/// 
+	/// You can assign a header and a footer either as strings (Header and Footer)
+	/// properties, or as UIViews to be shown (HeaderView and FooterView).   Internally
+	/// this uses the same storage, so you can only show one or the other.
 	/// </remarks>
 	public class Section : Element, IEnumerable {
-		public string Header, Footer;
+		object header, footer;
 		public List<Element> Elements = new List<Element> ();
-		
+				
 		// X corresponds to the alignment, Y to the height of the password
 		internal SizeF EntryAlignment;
 		
@@ -906,6 +910,66 @@ namespace MonoTouch.Dialog
 			Footer = footer;
 		}
 
+		public Section (UIView header) : base (null)
+		{
+			HeaderView = header;
+		}
+		
+		public Section (UIView header, UIView footer) : base (null)
+		{
+			HeaderView = header;
+			FooterView = footer;
+		}
+			
+		/// <summary>
+		///    The section header, as a string
+		/// </summary>
+		public string Header {
+			get {
+				return header as string;
+			}
+			set {
+				footer = value;
+			}
+		}
+		
+		/// <summary>
+		/// The section footer, as a string.
+		/// </summary>
+		public string Footer {
+			get {
+				return footer as string;
+			}
+			
+			set {
+				footer = value;
+			}
+		}
+		
+		/// <summary>
+		/// The section's header view.  
+		/// </summary>
+		public UIView HeaderView {
+			get {
+				return header as UIView;
+			}
+			set {
+				header = value;
+			}
+		}
+		
+		/// <summary>
+		/// The section's footer view.
+		/// </summary>
+		public UIView FooterView {
+			get {
+				return footer as UIView;
+			}
+			set {
+				footer = value;
+			}
+		}
+		
 		/// <summary>
 		/// Adds a new child Element to the Section
 		/// </summary>

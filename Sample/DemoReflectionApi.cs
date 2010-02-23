@@ -15,6 +15,7 @@ namespace Sample
 	class Settings {
 	[Section]
 		public bool AccountEnabled;
+		[Skip] public bool Hidden;
 				
 	[Section ("Account", "Your credentials")]
 		
