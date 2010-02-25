@@ -195,7 +195,7 @@ namespace MonoTouch.Dialog
 						caption = ((CaptionAttribute) attr).Caption;
 					else if (attr is SectionAttribute){
 						if (section != null)
-							Root.Add (section);
+							root.Add (section);
 						var sa = attr as SectionAttribute;
 						section = new Section (sa.Caption, sa.Footer);
 					}
