@@ -383,7 +383,7 @@ is also used as the Title for the subpage.   For example:
 
 	var root = new RootElement ("Meals") {
 	    new Section ("Dinner"){
-                new RootElement ("Desert", new RadioGroup ("desert", 0) {
+                new RootElement ("Desert", new RadioGroup ("desert", 2) {
                     new Section () {
                         new RadioElement ("Ice Cream", "desert"),
                         new RadioElement ("Milkshake", "desert"),
@@ -396,6 +396,10 @@ is also used as the Title for the subpage.   For example:
 In the above example, when the user taps on "Desert", MonoTouch.Dialog
 will create a new page and navigate to it with the root being "Desert"
 and having a radio group with three values.
+
+In this particular sample, the radio group will select "Chocolate
+Cake" in the "Desert" section because we passed the value "2" to the
+RadioGroup.  This means pick the 3rd item on the list (zero-index). 
 
 Sections are added by calling the Add method or using the C# 4
 initializer syntax.  The Insert methods are provided to insert
