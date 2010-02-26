@@ -70,6 +70,7 @@ namespace MonoTouch.Dialog
 				var element = section.Elements [indexPath.Row];
 
 				element.Selected (container, tableView, indexPath);
+
 			}			
 			
 			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)

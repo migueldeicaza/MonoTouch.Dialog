@@ -69,6 +69,7 @@ namespace MonoTouch.Dialog
 				viewToRemove.RemoveFromSuperview ();
 		}
 		
+
 		/// <summary>
 		/// Returns a summary of the value represented by this object, suitable 
 		/// for rendering as the result of a RootElement with child objects.
@@ -708,7 +709,7 @@ namespace MonoTouch.Dialog
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
-				entry.Ended += delegate {
+				entry.ValueChanged += delegate {
 					Value = entry.Text;
 				};
 				entry.ShouldReturn += delegate {
@@ -721,10 +722,22 @@ namespace MonoTouch.Dialog
 					}
 					if (focus != this)
 						focus.entry.BecomeFirstResponder ();
-					else
+					else 
 						focus.entry.ResignFirstResponder ();
 					
 					return true;
+				};
+				entry.Started += delegate {
+					EntryElement self = null;
+					var returnType = UIReturnKeyType.Default;
+					
+					foreach (var e in (Parent as Section).Elements){
+						if (e == this)
+							self = this;
+						else if (self != null && e is EntryElement)
+							returnType = UIReturnKeyType.Next;
+					}
+					entry.ReturnKeyType = returnType;
 				};
 			}
 			
