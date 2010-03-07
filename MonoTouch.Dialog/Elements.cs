@@ -614,12 +614,25 @@ namespace MonoTouch.Dialog
 	/// The Text fields in a given section are aligned with each other.
 	/// </remarks>
 	public class EntryElement : Element {
+		/// <summary>
+		///   The value of the EntryElement
+		/// </summary>
 		public string Value;
+		
+		/// <summary>
+		/// The type of keyboard used for input, you can change
+		/// this to use this for numeric input, email addressed,
+		/// urls, phones.
+		/// </summary>
+		public UIKeyboardType KeyboardType = UIKeyboardType.Default;
+		
 		static NSString ekey = new NSString ("EntryElement");
 		bool isPassword;
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
+		
+		public Func<bool,string> Validator;
 		
 		/// <summary>
 		/// Constructs an EntryElement with the given caption, placeholder and initial value.
@@ -702,7 +715,7 @@ namespace MonoTouch.Dialog
 				SizeF size = ComputeEntryPosition (tv, cell);
 				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
-					Placeholder = placeholder,
+					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword
 				};
 				entry.Text = Value ?? "";
@@ -740,6 +753,7 @@ namespace MonoTouch.Dialog
 					entry.ReturnKeyType = returnType;
 				};
 			}
+			entry.KeyboardType = KeyboardType;
 			
 			cell.TextLabel.Text = Caption;
 			cell.ContentView.AddSubview (entry);
