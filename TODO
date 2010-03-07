@@ -12,6 +12,7 @@ More Widgets:
 	Multiline text editing
 		Should support dingus-clicking on urls.
 	Limited number entry: for small ranges of numbers, use a digit picker.
+	Starred element.
 
 Reflection binder:
 	Support Collections as a source that becomes a radio button
