@@ -289,6 +289,28 @@ These are the current widgets supported by the Reflection API:
 	    }
         }
 
+### IEnumerable as a Radio Source ###
+
+You can use any type that implements IEnumerable, including
+generics (which implement IEnumerable) as a source of values
+for creating a one-of-many selector, similar to the radio-like
+selection that you get from an enumeration.
+
+To use this, you will need an int value that has the [RadioSelection]
+attribute set to hold the value that will be selected on startup
+and also to hold the new value when done.
+
+For example:
+
+        class MainSettings {
+	    [RadioSelection ("Themes")]
+	    public int CurrentTheme;
+	    public IList<string> Themes;
+	}
+
+The value rendered is the value rendered by calling ToString() on the
+value returned by IEnumerable.
+
 Creating a Dialog From the Object
 ---------------------------------
 
@@ -496,6 +518,13 @@ Additionally the KeyboardType property can be set at creation time to
 the keyboard type style desired for the data entry.  This can be used
 to configure the keyboard for numeric input, phone input, url input or
 email address input (The values of UIKeyboardType).
+
+Booleans
+--------
+
+The BoolElement is the base class for both the UISwitch-based boolean
+rendered image as well as the BooleanImageElement which is a boolean
+that can render the stage using a string.
 
 Validation
 ----------

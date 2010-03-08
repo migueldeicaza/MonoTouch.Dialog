@@ -47,6 +47,15 @@ namespace MonoTouch.Dialog
 	public class PasswordAttribute : EntryAttribute {
 		public PasswordAttribute (string placeholder) : base (placeholder) {}
 	}
+	
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class RadioSelectionAttribute : Attribute {
+		public string Target;
+		public RadioSelectionAttribute (string target) 
+		{
+			Target = target;
+		}
+	}
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class OnTapAttribute : Attribute {
@@ -174,6 +183,7 @@ namespace MonoTouch.Dialog
 		
 		void Populate (object callbacks, object o, RootElement root)
 		{
+			MemberInfo last_radio_index = null;
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -310,6 +320,28 @@ namespace MonoTouch.Dialog
 					element = new RootElement (caption, new RadioGroup (null, selected)) { csection };
 				} else if (mType == typeof (UIImage)){
 					element = new ImageElement ((UIImage) GetValue (mi, o));
+				} else if (typeof (System.Collections.IEnumerable).IsAssignableFrom (mType)){
+					var csection = new Section ();
+					int count = 0;
+					
+					if (last_radio_index == null)
+						throw new Exception ("IEnumerable found, but no previous int found");
+					foreach (var e in (IEnumerable) GetValue (mi, o)){
+						csection.Add (new RadioElement (e.ToString ()));
+						count++;
+					}
+					int selected = (int) GetValue (last_radio_index, o);
+					if (selected >= count || selected < 0)
+						selected = 0;
+					element = new RootElement (caption, new MemberRadioGroup (null, selected, last_radio_index)) { csection };
+					last_radio_index = null;
+				} else if (typeof (int) == mType){
+					foreach (object attr in attrs){
+						if (attr is RadioSelectionAttribute){
+							last_radio_index = mi;
+							break;
+						}
+					}
 				} else {
 					var nested = GetValue (mi, o);
 					if (nested != null){
@@ -325,6 +357,15 @@ namespace MonoTouch.Dialog
 				mappings [element] = new MemberAndInstance (mi, o);
 			}
 			root.Add (section);
+		}
+		
+		class MemberRadioGroup : RadioGroup {
+			public MemberInfo mi;
+			
+			public MemberRadioGroup (string key, int selected, MemberInfo mi) : base (key, selected)
+			{
+				this.mi = mi;
+			}
 		}
 		
 		public void Dispose ()
@@ -363,7 +404,10 @@ namespace MonoTouch.Dialog
 					SetValue (mi, obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;
-					if (re.group as RadioGroup != null){
+					if (re.group as MemberRadioGroup != null){
+						var group = re.group as MemberRadioGroup;
+						SetValue (group.mi, obj, re.RadioSelected);
+					} else if (re.group as RadioGroup != null){
 						var mType = GetTypeForMember (mi);
 						var fi = mType.GetFields (BindingFlags.Public | BindingFlags.Static) [re.RadioSelected];
 						

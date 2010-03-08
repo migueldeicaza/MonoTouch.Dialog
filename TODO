@@ -1,6 +1,3 @@
-Element API:
-	Insert/Remove sections and rows.
-
 Sliders:
 	Render the left/right image
 
@@ -12,15 +9,6 @@ More Widgets:
 	Multiline text editing
 		Should support dingus-clicking on urls.
 	Limited number entry: for small ranges of numbers, use a digit picker.
-	Starred element.
-
-Reflection binder:
-	Support Collections as a source that becomes a radio button
-
-	And support a [RadioSelect] property on an int to map
-	that to the selected value
-
-	Add support for nested objects.
 
 Ponder:
 	When to support pickers?
