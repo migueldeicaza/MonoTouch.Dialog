@@ -380,6 +380,9 @@ namespace MonoTouch.Dialog
 			{
 				base.ViewWillDisappear (animated);
 				NetworkActivity = false;
+				if (container.web == null)
+					return;
+
 				container.web.StopLoading ();
 				container.web.Dispose ();
 				container.web = null;
