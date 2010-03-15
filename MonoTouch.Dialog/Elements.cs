@@ -472,6 +472,43 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
+	public class ImageStringElement : StringElement {
+		static NSString skey = new NSString ("ImageStringElement");
+		UIImage image;
+		
+		public ImageStringElement (string caption, UIImage image) : base (caption)
+		{
+			this.image = image;
+		}
+		
+		public ImageStringElement (string caption,  NSAction tapped, UIImage image) : base (caption, tapped)
+		{
+			this.image = image;
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (skey);
+			if (cell == null){
+				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle, skey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+			}
+			
+			cell.Accessory = UITableViewCellAccessory.None;
+			cell.TextLabel.Text = Caption;
+			cell.TextLabel.TextAlignment = Alignment;
+			
+			cell.ImageView.Image = image;
+			
+			// The check is needed because the cell might have been recycled.
+			if (cell.DetailTextLabel != null)
+				cell.DetailTextLabel.Text = Value == null ? "" : Value;
+			
+			return cell;
+		}
+		
+	}
+	
 	public interface IElementSizing {
 		float GetHeight (UITableView tableView, NSIndexPath indexPath);
 	}
