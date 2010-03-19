@@ -25,14 +25,6 @@ Visible flag:
 
 
 
-Reflection binder:
-	Support Collections as a source that becomes a radio button
-
-	And support a [RadioSelect] property on an int to map
-	that to the selected value
-
-	Add support for nested objects.
-
 Ponder:
 	When to support pickers?
 

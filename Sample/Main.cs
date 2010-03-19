@@ -35,7 +35,7 @@ namespace Sample
 					new StringElement ("iPhone Settings Sample", DemoElementApi),
 					new StringElement ("Dynamically load data", DemoDynamic),
 					new StringElement ("Add/Remove demo", DemoAddRemove),
-					new StringElement ("Date cells", DemoDate),
+					new StringElement ("Assorted cells", DemoDate),
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)

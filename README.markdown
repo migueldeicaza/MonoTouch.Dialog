@@ -289,6 +289,28 @@ These are the current widgets supported by the Reflection API:
 	    }
         }
 
+### IEnumerable as a Radio Source ###
+
+You can use any type that implements IEnumerable, including
+generics (which implement IEnumerable) as a source of values
+for creating a one-of-many selector, similar to the radio-like
+selection that you get from an enumeration.
+
+To use this, you will need an int value that has the [RadioSelection]
+attribute set to hold the value that will be selected on startup
+and also to hold the new value when done.
+
+For example:
+
+        class MainSettings {
+	    [RadioSelection ("Themes")]
+	    public int CurrentTheme;
+	    public IList<string> Themes;
+	}
+
+The value rendered is the value rendered by calling ToString() on the
+value returned by IEnumerable.
+
 Creating a Dialog From the Object
 ---------------------------------
 
@@ -468,6 +490,61 @@ use:
   * BadgeElement 
     To render images (57x57) or calendar entries next to the text.
 
+Values
+------
+
+Elements that are used to capture user input expose a public "Value"
+property that holds the current value of the element at any time.  It
+is automatically updated as the user uses the application and does not
+require any programmer intervention to fetch the state of the control.
+
+This is the behavior for all of the Elements that are part of
+MonoTouch.Dialog but it is not required for user-created elements.
+
+EntryElement
+------------
+
+The EntryElement is used to get user input and is initialized with
+three values: the caption for the entry that will be shown to the
+user, a placeholder text (this is the greyed-out text that provides a
+hint to the user) and the value of the text.
+
+The placeholder and value can be null, the caption can not.
+
+At any point, the value of the EntryElement can be retrieved by
+accessing its Value property.
+
+Additionally the KeyboardType property can be set at creation time to
+the keyboard type style desired for the data entry.  This can be used
+to configure the keyboard for numeric input, phone input, url input or
+email address input (The values of UIKeyboardType).
+
+Booleans
+--------
+
+The BoolElement is the base class for both the UISwitch-based boolean
+rendered image as well as the BooleanImageElement which is a boolean
+that can render the stage using a string.
+
+Validation
+----------
+
+Elements do not provide validation themselves as the models that are
+well suited for web pages and desktop applications do not map
+directly to the iPhone interaction model.
+
+If you want to do data validation, you should do this when the user
+triggers an action with the data entered.  For example a "Done" or
+"Next" buttons on the top toolbar, or some StringElement used as a
+button to go to the next stage.   
+
+This is where you would perform basic input validation, and perhaps
+more complicated validation like checking for the validity of a
+user/password combination with a server.
+
+How you notify the user of an error is application specific: you could
+pop up a UIAlertView or show a hint.
+
 Creating Your Own Elements
 --------------------------
 
@@ -489,3 +566,47 @@ methods:
 
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+
+Customizing the DialogViewController
+====================================
+
+Both the Reflection and the Elements API use the same
+DialogViewController.  Sometimes you will want to customize the look
+of the view.   
+
+The DialogViewController is merely a subclass of the
+UITableViewController and you can customize it in the same way that
+you would customize a UITableViewController.
+
+For example, if you wanted to change the list style to be either
+Grouped or Plain, you could set this value by changing the property
+when you create the controller, like this:
+
+        var myController = new DialogViewController (root, true){
+            Style = UITableViewStyle.Grouped;
+        }
+
+For more advanced customizations, like setting the default background
+for the DialogViewController, you would need to create a subclass of
+it and override the proper methods.   
+
+This example shows how to use an image as the background for the
+DialogViewController:
+
+class SpiffyDialogViewController : DialogViewController {
+    UIImage image;
+
+    public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image) 
+        : base (root, pushing) 
+    {
+        this.image = image;
+    }
+
+    public override LoadView ()
+    {
+        base.LoadView ();
+	var color = UIColor.FromPatternImage(image);
+        Root.TableView.BackgroundColor = color;
+	ParentViewController.View.BackgroundColor = color;
+    }
+}

@@ -51,9 +51,26 @@ namespace Sample
 				});
 			}
 			
-			var root = new RootElement ("Date sample") {
+			UIImage favorite = UIImage.FromFile ("favorite.png");
+			UIImage favorited = UIImage.FromFile ("favorited.png");
+			
+			var imageSection = new Section ("Image Booleans"){
+				new BooleanImageElement ("Gone with the Wind", true, favorited, favorite),
+				new BooleanImageElement ("Policy Academy 38", false, favorited, favorite),
+			};
+			
+			var entrySection = new Section ("Keyboard styles for entry"){
+				new EntryElement ("Number ", "Some cute number", "1.2") { KeyboardType = UIKeyboardType.NumberPad },
+				new EntryElement ("Email ", "", null) { KeyboardType = UIKeyboardType.EmailAddress },
+				new EntryElement ("Url ", "", null) { KeyboardType = UIKeyboardType.Url },
+				new EntryElement ("Phone ", "", "1.2") { KeyboardType = UIKeyboardType.PhonePad },
+			};
+			
+			var root = new RootElement ("Assorted Elements") {
+				imageSection,
+				entrySection,
 				calendarSection,
-				badgeSection
+				badgeSection,
 			};
 			var dvc = new DialogViewController (root, true);
 			dvc.Style = UITableViewStyle.Plain;

@@ -2,6 +2,7 @@
 // Sample showing the core Element-based API to create a dialog
 //
 using System;
+using System.Collections.Generic;
 using MonoTouch.Dialog;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
@@ -50,6 +51,11 @@ namespace Sample
 		[Caption ("This is a\nmultiline string\nall you need is the\n[Multiline] attribute")]
 		[Multiline]
 		public string multi;
+		
+	[Section ("IEnumerable")]
+		[RadioSelection ("ListOfString")] 
+		public int selected = 1;
+		public IList<string> ListOfString;
 	}
 
 	public class TimeSettings {
@@ -82,7 +88,8 @@ namespace Sample
 					FavoriteType = TypeCode.Int32,
 					Top = image,
 					Middle = image,
-					Bottom = image
+					Bottom = image,
+					ListOfString = new List<string> () { "One", "Two", "Three" }
 				};
 			}
 			var bc = new BindingContext (null, settings, "Settings");
@@ -97,15 +104,18 @@ namespace Sample
 				// Manly way of dumping the data.
 				Console.WriteLine ("Current status:");
 				Console.WriteLine (
-				    "AccountEnabled: {0}\n" +
-				    "Login:          {1}\n" +
-				    "Password:       {2}\n" +
-				    "Appointment:    {3}\n" +
-				    "Birthday:       {4}\n" +
-				    "Alarm:          {5}\n" +
-				    "Favorite Type:  {6}\n", 
+				    "AccountEnabled:  {0}\n" +
+				    "Login:           {1}\n" +
+				    "Password:        {2}\n" +
+				    "Appointment:     {3}\n" +
+				    "Birthday:        {4}\n" +
+				    "Alarm:           {5}\n" +
+				    "Favorite Type:   {6}\n" + 
+				    "IEnumerable idx: {7}", 
 				    settings.AccountEnabled, settings.Login, settings.Password, 
-				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, settings.TimeSamples.Alarm, settings.FavoriteType);
+				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, 
+				    settings.TimeSamples.Alarm, settings.FavoriteType,
+				    settings.selected);
 			};
 			navigation.PushViewController (dv, true);	
 		}

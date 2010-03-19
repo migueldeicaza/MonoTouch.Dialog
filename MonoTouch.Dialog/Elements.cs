@@ -99,24 +99,32 @@ namespace MonoTouch.Dialog
 		}
 	}
 
-	/// <summary>
-	/// Used to display switch on the screen.
-	/// </summary>
-	public class BooleanElement : Element {
+	public abstract class BoolElement : Element {
 		public bool Value;
-		public string Key;
-		static NSString bkey = new NSString ("BooleanElement");
-		UISwitch sw;
 		
-		public BooleanElement (string caption, bool value) : base (caption)
+		public BoolElement (string caption, bool value) : base (caption)
 		{
 			Value = value;
 		}
 		
-		public BooleanElement (string caption, bool value, string key) : this (caption, value)
+		public override string Summary ()
 		{
-			Key = key;
-		}
+			return Value ? "On" : "Off";
+		}		
+	}
+	
+	/// <summary>
+	/// Used to display switch on the screen.
+	/// </summary>
+	public class BooleanElement : BoolElement {
+		static NSString bkey = new NSString ("BooleanElement");
+		UISwitch sw;
+		
+		public BooleanElement (string caption, bool value) : base (caption, value)
+		{  }
+		
+		public BooleanElement (string caption, bool value, string key) : base (caption, value)
+		{  }
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
@@ -144,11 +152,6 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		public override string Summary ()
-		{
-			return Value ? "On" : "Off";
-		}
-		
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
@@ -157,7 +160,120 @@ namespace MonoTouch.Dialog
 			}
 		}
 	}
+	
+	/// <summary>
+	///  This class is used to render a string + a state in the form
+	/// of an image.  
+	/// </summary>
+	/// <remarks>
+	/// It is abstract to avoid making this element
+	/// keep two pointers for the state images, saving 8 bytes per
+	/// slot.   The more derived class "BooleanImageElement" shows
+	/// one way to implement this by keeping two pointers, a better
+	/// implementation would return pointers to images that were 
+	/// preloaded and are static.
+	/// 
+	/// A subclass only needs to implement the GetImage method.
+	/// </remarks>
+	public abstract class BaseBooleanImageElement : BoolElement {
+		static NSString key = new NSString ("BooleanImageElement");
+		
+		public class TextWithImageCellView : UITableViewCell {
+			const int fontSize = 17;
+			static UIFont font = UIFont.BoldSystemFontOfSize (fontSize);
+			BaseBooleanImageElement parent;
+			UILabel label;
+			UIButton button;
+			const int ImageSpace = 32;
+			const int Padding = 8;
+	
+			public TextWithImageCellView (BaseBooleanImageElement parent) : base (UITableViewCellStyle.Value1, key)
+			{
+				this.parent = parent;
+				label = new UILabel () {
+					TextAlignment = UITextAlignment.Left,
+					Text = parent.Caption,
+					Font = font,
+				};
+				button = UIButton.FromType (UIButtonType.Custom);
+				button.TouchDown += delegate {
+					parent.Value = !parent.Value;
+					UpdateImage ();
+				};
+				ContentView.Add (label);
+				ContentView.Add (button);
+				UpdateImage ();
+			}
 
+			void UpdateImage ()
+			{
+				button.SetImage (parent.GetImage (), UIControlState.Normal);
+			}
+			
+			public override void LayoutSubviews ()
+			{
+				base.LayoutSubviews ();
+				var full = ContentView.Bounds;
+				var frame = full;
+				frame.Height = 22;
+				frame.X = Padding;
+				frame.Y = (full.Height-frame.Height)/2;
+				frame.Width -= ImageSpace+Padding;
+				label.Frame = frame;
+				
+				button.Frame = new RectangleF (full.Width-ImageSpace, -3, ImageSpace, 48);
+			}
+			
+			public void UpdateFrom (BaseBooleanImageElement newParent)
+			{
+				parent = newParent;
+				UpdateImage ();
+				label.Text = parent.Caption;
+			}
+		}
+	
+		public BaseBooleanImageElement (string caption, bool value)
+			: base (caption, value)
+		{
+		}
+		
+		protected abstract UIImage GetImage ();
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (key) as TextWithImageCellView;
+			if (cell == null)
+				cell = new TextWithImageCellView (this);
+			else
+				cell.UpdateFrom (this);
+			return cell;
+		}
+	}
+	
+	public class BooleanImageElement : BaseBooleanImageElement {
+		UIImage onImage, offImage;
+		
+		public BooleanImageElement (string caption, bool value, UIImage onImage, UIImage offImage) : base (caption, value)
+		{
+			this.onImage = onImage;
+			this.offImage = offImage;
+		}
+		
+		protected override UIImage GetImage ()
+		{
+			if (Value)
+				return onImage;
+			else
+				return offImage;
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+			onImage = offImage = null;
+		}
+	}
+	
 	/// <summary>
 	///  Used to display a slider on the screen.
 	/// </summary>
@@ -264,6 +380,9 @@ namespace MonoTouch.Dialog
 			{
 				base.ViewWillDisappear (animated);
 				NetworkActivity = false;
+				if (container.web == null)
+					return;
+
 				container.web.StopLoading ();
 				container.web.Dispose ();
 				container.web = null;
@@ -351,6 +470,43 @@ namespace MonoTouch.Dialog
 				Tapped ();
 			tableView.DeselectRow (indexPath, true);
 		}
+	}
+	
+	public class ImageStringElement : StringElement {
+		static NSString skey = new NSString ("ImageStringElement");
+		UIImage image;
+		
+		public ImageStringElement (string caption, UIImage image) : base (caption)
+		{
+			this.image = image;
+		}
+		
+		public ImageStringElement (string caption,  NSAction tapped, UIImage image) : base (caption, tapped)
+		{
+			this.image = image;
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (skey);
+			if (cell == null){
+				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle, skey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+			}
+			
+			cell.Accessory = UITableViewCellAccessory.None;
+			cell.TextLabel.Text = Caption;
+			cell.TextLabel.TextAlignment = Alignment;
+			
+			cell.ImageView.Image = image;
+			
+			// The check is needed because the cell might have been recycled.
+			if (cell.DetailTextLabel != null)
+				cell.DetailTextLabel.Text = Value == null ? "" : Value;
+			
+			return cell;
+		}
+		
 	}
 	
 	public interface IElementSizing {
@@ -469,7 +625,7 @@ namespace MonoTouch.Dialog
 	public class ImageElement : Element {
 		public UIImage Value;
 		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
-		static NSString ikey = new NSString ("ikey");
+		static NSString ikey = new NSString ("ImageElement");
 		UIImage scaled;
 		
 		// Apple leaks this one, so share across all.
@@ -614,12 +770,25 @@ namespace MonoTouch.Dialog
 	/// The Text fields in a given section are aligned with each other.
 	/// </remarks>
 	public class EntryElement : Element {
+		/// <summary>
+		///   The value of the EntryElement
+		/// </summary>
 		public string Value;
+		
+		/// <summary>
+		/// The type of keyboard used for input, you can change
+		/// this to use this for numeric input, email addressed,
+		/// urls, phones.
+		/// </summary>
+		public UIKeyboardType KeyboardType = UIKeyboardType.Default;
+		
 		static NSString ekey = new NSString ("EntryElement");
 		bool isPassword;
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
+		
+		public Func<bool,string> Validator;
 		
 		/// <summary>
 		/// Constructs an EntryElement with the given caption, placeholder and initial value.
@@ -702,7 +871,7 @@ namespace MonoTouch.Dialog
 				SizeF size = ComputeEntryPosition (tv, cell);
 				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
-					Placeholder = placeholder,
+					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword
 				};
 				entry.Text = Value ?? "";
@@ -740,6 +909,7 @@ namespace MonoTouch.Dialog
 					entry.ReturnKeyType = returnType;
 				};
 			}
+			entry.KeyboardType = KeyboardType;
 			
 			cell.TextLabel.Text = Caption;
 			cell.ContentView.AddSubview (entry);
@@ -1555,7 +1725,7 @@ namespace MonoTouch.Dialog
 								count++;
 							continue;
 						}
-						var be = e as BooleanElement;
+						var be = e as BoolElement;
 						if (be != null){
 							if (be.Value)
 								count++;
