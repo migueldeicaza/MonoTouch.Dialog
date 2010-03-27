@@ -881,6 +881,9 @@ namespace MonoTouch.Dialog
 				entry.ValueChanged += delegate {
 					Value = entry.Text;
 				};
+				entry.Ended += delegate {
+					Value = entry.Text;
+				};
 				entry.ShouldReturn += delegate {
 					EntryElement focus = null;
 					foreach (var e in (Parent as Section).Elements){
