@@ -968,7 +968,7 @@ namespace MonoTouch.Dialog
 		public virtual UIDatePicker CreatePicker ()
 		{
 			var picker = new UIDatePicker (RectangleF.Empty){
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
+				AutoresizingMask = UIViewAutoresizing.None,
 				Mode = UIDatePickerMode.Date,
 				Date = DateValue
 			};
@@ -978,8 +978,30 @@ namespace MonoTouch.Dialog
 		static RectangleF PickerFrameWithSize (SizeF size)
 		{                                                                                                                                    
 			var screenRect = UIScreen.MainScreen.ApplicationFrame;
-			return new RectangleF (0f, screenRect.Height - 84f - size.Height, size.Width, size.Height);
-		}                                                                                                                                    
+			
+			float fY = 0f;
+			float fX = 0f;
+			
+			switch(UIApplication.SharedApplication.StatusBarOrientation)
+			{
+				case UIInterfaceOrientation.LandscapeLeft:
+				case UIInterfaceOrientation.LandscapeRight:
+					fY = ((screenRect.Width-size.Height)/2)-17;
+					fX = (screenRect.Height-size.Width)/2;
+					break;
+		
+				case UIInterfaceOrientation.Portrait:
+				case UIInterfaceOrientation.PortraitUpsideDown:
+				default:
+					fY = ((screenRect.Height-size.Height)/2)-25;
+					fX = (screenRect.Width-size.Width)/2;
+					break;
+			
+			}
+			
+			return new RectangleF (fX, fY, size.Width, size.Height);
+		
+		}                                                                                                                                  
 
 		class MyViewController : UIViewController {
 			DateTimeElement container;
@@ -989,11 +1011,35 @@ namespace MonoTouch.Dialog
 				this.container = container;
 			}
 			
+			public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
+			{
+				
+				base.DidRotate (fromInterfaceOrientation);
+			
+				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (SizeF.Empty));
+				
+			}
+				                                                                                     
 			public override void ViewWillDisappear (bool animated)
 			{
 				base.ViewWillDisappear (animated);
 				container.DateValue = container.datePicker.Date;
 			}
+			private bool rotateUIEnabled = NSUserDefaults.StandardUserDefaults.BoolForKey("UIInterfaceRotateEnabled");
+		
+			public bool RotateUIEnabled
+			{
+				get{return rotateUIEnabled;}
+				set{rotateUIEnabled = value;}
+			}
+			
+			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+			{	
+				return true;
+				//return rotateUIEnabled;
+			
+			}
+			
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
@@ -1002,7 +1048,7 @@ namespace MonoTouch.Dialog
 			datePicker = CreatePicker ();
 			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 			                            
-			vc.View.BackgroundColor = UIColor.Black;
+			vc.View.BackgroundColor = UIColor.DarkGray;
 			vc.View.AddSubview (datePicker);
 			dvc.ActivateController (vc);
 		}

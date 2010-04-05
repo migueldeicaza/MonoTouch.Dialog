@@ -45,7 +45,7 @@ namespace Sample
 				}
 			};
 
-			var dv = new DialogViewController (menu);
+			var dv = new DialogViewController (menu,false);
 			navigation.PushViewController (dv, true);				
 			
 			window.MakeKeyAndVisible ();

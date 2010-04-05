@@ -1,4 +1,5 @@
 using System;
+using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using System.Drawing;
 
@@ -11,7 +12,15 @@ namespace MonoTouch.Dialog
 		RootElement root;
 		bool pushing;
 		bool dirty;
-
+		
+		private bool rotateUIEnabled = NSUserDefaults.StandardUserDefaults.BoolForKey("UIInterfaceRotateEnabled");
+		
+		public bool RotateUIEnabled
+		{
+			get{return rotateUIEnabled;}
+			set{rotateUIEnabled = value;}
+		}
+		
 		public RootElement Root {
 			get {
 				return root;
@@ -150,6 +159,13 @@ namespace MonoTouch.Dialog
 			
 			root.TableView = tableView;
 		}
+		
+		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+		{	
+			return true;
+			//return rotateUIEnabled;
+		
+		}
 
 		public override void ViewWillAppear (bool animated)
 		{
@@ -223,5 +239,14 @@ namespace MonoTouch.Dialog
 			this.pushing = pushing;
 			PrepareRoot (root);
 		}
+		
+		public DialogViewController (RootElement root, bool pushing, bool AutoRotateUI)
+		{
+			this.pushing = pushing;
+			this.rotateUIEnabled = AutoRotateUI;
+			PrepareRoot(root);
+		}
+			
 	}
+	
 }

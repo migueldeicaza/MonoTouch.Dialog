@@ -104,5 +104,11 @@
     <Content Include="jakub-calendar.png" />
     <Content Include="favorite.png" />
     <Content Include="favorited.png" />
+    <Content Include="Settings.bundle\Root.plist">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Settings.bundle\" />
   </ItemGroup>
 </Project>
