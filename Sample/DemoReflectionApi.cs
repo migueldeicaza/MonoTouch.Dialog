@@ -58,13 +58,13 @@ namespace Sample
 		public IList<string> ListOfString;
 		
 	[Section ("Alignment")]
-		[Alignment("Left")]
+		[Alignment(UITextAlignment.Left)]
 		public string LeftAlign;
 		
-		[Alignment("Center")]
+		[Alignment(UITextAlignment.Center)]
 		public string CenterAlign;
 		
-		[Alignment("Right")]
+		[Alignment(UITextAlignment.Right)]
 		public string RightAlign;
 		
 	}

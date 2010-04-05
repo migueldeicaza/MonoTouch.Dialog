@@ -77,8 +77,9 @@ namespace MonoTouch.Dialog
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class AlignmentAttribute : Attribute {
-		public AlignmentAttribute (string alignment)
+		public AlignmentAttribute (UITextAlignment alignment)
 		{
+			/*
 			switch(alignment.ToLower())
 			{
 			case "left":
@@ -95,7 +96,8 @@ namespace MonoTouch.Dialog
 				break;
 		
 			}
-			
+			*/
+			Alignment = alignment;
 		}
 		
 		public UITextAlignment Alignment;
@@ -266,7 +268,6 @@ namespace MonoTouch.Dialog
 							ea = attr as EntryAttribute;
 						else if (attr is MultilineAttribute)
 							multi = true;
-						
 						if (attr is OnTapAttribute){
 							string mname = ((OnTapAttribute) attr).Method;
 							

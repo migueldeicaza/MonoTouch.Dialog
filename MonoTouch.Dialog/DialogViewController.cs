@@ -13,7 +13,20 @@ namespace MonoTouch.Dialog
 		bool pushing;
 		bool dirty;
 		
-		private bool rotateUIEnabled = NSUserDefaults.StandardUserDefaults.BoolForKey("UIInterfaceRotateEnabled");
+		private static bool GetRotateEnabled()
+		{
+			bool bEnabled = false;
+			
+			bEnabled = NSUserDefaults.StandardUserDefaults.BoolForKey("interfaceRotateEnabled");
+		
+			string strEnabled = NSUserDefaults.StandardUserDefaults.StringForKey("InterfaceRotateEnabled");
+			
+			NSUserDefaults.StandardUserDefaults.SetBool(false,"interfaceRotateTest");
+			
+			return bEnabled;
+		}
+		
+		private bool rotateUIEnabled = DialogViewController.GetRotateEnabled(); 
 		
 		public bool RotateUIEnabled
 		{
@@ -162,8 +175,7 @@ namespace MonoTouch.Dialog
 		
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{	
-			return true;
-			//return rotateUIEnabled;
+			return rotateUIEnabled;
 		
 		}
 
