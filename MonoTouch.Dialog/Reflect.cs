@@ -74,6 +74,33 @@ namespace MonoTouch.Dialog
 		}
 		public string Caption;
 	}
+	
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class AlignmentAttribute : Attribute {
+		public AlignmentAttribute (string alignment)
+		{
+			switch(alignment.ToLower())
+			{
+			case "left":
+				Alignment = UITextAlignment.Left;
+				break;
+			case "right":
+				Alignment = UITextAlignment.Right;
+				break;
+			case "center":
+				Alignment = UITextAlignment.Center;
+				break;
+			default:
+				Alignment = UITextAlignment.Left;
+				break;
+		
+			}
+			
+		}
+		
+		public UITextAlignment Alignment;
+	}
+	
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class SectionAttribute : Attribute {
@@ -196,6 +223,8 @@ namespace MonoTouch.Dialog
 					continue;
 
 				string caption = null;
+				UITextAlignment alignment = UITextAlignment.Left;
+				
 				object [] attrs = mi.GetCustomAttributes (false);
 				bool skip = false;
 				foreach (var attr in attrs){
@@ -209,6 +238,10 @@ namespace MonoTouch.Dialog
 						var sa = attr as SectionAttribute;
 						section = new Section (sa.Caption, sa.Footer);
 					}
+					else if (attr is AlignmentAttribute){
+						alignment = ((AlignmentAttribute)attr).Alignment;	
+					}
+					
 				}
 				if (skip)
 					continue;
@@ -353,6 +386,10 @@ namespace MonoTouch.Dialog
 				
 				if (element == null)
 					continue;
+				
+				if(element is StringElement)
+					((StringElement)element).Alignment = alignment;
+				
 				section.Add (element);
 				mappings [element] = new MemberAndInstance (mi, o);
 			}

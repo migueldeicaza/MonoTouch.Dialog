@@ -56,6 +56,17 @@ namespace Sample
 		[RadioSelection ("ListOfString")] 
 		public int selected = 1;
 		public IList<string> ListOfString;
+		
+	[Section ("Alignment")]
+		[Alignment("Left")]
+		public string LeftAlign;
+		
+		[Alignment("Center")]
+		public string CenterAlign;
+		
+		[Alignment("Right")]
+		public string RightAlign;
+		
 	}
 
 	public class TimeSettings {
