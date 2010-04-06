@@ -41,6 +41,9 @@ namespace MonoTouch.Dialog
 	public class MultilineAttribute : Attribute {}
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class HtmlAttribute : Attribute {}
+	
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class SkipAttribute : Attribute {}
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
@@ -223,6 +226,7 @@ namespace MonoTouch.Dialog
 				if (mType == typeof (string)){
 					PasswordAttribute pa = null;
 					EntryAttribute ea = null;
+					object html = null;
 					NSAction invoke = null;
 					bool multi = false;
 					
@@ -233,6 +237,8 @@ namespace MonoTouch.Dialog
 							ea = attr as EntryAttribute;
 						else if (attr is MultilineAttribute)
 							multi = true;
+						else if (attr is HtmlAttribute)
+							html = attr;
 						
 						if (attr is OnTapAttribute){
 							string mname = ((OnTapAttribute) attr).Method;
@@ -257,6 +263,8 @@ namespace MonoTouch.Dialog
 						element = new EntryElement (caption, ea.Placeholder, value);
 					else if (multi)
 						element = new MultilineElement (caption, value);
+					else if (html != null)
+						element = new HtmlElement (caption, value);
 					else
 						element = new StringElement (caption, value);
 					

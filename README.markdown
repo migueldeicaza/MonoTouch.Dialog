@@ -143,7 +143,10 @@ These are the current widgets supported by the Reflection API:
   to invoke a method on demand.
 
   You can add the [Multiline] attribute to your string
-  to make the cell render in multiple lines.
+  to make the cell render in multiple lines.   And you 
+  can use the [Html] attribute on a string, in that
+  case the value of the string should contain the url
+  to load in the embedded UIWebView. 
 
   Examples:
 
