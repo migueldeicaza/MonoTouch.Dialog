@@ -132,9 +132,9 @@ namespace MonoTouch.Dialog
 
 	public class BindingContext : IDisposable {
 		public RootElement Root;
-		Dictionary<Element,MemberAndInstance> mappings;
+		protected Dictionary<Element,MemberAndInstance> mappings;
 			
-		class MemberAndInstance {
+		protected class MemberAndInstance {
 			public MemberAndInstance (MemberInfo mi, object o)
 			{
 				Member = mi;
@@ -144,7 +144,7 @@ namespace MonoTouch.Dialog
 			public object Obj;
 		}
 		
-		static object GetValue (MemberInfo mi, object o)
+		protected static object GetValue (MemberInfo mi, object o)
 		{
 			var fi = mi as FieldInfo;
 			if (fi != null)
@@ -167,7 +167,7 @@ namespace MonoTouch.Dialog
 			setMethod.Invoke (o, new object [] { val });
 		}
 			
-		static string MakeCaption (string name)
+		protected static string MakeCaption (string name)
 		{
 			var sb = new StringBuilder (name.Length);
 			bool nextUp = true;
@@ -190,7 +190,7 @@ namespace MonoTouch.Dialog
 		}
 
 		// Returns the type for fields and properties and null for everything else
-		static Type GetTypeForMember (MemberInfo mi)
+		protected static Type GetTypeForMember (MemberInfo mi)
 		{				
 			if (mi is FieldInfo)
 				return ((FieldInfo) mi).FieldType;
@@ -210,13 +210,13 @@ namespace MonoTouch.Dialog
 			Populate (callbacks, o, Root);
 		}
 		
-		void Populate (object callbacks, object o, RootElement root)
+		protected virtual void Populate (object callbacks, object o, RootElement root)
 		{
 			MemberInfo last_radio_index = null;
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
-
-			Section section = null;
+			
+			Section section = null;	
 			
 			foreach (var mi in members){
 				Type mType = GetTypeForMember (mi);
@@ -397,7 +397,7 @@ namespace MonoTouch.Dialog
 			root.Add (section);
 		}
 		
-		class MemberRadioGroup : RadioGroup {
+		protected class MemberRadioGroup : RadioGroup {
 			public MemberInfo mi;
 			
 			public MemberRadioGroup (string key, int selected, MemberInfo mi) : base (key, selected)
@@ -421,7 +421,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public void Fetch ()
+		public virtual void Fetch ()
 		{
 			foreach (var dk in mappings){
 				Element element = dk.Key;
@@ -455,4 +455,5 @@ namespace MonoTouch.Dialog
 			}
 		}
 	}
+	
 }
