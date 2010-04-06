@@ -609,7 +609,7 @@ class SpiffyDialogViewController : DialogViewController {
     {
         base.LoadView ();
 	var color = UIColor.FromPatternImage(image);
-        Root.TableView.BackgroundColor = color;
+        Root.TableView.BackgroundColor = UIColor.Clear;
 	ParentViewController.View.BackgroundColor = color;
     }
 }
