@@ -12,52 +12,49 @@ namespace MonoTouch.Dialog
 		RootElement root;
 		bool pushing;
 		bool dirty;
-		
-		private static bool GetRotateEnabled()
+
+		private static bool GetRotateEnabled ()
 		{
-			if(NSUserDefaults.StandardUserDefaults.StringForKey("interfaceRotateEnabled") == null)
-			{
-				NSUserDefaults.StandardUserDefaults.SetBool(false,"interfaceRotateEnabled");				
+			if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
+				NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
 			}
 			
-			return NSUserDefaults.StandardUserDefaults.BoolForKey("interfaceRotateEnabled");
-		
+			return NSUserDefaults.StandardUserDefaults.BoolForKey ("interfaceRotateEnabled");
+			
 		}
-		
-		private bool rotateUIEnabled = DialogViewController.GetRotateEnabled();
-		
-		public bool RotateUIEnabled
-		{
-			get{return rotateUIEnabled;}
-			set{rotateUIEnabled = value;}
+
+		private bool rotateUIEnabled = DialogViewController.GetRotateEnabled ();
+
+		public bool RotateUIEnabled {
+			get { return rotateUIEnabled; }
+			set { rotateUIEnabled = value; }
 		}
-		
+
 		public RootElement Root {
-			get {
-				return root;
-			}
+			get { return root; }
 			set {
 				if (root == value)
 					return;
 				root = value;
-				root.TableView = tableView;					
+				root.TableView = tableView;
 				ReloadData ();
 			}
-		} 
-		
-		class Source : UITableViewSource {
+		}
+
+		class Source : UITableViewSource
+		{
 			protected DialogViewController container;
 			protected RootElement root;
-			
+
 			public Source (DialogViewController container)
 			{
 				this.container = container;
 				root = container.root;
 			}
-			
+
 			public override int RowsInSection (UITableView tableview, int section)
 			{
-				var s = root.Sections [section];
+				var s = root.Sections[section];
 				return s.Elements.Count;
 			}
 
@@ -68,40 +65,40 @@ namespace MonoTouch.Dialog
 
 			public override string TitleForHeader (UITableView tableView, int section)
 			{
-				return root.Sections [section].Caption;
+				return root.Sections[section].Caption;
 			}
 
 			public override string TitleForFooter (UITableView tableView, int section)
 			{
-				return root.Sections [section].Footer;
+				return root.Sections[section].Footer;
 			}
 
 			public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
-				var element = section.Elements [indexPath.Row];
+				var section = root.Sections[indexPath.Section];
+				var element = section.Elements[indexPath.Row];
 				
 				return element.GetCell (tableView);
 			}
-			
+
 			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
-				var element = section.Elements [indexPath.Row];
-
+				var section = root.Sections[indexPath.Section];
+				var element = section.Elements[indexPath.Row];
+				
 				element.Selected (container, tableView, indexPath);
+				
+			}
 
-			}			
-			
 			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = root.Sections[sectionIdx];
 				return section.HeaderView;
 			}
 
 			public override float GetHeightForHeader (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = root.Sections[sectionIdx];
 				if (section.HeaderView == null)
 					return -1;
 				return section.HeaderView.Frame.Height;
@@ -109,13 +106,13 @@ namespace MonoTouch.Dialog
 
 			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = root.Sections[sectionIdx];
 				return section.FooterView;
 			}
-			
+
 			public override float GetHeightForFooter (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = root.Sections[sectionIdx];
 				if (section.FooterView == null)
 					return -1;
 				return section.FooterView.Frame.Height;
@@ -127,13 +124,16 @@ namespace MonoTouch.Dialog
 		// probe *every* row for its size;   Avoid this by creating a separate
 		// model that is used only when we have items that require resizing
 		//
-		class SizingSource : Source {
-			public SizingSource (DialogViewController controller) : base (controller) {}
-			
+		class SizingSource : Source
+		{
+			public SizingSource (DialogViewController controller) : base(controller)
+			{
+			}
+
 			public override float GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
-				var element = section.Elements [indexPath.Row];
+				var section = root.Sections[indexPath.Section];
+				var element = section.Elements[indexPath.Row];
 				
 				var sizable = element as IElementSizing;
 				if (sizable == null)
@@ -141,7 +141,7 @@ namespace MonoTouch.Dialog
 				return sizable.GetHeight (tableView, indexPath);
 			}
 		}
-			
+
 		public void ActivateController (UIViewController controller)
 		{
 			dirty = true;
@@ -158,11 +158,8 @@ namespace MonoTouch.Dialog
 
 		public override void LoadView ()
 		{
-			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) {
-				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin,
-				AutosizesSubviews = true
-			};
-
+			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) { AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin, AutosizesSubviews = true };
+			
 			UpdateSource ();
 			View = tableView;
 			if (root == null)
@@ -170,11 +167,11 @@ namespace MonoTouch.Dialog
 			
 			root.TableView = tableView;
 		}
-		
+
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
-		{	
+		{
 			return rotateUIEnabled;
-		
+			
 		}
 
 		public override void ViewWillAppear (bool animated)
@@ -185,14 +182,14 @@ namespace MonoTouch.Dialog
 			NavigationItem.HidesBackButton = !pushing;
 			if (root.Caption != null)
 				NavigationItem.Title = root.Caption;
-			if (dirty){
+			if (dirty) {
 				tableView.ReloadData ();
 				dirty = false;
 			}
 		}
 
 		Source TableSource;
-		
+
 		void UpdateSource ()
 		{
 			if (root == null)
@@ -205,15 +202,15 @@ namespace MonoTouch.Dialog
 		public void ReloadData ()
 		{
 			root.Prepare ();
-			if (tableView != null){
+			if (tableView != null) {
 				UpdateSource ();
 				tableView.ReloadData ();
 			}
 			dirty = false;
 		}
-		
+
 		public event EventHandler ViewDissapearing;
-		
+
 		public override void ViewWillDisappear (bool animated)
 		{
 			base.ViewWillDisappear (animated);
@@ -227,13 +224,13 @@ namespace MonoTouch.Dialog
 			if (root != null)
 				root.Prepare ();
 		}
-		
+
 		public DialogViewController (RootElement root)
 		{
 			PrepareRoot (root);
-
+			
 		}
-		
+
 		/// <summary>
 		///     Creates a new DialogViewController from a RootElement and sets the push status
 		/// </summary>
@@ -250,12 +247,12 @@ namespace MonoTouch.Dialog
 			this.pushing = pushing;
 			PrepareRoot (root);
 		}
-		
+
 		public DialogViewController (RootElement root, bool pushing, bool AutoRotateUI)
 		{
 			this.pushing = pushing;
 			this.rotateUIEnabled = AutoRotateUI;
-			PrepareRoot(root);
+			PrepareRoot (root);
 		}
 		
 	}

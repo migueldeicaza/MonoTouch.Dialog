@@ -24,7 +24,7 @@ namespace MonoTouch.Dialog
 		Portrait,
 		Landscape
 	}
-		
+
 	/// <summary>
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
@@ -371,17 +371,17 @@ namespace MonoTouch.Dialog
 			public WebViewController (HtmlElement container) : base()
 			{
 				this.container = container;
-			
+				
 			}
-			
-			public WebViewController (HtmlElement container, bool AutoRotateUI):base()
+
+			public WebViewController (HtmlElement container, bool AutoRotateUI) : base()
 			{
 				this.container = container;
 				this.rotateUIEnabled = AutoRotateUI;
 				
 			}
-			
-			public WebViewController (HtmlElement container, OrientationModes orientationMode):base()
+
+			public WebViewController (HtmlElement container, OrientationModes orientationMode) : base()
 			{
 				this.container = container;
 				this.rotateUIEnabled = true;
@@ -400,7 +400,7 @@ namespace MonoTouch.Dialog
 				container.web.Dispose ();
 				container.web = null;
 			}
-			
+
 			private static bool GetRotateEnabled ()
 			{
 				if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
