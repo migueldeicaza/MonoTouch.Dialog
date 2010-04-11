@@ -13,7 +13,7 @@ namespace MonoTouch.Dialog
 		bool pushing;
 		bool dirty;
 		
-		 private static bool GetRotateEnabled()
+		private static bool GetRotateEnabled()
 		{
 			if(NSUserDefaults.StandardUserDefaults.StringForKey("interfaceRotateEnabled") == null)
 			{
@@ -231,6 +231,7 @@ namespace MonoTouch.Dialog
 		public DialogViewController (RootElement root)
 		{
 			PrepareRoot (root);
+
 		}
 		
 		/// <summary>
@@ -256,7 +257,7 @@ namespace MonoTouch.Dialog
 			this.rotateUIEnabled = AutoRotateUI;
 			PrepareRoot(root);
 		}
-			
+		
 	}
 	
 }
