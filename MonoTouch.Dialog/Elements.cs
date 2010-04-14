@@ -643,7 +643,7 @@ namespace MonoTouch.Dialog
 
 		UITableViewCell ConfigCell (UITableViewCell cell)
 		{
-			cell.Accessory = Value ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.DisclosureIndicator;
+			cell.Accessory = Value ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
 			return cell;
 		}
 
