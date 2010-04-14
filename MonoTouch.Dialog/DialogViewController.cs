@@ -15,6 +15,8 @@ namespace MonoTouch.Dialog
 
 		private static bool GetRotateEnabled ()
 		{
+			NSUserDefaults.StandardUserDefaults.Init();
+			
 			if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
 				NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
 			}
@@ -173,7 +175,7 @@ namespace MonoTouch.Dialog
 			return rotateUIEnabled;
 			
 		}
-
+		
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);

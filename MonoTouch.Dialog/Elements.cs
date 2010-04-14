@@ -18,13 +18,6 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
-	public enum OrientationModes
-	{
-		All,
-		Portrait,
-		Landscape
-	}
-
 	/// <summary>
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
@@ -208,7 +201,7 @@ namespace MonoTouch.Dialog
 				ContentView.Add (button);
 				UpdateImage ();
 			}
-
+			
 			void UpdateImage ()
 			{
 				button.SetImage (parent.GetImage (), UIControlState.Normal);
@@ -251,6 +244,19 @@ namespace MonoTouch.Dialog
 				cell.UpdateFrom (this);
 			return cell;
 		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			Value = !Value;
+			var cell = tableView.CellAt (path);
+			
+			if(cell != null && cell is TextWithImageCellView)
+				((TextWithImageCellView)cell).UpdateFrom(this);
+			
+			tableView.DeselectRow (path, true);
+			
+		}	
+		
 	}
 
 	public class BooleanImageElement : BaseBooleanImageElement
@@ -366,8 +372,7 @@ namespace MonoTouch.Dialog
 		class WebViewController : UIViewController
 		{
 			HtmlElement container;
-			OrientationModes orientationMode = OrientationModes.All;
-
+			
 			public WebViewController (HtmlElement container) : base()
 			{
 				this.container = container;
@@ -378,14 +383,6 @@ namespace MonoTouch.Dialog
 			{
 				this.container = container;
 				this.rotateUIEnabled = AutoRotateUI;
-				
-			}
-
-			public WebViewController (HtmlElement container, OrientationModes orientationMode) : base()
-			{
-				this.container = container;
-				this.rotateUIEnabled = true;
-				this.orientationMode = orientationMode;
 				
 			}
 
@@ -403,6 +400,8 @@ namespace MonoTouch.Dialog
 
 			private static bool GetRotateEnabled ()
 			{
+				NSUserDefaults.StandardUserDefaults.Init();
+			
 				if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
 					NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
 				}
@@ -443,7 +442,9 @@ namespace MonoTouch.Dialog
 			
 			dvc.ActivateController (vc);
 			web.LoadRequest (NSUrlRequest.FromUrl (new NSUrl (Url)));
+			
 		}
+		 
 	}
 
 	/// <summary>
@@ -642,7 +643,7 @@ namespace MonoTouch.Dialog
 
 		UITableViewCell ConfigCell (UITableViewCell cell)
 		{
-			cell.Accessory = Value ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			cell.Accessory = Value ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.DisclosureIndicator;
 			return cell;
 		}
 
@@ -1031,15 +1032,8 @@ namespace MonoTouch.Dialog
 		class MyViewController : UIViewController
 		{
 			DateTimeElement container;
-			OrientationModes orientationMode = OrientationModes.All;
-
+			
 			public MyViewController (DateTimeElement container)
-			{
-				this.container = container;
-				
-			}
-
-			public MyViewController (DateTimeElement containerm, OrientationModes orientationMode)
 			{
 				this.container = container;
 				
@@ -1062,6 +1056,8 @@ namespace MonoTouch.Dialog
 
 			private static bool GetRotateEnabled ()
 			{
+				NSUserDefaults.StandardUserDefaults.Init();
+			
 				if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
 					NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
 				}

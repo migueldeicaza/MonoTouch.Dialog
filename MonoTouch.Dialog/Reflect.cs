@@ -102,24 +102,6 @@ namespace MonoTouch.Dialog
 	{
 		public AlignmentAttribute (UITextAlignment alignment)
 		{
-			/*
-			switch(alignment.ToLower())
-			{
-			case "left":
-				Alignment = UITextAlignment.Left;
-				break;
-			case "right":
-				Alignment = UITextAlignment.Right;
-				break;
-			case "center":
-				Alignment = UITextAlignment.Center;
-				break;
-			default:
-				Alignment = UITextAlignment.Left;
-				break;
-		
-			}
-			*/			
 			Alignment = alignment;
 		}
 
