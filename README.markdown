@@ -270,7 +270,7 @@ These are the current widgets supported by the Reflection API:
 
   Examples:
 
-        class MainSettings {
+	class MainSettings {
 	    string Subject;
 	    string RoomName;
 	    TimeRange Time;
@@ -608,8 +608,8 @@ class SpiffyDialogViewController : DialogViewController {
     public override LoadView ()
     {
         base.LoadView ();
-	var color = UIColor.FromPatternImage(image);
+        var color = UIColor.FromPatternImage(image);
         Root.TableView.BackgroundColor = UIColor.Clear;
-	ParentViewController.View.BackgroundColor = color;
+        ParentViewController.View.BackgroundColor = color;
     }
 }
