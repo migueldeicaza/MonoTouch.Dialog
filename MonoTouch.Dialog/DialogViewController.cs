@@ -5,6 +5,59 @@ using System.Drawing;
 
 namespace MonoTouch.Dialog
 {
+	public class CommitEditingStyleArgs : EventArgs
+	{
+		private UITableView tableView;
+		private UITableViewCellEditingStyle editingStyle;
+		private MonoTouch.Foundation.NSIndexPath indexPath;
+		
+		public CommitEditingStyleArgs(UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
+		{
+			this.tableView = tableView;
+			this.editingStyle = editingStyle;
+			this.indexPath = indexPath;
+			
+		}
+		
+		public UITableView TableView
+		{
+			get
+			{
+				return tableView;
+			}
+			set
+			{
+				tableView = value;
+			}
+		}
+		
+		public UITableViewCellEditingStyle EditingStyle
+		{
+			get
+			{
+				return editingStyle;
+			}
+			set
+			{
+				editingStyle = value;
+			}
+		}
+		
+		public NSIndexPath IndexPath
+		{
+			get
+			{
+				return indexPath;
+			}
+			set
+			{
+				indexPath = value;
+			}
+		}
+	    
+	}
+
+	
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
@@ -12,6 +65,38 @@ namespace MonoTouch.Dialog
 		RootElement root;
 		bool pushing;
 		bool dirty;
+		bool enableEdit;
+		private UIBarButtonItem _buttonEdit;
+		private UIBarButtonItem _buttonDone;
+		
+		public override void ViewDidLoad ()
+		{
+			if(enableEdit)
+			{
+				// Add Edit and Done buttons
+				_buttonEdit = new UIBarButtonItem(UIBarButtonSystemItem.Edit);
+				_buttonDone = new UIBarButtonItem(UIBarButtonSystemItem.Done);
+				_buttonEdit.Clicked += Handle_buttonEditClicked;
+				_buttonDone.Clicked += Handle_buttonDoneClicked;
+				
+				NavigationItem.RightBarButtonItem = _buttonEdit;
+			}
+			
+			base.ViewDidLoad ();
+			
+		}
+		
+		private void Handle_buttonDoneClicked (object sender, EventArgs e)
+		{
+			Editing = false;
+			NavigationItem.RightBarButtonItem = _buttonEdit;
+		}
+
+		private void Handle_buttonEditClicked (object sender, EventArgs e)
+		{
+			Editing = true;
+			NavigationItem.RightBarButtonItem = _buttonDone;
+		}
 
 		private static bool GetRotateEnabled ()
 		{
@@ -42,18 +127,46 @@ namespace MonoTouch.Dialog
 				ReloadData ();
 			}
 		}
-
+		
 		class Source : UITableViewSource
 		{
 			protected DialogViewController container;
 			protected RootElement root;
-
+			
+			public event EventHandler<CommitEditingStyleArgs> OnCommitEditingStyle;
+			
+			public override void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, MonoTouch.Foundation.NSIndexPath indexPath)
+			{
+				switch (editingStyle)
+				{
+					case UITableViewCellEditingStyle.Delete:
+						this.root[indexPath.Section].RemoveRange(indexPath.Row,1,UITableViewRowAnimation.Fade);
+						break;
+					
+					case UITableViewCellEditingStyle.Insert:
+						Console.WriteLine("UITableViewCellEditingStyle:Insert Called");
+						//this._tableItems[indexPath.Section].Items.Insert (indexPath.Row, new TableItem ());
+						//---- insert a new row in the table
+						//tableView.InsertRows (new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Fade);
+						break;
+					
+					case UITableViewCellEditingStyle.None:
+						// when is this called?
+						Console.WriteLine("UITableViewCellEditingStyle:None Called");
+						break;
+				}
+				
+				if(OnCommitEditingStyle != null)
+					OnCommitEditingStyle(this,new CommitEditingStyleArgs(tableView,editingStyle,indexPath));
+				
+			}
+		
 			public Source (DialogViewController container)
 			{
 				this.container = container;
 				root = container.root;
 			}
-
+			
 			public override int RowsInSection (UITableView tableview, int section)
 			{
 				var s = root.Sections[section];
@@ -191,14 +304,21 @@ namespace MonoTouch.Dialog
 		}
 
 		Source TableSource;
-
+		
+		public event EventHandler<CommitEditingStyleArgs> OnCommitEditingStyle;
+					
 		void UpdateSource ()
 		{
 			if (root == null)
 				return;
 			
 			TableSource = root.UnevenRows ? new SizingSource (this) : new Source (this);
+			
+			if(this.OnCommitEditingStyle != null)
+				TableSource.OnCommitEditingStyle += this.OnCommitEditingStyle;
+			
 			tableView.Source = TableSource;
+				
 		}
 
 		public void ReloadData ()
@@ -255,6 +375,14 @@ namespace MonoTouch.Dialog
 			this.pushing = pushing;
 			this.rotateUIEnabled = AutoRotateUI;
 			PrepareRoot (root);
+		}
+		
+		public DialogViewController(RootElement root, bool pushing, bool AutoRotateUI, bool EnableEdit)
+		{
+			this.pushing = pushing;
+			this.rotateUIEnabled = AutoRotateUI;
+			this.enableEdit = EnableEdit;
+			PrepareRoot(root);
 		}
 		
 	}

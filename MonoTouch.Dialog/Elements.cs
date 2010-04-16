@@ -196,6 +196,7 @@ namespace MonoTouch.Dialog
 				button.TouchDown += delegate {
 					parent.Value = !parent.Value;
 					UpdateImage ();
+					parent.Tapped();
 				};
 				ContentView.Add (label);
 				ContentView.Add (button);
@@ -232,6 +233,11 @@ namespace MonoTouch.Dialog
 		public BaseBooleanImageElement (string caption, bool value) : base(caption, value)
 		{
 		}
+		
+		public BaseBooleanImageElement (string caption, bool value, NSAction tapped) : base(caption, value)
+		{
+			Tapped += tapped;
+		}
 
 		protected abstract UIImage GetImage ();
 
@@ -253,10 +259,16 @@ namespace MonoTouch.Dialog
 			if(cell != null && cell is TextWithImageCellView)
 				((TextWithImageCellView)cell).UpdateFrom(this);
 			
+			if (Tapped != null)
+				Tapped ();
+			
 			tableView.DeselectRow (path, true);
 			
-		}	
+		}
 		
+		public event NSAction Tapped;
+
+				
 	}
 
 	public class BooleanImageElement : BaseBooleanImageElement
@@ -268,7 +280,13 @@ namespace MonoTouch.Dialog
 			this.onImage = onImage;
 			this.offImage = offImage;
 		}
-
+		
+		public BooleanImageElement(string caption, bool value, UIImage onImage, UIImage offImage, NSAction action) : base(caption, value, action)
+		{
+			this.onImage = onImage;
+			this.offImage = offImage;
+		}
+		                           
 		protected override UIImage GetImage ()
 		{
 			if (Value)
@@ -1465,7 +1483,8 @@ namespace MonoTouch.Dialog
 		internal Group @group;
 		public bool UnevenRows;
 		internal UITableView TableView;
-
+		internal UITableViewDelegate TableViewDelegate;
+		
 		/// <summary>
 		///  Initializes a RootSection with a caption
 		/// </summary>
@@ -1495,7 +1514,7 @@ namespace MonoTouch.Dialog
 			summarySection = section;
 			summaryElement = element;
 		}
-
+		
 		/// <summary>
 		/// Initializes a RootElement that renders the summary based on the radio settings of the contained elements. 
 		/// </summary>
@@ -1510,7 +1529,28 @@ namespace MonoTouch.Dialog
 		{
 			this.@group = @group;
 		}
-
+		
+		/// <summary>
+		/// Initializes a RootElement that renders the summary based on the radio settings of the contained elements. 
+		/// </summary>
+		/// <param name="caption">
+		/// The caption to ender
+		/// </param>
+		/// <param name="group">
+		/// The group that contains the checkbox or radio information.  This is used to display
+		/// the summary information when a RootElement is rendered inside a section.
+		/// </param>
+		/// <param name="enableEdit">
+		/// Enabled Editing of the elements below this Root element.  This is only for radio or checkbox groups.
+		/// </param>
+		public RootElement (string caption, Group @group, bool enableEdit) : base(caption)
+		{
+			this.@group = @group;
+			this.enableEdit = enableEdit;
+		}
+		
+		bool enableEdit;
+		
 		internal List<Section> Sections = new List<Section> ();
 
 		internal NSIndexPath PathForRadio (int idx)
@@ -1821,13 +1861,22 @@ namespace MonoTouch.Dialog
 
 		protected virtual void PrepareDialogViewController (DialogViewController dvc)
 		{
+			
 		}
 
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var newDvc = new DialogViewController (this, true);
+			var newDvc = new DialogViewController (this, true, true,OnCommitEditingStyle != null);
+			if(OnCommitEditingStyle != null)
+				newDvc.OnCommitEditingStyle += OnCommitEditingStyle;
+			
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
+			                                       
 		}
+		
+		public event EventHandler<CommitEditingStyleArgs> OnCommitEditingStyle;
+			                                       
 	}
+			                                       
 }
