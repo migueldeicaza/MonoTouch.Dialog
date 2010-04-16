@@ -596,20 +596,20 @@ it and override the proper methods.
 This example shows how to use an image as the background for the
 DialogViewController:
 
-class SpiffyDialogViewController : DialogViewController {
-    UIImage image;
-
-    public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image) 
-        : base (root, pushing) 
-    {
-        this.image = image;
+    class SpiffyDialogViewController : DialogViewController {
+        UIImage image;
+    
+        public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image) 
+            : base (root, pushing) 
+        {
+            this.image = image;
+        }
+    
+        public override LoadView ()
+        {
+            base.LoadView ();
+            var color = UIColor.FromPatternImage(image);
+            Root.TableView.BackgroundColor = UIColor.Clear;
+            ParentViewController.View.BackgroundColor = color;
+        }
     }
-
-    public override LoadView ()
-    {
-        base.LoadView ();
-        var color = UIColor.FromPatternImage(image);
-        Root.TableView.BackgroundColor = UIColor.Clear;
-        ParentViewController.View.BackgroundColor = color;
-    }
-}
