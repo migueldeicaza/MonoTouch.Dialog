@@ -154,6 +154,9 @@ namespace MonoTouch.Dialog
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			if (root == null)
+				return;
+			
 			root.Prepare ();
 			
 			NavigationItem.HidesBackButton = !pushing;
@@ -202,7 +205,12 @@ namespace MonoTouch.Dialog
 				root.Prepare ();
 		}
 		
-		public DialogViewController (RootElement root)
+		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
+		{
+			PrepareRoot (root);
+		}
+		
+		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
 			PrepareRoot (root);
 		}
@@ -218,7 +226,13 @@ namespace MonoTouch.Dialog
 		/// (NavigationControllers) or not.   If pushing is true, then the back button 
 		/// will be shown, allowing the user to go back to the previous controller
 		/// </param>
-		public DialogViewController (RootElement root, bool pushing)
+		public DialogViewController (RootElement root, bool pushing) : base (UITableViewStyle.Grouped)
+		{
+			this.pushing = pushing;
+			PrepareRoot (root);
+		}
+
+		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
 		{
 			this.pushing = pushing;
 			PrepareRoot (root);
