@@ -62,14 +62,13 @@ namespace MonoTouch.Dialog
 			return new UITableViewCell (UITableViewCellStyle.Default, "xx");
 		}
 		
-		static internal void RemoveTag (UITableViewCell cell, int tag)
+		static protected void RemoveTag (UITableViewCell cell, int tag)
 		{
 			var viewToRemove = cell.ContentView.ViewWithTag (tag);
 			if (viewToRemove != null)
 				viewToRemove.RemoveFromSuperview ();
 		}
 		
-
 		/// <summary>
 		/// Returns a summary of the value represented by this object, suitable 
 		/// for rendering as the result of a RootElement with child objects.
@@ -1049,6 +1048,67 @@ namespace MonoTouch.Dialog
 	}
 	
 	/// <summary>
+	///   This element can be used to insert an arbitrary UIView
+	/// </summary>
+	/// <remarks>
+	///   There is no cell reuse here as we have a 1:1 mapping
+	///   in this case from the UIViewElement to the cell that
+	///   holds our view.
+	/// </remarks>
+	public class UIViewElement : Element, IElementSizing {
+		static int count;
+		NSString key;
+		UIView view;
+		bool transparent;
+		
+		/// <summary>
+		///   Constructor
+		/// </summary>
+		/// <param name="caption">
+		/// The caption, only used for RootElements that might want to summarize results
+		/// </param>
+		/// <param name="view">
+		/// The view to display
+		/// </param>
+		/// <param name="transparent">
+		/// If this is set, then the view is responsible for painting the entire area,
+		/// otherwise the default cell paint code will be used.
+		/// </param>
+		public UIViewElement (string caption, UIView view, bool transparent) : base (caption) 
+		{
+			this.view = view;
+			this.transparent = transparent;
+			key = new NSString ("UIViewElement" + count++);
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (key);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
+				if (transparent){
+					cell.BackgroundColor = UIColor.Clear;
+					
+					// 
+					// This trick is necessary to keep the background clear, otherwise
+					// it gets painted as black
+					//
+					cell.BackgroundView = new UIView (RectangleF.Empty) { 
+						BackgroundColor = UIColor.Clear 
+					};
+				}
+				cell.ContentView.AddSubview (view);
+			} 
+			return cell;
+		}
+		
+		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		{
+			return view.Bounds.Height;
+		}
+	}
+	
+	/// <summary>
 	/// Sections contain individual Element instances that are rendered by MonoTouch.Dialog
 	/// </summary>
 	/// <remarks>
@@ -1177,10 +1237,40 @@ namespace MonoTouch.Dialog
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
 
+		/// <summary>
+		///    Add version that can be used with LINQ
+		/// </summary>
+		/// <param name="elements">
+		/// An enumerable list that can be produced by something like:
+		///    from x in ... select (Element) new MyElement (...)
+		/// </param>
 		public void Add (IEnumerable<Element> elements)
 		{
 			foreach (var e in elements)
 				Add (e);
+		}
+		
+		/// <summary>
+		/// Use to add a UIView to a section, it makes the section opaque, to
+		/// get a transparent one, you must manually call UIViewElement
+		public void Add (UIView view)
+		{
+			if (view == null)
+				return;
+			Add (new UIViewElement (null, view, false));
+		}
+
+		/// <summary>
+		///   Adds the UIViews to the section.
+		/// </summary>
+		/// <param name="views">
+		/// An enumarable list that can be produced by something like:
+		///    from x in ... select (UIView) new UIFoo ();
+		/// </param>
+		public void Add (IEnumerable<UIView> views)
+		{
+			foreach (var v in views)
+				Add (v);
 		}
 		
 		/// <summary>

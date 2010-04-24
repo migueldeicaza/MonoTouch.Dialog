@@ -8,12 +8,13 @@ navigation controllers that support:
 
   * On/Off controls
   * Slider (floats)
-  * String informational rendering.
+  * String informational rendering
   * Text Entry
   * Password Entry
   * Jump to HTML page
-  * Radio elements.
-  * Dates, Times and Dates+Times.
+  * Radio elements
+  * Dates, Times and Dates+Times
+  * Arbitary UIViews
 
 Miguel (miguel@gnome.org)
 
@@ -346,7 +347,8 @@ The Low-Level Elements API
 All that the Reflection API does is create a set of nodes from the
 Elements API.   
 
-First a sample of how you would create a UI:
+First a sample of how you would create a UI taking advantage of 
+C# 3.0 initializers:
 
         var root = new RootElement ("Settings") {
           new Section (){
@@ -363,6 +365,7 @@ First a sample of how you would create a UI:
               new Section (){
                 new FloatElement (null, null, 0.5f),
                 new BooleanElement ("Auto-brightness", false),
+		new UILabel ("I am a simple UILabel!"),
               }
             },
           },
@@ -373,7 +376,16 @@ First a sample of how you would create a UI:
             new TimeElement ("Select Time", DateTime.Now),
           },
 
-You will need a RootElement to get things rolling.
+You will need a RootElement to get things rolling.   The nested
+structure created by Sections() and Elements() are merely calls to
+either RootElement.Add () or Section.Add() that the C# compiler 
+invokes for us.
+
+Additionally notice that when adding elements to a section, you
+can use either Elements or UIViews directly.   The UIViews are
+just wrapped in a special UIViewElement element.
+
+In addition
 
 RootElement
 -----------
@@ -521,6 +533,13 @@ Additionally the KeyboardType property can be set at creation time to
 the keyboard type style desired for the data entry.  This can be used
 to configure the keyboard for numeric input, phone input, url input or
 email address input (The values of UIKeyboardType).
+
+UIViewElement
+-------------
+
+Use this element to quickly add a standard UIView as cell in a UITableView.
+
+
 
 Booleans
 --------
