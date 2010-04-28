@@ -397,13 +397,6 @@ namespace MonoTouch.Dialog
 				
 			}
 
-			public WebViewController (HtmlElement container, bool AutoRotateUI) : base()
-			{
-				this.container = container;
-				this.rotateUIEnabled = AutoRotateUI;
-				
-			}
-
 			public override void ViewWillDisappear (bool animated)
 			{
 				base.ViewWillDisappear (animated);
@@ -416,19 +409,7 @@ namespace MonoTouch.Dialog
 				container.web = null;
 			}
 
-			private static bool GetRotateEnabled ()
-			{
-				NSUserDefaults.StandardUserDefaults.Init();
-			
-				if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
-					NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
-				}
-				
-				return NSUserDefaults.StandardUserDefaults.BoolForKey ("interfaceRotateEnabled");
-				
-			}
-
-			private bool rotateUIEnabled = WebViewController.GetRotateEnabled ();
+			private bool rotateUIEnabled;
 
 			public bool RotateUIEnabled {
 				get { return rotateUIEnabled; }
@@ -1072,19 +1053,7 @@ namespace MonoTouch.Dialog
 				container.DateValue = container.datePicker.Date;
 			}
 
-			private static bool GetRotateEnabled ()
-			{
-				NSUserDefaults.StandardUserDefaults.Init();
-			
-				if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
-					NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
-				}
-				
-				return NSUserDefaults.StandardUserDefaults.BoolForKey ("interfaceRotateEnabled");
-				
-			}
-
-			private bool rotateUIEnabled = MyViewController.GetRotateEnabled ();
+			private bool rotateUIEnabled;
 
 			public bool RotateUIEnabled {
 				get { return rotateUIEnabled; }
@@ -1866,7 +1835,12 @@ namespace MonoTouch.Dialog
 
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var newDvc = new DialogViewController (this, true, true,OnCommitEditingStyle != null);
+			var newDvc = new DialogViewController (this, true)
+			{
+				RotateUIEnabled=true,
+				EnableEdit=OnCommitEditingStyle!= null
+			};
+			
 			if(OnCommitEditingStyle != null)
 				newDvc.OnCommitEditingStyle += OnCommitEditingStyle;
 			

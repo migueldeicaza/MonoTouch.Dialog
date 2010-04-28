@@ -65,7 +65,6 @@ namespace MonoTouch.Dialog
 		RootElement root;
 		bool pushing;
 		bool dirty;
-		bool enableEdit;
 		private UIBarButtonItem _buttonEdit;
 		private UIBarButtonItem _buttonDone;
 		
@@ -98,23 +97,18 @@ namespace MonoTouch.Dialog
 			NavigationItem.RightBarButtonItem = _buttonDone;
 		}
 
-		private static bool GetRotateEnabled ()
-		{
-			NSUserDefaults.StandardUserDefaults.Init();
-			
-			if (NSUserDefaults.StandardUserDefaults.StringForKey ("interfaceRotateEnabled") == null) {
-				NSUserDefaults.StandardUserDefaults.SetBool (false, "interfaceRotateEnabled");
-			}
-			
-			return NSUserDefaults.StandardUserDefaults.BoolForKey ("interfaceRotateEnabled");
-			
-		}
-
-		private bool rotateUIEnabled = DialogViewController.GetRotateEnabled ();
+		private bool rotateUIEnabled;
 
 		public bool RotateUIEnabled {
 			get { return rotateUIEnabled; }
 			set { rotateUIEnabled = value; }
+		}
+		
+		bool enableEdit;
+		
+		public bool EnableEdit {
+			get { return enableEdit; }
+			set { enableEdit = value; }
 		}
 
 		public RootElement Root {
@@ -368,21 +362,6 @@ namespace MonoTouch.Dialog
 		{
 			this.pushing = pushing;
 			PrepareRoot (root);
-		}
-
-		public DialogViewController (RootElement root, bool pushing, bool AutoRotateUI)
-		{
-			this.pushing = pushing;
-			this.rotateUIEnabled = AutoRotateUI;
-			PrepareRoot (root);
-		}
-		
-		public DialogViewController(RootElement root, bool pushing, bool AutoRotateUI, bool EnableEdit)
-		{
-			this.pushing = pushing;
-			this.rotateUIEnabled = AutoRotateUI;
-			this.enableEdit = EnableEdit;
-			PrepareRoot(root);
 		}
 		
 	}
