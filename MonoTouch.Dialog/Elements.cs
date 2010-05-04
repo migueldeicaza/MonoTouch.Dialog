@@ -1300,6 +1300,21 @@ namespace MonoTouch.Dialog
 				InsertVisual (idx, anim, newElements.Length);
 		}
 
+		public void Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
+		{
+			if (newElements == null)
+				return;
+
+			int pos = idx;
+			foreach (var e in newElements){
+				Elements.Insert (pos++, e);
+				e.Parent = this;
+			}
+			
+			if (Parent != null)
+				InsertVisual (idx, anim, pos-idx);
+		}
+		
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
 		{
 			var root = Parent as RootElement;
