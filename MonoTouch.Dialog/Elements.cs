@@ -11,6 +11,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
@@ -1289,15 +1290,20 @@ namespace MonoTouch.Dialog
 		{
 			if (newElements == null)
 				return;
+
+			var root = Parent as RootElement;
+			if (root != null)
+				root.TableView.BeginUpdates ();
 			
 			int pos = idx;
 			foreach (var e in newElements){
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			
-			if (Parent != null)
+			if (root != null){
 				InsertVisual (idx, anim, newElements.Length);
+				root.TableView.EndUpdates ();
+			}
 		}
 
 		public void Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
@@ -1305,14 +1311,19 @@ namespace MonoTouch.Dialog
 			if (newElements == null)
 				return;
 
+			var root = Parent as RootElement;
+			if (root != null)
+				root.TableView.BeginUpdates ();
+			
 			int pos = idx;
 			foreach (var e in newElements){
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			
-			if (Parent != null)
+			if (root != null){
 				InsertVisual (idx, anim, pos-idx);
+				root.TableView.EndUpdates ();
+			}
 		}
 		
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
@@ -1368,13 +1379,14 @@ namespace MonoTouch.Dialog
 			if (count == 0)
 				return;
 			
+			var root = Parent as RootElement;
+			if (root != null)
+				root.TableView.BeginUpdates ();
+			
 			if (start+count > Elements.Count)
 				count = Elements.Count-start;
 			
 			Elements.RemoveRange (start, count);
-			
-			// Now do the GUI part
-			var root = Parent as RootElement;
 			
 			if (root == null || root.TableView == null)
 				return;
@@ -1384,6 +1396,7 @@ namespace MonoTouch.Dialog
 			for (int i = 0; i < count; i++)
 				paths [i] = NSIndexPath.FromRowSection (start+i, sidx);
 			root.TableView.DeleteRows (paths, anim);
+			root.TableView.EndUpdates ();
 		}
 		
 		/// <summary>

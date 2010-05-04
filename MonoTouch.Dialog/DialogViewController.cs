@@ -38,7 +38,9 @@ namespace MonoTouch.Dialog
 			public override int RowsInSection (UITableView tableview, int section)
 			{
 				var s = root.Sections [section];
-				return s.Elements.Count;
+				var count = s.Elements.Count;
+				
+				return count;
 			}
 
 			public override int NumberOfSections (UITableView tableView)
@@ -58,7 +60,7 @@ namespace MonoTouch.Dialog
 
 			public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
+				var section = root.Sections [indexPath.Section];				
 				var element = section.Elements [indexPath.Row];
 				
 				return element.GetCell (tableView);
