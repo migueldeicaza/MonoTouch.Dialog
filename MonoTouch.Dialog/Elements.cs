@@ -1295,20 +1295,14 @@ namespace MonoTouch.Dialog
 		{
 			if (newElements == null)
 				return;
-
-			var root = Parent as RootElement;
-			if (root != null && root.TableView != null)
-				root.TableView.BeginUpdates ();
 			
 			int pos = idx;
 			foreach (var e in newElements){
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			if (root != null && root.TableView != null){
+			if (Parent != null)
 				InsertVisual (idx, anim, newElements.Length);
-				root.TableView.EndUpdates ();
-			}
 		}
 
 		public void Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
@@ -1316,19 +1310,13 @@ namespace MonoTouch.Dialog
 			if (newElements == null)
 				return;
 
-			var root = Parent as RootElement;
-			if (root != null && root.TableView != null)
-				root.TableView.BeginUpdates ();
-			
 			int pos = idx;
 			foreach (var e in newElements){
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			if (root != null && root.TableView != null){
+			if (Parent != null)
 				InsertVisual (idx, anim, pos-idx);
-				root.TableView.EndUpdates ();
-			}
 		}
 		
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
@@ -1385,8 +1373,6 @@ namespace MonoTouch.Dialog
 				return;
 			
 			var root = Parent as RootElement;
-			if (root != null && root.TableView != null)
-				root.TableView.BeginUpdates ();
 			
 			if (start+count > Elements.Count)
 				count = Elements.Count-start;
@@ -1401,7 +1387,6 @@ namespace MonoTouch.Dialog
 			for (int i = 0; i < count; i++)
 				paths [i] = NSIndexPath.FromRowSection (start+i, sidx);
 			root.TableView.DeleteRows (paths, anim);
-			root.TableView.EndUpdates ();
 		}
 		
 		/// <summary>
@@ -1637,16 +1622,12 @@ namespace MonoTouch.Dialog
 			if (section == null)
 				return;
 			
-			if (TableView != null)
-				TableView.BeginUpdates ();
-			
 			Sections.Add (section);
 			section.Parent = this;
 			if (TableView == null)
 				return;
 			
 			TableView.InsertSections (MakeIndexSet (Sections.Count-1, 1), UITableViewRowAnimation.None);
-			TableView.EndUpdates ();
 		}
 
 		//
