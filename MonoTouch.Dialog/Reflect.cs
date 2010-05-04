@@ -406,9 +406,11 @@ namespace MonoTouch.Dialog
 					SetValue (mi, obj, ((BooleanElement) element).Value);
 				else if (element is CheckboxElement)
 					SetValue (mi, obj, ((CheckboxElement) element).Value);
-				else if (element is EntryElement)
-					SetValue (mi, obj, ((EntryElement) element).Value);
-				else if (element is ImageElement)
+				else if (element is EntryElement){
+					var entry = (EntryElement) element;
+					entry.FetchValue ();
+					SetValue (mi, obj, entry.Value);
+				} else if (element is ImageElement)
 					SetValue (mi, obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;

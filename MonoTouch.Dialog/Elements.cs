@@ -881,10 +881,10 @@ namespace MonoTouch.Dialog
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
 				entry.ValueChanged += delegate {
-					Value = entry.Text;
+					FetchValue ();
 				};
 				entry.Ended += delegate {
-					Value = entry.Text;
+					FetchValue ();
 				};
 				entry.ShouldReturn += delegate {
 					EntryElement focus = null;
@@ -919,6 +919,11 @@ namespace MonoTouch.Dialog
 			cell.TextLabel.Text = Caption;
 			cell.ContentView.AddSubview (entry);
 			return cell;
+		}
+		
+		public void FetchValue ()
+		{
+			Value = entry.Text;
 		}
 		
 		protected override void Dispose (bool disposing)
@@ -1292,7 +1297,7 @@ namespace MonoTouch.Dialog
 				return;
 
 			var root = Parent as RootElement;
-			if (root != null)
+			if (root != null && root.TableView != null)
 				root.TableView.BeginUpdates ();
 			
 			int pos = idx;
@@ -1300,7 +1305,7 @@ namespace MonoTouch.Dialog
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			if (root != null){
+			if (root != null && root.TableView != null){
 				InsertVisual (idx, anim, newElements.Length);
 				root.TableView.EndUpdates ();
 			}
@@ -1312,7 +1317,7 @@ namespace MonoTouch.Dialog
 				return;
 
 			var root = Parent as RootElement;
-			if (root != null)
+			if (root != null && root.TableView != null)
 				root.TableView.BeginUpdates ();
 			
 			int pos = idx;
@@ -1320,7 +1325,7 @@ namespace MonoTouch.Dialog
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			if (root != null){
+			if (root != null && root.TableView != null){
 				InsertVisual (idx, anim, pos-idx);
 				root.TableView.EndUpdates ();
 			}
@@ -1380,7 +1385,7 @@ namespace MonoTouch.Dialog
 				return;
 			
 			var root = Parent as RootElement;
-			if (root != null)
+			if (root != null && root.TableView != null)
 				root.TableView.BeginUpdates ();
 			
 			if (start+count > Elements.Count)
@@ -1632,12 +1637,16 @@ namespace MonoTouch.Dialog
 			if (section == null)
 				return;
 			
+			if (TableView != null)
+				TableView.BeginUpdates ();
+			
 			Sections.Add (section);
 			section.Parent = this;
 			if (TableView == null)
 				return;
 			
 			TableView.InsertSections (MakeIndexSet (Sections.Count-1, 1), UITableViewRowAnimation.None);
+			TableView.EndUpdates ();
 		}
 
 		//
@@ -1652,6 +1661,7 @@ namespace MonoTouch.Dialog
 			foreach (var s in sections)
 				Add (s);
 		}
+		
 		NSIndexSet MakeIndexSet (int start, int count)
 		{
 			NSRange range;
@@ -1683,6 +1693,9 @@ namespace MonoTouch.Dialog
 			if (newSections == null)
 				return;
 			
+			if (TableView != null)
+				TableView.BeginUpdates ();
+			
 			int pos = idx;
 			foreach (var s in newSections){
 				s.Parent = this;
@@ -1693,6 +1706,7 @@ namespace MonoTouch.Dialog
 				return;
 			
 			TableView.InsertSections (MakeIndexSet (idx, newSections.Length), anim);
+			TableView.EndUpdates ();
 		}
 		
 		/// <summary>
