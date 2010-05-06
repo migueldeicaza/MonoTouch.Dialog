@@ -1,3 +1,14 @@
+//
+// DialogViewController.cs: drives MonoTouch.Dialog
+//
+// Author:
+//   Miguel de Icaza
+//
+// Code to support pull-to-refresh based on Martin Bowling's TweetTableView
+// which is based in turn in EGOTableViewPullRefresh code which was created
+// by Devin Doty and is Copyrighted 2009 enormego and released under the
+// MIT X11 license
+//
 using System;
 using MonoTouch.UIKit;
 using System.Drawing;
@@ -8,9 +19,11 @@ namespace MonoTouch.Dialog
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		UITableView tableView;
+		RefreshTableHeaderView refreshView;
 		RootElement root;
 		bool pushing;
 		bool dirty;
+		bool reloading;
 
 		public RootElement Root {
 			get {
@@ -19,15 +32,63 @@ namespace MonoTouch.Dialog
 			set {
 				if (root == value)
 					return;
+				if (root != null)
+					root.Dispose ();
+				
 				root = value;
 				root.TableView = tableView;					
 				ReloadData ();
 			}
 		} 
+
+		EventHandler refreshRequested;
+		public event EventHandler RefreshRequested {
+			add {
+				if (tableView != null)
+					throw new ArgumentException ("You should set the handler before the controller is shown");
+				refreshRequested += value; 
+			}
+			remove {
+				refreshRequested -= value;
+			}
+		}
+		
+		void TriggerRefresh ()
+		{
+			if (refreshRequested == null)
+				return;
+
+			reloading = true;
+			refreshView.SetActivity (true);
+			refreshRequested (this, EventArgs.Empty);
+			
+			UIView.BeginAnimations ("reloadingData");
+			UIView.SetAnimationDuration (0.2);
+			TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
+			UIView.CommitAnimations ();
+		}
+		
+		public void ReloadComplete ()
+		{
+			if (!reloading)
+				return;
+			
+			reloading = false;
+			refreshView.SetActivity (false);
+			refreshView.Flip (false);
+			UIView.BeginAnimations ("doneReloading");
+			UIView.SetAnimationDuration (0.3f);
+			TableView.ContentInset = new UIEdgeInsets (0, 0, 0, 0);
+			refreshView.SetStatus (RefreshViewStatus.PullToReload);
+			UIView.CommitAnimations ();
+			refreshView.LastUpdate = DateTime.Now;
+		}
 		
 		class Source : UITableViewSource {
+			const float yboundary = 65;
 			protected DialogViewController container;
 			protected RootElement root;
+			bool checkForRefresh;
 			
 			public Source (DialogViewController container)
 			{
@@ -102,6 +163,41 @@ namespace MonoTouch.Dialog
 					return -1;
 				return section.FooterView.Frame.Height;
 			}
+			
+			#region Pull to Refresh support
+			public override void Scrolled (UIScrollView scrollView)
+			{
+				if (!checkForRefresh)
+					return;
+				if (container.reloading)
+					return;
+				var view  = container.refreshView;
+				var point = container.TableView.ContentOffset;
+				if (view.IsFlipped && point.Y > -yboundary && point.Y < 0){
+					view.Flip (true);
+					view.SetStatus (RefreshViewStatus.PullToReload);
+				} else if (!view.IsFlipped && point.Y < -yboundary){
+					view.Flip (true);
+					view.SetStatus (RefreshViewStatus.ReleaseToReload);
+				}
+			}
+			
+			public override void DraggingStarted (UIScrollView scrollView)
+			{
+				checkForRefresh = true;
+			}
+			
+			public override void DraggingEnded (UIScrollView scrollView, bool willDecelerate)
+			{
+				if (container.refreshView == null)
+					return;
+				
+				checkForRefresh = false;
+				if (container.TableView.ContentOffset.Y > -yboundary)
+					return;
+				container.TriggerRefresh ();
+			}
+			#endregion
 		}
 
 		//
@@ -151,6 +247,11 @@ namespace MonoTouch.Dialog
 				return;
 			
 			root.TableView = tableView;
+			
+			if (refreshRequested != null){
+				refreshView = new RefreshTableHeaderView (new RectangleF (0, -100, 320, 100));
+				TableView.AddSubview (refreshView);
+			}
 		}
 
 		public override void ViewWillAppear (bool animated)
@@ -240,4 +341,5 @@ namespace MonoTouch.Dialog
 			PrepareRoot (root);
 		}
 	}
+	
 }

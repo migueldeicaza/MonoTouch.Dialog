@@ -1,10 +1,10 @@
 MonoTouch.Dialog
 ================
 
-MonoTouch.Dialog is a foundation to create dialog boxes without
-having to write dozens of delegates and controllers for a user
-interface.   Currently this supports creating Dialogs based on
-navigation controllers that support:
+MonoTouch.Dialog is a foundation to create dialog boxes and show
+table-based information without having to write dozens of delegates
+and controllers for the user interface.  Currently this supports
+creating Dialogs based on navigation controllers that support:
 
   * On/Off controls
   * Slider (floats)
@@ -15,6 +15,7 @@ navigation controllers that support:
   * Radio elements
   * Dates, Times and Dates+Times
   * Arbitary UIViews
+  * Pull-to-refresh functionality.
 
 Miguel (miguel@gnome.org)
 
@@ -588,6 +589,31 @@ methods:
 
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+
+Pull to Refresh Support
+=======================
+
+Pull to Refresh is a visual effect originally found in Tweetie2 which
+became a popular effect among many applications.
+
+To add automatic pull-to-refersh support to your dialogs, you only
+need to do two things: hook up an event handler to be notified when
+the user pulls the data and notify the DialogViewController when the
+data has been loaded to go back to its default state.
+
+Hooking up a notification is simple, just connect to the
+RefreshRequested event on the DialogViewController, like this:
+
+        dvc.RefreshRequested += OnUserRequestedRefresh;
+
+Then on your method OnUserRequestedRefresh, you would queue some data
+loading, request some data from the net, or spin a thread to compute
+the data.  Once the data has been loaded, you must notify the
+DialogViewController that the new data is in, and to restore the view
+to its default state, you do this by calling ReloadComplete:
+
+	dvc.ReloadComplete ();
+
 
 Customizing the DialogViewController
 ====================================

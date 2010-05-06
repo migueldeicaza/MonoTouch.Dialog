@@ -70,5 +70,6 @@
     <Compile Include="DialogViewController.cs" />
     <Compile Include="Reflect.cs" />
     <Compile Include="ElementBadge.cs" />
+    <Compile Include="Controls.cs" />
   </ItemGroup>
 </Project>
