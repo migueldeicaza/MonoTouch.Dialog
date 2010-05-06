@@ -70,6 +70,7 @@ namespace MonoTouch.Dialog
 		
 		public void ReloadComplete ()
 		{
+			refreshView.LastUpdate = DateTime.Now;
 			if (!reloading)
 				return;
 			
@@ -81,7 +82,6 @@ namespace MonoTouch.Dialog
 			TableView.ContentInset = new UIEdgeInsets (0, 0, 0, 0);
 			refreshView.SetStatus (RefreshViewStatus.PullToReload);
 			UIView.CommitAnimations ();
-			refreshView.LastUpdate = DateTime.Now;
 		}
 		
 		class Source : UITableViewSource {

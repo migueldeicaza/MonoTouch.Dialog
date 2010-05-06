@@ -1,7 +1,11 @@
 using System;
 using System.Drawing;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using MonoTouch.CoreGraphics;
 using MonoTouch.CoreAnimation;
+using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
@@ -11,9 +15,43 @@ namespace MonoTouch.Dialog
 		PullToReload,
 		Loading
 	}
-		
+
+	// This cute method will be added to UIImage.FromResource, but for old installs 
+	// make a copy here
+	internal static class Util {
+		public static UIImage FromResource (Assembly assembly, string name)
+		{
+			if (name == null)
+				throw new ArgumentNullException ("name");
+			assembly = Assembly.GetCallingAssembly ();
+			var stream = assembly.GetManifestResourceStream (name);
+			if (stream == null)
+				return null;
+			
+			IntPtr buffer = Marshal.AllocHGlobal ((int) stream.Length);
+			if (buffer == IntPtr.Zero)
+				return null;
+			
+			var copyBuffer = new byte [Math.Min (1024, (int) stream.Length)];
+			int n;
+			IntPtr target = buffer;
+			while ((n = stream.Read (copyBuffer, 0, copyBuffer.Length)) != 0){
+				Marshal.Copy (copyBuffer, 0, target, n);
+				target = (IntPtr) ((int) target + n);
+			}
+			try {
+				var data = NSData.FromBytes (buffer, (uint) stream.Length);
+				return UIImage.LoadFromData (data);
+			} finally {
+				Marshal.FreeHGlobal (buffer);
+				stream.Dispose ();
+			}
+		}
+	
+	}
+	
 	internal class RefreshTableHeaderView : UIView {
-		static UIImage arrow = UIImage.FromFileUncached ("Images/arrow.png");
+		static UIImage arrow = Util.FromResource (null, "arrow.png");
 		UIActivityIndicatorView activity;
 		UILabel lastUpdateLabel, statusLabel;
 		UIImageView arrowView;		
@@ -23,7 +61,7 @@ namespace MonoTouch.Dialog
 			BackgroundColor = new UIColor (0.88f, 0.9f, 0.92f, 1);
 			lastUpdateLabel = new UILabel (new RectangleF (0, rect.Height - 30, 320, 20)){
 				Font = UIFont.SystemFontOfSize (12f),
-				TextColor = new UIColor (0.34f, 0.74f, 0.54f, 1),
+				TextColor = UIColor.DarkGray,
 				ShadowColor = UIColor.FromWhiteAlpha (0.9f, 1),
 				ShadowOffset = new SizeF (0, 1),
 				BackgroundColor = this.BackgroundColor,
@@ -34,7 +72,7 @@ namespace MonoTouch.Dialog
 			
 			statusLabel = new UILabel (new RectangleF (0, rect.Height-48, 320, 20)){
 				Font = UIFont.BoldSystemFontOfSize (13),
-				TextColor = lastUpdateLabel.TextColor,
+				TextColor = UIColor.DarkGray,
 				ShadowColor = lastUpdateLabel.ShadowColor,
 				ShadowOffset = new SizeF (0, 1),
 				BackgroundColor = this.BackgroundColor,
