@@ -60,8 +60,8 @@ namespace MonoTouch.Dialog
 		{
 			BackgroundColor = new UIColor (0.88f, 0.9f, 0.92f, 1);
 			lastUpdateLabel = new UILabel (new RectangleF (0, rect.Height - 30, 320, 20)){
-				Font = UIFont.SystemFontOfSize (12f),
-				TextColor = UIColor.DarkGray,
+				Font = UIFont.SystemFontOfSize (13f),
+				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = UIColor.FromWhiteAlpha (0.9f, 1),
 				ShadowOffset = new SizeF (0, 1),
 				BackgroundColor = this.BackgroundColor,
@@ -71,8 +71,8 @@ namespace MonoTouch.Dialog
 			AddSubview (lastUpdateLabel);
 			
 			statusLabel = new UILabel (new RectangleF (0, rect.Height-48, 320, 20)){
-				Font = UIFont.BoldSystemFontOfSize (13),
-				TextColor = UIColor.DarkGray,
+				Font = UIFont.BoldSystemFontOfSize (14),
+				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = lastUpdateLabel.ShadowColor,
 				ShadowOffset = new SizeF (0, 1),
 				BackgroundColor = this.BackgroundColor,

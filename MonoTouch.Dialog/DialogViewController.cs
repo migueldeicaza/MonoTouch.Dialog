@@ -53,27 +53,34 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		void TriggerRefresh ()
+		public void TriggerRefresh ()
 		{
 			if (refreshRequested == null)
 				return;
 
-			reloading = true;
-			refreshView.SetActivity (true);
-			refreshRequested (this, EventArgs.Empty);
+			if (reloading)
+				return;
 			
-			UIView.BeginAnimations ("reloadingData");
-			UIView.SetAnimationDuration (0.2);
-			TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
-			UIView.CommitAnimations ();
+			reloading = true;
+			if (refreshView != null)
+				refreshView.SetActivity (true);
+			refreshRequested (this, EventArgs.Empty);
+
+			if (refreshView != null){
+				UIView.BeginAnimations ("reloadingData");
+				UIView.SetAnimationDuration (0.2);
+				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
+				UIView.CommitAnimations ();
+			}
 		}
 		
 		public void ReloadComplete ()
 		{
-			refreshView.LastUpdate = DateTime.Now;
+			if (refreshView != null)
+				refreshView.LastUpdate = DateTime.Now;
 			if (!reloading)
 				return;
-			
+
 			reloading = false;
 			refreshView.SetActivity (false);
 			refreshView.Flip (false);
@@ -172,6 +179,9 @@ namespace MonoTouch.Dialog
 				if (container.reloading)
 					return;
 				var view  = container.refreshView;
+				if (view == null)
+					return;
+				
 				var point = container.TableView.ContentOffset;
 				if (view.IsFlipped && point.Y > -yboundary && point.Y < 0){
 					view.Flip (true);
@@ -249,7 +259,12 @@ namespace MonoTouch.Dialog
 			root.TableView = tableView;
 			
 			if (refreshRequested != null){
-				refreshView = new RefreshTableHeaderView (new RectangleF (0, -100, 320, 100));
+				// The dimensions should be large enough so that even if the user scrolls, we render the
+				// whole are with the background color.
+				float height = View.Bounds.Height;
+				refreshView = new RefreshTableHeaderView (new RectangleF (0, -height, 320, height));
+				if (reloading)
+					refreshView.SetActivity (true);
 				TableView.AddSubview (refreshView);
 			}
 		}
