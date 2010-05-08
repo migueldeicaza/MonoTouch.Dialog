@@ -1301,8 +1301,13 @@ namespace MonoTouch.Dialog
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			if (Parent != null)
-				InsertVisual (idx, anim, newElements.Length);
+			var root = Parent as RootElement;
+			if (Parent != null && root.TableView != null){
+				if (anim == UITableViewRowAnimation.None)
+					root.TableView.ReloadData ();
+				else
+					InsertVisual (idx, anim, newElements.Length);
+			}
 		}
 
 		public void Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
@@ -1315,8 +1320,13 @@ namespace MonoTouch.Dialog
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
-			if (Parent != null)
-				InsertVisual (idx, anim, pos-idx);
+			var root = Parent as RootElement;
+			if (root != null && root.TableView != null){				
+				if (anim == UITableViewRowAnimation.None)
+					root.TableView.ReloadData ();
+				else
+					InsertVisual (idx, anim, pos-idx);
+			}
 		}
 		
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)

@@ -82,7 +82,7 @@ namespace MonoTouch.Dialog
 			AddSubview (statusLabel);
 			SetStatus (RefreshViewStatus.PullToReload);
 			
-			arrowView = new UIImageView (new RectangleF (25, rect.Height - 65, 30, 55)){
+			arrowView = new UIImageView (new RectangleF (20, rect.Height - 65, 30, 55)){
 				ContentMode = UIViewContentMode.ScaleAspectFill,
 				Image = arrow,
 			};

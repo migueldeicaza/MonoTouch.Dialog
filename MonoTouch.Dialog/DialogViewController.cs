@@ -82,6 +82,9 @@ namespace MonoTouch.Dialog
 				return;
 
 			reloading = false;
+			if (refreshView == null)
+				return;
+			
 			refreshView.SetActivity (false);
 			refreshView.Flip (false);
 			UIView.BeginAnimations ("doneReloading");
