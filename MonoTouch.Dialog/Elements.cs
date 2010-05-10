@@ -934,9 +934,16 @@ namespace MonoTouch.Dialog
 					EntryElement focus = null;
 					foreach (var e in (Parent as Section).Elements){
 						if (e == this)
+						{
 							focus = this;
+						}
+						
 						else if (focus != null && e is EntryElement)
+						{	
 							focus = e as EntryElement;
+							break;
+						}
+						
 					}
 					if (focus != this)
 						focus.entry.BecomeFirstResponder ();
