@@ -450,8 +450,7 @@ namespace MonoTouch.Dialog
 		}
 		
 		public event NSAction Tapped;
-		
-		
+				
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
@@ -481,6 +480,42 @@ namespace MonoTouch.Dialog
 				Tapped ();
 			tableView.DeselectRow (indexPath, true);
 		}
+	}
+
+	/// <summary>
+	///   A version of the StringElement that can be styled with a number of options.
+	/// </summary>
+	public class StyledStringElement : StringElement {
+		static NSString skey = new NSString ("StyledStringElement");
+
+		public StyledStringElement (string caption) : base (caption) {}
+		public StyledStringElement (string caption, string value) : base (caption, value) {}
+		public StyledStringElement (string caption, NSAction tapped) : base (caption, tapped) {}
+		
+		public UIFont Font;
+		public UIColor TextColor;
+		public UIColor BackgroundColor;
+			
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (skey);
+			if (cell == null){
+				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+			}
+			cell.Accessory = UITableViewCellAccessory.None;
+			cell.TextLabel.Text = Caption;
+			cell.TextLabel.TextAlignment = Alignment;
+			cell.TextLabel.TextColor = TextColor == null ? UIColor.Black : TextColor;
+			cell.TextLabel.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
+			cell.TextLabel.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
+			
+			// The check is needed because the cell might have been recycled.
+			if (cell.DetailTextLabel != null)
+				cell.DetailTextLabel.Text = Value == null ? "" : Value;
+			
+			return cell;
+		}		
 	}
 	
 	public class ImageStringElement : StringElement {

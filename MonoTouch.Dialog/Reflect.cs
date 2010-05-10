@@ -50,6 +50,13 @@ namespace MonoTouch.Dialog
 	public class PasswordAttribute : EntryAttribute {
 		public PasswordAttribute (string placeholder) : base (placeholder) {}
 	}
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class AlignmentAttribute : Attribute {
+		public AlignmentAttribute (UITextAlignment alignment) {
+			Alignment = alignment;
+		}
+		public UITextAlignment Alignment;
+	}
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class RadioSelectionAttribute : Attribute {
@@ -225,6 +232,7 @@ namespace MonoTouch.Dialog
 				Element element = null;
 				if (mType == typeof (string)){
 					PasswordAttribute pa = null;
+					AlignmentAttribute align = null;
 					EntryAttribute ea = null;
 					object html = null;
 					NSAction invoke = null;
@@ -239,6 +247,8 @@ namespace MonoTouch.Dialog
 							multi = true;
 						else if (attr is HtmlAttribute)
 							html = attr;
+						else if (attr is AlignmentAttribute)
+							align = attr as AlignmentAttribute;
 						
 						if (attr is OnTapAttribute){
 							string mname = ((OnTapAttribute) attr).Method;
@@ -265,8 +275,13 @@ namespace MonoTouch.Dialog
 						element = new MultilineElement (caption, value);
 					else if (html != null)
 						element = new HtmlElement (caption, value);
-					else
-						element = new StringElement (caption, value);
+					else {
+						var selement = new StringElement (caption, value);
+						element = selement;
+						
+						if (align != null)
+							selement.Alignment = align.Alignment;
+					}
 					
 					if (invoke != null)
 						((StringElement) element).Tapped += invoke;

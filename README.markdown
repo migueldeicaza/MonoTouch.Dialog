@@ -155,6 +155,9 @@ These are the current widgets supported by the Reflection API:
   case the value of the string should contain the url
   to load in the embedded UIWebView. 
 
+  The [Aligntment] attribute takes a parameter a UITextAlingment
+  that determines how the string should be rendered
+
   Examples:
 
         public string Version = "1.2.3";
@@ -168,6 +171,10 @@ These are the current widgets supported by the Reflection API:
         [Caption ("This is a\nmultiline caption")]
         [Multiline]
         string multiline;
+
+	[Caption ("Date")]
+	[Alignment (UITextAlignment.Center)]
+	string centered;
 
 ### Text Entry and Password Entries.###
 
@@ -501,6 +508,9 @@ use:
     To render static strings
     To render strings with a read-only value.
     To be used as "buttons", pass a delegate for this.
+  * StyledStringElement
+    Similar to StringElement but allows for the Font, TextColor, 
+    and BackgroundColor to be set on a per-cell basis.
   * MultilineElement
     Derives from StringElement, used to render multi-line cells.
   * RadioElements (to provide a radio-button feature).
