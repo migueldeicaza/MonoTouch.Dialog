@@ -78,25 +78,10 @@ namespace MonoTouch.Dialog
 		public string Caption;
 	}
 
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
-	public class AlignmentAttribute : Attribute
-	{
-		public AlignmentAttribute (UITextAlignment alignment)
-		{
-			Alignment = alignment;
-		}
-
-		public UITextAlignment Alignment;
-	}
-
-
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
-	public class SectionAttribute : Attribute
-	{
-		public SectionAttribute ()
-		{
-		}
-
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class SectionAttribute : Attribute {
+		public SectionAttribute () {}
+		
 		public SectionAttribute (string caption)
 		{
 			Caption = caption;
@@ -108,6 +93,17 @@ namespace MonoTouch.Dialog
 			Footer = footer;
 		}
 		public string Caption, Footer;
+	}
+	
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
+	public class AlignmentAttribute : Attribute
+	{
+		public AlignmentAttribute (UITextAlignment alignment)
+		{
+			Alignment = alignment;
+		}
+
+		public UITextAlignment Alignment;
 	}
 
 	public class RangeAttribute : Attribute {
@@ -215,9 +211,8 @@ namespace MonoTouch.Dialog
 					continue;
 
 				string caption = null;
+				object [] attrs = mi.GetCustomAttributes (false);
 				UITextAlignment alignment = UITextAlignment.Left;
-				
-				object[] attrs = mi.GetCustomAttributes (false);
 				bool skip = false;
 				foreach (var attr in attrs){
 					if (attr is SkipAttribute)

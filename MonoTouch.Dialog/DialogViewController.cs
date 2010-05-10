@@ -88,6 +88,14 @@ namespace MonoTouch.Dialog
 					return;
 				if (root != null)
 					root.Dispose ();
+				
+				root = value;
+				root.TableView = tableView;					
+				ReloadData ();
+				NavigationItem.RightBarButtonItem = _buttonEdit;
+			}
+		}
+		
 		private UIBarButtonItem _buttonEdit;
 		private UIBarButtonItem _buttonDone;
 		
@@ -101,11 +109,10 @@ namespace MonoTouch.Dialog
 				_buttonEdit.Clicked += Handle_buttonEditClicked;
 				_buttonDone.Clicked += Handle_buttonDoneClicked;
 				
-				root = value;
-				root.TableView = tableView;					
-				ReloadData ();
-				NavigationItem.RightBarButtonItem = _buttonEdit;
 			}
+			
+			base.ViewDidLoad ();
+			
 		} 
 
 		EventHandler refreshRequested;
@@ -118,19 +125,12 @@ namespace MonoTouch.Dialog
 			remove {
 				refreshRequested -= value;
 			}
-			
-			base.ViewDidLoad ();
-			
 		}
 		
 		public void TriggerRefresh ()
-		private void Handle_buttonDoneClicked (object sender, EventArgs e)
 		{
 			if (refreshRequested == null)
 				return;
-			Editing = false;
-			NavigationItem.RightBarButtonItem = _buttonEdit;
-		}
 
 			if (reloading)
 				return;
@@ -139,11 +139,6 @@ namespace MonoTouch.Dialog
 			if (refreshView != null)
 				refreshView.SetActivity (true);
 			refreshRequested (this, EventArgs.Empty);
-		private void Handle_buttonEditClicked (object sender, EventArgs e)
-		{
-			Editing = true;
-			NavigationItem.RightBarButtonItem = _buttonDone;
-		}
 
 			if (refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
@@ -151,11 +146,6 @@ namespace MonoTouch.Dialog
 				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
 				UIView.CommitAnimations ();
 			}
-		private bool rotateUIEnabled;
-
-		public bool RotateUIEnabled {
-			get { return rotateUIEnabled; }
-			set { rotateUIEnabled = value; }
 		}
 		
 		public void ReloadComplete ()
@@ -164,12 +154,6 @@ namespace MonoTouch.Dialog
 				refreshView.LastUpdate = DateTime.Now;
 			if (!reloading)
 				return;
-		bool enableEdit;
-		
-		public bool EnableEdit {
-			get { return enableEdit; }
-			set { enableEdit = value; }
-		}
 
 			reloading = false;
 			if (refreshView == null)
@@ -182,15 +166,34 @@ namespace MonoTouch.Dialog
 			TableView.ContentInset = new UIEdgeInsets (0, 0, 0, 0);
 			refreshView.SetStatus (RefreshViewStatus.PullToReload);
 			UIView.CommitAnimations ();
-		public RootElement Root {
-			get { return root; }
-			set {
-				if (root == value)
-					return;
-				root = value;
-				root.TableView = tableView;
-				ReloadData ();
-			}
+		}
+	
+		private void Handle_buttonDoneClicked (object sender, EventArgs e)
+		{
+			if (refreshRequested == null)
+				return;
+			Editing = false;
+			NavigationItem.RightBarButtonItem = _buttonEdit;
+		}
+		
+		private void Handle_buttonEditClicked (object sender, EventArgs e)
+		{
+			Editing = true;
+			NavigationItem.RightBarButtonItem = _buttonDone;
+		}
+		
+		private bool rotateUIEnabled;
+
+		public bool RotateUIEnabled {
+			get { return rotateUIEnabled; }
+			set { rotateUIEnabled = value; }
+		}
+		
+		private	bool enableEdit;
+		
+		public bool EnableEdit {
+			get { return enableEdit; }
+			set { enableEdit = value; }
 		}
 		
 		class Source : UITableViewSource {
@@ -393,15 +396,6 @@ namespace MonoTouch.Dialog
 		{
 			return rotateUIEnabled;
 			
-			if (refreshRequested != null){
-				// The dimensions should be large enough so that even if the user scrolls, we render the
-				// whole are with the background color.
-				float height = View.Bounds.Height;
-				refreshView = new RefreshTableHeaderView (new RectangleF (0, -height, 320, height));
-				if (reloading)
-					refreshView.SetActivity (true);
-				TableView.AddSubview (refreshView);
-			}
 		}
 
 		public override void ViewWillAppear (bool animated)

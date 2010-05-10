@@ -1976,17 +1976,15 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		protected virtual UIViewController MakeViewController ()
 		{
-			return new DialogViewController (this, true);
+			return new DialogViewController (this, true){
+				RotateUIEnabled=true,
+				EnableEdit=OnCommitEditingStyle!= null
+			};
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var newDvc = MakeViewController ();
-			var newDvc = new DialogViewController (this, true)
-			{
-				RotateUIEnabled=true,
-				EnableEdit=OnCommitEditingStyle!= null
-			};
+			var newDvc = (DialogViewController)MakeViewController ();
 			
 			if(OnCommitEditingStyle != null)
 				newDvc.OnCommitEditingStyle += OnCommitEditingStyle;
