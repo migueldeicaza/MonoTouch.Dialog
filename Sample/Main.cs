@@ -18,10 +18,8 @@ namespace Sample
 	// The name AppDelegate is referenced in the MainWindow.xib file.
 	public partial class AppDelegate : UIApplicationDelegate
 	{
-		const string footer = 
-			"These show the two sets of APIs\n" +
-			"available in MonoTouch.Dialogs";
-		
+		const string footer = "These show the two sets of APIs\n" + "available in MonoTouch.Dialogs";
+
 		// This method is invoked when the application has loaded its UI and its ready to run
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
@@ -45,8 +43,13 @@ namespace Sample
 				}
 			};
 
-			var dv = new DialogViewController (menu,false);
+			var dv = new DialogViewController (menu);
 			navigation.PushViewController (dv, true);				
+			
+			var menu = new RootElement ("Demos") { new Section ("Element API") { new StringElement ("iPhone Settings Sample", DemoElementApi), new StringElement ("Dynamically load data", DemoDynamic), new StringElement ("Add/Remove demo", DemoAddRemove), new StringElement ("Assorted cells", DemoDate) }, new Section ("Auto-mapped", footer) { new StringElement ("Reflection API", DemoReflectionApi) }, new Section ("Other") { new StringElement ("Headers and Footers", DemoHeadersFooters) } };
+			
+			var dv = new DialogViewController (menu, false);
+			navigation.PushViewController (dv, true);
 			
 			window.MakeKeyAndVisible ();
 			

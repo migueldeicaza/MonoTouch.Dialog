@@ -1,19 +1,21 @@
 MonoTouch.Dialog
 ================
 
-MonoTouch.Dialog is a foundation to create dialog boxes without
-having to write dozens of delegates and controllers for a user
-interface.   Currently this supports creating Dialogs based on
-navigation controllers that support:
+MonoTouch.Dialog is a foundation to create dialog boxes and show
+table-based information without having to write dozens of delegates
+and controllers for the user interface.  Currently this supports
+creating Dialogs based on navigation controllers that support:
 
   * On/Off controls
   * Slider (floats)
-  * String informational rendering.
+  * String informational rendering
   * Text Entry
   * Password Entry
   * Jump to HTML page
-  * Radio elements.
-  * Dates, Times and Dates+Times.
+  * Radio elements
+  * Dates, Times and Dates+Times
+  * Arbitary UIViews
+  * Pull-to-refresh functionality.
 
 Miguel (miguel@gnome.org)
 
@@ -143,7 +145,10 @@ These are the current widgets supported by the Reflection API:
   to invoke a method on demand.
 
   You can add the [Multiline] attribute to your string
-  to make the cell render in multiple lines.
+  to make the cell render in multiple lines.   And you 
+  can use the [Html] attribute on a string, in that
+  case the value of the string should contain the url
+  to load in the embedded UIWebView. 
 
   Examples:
 
@@ -267,7 +272,7 @@ These are the current widgets supported by the Reflection API:
 
   Examples:
 
-        class MainSettings {
+	class MainSettings {
 	    string Subject;
 	    string RoomName;
 	    TimeRange Time;
@@ -343,7 +348,8 @@ The Low-Level Elements API
 All that the Reflection API does is create a set of nodes from the
 Elements API.   
 
-First a sample of how you would create a UI:
+First a sample of how you would create a UI taking advantage of 
+C# 3.0 initializers:
 
         var root = new RootElement ("Settings") {
           new Section (){
@@ -360,6 +366,7 @@ First a sample of how you would create a UI:
               new Section (){
                 new FloatElement (null, null, 0.5f),
                 new BooleanElement ("Auto-brightness", false),
+		new UILabel ("I am a simple UILabel!"),
               }
             },
           },
@@ -370,7 +377,16 @@ First a sample of how you would create a UI:
             new TimeElement ("Select Time", DateTime.Now),
           },
 
-You will need a RootElement to get things rolling.
+You will need a RootElement to get things rolling.   The nested
+structure created by Sections() and Elements() are merely calls to
+either RootElement.Add () or Section.Add() that the C# compiler 
+invokes for us.
+
+Additionally notice that when adding elements to a section, you
+can use either Elements or UIViews directly.   The UIViews are
+just wrapped in a special UIViewElement element.
+
+In addition
 
 RootElement
 -----------
@@ -519,6 +535,13 @@ the keyboard type style desired for the data entry.  This can be used
 to configure the keyboard for numeric input, phone input, url input or
 email address input (The values of UIKeyboardType).
 
+UIViewElement
+-------------
+
+Use this element to quickly add a standard UIView as cell in a UITableView.
+
+
+
 Booleans
 --------
 
@@ -567,6 +590,31 @@ methods:
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 
+Pull to Refresh Support
+=======================
+
+Pull to Refresh is a visual effect originally found in Tweetie2 which
+became a popular effect among many applications.
+
+To add automatic pull-to-refersh support to your dialogs, you only
+need to do two things: hook up an event handler to be notified when
+the user pulls the data and notify the DialogViewController when the
+data has been loaded to go back to its default state.
+
+Hooking up a notification is simple, just connect to the
+RefreshRequested event on the DialogViewController, like this:
+
+        dvc.RefreshRequested += OnUserRequestedRefresh;
+
+Then on your method OnUserRequestedRefresh, you would queue some data
+loading, request some data from the net, or spin a thread to compute
+the data.  Once the data has been loaded, you must notify the
+DialogViewController that the new data is in, and to restore the view
+to its default state, you do this by calling ReloadComplete:
+
+	dvc.ReloadComplete ();
+
+
 Customizing the DialogViewController
 ====================================
 
@@ -593,20 +641,20 @@ it and override the proper methods.
 This example shows how to use an image as the background for the
 DialogViewController:
 
-class SpiffyDialogViewController : DialogViewController {
-    UIImage image;
-
-    public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image) 
-        : base (root, pushing) 
-    {
-        this.image = image;
+    class SpiffyDialogViewController : DialogViewController {
+        UIImage image;
+    
+        public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image) 
+            : base (root, pushing) 
+        {
+            this.image = image;
+        }
+    
+        public override LoadView ()
+        {
+            base.LoadView ();
+            var color = UIColor.FromPatternImage(image);
+            Root.TableView.BackgroundColor = UIColor.Clear;
+            ParentViewController.View.BackgroundColor = color;
+        }
     }
-
-    public override LoadView ()
-    {
-        base.LoadView ();
-	var color = UIColor.FromPatternImage(image);
-        Root.TableView.BackgroundColor = UIColor.Clear;
-	ParentViewController.View.BackgroundColor = color;
-    }
-}

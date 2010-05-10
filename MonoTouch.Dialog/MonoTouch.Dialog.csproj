@@ -12,6 +12,7 @@
     <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,5 +71,14 @@
     <Compile Include="DialogViewController.cs" />
     <Compile Include="Reflect.cs" />
     <Compile Include="ElementBadge.cs" />
+    <Compile Include="Controls.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Images\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\arrow.png">
+      <LogicalName>arrow.png</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

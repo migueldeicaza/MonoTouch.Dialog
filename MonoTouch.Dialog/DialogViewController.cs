@@ -1,3 +1,14 @@
+//
+// DialogViewController.cs: drives MonoTouch.Dialog
+//
+// Author:
+//   Miguel de Icaza
+//
+// Code to support pull-to-refresh based on Martin Bowling's TweetTableView
+// which is based in turn in EGOTableViewPullRefresh code which was created
+// by Devin Doty and is Copyrighted 2009 enormego and released under the
+// MIT X11 license
+//
 using System;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -62,9 +73,21 @@ namespace MonoTouch.Dialog
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		UITableView tableView;
+		RefreshTableHeaderView refreshView;
 		RootElement root;
 		bool pushing;
 		bool dirty;
+		bool reloading;
+
+		public RootElement Root {
+			get {
+				return root;
+			}
+			set {
+				if (root == value)
+					return;
+				if (root != null)
+					root.Dispose ();
 		private UIBarButtonItem _buttonEdit;
 		private UIBarButtonItem _buttonDone;
 		
@@ -78,25 +101,56 @@ namespace MonoTouch.Dialog
 				_buttonEdit.Clicked += Handle_buttonEditClicked;
 				_buttonDone.Clicked += Handle_buttonDoneClicked;
 				
+				root = value;
+				root.TableView = tableView;					
+				ReloadData ();
 				NavigationItem.RightBarButtonItem = _buttonEdit;
+			}
+		} 
+
+		EventHandler refreshRequested;
+		public event EventHandler RefreshRequested {
+			add {
+				if (tableView != null)
+					throw new ArgumentException ("You should set the handler before the controller is shown");
+				refreshRequested += value; 
+			}
+			remove {
+				refreshRequested -= value;
 			}
 			
 			base.ViewDidLoad ();
 			
 		}
 		
+		public void TriggerRefresh ()
 		private void Handle_buttonDoneClicked (object sender, EventArgs e)
 		{
+			if (refreshRequested == null)
+				return;
 			Editing = false;
 			NavigationItem.RightBarButtonItem = _buttonEdit;
 		}
 
+			if (reloading)
+				return;
+			
+			reloading = true;
+			if (refreshView != null)
+				refreshView.SetActivity (true);
+			refreshRequested (this, EventArgs.Empty);
 		private void Handle_buttonEditClicked (object sender, EventArgs e)
 		{
 			Editing = true;
 			NavigationItem.RightBarButtonItem = _buttonDone;
 		}
 
+			if (refreshView != null){
+				UIView.BeginAnimations ("reloadingData");
+				UIView.SetAnimationDuration (0.2);
+				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
+				UIView.CommitAnimations ();
+			}
 		private bool rotateUIEnabled;
 
 		public bool RotateUIEnabled {
@@ -104,6 +158,12 @@ namespace MonoTouch.Dialog
 			set { rotateUIEnabled = value; }
 		}
 		
+		public void ReloadComplete ()
+		{
+			if (refreshView != null)
+				refreshView.LastUpdate = DateTime.Now;
+			if (!reloading)
+				return;
 		bool enableEdit;
 		
 		public bool EnableEdit {
@@ -111,6 +171,17 @@ namespace MonoTouch.Dialog
 			set { enableEdit = value; }
 		}
 
+			reloading = false;
+			if (refreshView == null)
+				return;
+			
+			refreshView.SetActivity (false);
+			refreshView.Flip (false);
+			UIView.BeginAnimations ("doneReloading");
+			UIView.SetAnimationDuration (0.3f);
+			TableView.ContentInset = new UIEdgeInsets (0, 0, 0, 0);
+			refreshView.SetStatus (RefreshViewStatus.PullToReload);
+			UIView.CommitAnimations ();
 		public RootElement Root {
 			get { return root; }
 			set {
@@ -122,10 +193,11 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		class Source : UITableViewSource
-		{
+		class Source : UITableViewSource {
+			const float yboundary = 65;
 			protected DialogViewController container;
 			protected RootElement root;
+			bool checkForRefresh;
 			
 			public event EventHandler<CommitEditingStyleArgs> OnCommitEditingStyle;
 			
@@ -163,8 +235,10 @@ namespace MonoTouch.Dialog
 			
 			public override int RowsInSection (UITableView tableview, int section)
 			{
-				var s = root.Sections[section];
-				return s.Elements.Count;
+				var s = root.Sections [section];
+				var count = s.Elements.Count;
+				
+				return count;
 			}
 
 			public override int NumberOfSections (UITableView tableView)
@@ -174,40 +248,40 @@ namespace MonoTouch.Dialog
 
 			public override string TitleForHeader (UITableView tableView, int section)
 			{
-				return root.Sections[section].Caption;
+				return root.Sections [section].Caption;
 			}
 
 			public override string TitleForFooter (UITableView tableView, int section)
 			{
-				return root.Sections[section].Footer;
+				return root.Sections [section].Footer;
 			}
 
 			public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections[indexPath.Section];
-				var element = section.Elements[indexPath.Row];
+				var section = root.Sections [indexPath.Section];				
+				var element = section.Elements [indexPath.Row];
 				
 				return element.GetCell (tableView);
 			}
-
+			
 			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections[indexPath.Section];
-				var element = section.Elements[indexPath.Row];
-				
-				element.Selected (container, tableView, indexPath);
-				
-			}
+				var section = root.Sections [indexPath.Section];
+				var element = section.Elements [indexPath.Row];
 
+				element.Selected (container, tableView, indexPath);
+
+			}			
+			
 			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections[sectionIdx];
+				var section = root.Sections [sectionIdx];
 				return section.HeaderView;
 			}
 
 			public override float GetHeightForHeader (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections[sectionIdx];
+				var section = root.Sections [sectionIdx];
 				if (section.HeaderView == null)
 					return -1;
 				return section.HeaderView.Frame.Height;
@@ -215,17 +289,55 @@ namespace MonoTouch.Dialog
 
 			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections[sectionIdx];
+				var section = root.Sections [sectionIdx];
 				return section.FooterView;
 			}
-
+			
 			public override float GetHeightForFooter (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections[sectionIdx];
+				var section = root.Sections [sectionIdx];
 				if (section.FooterView == null)
 					return -1;
 				return section.FooterView.Frame.Height;
 			}
+			
+			#region Pull to Refresh support
+			public override void Scrolled (UIScrollView scrollView)
+			{
+				if (!checkForRefresh)
+					return;
+				if (container.reloading)
+					return;
+				var view  = container.refreshView;
+				if (view == null)
+					return;
+				
+				var point = container.TableView.ContentOffset;
+				if (view.IsFlipped && point.Y > -yboundary && point.Y < 0){
+					view.Flip (true);
+					view.SetStatus (RefreshViewStatus.PullToReload);
+				} else if (!view.IsFlipped && point.Y < -yboundary){
+					view.Flip (true);
+					view.SetStatus (RefreshViewStatus.ReleaseToReload);
+				}
+			}
+			
+			public override void DraggingStarted (UIScrollView scrollView)
+			{
+				checkForRefresh = true;
+			}
+			
+			public override void DraggingEnded (UIScrollView scrollView, bool willDecelerate)
+			{
+				if (container.refreshView == null)
+					return;
+				
+				checkForRefresh = false;
+				if (container.TableView.ContentOffset.Y > -yboundary)
+					return;
+				container.TriggerRefresh ();
+			}
+			#endregion
 		}
 
 		//
@@ -233,16 +345,13 @@ namespace MonoTouch.Dialog
 		// probe *every* row for its size;   Avoid this by creating a separate
 		// model that is used only when we have items that require resizing
 		//
-		class SizingSource : Source
-		{
-			public SizingSource (DialogViewController controller) : base(controller)
-			{
-			}
-
+		class SizingSource : Source {
+			public SizingSource (DialogViewController controller) : base (controller) {}
+			
 			public override float GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections[indexPath.Section];
-				var element = section.Elements[indexPath.Row];
+				var section = root.Sections [indexPath.Section];
+				var element = section.Elements [indexPath.Row];
 				
 				var sizable = element as IElementSizing;
 				if (sizable == null)
@@ -250,7 +359,7 @@ namespace MonoTouch.Dialog
 				return sizable.GetHeight (tableView, indexPath);
 			}
 		}
-
+			
 		public void ActivateController (UIViewController controller)
 		{
 			dirty = true;
@@ -267,8 +376,11 @@ namespace MonoTouch.Dialog
 
 		public override void LoadView ()
 		{
-			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) { AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin, AutosizesSubviews = true };
-			
+			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) {
+				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin,
+				AutosizesSubviews = true
+			};
+
 			UpdateSource ();
 			View = tableView;
 			if (root == null)
@@ -281,17 +393,29 @@ namespace MonoTouch.Dialog
 		{
 			return rotateUIEnabled;
 			
+			if (refreshRequested != null){
+				// The dimensions should be large enough so that even if the user scrolls, we render the
+				// whole are with the background color.
+				float height = View.Bounds.Height;
+				refreshView = new RefreshTableHeaderView (new RectangleF (0, -height, 320, height));
+				if (reloading)
+					refreshView.SetActivity (true);
+				TableView.AddSubview (refreshView);
+			}
 		}
-		
+
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			if (root == null)
+				return;
+			
 			root.Prepare ();
 			
 			NavigationItem.HidesBackButton = !pushing;
 			if (root.Caption != null)
 				NavigationItem.Title = root.Caption;
-			if (dirty) {
+			if (dirty){
 				tableView.ReloadData ();
 				dirty = false;
 			}
@@ -312,21 +436,20 @@ namespace MonoTouch.Dialog
 				TableSource.OnCommitEditingStyle += this.OnCommitEditingStyle;
 			
 			tableView.Source = TableSource;
-				
 		}
 
 		public void ReloadData ()
 		{
 			root.Prepare ();
-			if (tableView != null) {
+			if (tableView != null){
 				UpdateSource ();
 				tableView.ReloadData ();
 			}
 			dirty = false;
 		}
-
+		
 		public event EventHandler ViewDissapearing;
-
+		
 		public override void ViewWillDisappear (bool animated)
 		{
 			base.ViewWillDisappear (animated);
@@ -340,13 +463,17 @@ namespace MonoTouch.Dialog
 			if (root != null)
 				root.Prepare ();
 		}
-
-		public DialogViewController (RootElement root)
+		
+		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
 		{
 			PrepareRoot (root);
-			
 		}
-
+		
+		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
+		{
+			PrepareRoot (root);
+		}
+		
 		/// <summary>
 		///     Creates a new DialogViewController from a RootElement and sets the push status
 		/// </summary>
@@ -358,12 +485,17 @@ namespace MonoTouch.Dialog
 		/// (NavigationControllers) or not.   If pushing is true, then the back button 
 		/// will be shown, allowing the user to go back to the previous controller
 		/// </param>
-		public DialogViewController (RootElement root, bool pushing)
+		public DialogViewController (RootElement root, bool pushing) : base (UITableViewStyle.Grouped)
 		{
 			this.pushing = pushing;
 			PrepareRoot (root);
 		}
-		
+
+		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
+		{
+			this.pushing = pushing;
+			PrepareRoot (root);
+		}
 	}
 	
 }

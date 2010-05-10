@@ -17,7 +17,7 @@ using System.Drawing;
 using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
-{
+{	
 	/// <summary>
 	///    This element can be used to show an image with some text
 	/// </summary>
@@ -32,8 +32,7 @@ namespace MonoTouch.Dialog
 	///    render a calendar badge like the iPhone OS.   It will compose
 	///    the text on top of the image which is expected to be 57x57
 	/// </remarks>
-	public class BadgeElement : Element, IElementSizing
-	{
+	public class BadgeElement : Element, IElementSizing {
 		static NSString ckey = new NSString ("badgeKey");
 		public event NSAction Tapped;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.TailTruncation;
@@ -42,12 +41,13 @@ namespace MonoTouch.Dialog
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		UIImage image;
 		UIFont font;
-
-		public BadgeElement (UIImage badgeImage, string cellText) : this(badgeImage, cellText, null)
+	
+		public BadgeElement (UIImage badgeImage, string cellText)
+			: this (badgeImage, cellText, null)
 		{
 		}
 
-		public BadgeElement (UIImage badgeImage, string cellText, NSAction tapped) : base(cellText)
+		public BadgeElement (UIImage badgeImage, string cellText, NSAction tapped) : base (cellText)
 		{
 			if (badgeImage == null)
 				throw new ArgumentNullException ("badgeImage");
@@ -55,8 +55,8 @@ namespace MonoTouch.Dialog
 			image = badgeImage;
 			if (tapped != null)
 				Tapped += tapped;
-		}
-
+		}		
+	
 		public UIFont Font {
 			get {
 				if (font == null)
@@ -69,12 +69,14 @@ namespace MonoTouch.Dialog
 				font = value;
 			}
 		}
-
+		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (ckey);
-			if (cell == null) {
-				cell = new UITableViewCell (UITableViewCellStyle.Default, ckey) { SelectionStyle = UITableViewCellSelectionStyle.Blue };
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, ckey) {
+					SelectionStyle = UITableViewCellSelectionStyle.Blue
+				};
 			}
 			cell.Accessory = Accessory;
 			var tl = cell.TextLabel;
@@ -109,11 +111,11 @@ namespace MonoTouch.Dialog
 				Tapped ();
 			tableView.DeselectRow (path, true);
 		}
-
+		
 		public static UIImage MakeCalendarBadge (UIImage template, string smallText, string bigText)
 		{
-			using (var cs = CGColorSpace.CreateDeviceRGB ()) {
-				using (var context = new CGBitmapContext (IntPtr.Zero, 57, 57, 8, 57 * 4, cs, CGImageAlphaInfo.PremultipliedLast)) {
+			using (var cs = CGColorSpace.CreateDeviceRGB ()){
+				using (var context = new CGBitmapContext (IntPtr.Zero, 57, 57, 8, 57*4, cs, CGImageAlphaInfo.PremultipliedLast)){
 					//context.ScaleCTM (0.5f, -1);
 					context.TranslateCTM (0, 0);
 					context.DrawImage (new RectangleF (0, 0, 57, 57), template.CGImage);
@@ -122,7 +124,7 @@ namespace MonoTouch.Dialog
 					context.SelectFont ("Helvetica", 10f, CGTextEncoding.MacRoman);
 					
 					// Pretty lame way of measuring strings, as documented:
-					var start = context.TextPosition.X;
+					var start = context.TextPosition.X;					
 					context.SetTextDrawingMode (CGTextDrawingMode.Invisible);
 					context.ShowText (smallText);
 					var width = context.TextPosition.X - start;
@@ -131,10 +133,10 @@ namespace MonoTouch.Dialog
 					UIFont ff = UIFont.FromName ("Helvetica", 10);
 					
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
-					context.ShowTextAtPoint ((57 - width) / 2, 46, smallText);
+					context.ShowTextAtPoint ((57-width)/2, 46, smallText);
 					
 					// The big string
-					context.SelectFont ("Helvetica-Bold", 32, CGTextEncoding.MacRoman);
+					context.SelectFont ("Helvetica-Bold", 32, CGTextEncoding.MacRoman);					
 					start = context.TextPosition.X;
 					context.SetTextDrawingMode (CGTextDrawingMode.Invisible);
 					context.ShowText (bigText);
@@ -142,10 +144,10 @@ namespace MonoTouch.Dialog
 					
 					context.SetRGBFillColor (0, 0, 0, 1);
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
-					context.ShowTextAtPoint ((57 - width) / 2, 9, bigText);
+					context.ShowTextAtPoint ((57-width)/2, 9, bigText);
 					
 					context.StrokePath ();
-					
+				
 					return UIImage.FromImage (context.ToImage ());
 				}
 			}
