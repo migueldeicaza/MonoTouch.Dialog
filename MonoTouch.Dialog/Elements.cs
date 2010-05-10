@@ -536,7 +536,7 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (280, float.MaxValue);
 			using (var font = UIFont.FromName ("Helvetica", 17f))
@@ -1874,13 +1874,25 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		protected virtual void PrepareDialogViewController (DialogViewController dvc)
+		/// <summary>
+		///    This method does nothing by default, but gives a chance to subclasses to
+		///    customize the UIViewController before it is presented
+		/// </summary>
+		protected virtual void PrepareDialogViewController (UIViewController dvc)
 		{
+		}
+		
+		/// <summary>
+		/// Creates the UIViewController that will be pushed by this RootElement
+		/// </summary>
+		protected virtual UIViewController MakeViewController ()
+		{
+			return new DialogViewController (this, true);
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var newDvc = new DialogViewController (this, true);
+			var newDvc = MakeViewController ();
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
 		}
