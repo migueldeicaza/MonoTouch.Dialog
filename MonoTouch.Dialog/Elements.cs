@@ -199,6 +199,7 @@ namespace MonoTouch.Dialog
 				button.TouchDown += delegate {
 					parent.Value = !parent.Value;
 					UpdateImage ();
+					parent.Tapped ();
 				};
 				ContentView.Add (label);
 				ContentView.Add (button);
@@ -236,6 +237,8 @@ namespace MonoTouch.Dialog
 			: base (caption, value)
 		{
 		}
+		
+		public event NSAction Tapped;
 		
 		protected abstract UIImage GetImage ();
 		
@@ -388,11 +391,19 @@ namespace MonoTouch.Dialog
 				container.web = null;
 			}
 
+			public bool Autorotate { get; set; }
+			
+			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+			{
+				return Autorotate;
+			}
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var vc = new WebViewController (this);
+			var vc = new WebViewController (this) {
+				Autorotate = dvc.Autorotate
+			};
 			web = new UIWebView (UIScreen.MainScreen.ApplicationFrame){
 				BackgroundColor = UIColor.White,
 				ScalesPageToFit = true,
@@ -985,7 +996,23 @@ namespace MonoTouch.Dialog
 		static RectangleF PickerFrameWithSize (SizeF size)
 		{                                                                                                                                    
 			var screenRect = UIScreen.MainScreen.ApplicationFrame;
-			return new RectangleF (0f, screenRect.Height - 84f - size.Height, size.Width, size.Height);
+			float fY = 0, fX = 0;
+			
+			switch (UIApplication.SharedApplication.StatusBarOrientation){
+			case UIInterfaceOrientation.LandscapeLeft:
+			case UIInterfaceOrientation.LandscapeRight:
+				fX = (screenRect.Height - size.Width) /2;
+				fY = (screenRect.Width - size.Height) / 2 -17;
+				break;
+				
+			case UIInterfaceOrientation.Portrait:
+			case UIInterfaceOrientation.PortraitUpsideDown:
+				fX = (screenRect.Width - size.Width) / 2;
+				fY = (screenRect.Height - size.Height) / 2 - 25;
+				break;
+			}
+			
+			return new RectangleF (fX, fY, size.Width, size.Height);
 		}                                                                                                                                    
 
 		class MyViewController : UIViewController {
@@ -1001,11 +1028,26 @@ namespace MonoTouch.Dialog
 				base.ViewWillDisappear (animated);
 				container.DateValue = container.datePicker.Date;
 			}
+			
+			public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
+			{
+				base.DidRotate (fromInterfaceOrientation);
+				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (SizeF.Empty));
+			}
+			
+			public bool Autorotate { get; set; }
+			
+			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+			{
+				return Autorotate;
+			}
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var vc = new MyViewController (this);
+			var vc = new MyViewController (this) {
+				Autorotate = dvc.Autorotate
+			};
 			datePicker = CreatePicker ();
 			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 			                            
@@ -1887,7 +1929,9 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		protected virtual UIViewController MakeViewController ()
 		{
-			return new DialogViewController (this, true);
+			return new DialogViewController (this, true) {
+				Autorotate = true
+			};
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)

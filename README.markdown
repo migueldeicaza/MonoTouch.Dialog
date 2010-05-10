@@ -75,6 +75,11 @@ with [this code](http://gist.github.com/281469)
 To create nested UIs that provide automatic navigation, you would just
 create an instance of that class.  
 
+Autorotation is supported by default by setting the Autorotate property
+in the DialogViewController.   Setting this value will propagate to 
+the various components that are shiped with MonoTouch.Dialog like the
+WebView and the date and time pickers
+
 Samples Included
 ----------------
 

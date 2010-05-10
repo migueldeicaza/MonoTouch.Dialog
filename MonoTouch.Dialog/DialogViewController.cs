@@ -94,6 +94,13 @@ namespace MonoTouch.Dialog
 			UIView.CommitAnimations ();
 		}
 		
+		public bool Autorotate { get; set; }
+		
+		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+		{
+			return Autorotate;
+		}
+		
 		class Source : UITableViewSource {
 			const float yboundary = 65;
 			protected DialogViewController container;

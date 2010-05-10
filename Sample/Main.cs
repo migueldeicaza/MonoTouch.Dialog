@@ -45,7 +45,9 @@ namespace Sample
 				}
 			};
 
-			var dv = new DialogViewController (menu);
+			var dv = new DialogViewController (menu) {
+				Autorotate = true
+			};
 			navigation.PushViewController (dv, true);				
 			
 			window.MakeKeyAndVisible ();
