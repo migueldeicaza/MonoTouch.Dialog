@@ -78,6 +78,7 @@
     <Compile Include="DemoAddRemove.cs" />
     <Compile Include="DemoDate.cs" />
     <Compile Include="DemoHeadersFooters.cs" />
+    <Compile Include="DemoEditableList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />
@@ -100,5 +101,7 @@
     <Content Include="jakub-calendar.png" />
     <Content Include="favorite.png" />
     <Content Include="favorited.png" />
+    <Content Include="checked.png" />
+    <Content Include="unchecked.png" />
   </ItemGroup>
 </Project>

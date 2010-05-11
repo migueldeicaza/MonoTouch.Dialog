@@ -41,7 +41,8 @@ namespace Sample
 					new StringElement ("Reflection API", DemoReflectionApi)
 				},
 				new Section ("Other"){
-					new StringElement ("Headers and Footers", DemoHeadersFooters)
+				 	new StringElement ("Headers and Footers", DemoHeadersFooters),
+					new StringElement("Login and Editable List",DemoEditableList)
 				}
 			};
 

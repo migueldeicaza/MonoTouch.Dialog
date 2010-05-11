@@ -92,7 +92,6 @@ namespace MonoTouch.Dialog
 				root = value;
 				root.TableView = tableView;					
 				ReloadData ();
-				NavigationItem.RightBarButtonItem = _buttonEdit;
 			}
 		}
 		
@@ -101,6 +100,8 @@ namespace MonoTouch.Dialog
 		
 		public override void ViewDidLoad ()
 		{
+			base.ViewDidLoad ();
+			
 			if(enableEdit)
 			{
 				// Add Edit and Done buttons
@@ -108,10 +109,8 @@ namespace MonoTouch.Dialog
 				_buttonDone = new UIBarButtonItem(UIBarButtonSystemItem.Done);
 				_buttonEdit.Clicked += Handle_buttonEditClicked;
 				_buttonDone.Clicked += Handle_buttonDoneClicked;
-				
+				NavigationItem.RightBarButtonItem = _buttonEdit;
 			}
-			
-			base.ViewDidLoad ();
 			
 		} 
 
@@ -170,8 +169,6 @@ namespace MonoTouch.Dialog
 	
 		private void Handle_buttonDoneClicked (object sender, EventArgs e)
 		{
-			if (refreshRequested == null)
-				return;
 			Editing = false;
 			NavigationItem.RightBarButtonItem = _buttonEdit;
 		}
@@ -206,27 +203,30 @@ namespace MonoTouch.Dialog
 			
 			public override void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				switch (editingStyle)
-				{
-					case UITableViewCellEditingStyle.Delete:
-						this.root[indexPath.Section].RemoveRange(indexPath.Row,1,UITableViewRowAnimation.Fade);
-						break;
-					
-					case UITableViewCellEditingStyle.Insert:
-						Console.WriteLine("UITableViewCellEditingStyle:Insert Called");
-						//this._tableItems[indexPath.Section].Items.Insert (indexPath.Row, new TableItem ());
-						//---- insert a new row in the table
-						//tableView.InsertRows (new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Fade);
-						break;
-					
-					case UITableViewCellEditingStyle.None:
-						// when is this called?
-						Console.WriteLine("UITableViewCellEditingStyle:None Called");
-						break;
-				}
-				
 				if(OnCommitEditingStyle != null)
+				{
+					switch (editingStyle)
+					{
+						case UITableViewCellEditingStyle.Delete:
+							this.root[indexPath.Section].RemoveRange(indexPath.Row,1,UITableViewRowAnimation.Fade);
+							break;
+						
+						case UITableViewCellEditingStyle.Insert:
+							Console.WriteLine("UITableViewCellEditingStyle:Insert Called");
+							//this._tableItems[indexPath.Section].Items.Insert (indexPath.Row, new TableItem ());
+							//---- insert a new row in the table
+							//tableView.InsertRows (new NSIndexPath[] { indexPath }, UITableViewRowAnimation.Fade);
+							break;
+						
+						case UITableViewCellEditingStyle.None:
+							// when is this called?
+							Console.WriteLine("UITableViewCellEditingStyle:None Called");
+							break;
+					}
+				
 					OnCommitEditingStyle(this,new CommitEditingStyleArgs(tableView,editingStyle,indexPath));
+					
+				}
 				
 			}
 		
