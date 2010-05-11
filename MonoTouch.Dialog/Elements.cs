@@ -199,7 +199,8 @@ namespace MonoTouch.Dialog
 				button.TouchDown += delegate {
 					parent.Value = !parent.Value;
 					UpdateImage ();
-					parent.Tapped ();
+					if (parent.Tapped != null)
+						parent.Tapped ();
 				};
 				ContentView.Add (label);
 				ContentView.Add (button);
