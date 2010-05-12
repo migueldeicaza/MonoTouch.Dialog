@@ -45,8 +45,12 @@ namespace Sample
 					new StringElement("Login and Editable List",DemoEditableList)
 				}
 			};
-
-			var dv = new DialogViewController (menu);
+			 
+			var dv = new DialogViewController (menu){
+				//Set this to false or omit for legacy bahaviour.  Portrait view only. 
+				//To enable auto-rotation and rendering of the DialogViewController include RotateUIEnabled=true.
+				RotateUIEnabled=false 
+			};
 			navigation.PushViewController (dv, true);				
 			
 			window.MakeKeyAndVisible ();

@@ -16,6 +16,7 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
+using System.IO;
 
 namespace MonoTouch.Dialog
 {

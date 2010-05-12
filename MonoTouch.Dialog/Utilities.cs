@@ -45,6 +45,13 @@ namespace MonoTouch.Dialog
 			
 		}
 		
+		public static int GenerateRandomNumber()
+		{
+			System.Random rand = new System.Random();
+			
+			return rand.Next(100000,999999);
+		}
+		
 	}
 	
 }
