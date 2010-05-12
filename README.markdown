@@ -16,6 +16,7 @@ creating Dialogs based on navigation controllers that support:
   * Dates, Times and Dates+Times
   * Arbitary UIViews
   * Pull-to-refresh functionality.
+  * Activity indicators
 
 Miguel (miguel@gnome.org)
 
@@ -555,7 +556,12 @@ UIViewElement
 
 Use this element to quickly add a standard UIView as cell in a UITableView.
 
+ActivityElement
+---------------
 
+This element shows a UIActivity indicator in the view, use this while your
+application is loading data and you want to provide the user with some
+visual feedback that your application is busy.
 
 Booleans
 --------

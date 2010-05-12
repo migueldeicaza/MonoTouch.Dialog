@@ -1142,7 +1142,7 @@ namespace MonoTouch.Dialog
 	public class UIViewElement : Element, IElementSizing {
 		static int count;
 		NSString key;
-		UIView view;
+		protected UIView View;
 		bool transparent;
 		
 		/// <summary>
@@ -1160,7 +1160,7 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public UIViewElement (string caption, UIView view, bool transparent) : base (caption) 
 		{
-			this.view = view;
+			this.View = view;
 			this.transparent = transparent;
 			key = new NSString ("UIViewElement" + count++);
 		}
@@ -1181,14 +1181,23 @@ namespace MonoTouch.Dialog
 						BackgroundColor = UIColor.Clear 
 					};
 				}
-				cell.ContentView.AddSubview (view);
+				cell.ContentView.AddSubview (View);
 			} 
 			return cell;
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return view.Bounds.Height;
+			return View.Bounds.Height;
+		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+			if (disposing){
+				View.Dispose ();
+				View = null;
+			}
 		}
 	}
 	
@@ -1614,7 +1623,7 @@ namespace MonoTouch.Dialog
 		/// <param name="element">
 		/// The element index inside the section that contains the summary for this RootSection.
 		/// </param>
-		public RootElement (string caption, int section, int element) : base (caption)
+		public 	RootElement (string caption, int section, int element) : base (caption)
 		{
 			summarySection = section;
 			summaryElement = element;
