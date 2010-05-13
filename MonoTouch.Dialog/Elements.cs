@@ -97,6 +97,37 @@ namespace MonoTouch.Dialog
 		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 		}
+		
+		/// <summary>
+		///  Returns the IndexPath of a given element.   This is only valid for leaf elements,
+		///  it does not work for a toplevel RootElement or a Section of if the Element has
+		///  not been attached yet.
+		/// </summary>
+		public NSIndexPath IndexPath { 
+			get {
+				var section = Parent as Section;
+				if (section == null)
+					return null;
+				var root = section.Parent as RootElement;
+				if (root == null)
+					return null;
+				
+				int row = 0;
+				foreach (var element in section.Elements){
+					if (element == this){
+						int nsect = 0;
+						foreach (var sect in root.Sections){
+							if (section == sect){
+								return NSIndexPath.FromRowSection (row, nsect);
+							}
+							nsect++;
+						}
+					}
+					row++;
+				}
+				return null;
+			}
+		}
 	}
 
 	public abstract class BoolElement : Element {
@@ -435,14 +466,14 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
-		public string Value;
 		public UITextAlignment Alignment = UITextAlignment.Left;
+		public string Value;
 		
 		public StringElement (string caption) : base (caption) {}
 		
 		public StringElement (string caption, string value) : base (caption)
 		{
-			Value = value;
+			this.Value = value;
 		}
 		
 		public StringElement (string caption,  NSAction tapped) : base (caption)
@@ -496,7 +527,10 @@ namespace MonoTouch.Dialog
 		public UIFont Font;
 		public UIColor TextColor;
 		public UIColor BackgroundColor;
-			
+		public UILineBreakMode LineBreakMode = UILineBreakMode.CharacterWrap;
+		public int Lines = 1;
+		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
+		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
@@ -504,13 +538,15 @@ namespace MonoTouch.Dialog
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
-			cell.Accessory = UITableViewCellAccessory.None;
-			cell.TextLabel.Text = Caption;
-			cell.TextLabel.TextAlignment = Alignment;
-			cell.TextLabel.TextColor = TextColor == null ? UIColor.Black : TextColor;
-			cell.TextLabel.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
-			cell.TextLabel.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
-			
+			cell.Accessory = Accessory;
+			var tl = cell.TextLabel;
+			tl.Text = Caption;
+			tl.TextAlignment = Alignment;
+			tl.TextColor = TextColor == null ? UIColor.Black : TextColor;
+			tl.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
+			tl.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
+			tl.LineBreakMode = UILineBreakMode.WordWrap;
+			tl.Lines = 0;			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
@@ -1985,5 +2021,37 @@ namespace MonoTouch.Dialog
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
 		}
+		
+		public void Reload (Section section, UITableViewRowAnimation animation)
+		{
+			if (section == null)
+				throw new ArgumentNullException ("section");
+			if (section.Parent == null || section.Parent != this)
+				throw new ArgumentException ("Section is not attached to this root");
+			
+			int idx = 0;
+			foreach (var sect in Sections){
+				if (sect == section){
+					TableView.ReloadSections (new NSIndexSet ((uint) idx), animation);
+					return;
+				}
+				idx++;
+			}
+		}
+		
+		public void Reload (Element element, UITableViewRowAnimation animation)
+		{
+			if (element == null)
+				throw new ArgumentNullException ("element");
+			var section = element.Parent as Section;
+			if (section == null)
+				throw new ArgumentException ("Element is not attached to this root");
+			var root = section.Parent as RootElement;
+			if (root == null)
+				throw new ArgumentException ("Element is not attached to this root");
+			var path = element.IndexPath;
+			TableView.ReloadRows (new NSIndexPath [] { path }, animation);
+		}
+		
 	}
 }
