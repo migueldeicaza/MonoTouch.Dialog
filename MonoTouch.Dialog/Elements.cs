@@ -872,8 +872,8 @@ namespace MonoTouch.Dialog
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
-		
-		public Func<bool,string> Validator;
+
+		public event EventHandler Changed;
 		
 		/// <summary>
 		/// Constructs an EntryElement with the given caption, placeholder and initial value.
@@ -1006,7 +1006,14 @@ namespace MonoTouch.Dialog
 		
 		public void FetchValue ()
 		{
-			Value = entry.Text;
+			var newValue = entry.Text;
+			var diff = newValue != Value;
+			Value = newValue;
+			
+			if (diff){
+				if (Changed != null)
+					Changed (this, EventArgs.Empty);
+			}
 		}
 		
 		protected override void Dispose (bool disposing)

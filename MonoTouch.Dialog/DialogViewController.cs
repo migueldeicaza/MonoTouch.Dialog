@@ -25,6 +25,9 @@ namespace MonoTouch.Dialog
 		bool dirty;
 		bool reloading;
 
+		/// <summary>
+		/// The root element displayed by the DialogViewController, the value can be changed during runtime to update the contents.
+		/// </summary>
 		public RootElement Root {
 			get {
 				return root;
@@ -42,6 +45,10 @@ namespace MonoTouch.Dialog
 		} 
 
 		EventHandler refreshRequested;
+		/// <summary>
+		/// If you assign a handler to this event before the view is shown, the
+		/// DialogViewController will have support for pull-to-refresh UI.
+		/// </summary>
 		public event EventHandler RefreshRequested {
 			add {
 				if (tableView != null)
@@ -53,6 +60,14 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		/// <summary>
+		/// Invoke this method to trigger a data refresh.   
+		/// </summary>
+		/// <remarks>
+		/// This will invoke the RerfeshRequested event handler, the code attached to it
+		/// should start the background operation to fetch the data and when it completes
+		/// it should call ReloadComplete to restore the control state.
+		/// </remarks>
 		public void TriggerRefresh ()
 		{
 			if (refreshRequested == null)
@@ -74,6 +89,9 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		/// <summary>
+		/// Invoke this method to signal that a reload has completed, this will update the UI accordingly.
+		/// </summary>
 		public void ReloadComplete ()
 		{
 			if (refreshView != null)
@@ -94,6 +112,9 @@ namespace MonoTouch.Dialog
 			UIView.CommitAnimations ();
 		}
 		
+		/// <summary>
+		/// Controls whether the DialogViewController should auto rotate
+		/// </summary>
 		public bool Autorotate { get; set; }
 		
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
@@ -240,6 +261,12 @@ namespace MonoTouch.Dialog
 			}
 		}
 			
+		/// <summary>
+		/// Activates a nested view controller from the DialogViewController.   
+		/// If the view controller is hosted in a UINavigationController it
+		/// will push the result.   Otherwise it will show it as a modal
+		/// dialog
+		/// </summary>
 		public void ActivateController (UIViewController controller)
 		{
 			dirty = true;
@@ -254,6 +281,21 @@ namespace MonoTouch.Dialog
 				PresentModalViewController (controller, true);
 		}
 
+		/// <summary>
+		/// Dismisses the view controller.   It either pops or dismisses
+		/// based on the kind of container we are hosted in.
+		/// </summary>
+		public void DeactivateController (bool animated)
+		{
+			var parent = ParentViewController;
+			var nav = parent as UINavigationController;
+			
+			if (nav != null)
+				nav.PopViewControllerAnimated (animated);
+			else
+				DismissModalViewControllerAnimated (animated);
+		}
+		
 		public override void LoadView ()
 		{
 			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) {
