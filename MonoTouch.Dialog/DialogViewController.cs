@@ -12,6 +12,8 @@
 using System;
 using MonoTouch.UIKit;
 using System.Drawing;
+using System.Collections.Generic;
+using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
@@ -60,6 +62,21 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		// If the value is 1, we are enabled, used in the source for quick computation
+		bool enableSearch;
+		public bool EnableSearch {
+			get {
+			   return enableSearch;
+			}
+			set {
+				// After MonoTouch 3.0, we can allow for the search to be enabled/disable
+				if (tableView != null)
+					throw new ArgumentException ("You should set EnableSearch before the controller is shown");
+				enableSearch = value;
+			}
+		}
+		public string SearchPlaceholder { get; set; }
+			
 		/// <summary>
 		/// Invoke this method to trigger a data refresh.   
 		/// </summary>
@@ -122,6 +139,90 @@ namespace MonoTouch.Dialog
 			return Autorotate;
 		}
 		
+		Section [] originalSections;
+		Element [][] originalElements;
+		void StartSearch ()
+		{
+			originalSections = Root.Sections.ToArray ();
+			originalElements = new Element [originalSections.Length][];
+			for (int i = 0; i < originalSections.Length; i++)
+				originalElements [i] = originalSections [i].Elements.ToArray ();
+		}
+		
+		void FinishSearch ()
+		{
+			Root.Sections = new List<Section> (originalSections);
+			originalSections = null;
+			originalElements = null;
+		}
+		
+		void PerformFilter (string text)
+		{
+			if (text == ""){
+				Root.Sections = new List<Section> (originalSections);
+				//ReloadData ();
+				return;
+			}
+			bool changed = false;
+			var newSections = new List<Section> ();
+			
+			for (int sidx = 0; sidx < originalSections.Length; sidx++){
+				Section newSection = null;
+				var section = originalSections [sidx];
+				bool sectionAdded = false;
+				Element [] elements = originalElements [sidx];
+				
+				for (int eidx = 0; eidx < elements.Length; eidx++){
+					if (elements [eidx].Matches (text)){
+						if (!sectionAdded){
+							newSection = new Section (section.Header, section.Footer){
+								FooterView = section.FooterView,
+								HeaderView = section.HeaderView
+							};
+							newSections.Add (newSection);
+						}
+						newSection.Add (elements [eidx]);
+					}
+				}
+			}
+			
+			Root.Sections = newSections;
+			
+			ReloadData ();
+		}
+		
+		class SearchDelegate : UISearchBarDelegate {
+			DialogViewController container;
+			
+			public SearchDelegate (DialogViewController container)
+			{
+				this.container = container;
+			}
+			
+			public override void OnEditingStarted (UISearchBar searchBar)
+			{
+				searchBar.ShowsCancelButton = true;
+				container.StartSearch ();
+			}
+			
+			public override void OnEditingStopped (UISearchBar searchBar)
+			{
+				searchBar.ShowsCancelButton = false;
+				container.FinishSearch ();
+			}
+			
+			public override void TextChanged (UISearchBar searchBar, string searchText)
+			{
+				container.PerformFilter (searchText ?? "");
+			}
+			
+			public override void CancelButtonClicked (UISearchBar searchBar)
+			{
+				searchBar.ShowsCancelButton = false;
+				container.FinishSearch ();
+			}
+		}
+		
 		class Source : UITableViewSource {
 			const float yboundary = 65;
 			protected DialogViewController container;
@@ -159,7 +260,7 @@ namespace MonoTouch.Dialog
 
 			public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];				
+				var section = root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
 				
 				return element.GetCell (tableView);
@@ -240,7 +341,7 @@ namespace MonoTouch.Dialog
 			}
 			#endregion
 		}
-
+		
 		//
 		// Performance trick, if we expose GetHeightForRow, the UITableView will
 		// probe *every* row for its size;   Avoid this by creating a separate
@@ -295,6 +396,21 @@ namespace MonoTouch.Dialog
 			else
 				DismissModalViewControllerAnimated (animated);
 		}
+
+		void SetupSearch ()
+		{
+			if (enableSearch){
+				var searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+					Delegate = new SearchDelegate (this)
+				};
+				if (SearchPlaceholder != null)
+					searchBar.Placeholder = this.SearchPlaceholder;
+				tableView.TableHeaderView = searchBar;					
+			} else {
+				// Does not work with current Monotouch, will work with 3.0
+				// tableView.TableHeaderView = null;
+			}
+		}
 		
 		public override void LoadView ()
 		{
@@ -305,6 +421,8 @@ namespace MonoTouch.Dialog
 
 			UpdateSource ();
 			View = tableView;
+			SetupSearch ();
+			
 			if (root == null)
 				return;
 			

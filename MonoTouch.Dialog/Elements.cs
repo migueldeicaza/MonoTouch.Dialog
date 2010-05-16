@@ -128,6 +128,16 @@ namespace MonoTouch.Dialog
 				return null;
 			}
 		}
+		
+		/// <summary>
+		///   Method invoked to determine if the cell matches the given text, never invoked with a null value or an empty string.
+		/// </summary>
+		public virtual bool Matches (string text)
+		{
+			if (Caption == null)
+				return false;
+			return Caption.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1;
+		}
 	}
 
 	public abstract class BoolElement : Element {
@@ -511,6 +521,11 @@ namespace MonoTouch.Dialog
 			if (Tapped != null)
 				Tapped ();
 			tableView.DeselectRow (indexPath, true);
+		}
+		
+		public override bool Matches (string text)
+		{
+			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
 		}
 	}
 
@@ -1023,6 +1038,11 @@ namespace MonoTouch.Dialog
 				entry = null;
 			}
 		}
+		
+		public override bool Matches (string text)
+		{
+			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
+		}
 	}
 	
 	public class DateTimeElement : StringElement {
@@ -1305,7 +1325,7 @@ namespace MonoTouch.Dialog
 			HeaderView = header;
 			FooterView = footer;
 		}
-			
+		
 		/// <summary>
 		///    The section header, as a string
 		/// </summary>

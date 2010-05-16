@@ -3,8 +3,11 @@ MonoTouch.Dialog
 
 MonoTouch.Dialog is a foundation to create dialog boxes and show
 table-based information without having to write dozens of delegates
-and controllers for the user interface.  Currently this supports
-creating Dialogs based on navigation controllers that support:
+and controllers for the user interface.  Table support Pull-to-Refresh
+as well as built-in searching.
+
+Currently this supports creating Dialogs based on navigation controllers 
+that support:
 
   * On/Off controls
   * Slider (floats)
@@ -81,6 +84,42 @@ in the DialogViewController.   Setting this value will propagate to
 the various components that are shiped with MonoTouch.Dialog like the
 WebView and the date and time pickers
 
+Pull to Refresh Support
+-----------------------
+
+Pull to Refresh is a visual effect originally found in Tweetie2 which
+became a popular effect among many applications.
+
+To add automatic pull-to-refersh support to your dialogs, you only
+need to do two things: hook up an event handler to be notified when
+the user pulls the data and notify the DialogViewController when the
+data has been loaded to go back to its default state.
+
+Hooking up a notification is simple, just connect to the
+RefreshRequested event on the DialogViewController, like this:
+
+        dvc.RefreshRequested += OnUserRequestedRefresh;
+
+Then on your method OnUserRequestedRefresh, you would queue some data
+loading, request some data from the net, or spin a thread to compute
+the data.  Once the data has been loaded, you must notify the
+DialogViewController that the new data is in, and to restore the view
+to its default state, you do this by calling ReloadComplete:
+
+       dvc.ReloadComplete ();
+
+Search Support
+--------------
+
+To support searching, set the EnableSearch property on your
+DialogViewController.   You can also set the SearchPlaceholder
+property to use as the watermark text in the search bar.
+
+Searching will change the contents of the view as the user types,
+it searches the visible fields and shows those to the user.  The
+system is extensible, so you can alter this behavior if you want,
+details are below.
+
 Samples Included
 ----------------
 
@@ -100,7 +139,11 @@ parameters:
 
   * The object that will be edited.
 
-  * The title for the page to be rendered.
+    	var searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+	    	      	Delegate = new SearchDelegate (this)
+				   };
+						if (SearchPlaceholder != null)
+						   		        * The title for the page to be rendered.
 
 A very simple dialog that contains a checkbox is shown here:
 
@@ -395,11 +438,43 @@ structure created by Sections() and Elements() are merely calls to
 either RootElement.Add () or Section.Add() that the C# compiler 
 invokes for us.
 
+The basic principle is that the DialogViewController shows one
+RootElement, and a RootElement is made up of Sections which in turn
+can contain any kind of Element (including other RootElements).
+
+RootElements inside a Section when tapped have the effect of activating
+a nested UI on a new DialogViewController. 
+
+The hierarchy of Elements looks like this:
+
+        Element
+           BadgeElement
+           BoolElement
+              BooleanElement       - uses an on/off slider
+              BooleanImageElement  - uses images for true/false
+           EntryElement
+           FloatElement
+           HtmlElement
+           ImageElement
+           MultilineElement
+	   RootElement (container for Sections)
+           Section (only valid container for Elements)
+           StringElement
+              CheckboxElement
+              DateTimeElement
+                  DateElement
+                  TimeElement
+              ImageStringElement
+              RadioElement
+              StyleStringElement
+          UIViewElement
+        
 Additionally notice that when adding elements to a section, you
 can use either Elements or UIViews directly.   The UIViews are
 just wrapped in a special UIViewElement element.
 
-In addition
+You can also create your own Elements by subclassing one of the 
+above elements and overriding a handful of methods.
 
 RootElement
 -----------
@@ -611,30 +686,14 @@ methods:
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 
-Pull to Refresh Support
-=======================
+	// If you support search, to probe if the cell matches the user input
+	bool Matches (string text)
 
-Pull to Refresh is a visual effect originally found in Tweetie2 which
-became a popular effect among many applications.
+If your element can have a variable size, you need to implement the
+IElementSizing interface, which contains one method:
 
-To add automatic pull-to-refersh support to your dialogs, you only
-need to do two things: hook up an event handler to be notified when
-the user pulls the data and notify the DialogViewController when the
-data has been loaded to go back to its default state.
-
-Hooking up a notification is simple, just connect to the
-RefreshRequested event on the DialogViewController, like this:
-
-        dvc.RefreshRequested += OnUserRequestedRefresh;
-
-Then on your method OnUserRequestedRefresh, you would queue some data
-loading, request some data from the net, or spin a thread to compute
-the data.  Once the data has been loaded, you must notify the
-DialogViewController that the new data is in, and to restore the view
-to its default state, you do this by calling ReloadComplete:
-
-	dvc.ReloadComplete ();
-
+	// Returns the height for the cell at indexPath.Section, indexPath.Row
+        float GetHeight (UITableView tableView, NSIndexPath indexPath);
 
 Customizing the DialogViewController
 ====================================
