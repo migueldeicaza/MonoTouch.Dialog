@@ -72,7 +72,7 @@
     <Compile Include="Reflect.cs" />
     <Compile Include="ElementBadge.cs" />
     <Compile Include="Controls.cs" />
-    <Compile Include="ActivityElement_1.cs" />
+    <Compile Include="ActivityElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />

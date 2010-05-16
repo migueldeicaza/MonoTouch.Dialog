@@ -143,6 +143,9 @@ namespace MonoTouch.Dialog
 		Element [][] originalElements;
 		void StartSearch ()
 		{
+			if (originalSections != null)
+				return;
+			
 			originalSections = Root.Sections.ToArray ();
 			originalElements = new Element [originalSections.Length][];
 			for (int i = 0; i < originalSections.Length; i++)
@@ -151,6 +154,9 @@ namespace MonoTouch.Dialog
 		
 		void FinishSearch ()
 		{
+			if (originalSections == null)
+				return;
+			
 			Root.Sections = new List<Section> (originalSections);
 			originalSections = null;
 			originalElements = null;
@@ -220,6 +226,8 @@ namespace MonoTouch.Dialog
 			{
 				searchBar.ShowsCancelButton = false;
 				container.FinishSearch ();
+				searchBar.ResignFirstResponder ();
+				
 			}
 		}
 		
