@@ -20,6 +20,7 @@ namespace MonoTouch.Dialog
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
+		UISearchBar searchBar;
 		UITableView tableView;
 		RefreshTableHeaderView refreshView;
 		RootElement root;
@@ -141,46 +142,63 @@ namespace MonoTouch.Dialog
 		
 		Section [] originalSections;
 		Element [][] originalElements;
-		void StartSearch ()
+		
+		/// <summary>
+		/// Allows caller to programatically activate the search bar and start the search process
+		/// </summary>
+		public void StartSearch ()
 		{
 			if (originalSections != null)
 				return;
 			
+			searchBar.BecomeFirstResponder ();
 			originalSections = Root.Sections.ToArray ();
 			originalElements = new Element [originalSections.Length][];
 			for (int i = 0; i < originalSections.Length; i++)
 				originalElements [i] = originalSections [i].Elements.ToArray ();
 		}
 		
-		void FinishSearch ()
+		/// <summary>
+		/// Allows the caller to programatically stop searching.
+		/// </summary>
+		public void FinishSearch ()
 		{
 			if (originalSections == null)
 				return;
 			
+			searchBar.ResignFirstResponder ();
 			Root.Sections = new List<Section> (originalSections);
 			originalSections = null;
 			originalElements = null;
 		}
 		
-		void PerformFilter (string text)
+		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
+		public event SearchTextEventHandler SearchTextChanged;
+		
+		public virtual void OnSearchTextChanged (string text)
 		{
-			if (text == ""){
-				Root.Sections = new List<Section> (originalSections);
-				//ReloadData ();
+			if (SearchTextChanged != null)
+				SearchTextChanged (this, new SearchChangedEventArgs (text));
+		}
+		                                     
+		public void PerformFilter (string text)
+		{
+			if (originalSections == null)
 				return;
-			}
+			
+			OnSearchTextChanged (text);
+			
 			bool changed = false;
 			var newSections = new List<Section> ();
 			
 			for (int sidx = 0; sidx < originalSections.Length; sidx++){
 				Section newSection = null;
 				var section = originalSections [sidx];
-				bool sectionAdded = false;
 				Element [] elements = originalElements [sidx];
 				
 				for (int eidx = 0; eidx < elements.Length; eidx++){
 					if (elements [eidx].Matches (text)){
-						if (!sectionAdded){
+						if (newSection == null){
 							newSection = new Section (section.Header, section.Footer){
 								FooterView = section.FooterView,
 								HeaderView = section.HeaderView
@@ -276,11 +294,7 @@ namespace MonoTouch.Dialog
 			
 			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
-				var element = section.Elements [indexPath.Row];
-
-				element.Selected (container, tableView, indexPath);
-
+				container.Selected (indexPath);
 			}			
 			
 			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
@@ -408,7 +422,7 @@ namespace MonoTouch.Dialog
 		void SetupSearch ()
 		{
 			if (enableSearch){
-				var searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
@@ -418,6 +432,14 @@ namespace MonoTouch.Dialog
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
 			}
+		}
+		
+		public virtual void Selected (NSIndexPath indexPath)
+		{
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
+
+			element.Selected (this, tableView, indexPath);
 		}
 		
 		public override void LoadView ()

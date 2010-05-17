@@ -1460,15 +1460,17 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		public void Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
+		public int Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
 		{
 			if (newElements == null)
-				return;
+				return 0;
 
 			int pos = idx;
+			int count = 0;
 			foreach (var e in newElements){
 				Elements.Insert (pos++, e);
 				e.Parent = this;
+				count++;
 			}
 			var root = Parent as RootElement;
 			if (root != null && root.TableView != null){				
@@ -1477,6 +1479,7 @@ namespace MonoTouch.Dialog
 				else
 					InsertVisual (idx, anim, pos-idx);
 			}
+			return count;
 		}
 		
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
@@ -1497,6 +1500,19 @@ namespace MonoTouch.Dialog
 		public void Insert (int index, params Element [] newElements)
 		{
 			Insert (index, UITableViewRowAnimation.None, newElements);
+		}
+		
+		public void Remove (Element e)
+		{
+			if (e == null)
+				return;
+			for (int i = Elements.Count; i > 0;){
+				i--;
+				if (Elements [i] == e){
+					RemoveRange (i, 1);
+					return;
+				}
+			}
 		}
 		
 		/// <summary>
@@ -1660,6 +1676,7 @@ namespace MonoTouch.Dialog
 		int summarySection, summaryElement;
 		internal Group group;
 		public bool UnevenRows;
+		public Func<RootElement, UIViewController> createOnSelected;
 		internal UITableView TableView;
 		
 		/// <summary>
@@ -1674,6 +1691,21 @@ namespace MonoTouch.Dialog
 			Sections = new List<Section> ();
 		}
 
+		/// <summary>
+		/// Initializes a RootSection with a caption and a callback that will
+		/// create the nested UIViewController that is activated when the user
+		/// taps on the element.
+		/// </summary>
+		/// <param name="caption">
+		///  The caption to render.
+		/// </param>
+		public RootElement (string caption, Func<RootElement, UIViewController> createOnSelected) : base (caption)
+		{
+			summarySection = -1;
+			this.createOnSelected = createOnSelected;
+			Sections = new List<Section> ();
+		}
+		
 		/// <summary>
 		///   Initializes a RootElement with a caption with a summary fetched from the specified section and leement
 		/// </summary>
@@ -2037,6 +2069,9 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		protected virtual UIViewController MakeViewController ()
 		{
+			if (createOnSelected != null)
+				return createOnSelected (this);
+			
 			return new DialogViewController (this, true) {
 				Autorotate = true
 			};
@@ -2077,6 +2112,8 @@ namespace MonoTouch.Dialog
 			if (root == null)
 				throw new ArgumentException ("Element is not attached to this root");
 			var path = element.IndexPath;
+			if (path == null)
+				return;
 			TableView.ReloadRows (new NSIndexPath [] { path }, animation);
 		}
 		

@@ -6,6 +6,9 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
+MonoTouch.Dialog is a retained system for implementing UITableViews
+as opposed to the on-demand nature of UITableView.
+
 Currently this supports creating Dialogs based on navigation controllers 
 that support:
 
@@ -115,9 +118,14 @@ To support searching, set the EnableSearch property on your
 DialogViewController.   You can also set the SearchPlaceholder
 property to use as the watermark text in the search bar.
 
-Searching will change the contents of the view as the user types,
-it searches the visible fields and shows those to the user.  The
-system is extensible, so you can alter this behavior if you want,
+Searching will change the contents of the view as the user types, it
+searches the visible fields and shows those to the user.  The
+DialogViewController exposes three methods to programatically
+initiate, terminate or trigger a new filter operation on the results:
+
+	  StartSearch, FinishSearch, PerformFilter
+
+The system is extensible, so you can alter this behavior if you want,
 details are below.
 
 Samples Included
@@ -138,12 +146,6 @@ parameters:
   * An object that will be used to resolve Tap targets.
 
   * The object that will be edited.
-
-    	var searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
-	    	      	Delegate = new SearchDelegate (this)
-				   };
-						if (SearchPlaceholder != null)
-						   		        * The title for the page to be rendered.
 
 A very simple dialog that contains a checkbox is shown here:
 
@@ -673,10 +675,12 @@ Element or by deriving from the root class Element.
 To create your own Element, you will want to override the following
 methods:
 
-        // To release any resources 
+        // To release any heavy resources that you might have
         void Dispose (bool disposing);
 
         // To retrieve the UITableViewCell for your element
+	// you would need to prepare the cell to be reused, in the
+	// same way that UITableView expects reusable cells to work
         UITableViewCell GetCell (UITableView tv)
 
         // To retrieve a "summary" that can be used with

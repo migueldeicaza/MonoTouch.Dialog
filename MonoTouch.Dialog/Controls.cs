@@ -171,4 +171,12 @@ namespace MonoTouch.Dialog
 			}
 		}	
 	}
+	
+	public class SearchChangedEventArgs : EventArgs {
+		public SearchChangedEventArgs (string text) 
+		{
+			Text = text;
+		}
+		public string Text { get; set; }
+	}
 }
