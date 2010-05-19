@@ -161,15 +161,15 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		/// Allows the caller to programatically stop searching.
 		/// </summary>
-		public void FinishSearch ()
+		public virtual void FinishSearch ()
 		{
 			if (originalSections == null)
 				return;
 			
-			searchBar.ResignFirstResponder ();
 			Root.Sections = new List<Section> (originalSections);
 			originalSections = null;
 			originalElements = null;
+			searchBar.ResignFirstResponder ();
 		}
 		
 		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
