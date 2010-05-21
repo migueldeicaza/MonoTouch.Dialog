@@ -640,6 +640,17 @@ This element shows a UIActivity indicator in the view, use this while your
 application is loading data and you want to provide the user with some
 visual feedback that your application is busy.
 
+LoadMoreElement
+---------------
+
+Use this element to allow users to load more items in your list. 
+You can customize the normal and loading captions, as well as the
+font and text color.  The UIActivity indicator starts animating,
+and the loading caption is displayed when a user taps the cell,
+and then the NSAction passed into the constructor is executed.
+Once your code in the NSAction is finished, the UIActivity indicator
+stops animating and the normal caption is displayed again.
+
 Booleans
 --------
 
