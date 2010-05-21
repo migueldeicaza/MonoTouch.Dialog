@@ -578,6 +578,11 @@ namespace MonoTouch.Dialog
 		{
 			this.image = image;
 		}
+
+		public ImageStringElement (string caption, string value, UIImage image) : base (caption, value)
+		{
+			this.image = image;
+		}
 		
 		public ImageStringElement (string caption,  NSAction tapped, UIImage image) : base (caption, tapped)
 		{
