@@ -73,6 +73,7 @@
     <Compile Include="ElementBadge.cs" />
     <Compile Include="Controls.cs" />
     <Compile Include="ActivityElement.cs" />
+    <Compile Include="LoadMoreElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
