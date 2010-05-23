@@ -272,6 +272,7 @@ namespace MonoTouch.Dialog
 				parent = newParent;
 				UpdateImage ();
 				label.Text = parent.Caption;
+				SetNeedsDisplay ();
 			}
 		}
 	
@@ -1206,7 +1207,12 @@ namespace MonoTouch.Dialog
 		static int count;
 		NSString key;
 		protected UIView View;
-		bool transparent;
+		public CellFlags Flags;
+		
+		public enum CellFlags {
+			Transparent = 1,
+			DisableSelection = 2
+		}
 		
 		/// <summary>
 		///   Constructor
@@ -1224,7 +1230,7 @@ namespace MonoTouch.Dialog
 		public UIViewElement (string caption, UIView view, bool transparent) : base (caption) 
 		{
 			this.View = view;
-			this.transparent = transparent;
+			this.Flags = transparent ? CellFlags.Transparent : 0;
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
@@ -1233,7 +1239,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
-				if (transparent){
+				if ((Flags & CellFlags.Transparent) != 0){
 					cell.BackgroundColor = UIColor.Clear;
 					
 					// 
@@ -1244,6 +1250,9 @@ namespace MonoTouch.Dialog
 						BackgroundColor = UIColor.Clear 
 					};
 				}
+				if ((Flags & CellFlags.DisableSelection) != 0)
+					cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				
 				cell.ContentView.AddSubview (View);
 			} 
 			return cell;

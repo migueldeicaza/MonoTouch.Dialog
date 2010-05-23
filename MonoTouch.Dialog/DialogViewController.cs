@@ -249,21 +249,21 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		class Source : UITableViewSource {
+		public class Source : UITableViewSource {
 			const float yboundary = 65;
-			protected DialogViewController container;
-			protected RootElement root;
+			protected DialogViewController Container;
+			protected RootElement Root;
 			bool checkForRefresh;
 			
 			public Source (DialogViewController container)
 			{
-				this.container = container;
-				root = container.root;
+				this.Container = container;
+				Root = container.root;
 			}
 			
 			public override int RowsInSection (UITableView tableview, int section)
 			{
-				var s = root.Sections [section];
+				var s = Root.Sections [section];
 				var count = s.Elements.Count;
 				
 				return count;
@@ -271,22 +271,22 @@ namespace MonoTouch.Dialog
 
 			public override int NumberOfSections (UITableView tableView)
 			{
-				return root.Sections.Count;
+				return Root.Sections.Count;
 			}
 
 			public override string TitleForHeader (UITableView tableView, int section)
 			{
-				return root.Sections [section].Caption;
+				return Root.Sections [section].Caption;
 			}
 
 			public override string TitleForFooter (UITableView tableView, int section)
 			{
-				return root.Sections [section].Footer;
+				return Root.Sections [section].Footer;
 			}
 
 			public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
+				var section = Root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
 				
 				return element.GetCell (tableView);
@@ -294,18 +294,18 @@ namespace MonoTouch.Dialog
 			
 			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				container.Selected (indexPath);
+				Container.Selected (indexPath);
 			}			
 			
 			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = Root.Sections [sectionIdx];
 				return section.HeaderView;
 			}
 
 			public override float GetHeightForHeader (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = Root.Sections [sectionIdx];
 				if (section.HeaderView == null)
 					return -1;
 				return section.HeaderView.Frame.Height;
@@ -313,13 +313,13 @@ namespace MonoTouch.Dialog
 
 			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = Root.Sections [sectionIdx];
 				return section.FooterView;
 			}
 			
 			public override float GetHeightForFooter (UITableView tableView, int sectionIdx)
 			{
-				var section = root.Sections [sectionIdx];
+				var section = Root.Sections [sectionIdx];
 				if (section.FooterView == null)
 					return -1;
 				return section.FooterView.Frame.Height;
@@ -330,13 +330,14 @@ namespace MonoTouch.Dialog
 			{
 				if (!checkForRefresh)
 					return;
-				if (container.reloading)
+				if (Container.reloading)
 					return;
-				var view  = container.refreshView;
+				var view  = Container.refreshView;
 				if (view == null)
 					return;
 				
-				var point = container.TableView.ContentOffset;
+				var point = Container.TableView.ContentOffset;
+				
 				if (view.IsFlipped && point.Y > -yboundary && point.Y < 0){
 					view.Flip (true);
 					view.SetStatus (RefreshViewStatus.PullToReload);
@@ -353,13 +354,13 @@ namespace MonoTouch.Dialog
 			
 			public override void DraggingEnded (UIScrollView scrollView, bool willDecelerate)
 			{
-				if (container.refreshView == null)
+				if (Container.refreshView == null)
 					return;
 				
 				checkForRefresh = false;
-				if (container.TableView.ContentOffset.Y > -yboundary)
+				if (Container.TableView.ContentOffset.Y > -yboundary)
 					return;
-				container.TriggerRefresh ();
+				Container.TriggerRefresh ();
 			}
 			#endregion
 		}
@@ -369,12 +370,12 @@ namespace MonoTouch.Dialog
 		// probe *every* row for its size;   Avoid this by creating a separate
 		// model that is used only when we have items that require resizing
 		//
-		class SizingSource : Source {
+		public class SizingSource : Source {
 			public SizingSource (DialogViewController controller) : base (controller) {}
 			
 			public override float GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
-				var section = root.Sections [indexPath.Section];
+				var section = Root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
 				
 				var sizable = element as IElementSizing;
@@ -486,6 +487,11 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+		public virtual Source CreateSizingSource (bool unevenRows)
+		{
+			return unevenRows ? new SizingSource (this) : new Source (this);
+		}
+		
 		Source TableSource;
 		
 		void UpdateSource ()
@@ -493,7 +499,7 @@ namespace MonoTouch.Dialog
 			if (root == null)
 				return;
 			
-			TableSource = root.UnevenRows ? new SizingSource (this) : new Source (this);
+			TableSource = CreateSizingSource (root.UnevenRows);
 			tableView.Source = TableSource;
 		}
 
