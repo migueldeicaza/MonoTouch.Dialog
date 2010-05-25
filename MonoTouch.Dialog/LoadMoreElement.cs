@@ -1,5 +1,10 @@
+//
+// This cell does not perform cell recycling, do not use as
+// sample code for new elements. 
+//
 using System;
 using System.Drawing;
+using System.Threading;
 using MonoTouch.CoreFoundation;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -8,15 +13,8 @@ namespace MonoTouch.Dialog
 {
 	public class LoadMoreElement : Element, IElementSizing
 	{
-		public string NormalCaption
-		{
-			get;set;
-		}
-		
-		public string LoadingCaption
-		{
-			get;set;
-		}
+		public string NormalCaption { get; set; }
+		public string LoadingCaption { get; set; }
 		
 		NSAction tapped = null;
 		
@@ -25,50 +23,50 @@ namespace MonoTouch.Dialog
 		UILabel caption;
 		UIFont font;
 		
-		public LoadMoreElement (string normalCaption, string loadingCaption, NSAction tapped, UIFont font, UIColor textColor) : base("")
+		public LoadMoreElement (string normalCaption, string loadingCaption, NSAction tapped, UIFont font, UIColor textColor) : base ("")
 		{
 			this.NormalCaption = normalCaption;
 			this.LoadingCaption = loadingCaption;
 			this.tapped = tapped;
 			this.font = font;
 			
-			cell = new UITableViewCell(UITableViewCellStyle.Default, "loadMoreElement");
+			cell = new UITableViewCell (UITableViewCellStyle.Default, "loadMoreElement");
 			
-			activityIndicator = new UIActivityIndicatorView();
-			activityIndicator.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
-			activityIndicator.Hidden = true;
-			activityIndicator.StopAnimating();
+			activityIndicator = new UIActivityIndicatorView () {
+				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
+				Hidden = true
+			};
+			activityIndicator.StopAnimating ();
 			
-			caption = new UILabel();
-			caption.Font = font;
-			caption.Text = this.NormalCaption;
-			caption.TextColor = textColor;
-			caption.TextAlignment = UITextAlignment.Center;
+			caption = new UILabel () {
+				Font = font,
+				Text = this.NormalCaption,
+				TextColor = textColor,
+				TextAlignment = UITextAlignment.Center
+			};
 			
-			Layout();
+			Layout ();
 			
-			cell.AddSubview(caption);
-			cell.AddSubview(activityIndicator);
-			
-									
+			cell.AddSubview (caption);
+			cell.AddSubview (activityIndicator);
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			Layout();
+			Layout ();
 			return cell;
 		}
 				
-		public override void Selected (MonoTouch.Dialog.DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			tableView.DeselectRow(path, true);
+			tableView.DeselectRow (path, true);
 			
 			caption.Text = this.LoadingCaption;
 			activityIndicator.Hidden = false;
-			activityIndicator.StartAnimating();
-			Layout();
+			activityIndicator.StartAnimating ();
+			Layout ();
 			
-			System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(Tapped));
+			ThreadPool.QueueUserWorkItem (Tapped);
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
@@ -77,15 +75,15 @@ namespace MonoTouch.Dialog
 		}
 		
 		
-		void Tapped(object state)
+		void Tapped (object state)
 		{
 			if (tapped != null)
-				tapped();
+				tapped ();
 			
-			FinishedLoading();
+			FinishedLoading ();
 		}
 		
-		void Layout()
+		void Layout ()
 		{
 			float h = UIScreen.MainScreen.Bounds.Height;
 			float width = UIScreen.MainScreen.Bounds.Width;
@@ -95,29 +93,29 @@ namespace MonoTouch.Dialog
 			float topPadding = 0.02083f * h;
 			float itemPadding = 0.01042f * h;
 						
-			var size = cell.StringSize(caption.Text, font, width - captionHeight - topPadding, UILineBreakMode.TailTruncation);
+			var size = cell.StringSize (caption.Text, font, width - captionHeight - topPadding, UILineBreakMode.TailTruncation);
 			
 			float center = width / 2;
 			
 			if (!activityIndicator.Hidden)
 			{
-				activityIndicator.Frame = new RectangleF(center - (size.Width / 2) - captionHeight, topPadding, captionHeight, captionHeight);
-				caption.Frame = new RectangleF(activityIndicator.Frame.Right + itemPadding, topPadding, size.Width, captionHeight);
+				activityIndicator.Frame = new RectangleF (center - (size.Width / 2) - captionHeight, topPadding, captionHeight, captionHeight);
+				caption.Frame = new RectangleF (activityIndicator.Frame.Right + itemPadding, topPadding, size.Width, captionHeight);
 			}
 			else
 			{
-				caption.Frame = new RectangleF(center - (size.Width / 2), topPadding, size.Width, captionHeight);
+				caption.Frame = new RectangleF (center - (size.Width / 2), topPadding, size.Width, captionHeight);
 			}
 		}
 		
-		void FinishedLoading()
+		void FinishedLoading ()
 		{
-			this.cell.BeginInvokeOnMainThread(delegate {
-				activityIndicator.StopAnimating();
+			this.cell.BeginInvokeOnMainThread (delegate {
+				activityIndicator.StopAnimating ();
 				activityIndicator.Hidden = true;
 				caption.Text = this.NormalCaption;
 				
-				Layout();
+				Layout ();
 			});
 		}
 	}
