@@ -215,6 +215,10 @@ namespace MonoTouch.Dialog
 			ReloadData ();
 		}
 		
+		public virtual void SearchButtonClicked (string text)
+		{
+		}
+			
 		class SearchDelegate : UISearchBarDelegate {
 			DialogViewController container;
 			
@@ -245,7 +249,11 @@ namespace MonoTouch.Dialog
 				searchBar.ShowsCancelButton = false;
 				container.FinishSearch ();
 				searchBar.ResignFirstResponder ();
-				
+			}
+			
+			public override void SearchButtonClicked (UISearchBar searchBar)
+			{
+				container.SearchButtonClicked (searchBar.Text);
 			}
 		}
 		

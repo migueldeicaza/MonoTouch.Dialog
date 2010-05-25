@@ -1,6 +1,7 @@
 using System;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
+using System.Threading;
 
 namespace Sample
 {
@@ -9,25 +10,30 @@ namespace Sample
 		public void DemoLoadMore () 
 		{
 			Section loadMore = new Section();
-			
 			loadMore.Add(new StringElement("Element 1"));
 			loadMore.Add(new StringElement("Element 2"));
 			loadMore.Add(new StringElement("Element 3"));
 						
-			loadMore.Add(new LoadMoreElement("Load More Elements...", "Loading Elements...", delegate {
-				
-				System.Threading.Thread.Sleep(2000);
-				
-				navigation.BeginInvokeOnMainThread(delegate {
+			
+			loadMore.Add (new LoadMoreElement("Load More Elements...", "Loading Elements...", lme => {
+				// Launch a thread to do some work
+				ThreadPool.QueueUserWorkItem (delegate {
 					
-					loadMore.Insert(loadMore.Count - 1, new StringElement("Element " + (loadMore.Count + 1)),
+					// We just wait for 2 seconds.
+					System.Threading.Thread.Sleep(2000);
+				
+					// Now make sure we invoke on the main thread the updates
+					navigation.BeginInvokeOnMainThread(delegate {
+						lme.Animating = false;
+						loadMore.Insert(loadMore.Count - 1, new StringElement("Element " + (loadMore.Count + 1)),
 				    		            new StringElement("Element " + (loadMore.Count + 2)),
 				            		    new StringElement("Element " + (loadMore.Count + 3)));
 					
+					});
 				});
 				
 			}, UIFont.BoldSystemFontOfSize(14.0f), UIColor.Blue));
-						
+							
 			var root = new RootElement("Load More") {
 				loadMore
 			};

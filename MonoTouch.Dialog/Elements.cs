@@ -1414,10 +1414,14 @@ namespace MonoTouch.Dialog
 		/// An enumerable list that can be produced by something like:
 		///    from x in ... select (Element) new MyElement (...)
 		/// </param>
-		public void Add (IEnumerable<Element> elements)
+		public int Add (IEnumerable<Element> elements)
 		{
-			foreach (var e in elements)
+			int count = 0;
+			foreach (var e in elements){
 				Add (e);
+				count++;
+			}
+			return count;
 		}
 		
 		/// <summary>
@@ -1976,6 +1980,9 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
+				if (Sections == null)
+					return;
+				
 				TableView = null;
 				Clear ();
 				Sections = null;

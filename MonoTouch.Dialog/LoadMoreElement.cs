@@ -16,14 +16,14 @@ namespace MonoTouch.Dialog
 		public string NormalCaption { get; set; }
 		public string LoadingCaption { get; set; }
 		
-		NSAction tapped = null;
+		Action<LoadMoreElement> tapped = null;
 		
 		UITableViewCell cell;
 		UIActivityIndicatorView activityIndicator;
 		UILabel caption;
 		UIFont font;
 		
-		public LoadMoreElement (string normalCaption, string loadingCaption, NSAction tapped, UIFont font, UIColor textColor) : base ("")
+		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped, UIFont font, UIColor textColor) : base ("")
 		{
 			this.NormalCaption = normalCaption;
 			this.LoadingCaption = loadingCaption;
@@ -51,6 +51,24 @@ namespace MonoTouch.Dialog
 			cell.AddSubview (activityIndicator);
 		}
 		
+		public bool Animating {
+			get {
+				return activityIndicator.IsAnimating;
+			}
+			set {
+				if (value){
+					caption.Text = LoadingCaption;
+					activityIndicator.Hidden = false;
+					activityIndicator.StartAnimating ();
+				} else {
+					activityIndicator.StopAnimating ();
+					activityIndicator.Hidden = true;
+					caption.Text = NormalCaption;
+				}
+				Layout ();
+			}
+		}
+				
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			Layout ();
@@ -61,26 +79,16 @@ namespace MonoTouch.Dialog
 		{
 			tableView.DeselectRow (path, true);
 			
-			caption.Text = this.LoadingCaption;
-			activityIndicator.Hidden = false;
-			activityIndicator.StartAnimating ();
+			Animating = true;
 			Layout ();
 			
-			ThreadPool.QueueUserWorkItem (Tapped);
+			if (tapped != null)
+				tapped (this);
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			return 0.1042f * UIScreen.MainScreen.Bounds.Height;
-		}
-		
-		
-		void Tapped (object state)
-		{
-			if (tapped != null)
-				tapped ();
-			
-			FinishedLoading ();
 		}
 		
 		void Layout ()
@@ -106,17 +114,6 @@ namespace MonoTouch.Dialog
 			{
 				caption.Frame = new RectangleF (center - (size.Width / 2), topPadding, size.Width, captionHeight);
 			}
-		}
-		
-		void FinishedLoading ()
-		{
-			this.cell.BeginInvokeOnMainThread (delegate {
-				activityIndicator.StopAnimating ();
-				activityIndicator.Hidden = true;
-				caption.Text = this.NormalCaption;
-				
-				Layout ();
-			});
 		}
 	}
 }
