@@ -34,6 +34,9 @@ namespace Sample
 			
 			public override void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
 			{
+				//
+				// In this method, we need to actually carry out the request
+				//
 				var section = Container.Root [indexPath.Section];
 				var element = section [indexPath.Row];
 				section.Remove (element);

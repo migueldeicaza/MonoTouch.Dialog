@@ -1533,6 +1533,11 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public void Remove (int idx)
+		{
+			RemoveRange (idx, 1);
+		}
+		
 		/// <summary>
 		/// Removes a range of elements from the Section
 		/// </summary>

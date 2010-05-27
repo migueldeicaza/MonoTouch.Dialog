@@ -717,7 +717,8 @@ Customizing the DialogViewController
 
 Both the Reflection and the Elements API use the same
 DialogViewController.  Sometimes you will want to customize the look
-of the view.   
+of the view or you might want to use some features of the
+UITableViewController that go beyond the basic creation of UIs.
 
 The DialogViewController is merely a subclass of the
 UITableViewController and you can customize it in the same way that
@@ -770,3 +771,22 @@ methods.   For example, TweetStation uses this to track when the
 user has scrolled to the top and update accordingly the number
 of unread tweets.
 
+Editing Cells
+-------------
+
+Editing cells is one of those cases where you will need to customize
+the UITableView source.  To do this, you need to create a subclass of
+DialogViewController and override the CreateSizingSource method to
+return instances of custom versions of DialogViewController.Source or
+DialogViewController.SizingSource.
+
+In these methods you will need to override three methods:
+
+        bool CanEditRow (UITableView tableView, NSIndexPath indexPath)
+
+        UITableViewCellEditingStyle EditingStyleForRow (UITableView tableView, NSIndexPath indexPath)
+
+        void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
+
+See the DemoEditing.cs sample for an example that shows what these
+methods should do.

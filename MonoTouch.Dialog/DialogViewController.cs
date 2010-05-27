@@ -42,7 +42,7 @@ namespace MonoTouch.Dialog
 					root.Dispose ();
 				
 				root = value;
-				root.TableView = tableView;					
+				root.TableView = tableView;		
 				ReloadData ();
 			}
 		} 
@@ -137,7 +137,7 @@ namespace MonoTouch.Dialog
 		
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
-			return Autorotate;
+			return Autorotate || toInterfaceOrientation == UIInterfaceOrientation.Portrait;
 		}
 		
 		Section [] originalSections;
@@ -451,22 +451,29 @@ namespace MonoTouch.Dialog
 			element.Selected (this, tableView, indexPath);
 		}
 		
+		public virtual UITableView MakeTableView (RectangleF bounds, UITableViewStyle style)
+		{
+			return new UITableView (bounds, style);
+		}
+		
 		public override void LoadView ()
 		{
-			tableView = new UITableView (UIScreen.MainScreen.Bounds, Style) {
-				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin,
-				AutosizesSubviews = true
-			};
-
+			tableView = MakeTableView (UIScreen.MainScreen.Bounds, Style);
+			tableView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin;
+			tableView.AutosizesSubviews = true;
+			
 			UpdateSource ();
 			View = tableView;
 			SetupSearch ();
+			ConfigureTableView ();
 			
 			if (root == null)
 				return;
-			
 			root.TableView = tableView;
-			
+		}
+		
+		void ConfigureTableView ()
+		{
 			if (refreshRequested != null){
 				// The dimensions should be large enough so that even if the user scrolls, we render the
 				// whole are with the background color.
