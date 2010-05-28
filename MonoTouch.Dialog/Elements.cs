@@ -141,16 +141,28 @@ namespace MonoTouch.Dialog
 	}
 
 	public abstract class BoolElement : Element {
-		public bool Value;
+		bool val;
+		public bool Value {
+			get {
+				return val;
+			}
+			set {
+				bool emit = val != value;
+				val = value;
+				if (emit && ValueChanged != null)
+					ValueChanged (this, EventArgs.Empty);
+			}
+		}
+		public event EventHandler ValueChanged;
 		
 		public BoolElement (string caption, bool value) : base (caption)
 		{
-			Value = value;
+			val = value;
 		}
 		
 		public override string Summary ()
 		{
-			return Value ? "On" : "Off";
+			return val ? "On" : "Off";
 		}		
 	}
 	
@@ -175,9 +187,9 @@ namespace MonoTouch.Dialog
 					Tag = 1,
 					On = Value
 				};
-				sw.ValueChanged += delegate {
+				sw.AddTarget (delegate {
 					Value = sw.On;
-				};
+				}, UIControlEvent.ValueChanged);
 			}
 			
 			var cell = tv.DequeueReusableCell (bkey);
@@ -383,13 +395,27 @@ namespace MonoTouch.Dialog
 	///  Used to display a cell that will launch a web browser when selected.
 	/// </summary>
 	public class HtmlElement : Element {
-		public string Url;
+		NSUrl nsUrl;
 		static NSString hkey = new NSString ("HtmlElement");
 		UIWebView web;
 		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
 			Url = url;
+		}
+		
+		public HtmlElement (string caption, NSUrl url) : base (caption)
+		{
+			nsUrl = url;
+		}
+		
+		public string Url {
+			get {
+				return nsUrl.ToString ();
+			}
+			set {
+				nsUrl = new NSUrl (value);
+			}
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -467,7 +493,7 @@ namespace MonoTouch.Dialog
 			vc.View.AddSubview (web);
 			
 			dvc.ActivateController (vc);
-			web.LoadRequest (NSUrlRequest.FromUrl (new NSUrl (Url)));
+			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
 		}
 	}
 
