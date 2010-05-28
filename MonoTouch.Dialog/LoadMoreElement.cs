@@ -42,7 +42,9 @@ namespace MonoTouch.Dialog
 				Font = font,
 				Text = this.NormalCaption,
 				TextColor = textColor,
-				TextAlignment = UITextAlignment.Center
+				BackgroundColor = UIColor.Clear,
+				TextAlignment = UITextAlignment.Center,
+				AdjustsFontSizeToFitWidth = false,
 			};
 			
 			Layout ();
@@ -79,41 +81,38 @@ namespace MonoTouch.Dialog
 		{
 			tableView.DeselectRow (path, true);
 			
-			Animating = true;
-			Layout ();
+			if (tapped != null){
+				Animating = true;
+				Layout ();
+			}
 			
 			if (tapped != null)
 				tapped (this);
 		}
 		
+		SizeF GetTextSize ()
+		{
+			return new NSString (caption.Text).StringSize (font, UIScreen.MainScreen.Bounds.Width, UILineBreakMode.TailTruncation);
+		}
+		
+		const int pad = 10;
+		const int isize = 20;
+		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return 0.1042f * UIScreen.MainScreen.Bounds.Height;
+			return GetTextSize ().Height + 2*pad;
 		}
 		
 		void Layout ()
 		{
-			float h = UIScreen.MainScreen.Bounds.Height;
-			float width = UIScreen.MainScreen.Bounds.Width;
-			
-			
-			float captionHeight = 0.0625f * h;			
-			float topPadding = 0.02083f * h;
-			float itemPadding = 0.01042f * h;
-						
-			var size = cell.StringSize (caption.Text, font, width - captionHeight - topPadding, UILineBreakMode.TailTruncation);
-			
-			float center = width / 2;
+			var sbounds = UIScreen.MainScreen.Bounds;
+
+			var size = GetTextSize ();
 			
 			if (!activityIndicator.Hidden)
-			{
-				activityIndicator.Frame = new RectangleF (center - (size.Width / 2) - captionHeight, topPadding, captionHeight, captionHeight);
-				caption.Frame = new RectangleF (activityIndicator.Frame.Right + itemPadding, topPadding, size.Width, captionHeight);
-			}
-			else
-			{
-				caption.Frame = new RectangleF (center - (size.Width / 2), topPadding, size.Width, captionHeight);
-			}
+				activityIndicator.Frame = new RectangleF ((sbounds.Width-size.Width)/2-isize*2, pad, isize, isize);
+
+			caption.Frame = new RectangleF (0, pad, sbounds.Width, size.Height);
 		}
 	}
 }
