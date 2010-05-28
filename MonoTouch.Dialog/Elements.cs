@@ -879,7 +879,20 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		///   The value of the EntryElement
 		/// </summary>
-		public string Value;
+		
+		public string Value { 
+			get {
+				if (entry != null)
+					val = entry.Text;
+				return val;
+			}
+			set {
+				val = value;
+				if (entry != null)
+					entry.Text = value;
+			}
+		}
+		string val;
 		
 		/// <summary>
 		/// The type of keyboard used for input, you can change
