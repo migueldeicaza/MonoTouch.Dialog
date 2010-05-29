@@ -88,6 +88,11 @@ namespace MonoTouch.Dialog
 		/// </remarks>
 		public void TriggerRefresh ()
 		{
+			TriggerRefresh (false);
+		}
+		
+		void TriggerRefresh (bool showStatus)
+		{
 			if (refreshRequested == null)
 				return;
 
@@ -99,7 +104,7 @@ namespace MonoTouch.Dialog
 				refreshView.SetActivity (true);
 			refreshRequested (this, EventArgs.Empty);
 
-			if (refreshView != null){
+			if (showStatus && refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
 				UIView.SetAnimationDuration (0.2);
 				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
@@ -368,7 +373,7 @@ namespace MonoTouch.Dialog
 				checkForRefresh = false;
 				if (Container.TableView.ContentOffset.Y > -yboundary)
 					return;
-				Container.TriggerRefresh ();
+				Container.TriggerRefresh (true);
 			}
 			#endregion
 		}
