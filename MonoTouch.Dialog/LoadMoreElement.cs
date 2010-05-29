@@ -35,7 +35,7 @@ namespace MonoTouch.Dialog
 			this.font = font;
 			
 			cell = new UITableViewCell (UITableViewCellStyle.Default, "loadMoreElement");
-			
+
 			activityIndicator = new UIActivityIndicatorView () {
 				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
 				Hidden = true
@@ -117,6 +117,22 @@ namespace MonoTouch.Dialog
 				activityIndicator.Frame = new RectangleF ((sbounds.Width-size.Width)/2-isize*2, pad, isize, isize);
 
 			caption.Frame = new RectangleF (0, pad, sbounds.Width, size.Height);
+		}
+		public UITextAlignment Alignment {
+			get {
+				return caption.TextAlignment;
+			}
+			set {
+				caption.TextAlignment = value;
+			}
+		}
+		public UITableViewCellAccessory Accessory {
+			get {
+				return cell.Accessory;
+			}
+			set {
+				cell.Accessory = value;
+			}
 		}
 	}
 }
