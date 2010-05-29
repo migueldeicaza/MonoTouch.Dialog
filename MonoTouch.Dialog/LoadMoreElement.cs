@@ -23,6 +23,10 @@ namespace MonoTouch.Dialog
 		UILabel caption;
 		UIFont font;
 		
+		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped) : this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (16), UIColor.Black)
+		{
+		}
+		
 		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped, UIFont font, UIColor textColor) : base ("")
 		{
 			this.NormalCaption = normalCaption;
