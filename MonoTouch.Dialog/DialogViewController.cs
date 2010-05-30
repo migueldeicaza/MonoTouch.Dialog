@@ -483,11 +483,16 @@ namespace MonoTouch.Dialog
 				// The dimensions should be large enough so that even if the user scrolls, we render the
 				// whole are with the background color.
 				float height = View.Bounds.Height;
-				refreshView = new RefreshTableHeaderView (new RectangleF (0, -height, 320, height));
+				refreshView = MakeRefreshTableHeaderView (new RectangleF (0, -height, 320, height));
 				if (reloading)
 					refreshView.SetActivity (true);
 				TableView.AddSubview (refreshView);
 			}
+		}
+		
+		public virtual RefreshTableHeaderView MakeRefreshTableHeaderView (RectangleF rect)
+		{
+			return new RefreshTableHeaderView (rect);
 		}
 
 		public override void ViewWillAppear (bool animated)

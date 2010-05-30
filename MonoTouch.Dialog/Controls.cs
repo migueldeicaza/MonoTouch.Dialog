@@ -10,7 +10,7 @@ using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
 {
-	internal enum RefreshViewStatus {
+	public enum RefreshViewStatus {
 		ReleaseToReload,
 		PullToReload,
 		Loading
@@ -50,7 +50,7 @@ namespace MonoTouch.Dialog
 	
 	}
 	
-	internal class RefreshTableHeaderView : UIView {
+	public class RefreshTableHeaderView : UIView {
 		static UIImage arrow = Util.FromResource (null, "arrow.png");
 		UIActivityIndicatorView activity;
 		UILabel lastUpdateLabel, statusLabel;
@@ -98,7 +98,7 @@ namespace MonoTouch.Dialog
 		
 		RefreshViewStatus status = (RefreshViewStatus) (-1);
 		
-		public void SetStatus (RefreshViewStatus status)
+		public virtual void SetStatus (RefreshViewStatus status)
 		{
 			if (this.status == status)
 				return;
