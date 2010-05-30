@@ -35,7 +35,7 @@ namespace MonoTouch.Dialog
 			this.font = font;
 			
 			cell = new UITableViewCell (UITableViewCellStyle.Default, "loadMoreElement");
-
+			
 			activityIndicator = new UIActivityIndicatorView () {
 				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
 				Hidden = true
@@ -53,8 +53,8 @@ namespace MonoTouch.Dialog
 			
 			Layout ();
 			
-			cell.AddSubview (caption);
-			cell.AddSubview (activityIndicator);
+			cell.ContentView.AddSubview (caption);
+			cell.ContentView.AddSubview (activityIndicator);
 		}
 		
 		public bool Animating {
@@ -109,15 +109,16 @@ namespace MonoTouch.Dialog
 		
 		void Layout ()
 		{
-			var sbounds = UIScreen.MainScreen.Bounds;
+			var sbounds = cell.ContentView.Bounds;
 
 			var size = GetTextSize ();
 			
 			if (!activityIndicator.Hidden)
 				activityIndicator.Frame = new RectangleF ((sbounds.Width-size.Width)/2-isize*2, pad, isize, isize);
 
-			caption.Frame = new RectangleF (0, pad, sbounds.Width, size.Height);
+			caption.Frame = new RectangleF (10, pad, sbounds.Width-20, size.Height);
 		}
+		
 		public UITextAlignment Alignment {
 			get {
 				return caption.TextAlignment;
