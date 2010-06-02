@@ -1182,7 +1182,7 @@ namespace MonoTouch.Dialog
 		
 		public override string FormatDate (DateTime dt)
 		{
-			Console.WriteLine (dt.ToShortTimeString () + " - " + dt.ToLongTimeString ());
+			//Console.WriteLine (dt.ToShortTimeString () + " - " + dt.ToLongTimeString ());
 			return dt.ToLocalTime ().ToShortTimeString ();
 		}
 		
@@ -1284,7 +1284,7 @@ namespace MonoTouch.Dialog
 		public List<Element> Elements = new List<Element> ();
 				
 		// X corresponds to the alignment, Y to the height of the password
-		internal SizeF EntryAlignment;
+		public SizeF EntryAlignment;
 		
 		/// <summary>
 		///  Constructs a Section without header or footers.
@@ -1677,7 +1677,7 @@ namespace MonoTouch.Dialog
 		internal Group group;
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
-		internal UITableView TableView;
+		public UITableView TableView;
 		
 		/// <summary>
 		///  Initializes a RootSection with a caption

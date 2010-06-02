@@ -34,6 +34,9 @@ namespace MonoTouch.Dialog
 			
 			cell = new UITableViewCell(UITableViewCellStyle.Default, "loadMoreElement");
 			
+			if (this.tapped == null)
+				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			
 			activityIndicator = new UIActivityIndicatorView();
 			activityIndicator.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
 			activityIndicator.Hidden = true;
@@ -62,13 +65,16 @@ namespace MonoTouch.Dialog
 		public override void Selected (MonoTouch.Dialog.DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			tableView.DeselectRow(path, true);
-			
-			caption.Text = this.LoadingCaption;
-			activityIndicator.Hidden = false;
-			activityIndicator.StartAnimating();
-			Layout();
-			
-			System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(Tapped));
+		
+			if (this.tapped != null)
+			{
+				caption.Text = this.LoadingCaption;
+				activityIndicator.Hidden = false;
+				activityIndicator.StartAnimating();
+				Layout();
+				
+				System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(Tapped));
+			}
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
@@ -89,10 +95,11 @@ namespace MonoTouch.Dialog
 		{
 			float h = UIScreen.MainScreen.Bounds.Height;
 			float width = UIScreen.MainScreen.Bounds.Width;
+			width = cell.ContentView.Bounds.Width;
 			
 			
-			float captionHeight = 0.0625f * h;			
-			float topPadding = 0.02083f * h;
+			float captionHeight = 0.04166f * h;			
+			float topPadding = 0.03125f * h;
 			float itemPadding = 0.01042f * h;
 						
 			var size = cell.StringSize(caption.Text, font, width - captionHeight - topPadding, UILineBreakMode.TailTruncation);

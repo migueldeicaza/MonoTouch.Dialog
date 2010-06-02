@@ -10,7 +10,8 @@ namespace MonoTouch.Dialog
 			((UIActivityIndicatorView) View).StartAnimating ();
 			var sbounds = UIScreen.MainScreen.Bounds;
 			var vbounds = View.Bounds;
-			View.Frame = new RectangleF ((sbounds.Width-vbounds.Width)/2, 4, vbounds.Width, vbounds.Height + 8);
+			View.Frame = new RectangleF ((sbounds.Width-vbounds.Width)/2, 4, vbounds.Width, vbounds.Height + 0);
+			View.AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin;
 		}
 		
 		public bool Animating {
