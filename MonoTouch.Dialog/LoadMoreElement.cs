@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-using System;
-using System.Drawing;
-=======
 //
 // This cell does not perform cell recycling, do not use as
 // sample code for new elements. 
@@ -9,7 +5,6 @@ using System.Drawing;
 using System;
 using System.Drawing;
 using System.Threading;
->>>>>>> 5c3d2de82512de8db31575f938688a69f16ddb4a
 using MonoTouch.CoreFoundation;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;

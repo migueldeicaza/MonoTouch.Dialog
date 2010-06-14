@@ -1818,7 +1818,7 @@ namespace MonoTouch.Dialog
 						continue;
 					
 					if (current == idx){
-						return new NSIndexPath ().FromIndexes (new uint [] { section, row});
+						return NSIndexPath.Create(section, row); 
 					}
 					row++;
 					current++;
