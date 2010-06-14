@@ -1,5 +1,15 @@
+<<<<<<< HEAD
 using System;
 using System.Drawing;
+=======
+//
+// This cell does not perform cell recycling, do not use as
+// sample code for new elements. 
+//
+using System;
+using System.Drawing;
+using System.Threading;
+>>>>>>> 5c3d2de82512de8db31575f938688a69f16ddb4a
 using MonoTouch.CoreFoundation;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -8,124 +18,127 @@ namespace MonoTouch.Dialog
 {
 	public class LoadMoreElement : Element, IElementSizing
 	{
-		public string NormalCaption
-		{
-			get;set;
-		}
+		public string NormalCaption { get; set; }
+		public string LoadingCaption { get; set; }
 		
-		public string LoadingCaption
-		{
-			get;set;
-		}
-		
-		NSAction tapped = null;
+		Action<LoadMoreElement> tapped = null;
 		
 		UITableViewCell cell;
 		UIActivityIndicatorView activityIndicator;
 		UILabel caption;
 		UIFont font;
 		
-		public LoadMoreElement (string normalCaption, string loadingCaption, NSAction tapped, UIFont font, UIColor textColor) : base("")
+		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped) : this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (16), UIColor.Black)
+		{
+		}
+		
+		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped, UIFont font, UIColor textColor) : base ("")
 		{
 			this.NormalCaption = normalCaption;
 			this.LoadingCaption = loadingCaption;
 			this.tapped = tapped;
 			this.font = font;
 			
-			cell = new UITableViewCell(UITableViewCellStyle.Default, "loadMoreElement");
+			cell = new UITableViewCell (UITableViewCellStyle.Default, "loadMoreElement");
 			
-			if (this.tapped == null)
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			activityIndicator = new UIActivityIndicatorView () {
+				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
+				Hidden = true
+			};
+			activityIndicator.StopAnimating ();
 			
-			activityIndicator = new UIActivityIndicatorView();
-			activityIndicator.ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray;
-			activityIndicator.Hidden = true;
-			activityIndicator.StopAnimating();
+			caption = new UILabel () {
+				Font = font,
+				Text = this.NormalCaption,
+				TextColor = textColor,
+				BackgroundColor = UIColor.Clear,
+				TextAlignment = UITextAlignment.Center,
+				AdjustsFontSizeToFitWidth = false,
+			};
 			
-			caption = new UILabel();
-			caption.Font = font;
-			caption.Text = this.NormalCaption;
-			caption.TextColor = textColor;
-			caption.TextAlignment = UITextAlignment.Center;
+			Layout ();
 			
-			Layout();
-			
-			cell.AddSubview(caption);
-			cell.AddSubview(activityIndicator);
-			
-									
+			cell.ContentView.AddSubview (caption);
+			cell.ContentView.AddSubview (activityIndicator);
 		}
 		
+		public bool Animating {
+			get {
+				return activityIndicator.IsAnimating;
+			}
+			set {
+				if (value){
+					caption.Text = LoadingCaption;
+					activityIndicator.Hidden = false;
+					activityIndicator.StartAnimating ();
+				} else {
+					activityIndicator.StopAnimating ();
+					activityIndicator.Hidden = true;
+					caption.Text = NormalCaption;
+				}
+				Layout ();
+			}
+		}
+				
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			Layout();
+			Layout ();
 			return cell;
 		}
 				
-		public override void Selected (MonoTouch.Dialog.DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			tableView.DeselectRow(path, true);
-		
-			if (this.tapped != null)
-			{
-				caption.Text = this.LoadingCaption;
-				activityIndicator.Hidden = false;
-				activityIndicator.StartAnimating();
-				Layout();
-				
-				System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(Tapped));
+			tableView.DeselectRow (path, true);
+			
+			if (tapped != null){
+				Animating = true;
+				Layout ();
 			}
+			
+			if (tapped != null)
+				tapped (this);
 		}
+		
+		SizeF GetTextSize ()
+		{
+			return new NSString (caption.Text).StringSize (font, UIScreen.MainScreen.Bounds.Width, UILineBreakMode.TailTruncation);
+		}
+		
+		const int pad = 10;
+		const int isize = 20;
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return 0.1042f * UIScreen.MainScreen.Bounds.Height;
+			return GetTextSize ().Height + 2*pad;
 		}
 		
-		
-		void Tapped(object state)
+		void Layout ()
 		{
-			if (tapped != null)
-				tapped();
-			
-			FinishedLoading();
-		}
-		
-		void Layout()
-		{
-			float h = UIScreen.MainScreen.Bounds.Height;
-			float width = UIScreen.MainScreen.Bounds.Width;
-			width = cell.ContentView.Bounds.Width;
-			
-			
-			float captionHeight = 0.04166f * h;			
-			float topPadding = 0.03125f * h;
-			float itemPadding = 0.01042f * h;
-						
-			var size = cell.StringSize(caption.Text, font, width - captionHeight - topPadding, UILineBreakMode.TailTruncation);
-			
-			float center = width / 2;
+			var sbounds = cell.ContentView.Bounds;
+
+			var size = GetTextSize ();
 			
 			if (!activityIndicator.Hidden)
-			{
-				activityIndicator.Frame = new RectangleF(center - (size.Width / 2) - captionHeight, topPadding, captionHeight, captionHeight);
-				caption.Frame = new RectangleF(activityIndicator.Frame.Right + itemPadding, topPadding, size.Width, captionHeight);
-			}
-			else
-			{
-				caption.Frame = new RectangleF(center - (size.Width / 2), topPadding, size.Width, captionHeight);
-			}
+				activityIndicator.Frame = new RectangleF ((sbounds.Width-size.Width)/2-isize*2, pad, isize, isize);
+
+			caption.Frame = new RectangleF (10, pad, sbounds.Width-20, size.Height);
 		}
 		
-		void FinishedLoading()
-		{
-			this.cell.BeginInvokeOnMainThread(delegate {
-				activityIndicator.StopAnimating();
-				activityIndicator.Hidden = true;
-				caption.Text = this.NormalCaption;
-				
-				Layout();
-			});
+		public UITextAlignment Alignment {
+			get {
+				return caption.TextAlignment;
+			}
+			set {
+				caption.TextAlignment = value;
+			}
+		}
+		public UITableViewCellAccessory Accessory {
+			get {
+				return cell.Accessory;
+			}
+			set {
+				cell.Accessory = value;
+			}
 		}
 	}
 }

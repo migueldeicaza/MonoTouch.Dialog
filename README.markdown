@@ -631,7 +631,9 @@ email address input (The values of UIKeyboardType).
 UIViewElement
 -------------
 
-Use this element to quickly add a standard UIView as cell in a UITableView.
+Use this element to quickly add a standard UIView as cell in a UITableView,
+you can control whether the cell can be selected or whether it is transparent
+by passing one of the CellFlags to the constructor.
 
 ActivityElement
 ---------------
@@ -715,7 +717,8 @@ Customizing the DialogViewController
 
 Both the Reflection and the Elements API use the same
 DialogViewController.  Sometimes you will want to customize the look
-of the view.   
+of the view or you might want to use some features of the
+UITableViewController that go beyond the basic creation of UIs.
 
 The DialogViewController is merely a subclass of the
 UITableViewController and you can customize it in the same way that
@@ -753,3 +756,37 @@ DialogViewController:
             ParentViewController.View.BackgroundColor = color;
         }
     }
+
+Another customization point is the following virtual methods in the
+DialogViewController:
+
+    public override Source CreateSizingSource (bool unevenRows)
+
+This method should return a subclass of DialogViewController.Source
+for cases where your cells are evenly sized, or a subclass of
+DialogViewController.SizingSource if your cells are uneven.
+
+You can use this override to capture any of the UITableViewSource
+methods.   For example, TweetStation uses this to track when the
+user has scrolled to the top and update accordingly the number
+of unread tweets.
+
+Editing Cells
+-------------
+
+Editing cells is one of those cases where you will need to customize
+the UITableView source.  To do this, you need to create a subclass of
+DialogViewController and override the CreateSizingSource method to
+return instances of custom versions of DialogViewController.Source or
+DialogViewController.SizingSource.
+
+In these methods you will need to override three methods:
+
+        bool CanEditRow (UITableView tableView, NSIndexPath indexPath)
+
+        UITableViewCellEditingStyle EditingStyleForRow (UITableView tableView, NSIndexPath indexPath)
+
+        void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
+
+See the DemoEditing.cs sample for an example that shows what these
+methods should do.

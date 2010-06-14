@@ -141,16 +141,28 @@ namespace MonoTouch.Dialog
 	}
 
 	public abstract class BoolElement : Element {
-		public bool Value;
+		bool val;
+		public bool Value {
+			get {
+				return val;
+			}
+			set {
+				bool emit = val != value;
+				val = value;
+				if (emit && ValueChanged != null)
+					ValueChanged (this, EventArgs.Empty);
+			}
+		}
+		public event EventHandler ValueChanged;
 		
 		public BoolElement (string caption, bool value) : base (caption)
 		{
-			Value = value;
+			val = value;
 		}
 		
 		public override string Summary ()
 		{
-			return Value ? "On" : "Off";
+			return val ? "On" : "Off";
 		}		
 	}
 	
@@ -175,9 +187,9 @@ namespace MonoTouch.Dialog
 					Tag = 1,
 					On = Value
 				};
-				sw.ValueChanged += delegate {
+				sw.AddTarget (delegate {
 					Value = sw.On;
-				};
+				}, UIControlEvent.ValueChanged);
 			}
 			
 			var cell = tv.DequeueReusableCell (bkey);
@@ -272,6 +284,7 @@ namespace MonoTouch.Dialog
 				parent = newParent;
 				UpdateImage ();
 				label.Text = parent.Caption;
+				SetNeedsDisplay ();
 			}
 		}
 	
@@ -382,13 +395,27 @@ namespace MonoTouch.Dialog
 	///  Used to display a cell that will launch a web browser when selected.
 	/// </summary>
 	public class HtmlElement : Element {
-		public string Url;
+		NSUrl nsUrl;
 		static NSString hkey = new NSString ("HtmlElement");
 		UIWebView web;
 		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
 			Url = url;
+		}
+		
+		public HtmlElement (string caption, NSUrl url) : base (caption)
+		{
+			nsUrl = url;
+		}
+		
+		public string Url {
+			get {
+				return nsUrl.ToString ();
+			}
+			set {
+				nsUrl = new NSUrl (value);
+			}
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -466,7 +493,7 @@ namespace MonoTouch.Dialog
 			vc.View.AddSubview (web);
 			
 			dvc.ActivateController (vc);
-			web.LoadRequest (NSUrlRequest.FromUrl (new NSUrl (Url)));
+			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
 		}
 	}
 
@@ -575,6 +602,11 @@ namespace MonoTouch.Dialog
 		UIImage image;
 		
 		public ImageStringElement (string caption, UIImage image) : base (caption)
+		{
+			this.image = image;
+		}
+
+		public ImageStringElement (string caption, string value, UIImage image) : base (caption, value)
 		{
 			this.image = image;
 		}
@@ -873,7 +905,20 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		///   The value of the EntryElement
 		/// </summary>
-		public string Value;
+		
+		public string Value { 
+			get {
+				if (entry != null)
+					val = entry.Text;
+				return val;
+			}
+			set {
+				val = value;
+				if (entry != null)
+					entry.Text = value;
+			}
+		}
+		string val;
 		
 		/// <summary>
 		/// The type of keyboard used for input, you can change
@@ -1206,7 +1251,12 @@ namespace MonoTouch.Dialog
 		static int count;
 		NSString key;
 		protected UIView View;
-		bool transparent;
+		public CellFlags Flags;
+		
+		public enum CellFlags {
+			Transparent = 1,
+			DisableSelection = 2
+		}
 		
 		/// <summary>
 		///   Constructor
@@ -1224,7 +1274,7 @@ namespace MonoTouch.Dialog
 		public UIViewElement (string caption, UIView view, bool transparent) : base (caption) 
 		{
 			this.View = view;
-			this.transparent = transparent;
+			this.Flags = transparent ? CellFlags.Transparent : 0;
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
@@ -1233,7 +1283,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
-				if (transparent){
+				if ((Flags & CellFlags.Transparent) != 0){
 					cell.BackgroundColor = UIColor.Clear;
 					
 					// 
@@ -1244,6 +1294,9 @@ namespace MonoTouch.Dialog
 						BackgroundColor = UIColor.Clear 
 					};
 				}
+				if ((Flags & CellFlags.DisableSelection) != 0)
+					cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				
 				cell.ContentView.AddSubview (View);
 			} 
 			return cell;
@@ -1400,10 +1453,14 @@ namespace MonoTouch.Dialog
 		/// An enumerable list that can be produced by something like:
 		///    from x in ... select (Element) new MyElement (...)
 		/// </param>
-		public void Add (IEnumerable<Element> elements)
+		public int Add (IEnumerable<Element> elements)
 		{
-			foreach (var e in elements)
+			int count = 0;
+			foreach (var e in elements){
 				Add (e);
+				count++;
+			}
+			return count;
 		}
 		
 		/// <summary>
@@ -1513,6 +1570,11 @@ namespace MonoTouch.Dialog
 					return;
 				}
 			}
+		}
+		
+		public void Remove (int idx)
+		{
+			RemoveRange (idx, 1);
 		}
 		
 		/// <summary>
@@ -1962,6 +2024,9 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
+				if (Sections == null)
+					return;
+				
 				TableView = null;
 				Clear ();
 				Sections = null;
