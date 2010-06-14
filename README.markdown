@@ -653,6 +653,20 @@ and then the NSAction passed into the constructor is executed.
 Once your code in the NSAction is finished, the UIActivity indicator
 stops animating and the normal caption is displayed again.
 
+OwnerDrawnElement
+-----------------
+
+This element must be subclassed as it is an abstract class.  You 
+should override the Height(RectangleF bounds) method in which you
+should return the height of the element, as well as 
+Draw(RectangleF bounds, CGContext context, UIView view) in which
+you should do all your customized drawing within the given bounds,
+using the context and view parameters.
+This element does the heavy lifting of subclassing a UIView, and 
+placing it in the Cell to be returned, leaving you only needing to
+implement two simple overrides.  You can see a sample implementation
+in the Sample app in the DemoOwnerDrawnElement.cs file.
+
 Booleans
 --------
 

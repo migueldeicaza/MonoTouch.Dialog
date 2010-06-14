@@ -88,6 +88,7 @@
     <Compile Include="DemoHeadersFooters.cs" />
     <Compile Include="DemoLoadMore.cs" />
     <Compile Include="DemoEditing.cs" />
+    <Compile Include="DemoOwnerDrawnElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />
