@@ -153,7 +153,6 @@ namespace MonoTouch.Dialog
 				
 				refreshView.Frame = new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height);
 			}
-			Console.WriteLine (View.Bounds);
 		}
 		
 		Section [] originalSections;
