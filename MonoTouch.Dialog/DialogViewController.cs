@@ -149,10 +149,13 @@ namespace MonoTouch.Dialog
 		{
 			base.DidRotate (fromInterfaceOrientation);
 			
-			//JON DID THIS
-			this.ReloadData();
+			if (refreshView != null){
+				var bounds = View.Bounds;
+				
+				refreshView.Frame = new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height);
+			}
+			//Console.WriteLine (View.Bounds);
 		}
-		
 		
 		Section [] originalSections;
 		Element [][] originalElements;
@@ -491,8 +494,8 @@ namespace MonoTouch.Dialog
 			if (refreshRequested != null){
 				// The dimensions should be large enough so that even if the user scrolls, we render the
 				// whole are with the background color.
-				float height = View.Bounds.Height;
-				refreshView = MakeRefreshTableHeaderView (new RectangleF (0, -height, 320, height));
+				var bounds = View.Bounds;
+				refreshView = MakeRefreshTableHeaderView (new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height));
 				if (reloading)
 					refreshView.SetActivity (true);
 				TableView.AddSubview (refreshView);

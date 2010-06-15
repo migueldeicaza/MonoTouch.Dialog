@@ -61,7 +61,7 @@ namespace MonoTouch.Dialog
 			this.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			
 			BackgroundColor = new UIColor (0.88f, 0.9f, 0.92f, 1);
-			lastUpdateLabel = new UILabel (new RectangleF (0, rect.Height - 30, 320, 20)){
+			lastUpdateLabel = new UILabel (){
 				Font = UIFont.SystemFontOfSize (13f),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = UIColor.FromWhiteAlpha (0.9f, 1),
@@ -73,7 +73,7 @@ namespace MonoTouch.Dialog
 			};
 			AddSubview (lastUpdateLabel);
 			
-			statusLabel = new UILabel (new RectangleF (0, rect.Height-48, 320, 20)){
+			statusLabel = new UILabel (){
 				Font = UIFont.BoldSystemFontOfSize (14),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = lastUpdateLabel.ShadowColor,
@@ -86,7 +86,7 @@ namespace MonoTouch.Dialog
 			AddSubview (statusLabel);
 			SetStatus (RefreshViewStatus.PullToReload);
 			
-			arrowView = new UIImageView (new RectangleF (20, rect.Height - 65, 30, 55)){
+			arrowView = new UIImageView (){
 				ContentMode = UIViewContentMode.ScaleAspectFill,
 				Image = arrow,
 				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
@@ -95,11 +95,20 @@ namespace MonoTouch.Dialog
 			AddSubview (arrowView);
 			
 			activity = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.Gray) {
-				Frame = new RectangleF (25, rect.Height-38, 20, 20),
-				HidesWhenStopped = true,
-				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
+				HidesWhenStopped = true
 			};
 			AddSubview (activity);
+		}
+		
+		public override void LayoutSubviews ()
+		{
+			base.LayoutSubviews ();
+			var bounds = Bounds;
+			
+			lastUpdateLabel.Frame = new RectangleF (0, bounds.Height - 30, bounds.Width, 20);
+			statusLabel.Frame = new RectangleF (0, bounds.Height-48, bounds.Width, 20);
+			arrowView.Frame = new RectangleF (20, bounds.Height - 65, 30, 55);
+			activity.Frame = new RectangleF (25, bounds.Height-38, 20, 20);
 		}
 		
 		RefreshViewStatus status = (RefreshViewStatus) (-1);
