@@ -600,20 +600,24 @@ namespace MonoTouch.Dialog
 	public class ImageStringElement : StringElement {
 		static NSString skey = new NSString ("ImageStringElement");
 		UIImage image;
+		public UITableViewCellAccessory Accessory { get; set; }
 		
 		public ImageStringElement (string caption, UIImage image) : base (caption)
 		{
 			this.image = image;
+			this.Accessory = UITableViewCellAccessory.None;
 		}
 
 		public ImageStringElement (string caption, string value, UIImage image) : base (caption, value)
 		{
 			this.image = image;
+			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public ImageStringElement (string caption,  NSAction tapped, UIImage image) : base (caption, tapped)
 		{
 			this.image = image;
+			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -624,7 +628,7 @@ namespace MonoTouch.Dialog
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
 			
-			cell.Accessory = UITableViewCellAccessory.None;
+			cell.Accessory = Accessory;
 			cell.TextLabel.Text = Caption;
 			cell.TextLabel.TextAlignment = Alignment;
 			
