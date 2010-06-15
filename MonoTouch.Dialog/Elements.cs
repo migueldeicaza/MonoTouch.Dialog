@@ -1227,7 +1227,6 @@ namespace MonoTouch.Dialog
 		
 		public override string FormatDate (DateTime dt)
 		{
-			Console.WriteLine (dt.ToShortTimeString () + " - " + dt.ToLongTimeString ());
 			return dt.ToLocalTime ().ToShortTimeString ();
 		}
 		
