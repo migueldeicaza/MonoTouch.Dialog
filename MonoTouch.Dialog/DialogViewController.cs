@@ -156,6 +156,15 @@ namespace MonoTouch.Dialog
 			Console.WriteLine (View.Bounds);
 		}
 		
+		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
+		{
+			base.DidRotate (fromInterfaceOrientation);
+			
+			//JON DID THIS
+			this.ReloadData();
+		}
+		
+		
 		Section [] originalSections;
 		Element [][] originalElements;
 		

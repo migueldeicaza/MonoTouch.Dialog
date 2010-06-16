@@ -600,20 +600,24 @@ namespace MonoTouch.Dialog
 	public class ImageStringElement : StringElement {
 		static NSString skey = new NSString ("ImageStringElement");
 		UIImage image;
+		public UITableViewCellAccessory Accessory { get; set; }
 		
 		public ImageStringElement (string caption, UIImage image) : base (caption)
 		{
 			this.image = image;
+			this.Accessory = UITableViewCellAccessory.None;
 		}
 
 		public ImageStringElement (string caption, string value, UIImage image) : base (caption, value)
 		{
 			this.image = image;
+			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public ImageStringElement (string caption,  NSAction tapped, UIImage image) : base (caption, tapped)
 		{
 			this.image = image;
+			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -624,7 +628,7 @@ namespace MonoTouch.Dialog
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
 			
-			cell.Accessory = UITableViewCellAccessory.None;
+			cell.Accessory = Accessory;
 			cell.TextLabel.Text = Caption;
 			cell.TextLabel.TextAlignment = Alignment;
 			
@@ -1336,7 +1340,7 @@ namespace MonoTouch.Dialog
 		public List<Element> Elements = new List<Element> ();
 				
 		// X corresponds to the alignment, Y to the height of the password
-		internal SizeF EntryAlignment;
+		public SizeF EntryAlignment;
 		
 		/// <summary>
 		///  Constructs a Section without header or footers.
@@ -1817,7 +1821,7 @@ namespace MonoTouch.Dialog
 						continue;
 					
 					if (current == idx){
-						return new NSIndexPath ().FromIndexes (new uint [] { section, row});
+						return NSIndexPath.Create(section, row); 
 					}
 					row++;
 					current++;
