@@ -86,6 +86,8 @@
     <Compile Include="DemoAddRemove.cs" />
     <Compile Include="DemoDate.cs" />
     <Compile Include="DemoHeadersFooters.cs" />
+    <Compile Include="DemoLoadMore.cs" />
+    <Compile Include="DemoEditing.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />

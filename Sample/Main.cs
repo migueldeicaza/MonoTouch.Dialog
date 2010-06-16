@@ -36,6 +36,8 @@ namespace Sample
 					new StringElement ("Dynamically load data", DemoDynamic),
 					new StringElement ("Add/Remove demo", DemoAddRemove),
 					new StringElement ("Assorted cells", DemoDate),
+					new StringElement ("Load More Sample", DemoLoadMore),
+					new StringElement ("Row Editing Support", DemoEditing),
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)

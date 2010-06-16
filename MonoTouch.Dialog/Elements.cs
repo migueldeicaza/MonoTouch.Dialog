@@ -97,19 +97,72 @@ namespace MonoTouch.Dialog
 		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 		}
+		
+		/// <summary>
+		///  Returns the IndexPath of a given element.   This is only valid for leaf elements,
+		///  it does not work for a toplevel RootElement or a Section of if the Element has
+		///  not been attached yet.
+		/// </summary>
+		public NSIndexPath IndexPath { 
+			get {
+				var section = Parent as Section;
+				if (section == null)
+					return null;
+				var root = section.Parent as RootElement;
+				if (root == null)
+					return null;
+				
+				int row = 0;
+				foreach (var element in section.Elements){
+					if (element == this){
+						int nsect = 0;
+						foreach (var sect in root.Sections){
+							if (section == sect){
+								return NSIndexPath.FromRowSection (row, nsect);
+							}
+							nsect++;
+						}
+					}
+					row++;
+				}
+				return null;
+			}
+		}
+		
+		/// <summary>
+		///   Method invoked to determine if the cell matches the given text, never invoked with a null value or an empty string.
+		/// </summary>
+		public virtual bool Matches (string text)
+		{
+			if (Caption == null)
+				return false;
+			return Caption.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1;
+		}
 	}
 
 	public abstract class BoolElement : Element {
-		public bool Value;
+		bool val;
+		public bool Value {
+			get {
+				return val;
+			}
+			set {
+				bool emit = val != value;
+				val = value;
+				if (emit && ValueChanged != null)
+					ValueChanged (this, EventArgs.Empty);
+			}
+		}
+		public event EventHandler ValueChanged;
 		
 		public BoolElement (string caption, bool value) : base (caption)
 		{
-			Value = value;
+			val = value;
 		}
 		
 		public override string Summary ()
 		{
-			return Value ? "On" : "Off";
+			return val ? "On" : "Off";
 		}		
 	}
 	
@@ -134,9 +187,9 @@ namespace MonoTouch.Dialog
 					Tag = 1,
 					On = Value
 				};
-				sw.ValueChanged += delegate {
+				sw.AddTarget (delegate {
 					Value = sw.On;
-				};
+				}, UIControlEvent.ValueChanged);
 			}
 			
 			var cell = tv.DequeueReusableCell (bkey);
@@ -199,7 +252,8 @@ namespace MonoTouch.Dialog
 				button.TouchDown += delegate {
 					parent.Value = !parent.Value;
 					UpdateImage ();
-					parent.Tapped ();
+					if (parent.Tapped != null)
+						parent.Tapped ();
 				};
 				ContentView.Add (label);
 				ContentView.Add (button);
@@ -230,6 +284,7 @@ namespace MonoTouch.Dialog
 				parent = newParent;
 				UpdateImage ();
 				label.Text = parent.Caption;
+				SetNeedsDisplay ();
 			}
 		}
 	
@@ -340,13 +395,27 @@ namespace MonoTouch.Dialog
 	///  Used to display a cell that will launch a web browser when selected.
 	/// </summary>
 	public class HtmlElement : Element {
-		public string Url;
+		NSUrl nsUrl;
 		static NSString hkey = new NSString ("HtmlElement");
 		UIWebView web;
 		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
 			Url = url;
+		}
+		
+		public HtmlElement (string caption, NSUrl url) : base (caption)
+		{
+			nsUrl = url;
+		}
+		
+		public string Url {
+			get {
+				return nsUrl.ToString ();
+			}
+			set {
+				nsUrl = new NSUrl (value);
+			}
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -424,7 +493,7 @@ namespace MonoTouch.Dialog
 			vc.View.AddSubview (web);
 			
 			dvc.ActivateController (vc);
-			web.LoadRequest (NSUrlRequest.FromUrl (new NSUrl (Url)));
+			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
 		}
 	}
 
@@ -434,14 +503,14 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
-		public string Value;
 		public UITextAlignment Alignment = UITextAlignment.Left;
+		public string Value;
 		
 		public StringElement (string caption) : base (caption) {}
 		
 		public StringElement (string caption, string value) : base (caption)
 		{
-			Value = value;
+			this.Value = value;
 		}
 		
 		public StringElement (string caption,  NSAction tapped) : base (caption)
@@ -480,6 +549,11 @@ namespace MonoTouch.Dialog
 				Tapped ();
 			tableView.DeselectRow (indexPath, true);
 		}
+		
+		public override bool Matches (string text)
+		{
+			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
+		}
 	}
 
 	/// <summary>
@@ -495,7 +569,10 @@ namespace MonoTouch.Dialog
 		public UIFont Font;
 		public UIColor TextColor;
 		public UIColor BackgroundColor;
-			
+		public UILineBreakMode LineBreakMode = UILineBreakMode.CharacterWrap;
+		public int Lines = 1;
+		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
+		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
@@ -503,13 +580,15 @@ namespace MonoTouch.Dialog
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
-			cell.Accessory = UITableViewCellAccessory.None;
-			cell.TextLabel.Text = Caption;
-			cell.TextLabel.TextAlignment = Alignment;
-			cell.TextLabel.TextColor = TextColor == null ? UIColor.Black : TextColor;
-			cell.TextLabel.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
-			cell.TextLabel.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
-			
+			cell.Accessory = Accessory;
+			var tl = cell.TextLabel;
+			tl.Text = Caption;
+			tl.TextAlignment = Alignment;
+			tl.TextColor = TextColor == null ? UIColor.Black : TextColor;
+			tl.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
+			tl.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
+			tl.LineBreakMode = UILineBreakMode.WordWrap;
+			tl.Lines = 0;			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
@@ -523,6 +602,11 @@ namespace MonoTouch.Dialog
 		UIImage image;
 		
 		public ImageStringElement (string caption, UIImage image) : base (caption)
+		{
+			this.image = image;
+		}
+
+		public ImageStringElement (string caption, string value, UIImage image) : base (caption, value)
 		{
 			this.image = image;
 		}
@@ -821,7 +905,20 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		///   The value of the EntryElement
 		/// </summary>
-		public string Value;
+		
+		public string Value { 
+			get {
+				if (entry != null)
+					val = entry.Text;
+				return val;
+			}
+			set {
+				val = value;
+				if (entry != null)
+					entry.Text = value;
+			}
+		}
+		string val;
 		
 		/// <summary>
 		/// The type of keyboard used for input, you can change
@@ -835,8 +932,8 @@ namespace MonoTouch.Dialog
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
-		
-		public Func<bool,string> Validator;
+
+		public event EventHandler Changed;
 		
 		/// <summary>
 		/// Constructs an EntryElement with the given caption, placeholder and initial value.
@@ -969,7 +1066,14 @@ namespace MonoTouch.Dialog
 		
 		public void FetchValue ()
 		{
-			Value = entry.Text;
+			var newValue = entry.Text;
+			var diff = newValue != Value;
+			Value = newValue;
+			
+			if (diff){
+				if (Changed != null)
+					Changed (this, EventArgs.Empty);
+			}
 		}
 		
 		protected override void Dispose (bool disposing)
@@ -978,6 +1082,11 @@ namespace MonoTouch.Dialog
 				entry.Dispose ();
 				entry = null;
 			}
+		}
+		
+		public override bool Matches (string text)
+		{
+			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
 		}
 	}
 	
@@ -1118,7 +1227,6 @@ namespace MonoTouch.Dialog
 		
 		public override string FormatDate (DateTime dt)
 		{
-			Console.WriteLine (dt.ToShortTimeString () + " - " + dt.ToLongTimeString ());
 			return dt.ToLocalTime ().ToShortTimeString ();
 		}
 		
@@ -1141,8 +1249,13 @@ namespace MonoTouch.Dialog
 	public class UIViewElement : Element, IElementSizing {
 		static int count;
 		NSString key;
-		UIView view;
-		bool transparent;
+		protected UIView View;
+		public CellFlags Flags;
+		
+		public enum CellFlags {
+			Transparent = 1,
+			DisableSelection = 2
+		}
 		
 		/// <summary>
 		///   Constructor
@@ -1159,8 +1272,8 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public UIViewElement (string caption, UIView view, bool transparent) : base (caption) 
 		{
-			this.view = view;
-			this.transparent = transparent;
+			this.View = view;
+			this.Flags = transparent ? CellFlags.Transparent : 0;
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
@@ -1169,7 +1282,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
-				if (transparent){
+				if ((Flags & CellFlags.Transparent) != 0){
 					cell.BackgroundColor = UIColor.Clear;
 					
 					// 
@@ -1180,14 +1293,26 @@ namespace MonoTouch.Dialog
 						BackgroundColor = UIColor.Clear 
 					};
 				}
-				cell.ContentView.AddSubview (view);
+				if ((Flags & CellFlags.DisableSelection) != 0)
+					cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				
+				cell.ContentView.AddSubview (View);
 			} 
 			return cell;
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return view.Bounds.Height;
+			return View.Bounds.Height;
+		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			base.Dispose (disposing);
+			if (disposing){
+				View.Dispose ();
+				View = null;
+			}
 		}
 	}
 	
@@ -1252,7 +1377,7 @@ namespace MonoTouch.Dialog
 			HeaderView = header;
 			FooterView = footer;
 		}
-			
+		
 		/// <summary>
 		///    The section header, as a string
 		/// </summary>
@@ -1327,10 +1452,14 @@ namespace MonoTouch.Dialog
 		/// An enumerable list that can be produced by something like:
 		///    from x in ... select (Element) new MyElement (...)
 		/// </param>
-		public void Add (IEnumerable<Element> elements)
+		public int Add (IEnumerable<Element> elements)
 		{
-			foreach (var e in elements)
+			int count = 0;
+			foreach (var e in elements){
 				Add (e);
+				count++;
+			}
+			return count;
 		}
 		
 		/// <summary>
@@ -1387,15 +1516,17 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		public void Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
+		public int Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
 		{
 			if (newElements == null)
-				return;
+				return 0;
 
 			int pos = idx;
+			int count = 0;
 			foreach (var e in newElements){
 				Elements.Insert (pos++, e);
 				e.Parent = this;
+				count++;
 			}
 			var root = Parent as RootElement;
 			if (root != null && root.TableView != null){				
@@ -1404,6 +1535,7 @@ namespace MonoTouch.Dialog
 				else
 					InsertVisual (idx, anim, pos-idx);
 			}
+			return count;
 		}
 		
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
@@ -1424,6 +1556,24 @@ namespace MonoTouch.Dialog
 		public void Insert (int index, params Element [] newElements)
 		{
 			Insert (index, UITableViewRowAnimation.None, newElements);
+		}
+		
+		public void Remove (Element e)
+		{
+			if (e == null)
+				return;
+			for (int i = Elements.Count; i > 0;){
+				i--;
+				if (Elements [i] == e){
+					RemoveRange (i, 1);
+					return;
+				}
+			}
+		}
+		
+		public void Remove (int idx)
+		{
+			RemoveRange (idx, 1);
 		}
 		
 		/// <summary>
@@ -1587,6 +1737,7 @@ namespace MonoTouch.Dialog
 		int summarySection, summaryElement;
 		internal Group group;
 		public bool UnevenRows;
+		public Func<RootElement, UIViewController> createOnSelected;
 		internal UITableView TableView;
 		
 		/// <summary>
@@ -1602,6 +1753,21 @@ namespace MonoTouch.Dialog
 		}
 
 		/// <summary>
+		/// Initializes a RootSection with a caption and a callback that will
+		/// create the nested UIViewController that is activated when the user
+		/// taps on the element.
+		/// </summary>
+		/// <param name="caption">
+		///  The caption to render.
+		/// </param>
+		public RootElement (string caption, Func<RootElement, UIViewController> createOnSelected) : base (caption)
+		{
+			summarySection = -1;
+			this.createOnSelected = createOnSelected;
+			Sections = new List<Section> ();
+		}
+		
+		/// <summary>
 		///   Initializes a RootElement with a caption with a summary fetched from the specified section and leement
 		/// </summary>
 		/// <param name="caption">
@@ -1613,7 +1779,7 @@ namespace MonoTouch.Dialog
 		/// <param name="element">
 		/// The element index inside the section that contains the summary for this RootSection.
 		/// </param>
-		public RootElement (string caption, int section, int element) : base (caption)
+		public 	RootElement (string caption, int section, int element) : base (caption)
 		{
 			summarySection = section;
 			summaryElement = element;
@@ -1857,6 +2023,9 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
+				if (Sections == null)
+					return;
+				
 				TableView = null;
 				Clear ();
 				Sections = null;
@@ -1964,6 +2133,9 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		protected virtual UIViewController MakeViewController ()
 		{
+			if (createOnSelected != null)
+				return createOnSelected (this);
+			
 			return new DialogViewController (this, true) {
 				Autorotate = true
 			};
@@ -1975,5 +2147,39 @@ namespace MonoTouch.Dialog
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
 		}
+		
+		public void Reload (Section section, UITableViewRowAnimation animation)
+		{
+			if (section == null)
+				throw new ArgumentNullException ("section");
+			if (section.Parent == null || section.Parent != this)
+				throw new ArgumentException ("Section is not attached to this root");
+			
+			int idx = 0;
+			foreach (var sect in Sections){
+				if (sect == section){
+					TableView.ReloadSections (new NSIndexSet ((uint) idx), animation);
+					return;
+				}
+				idx++;
+			}
+		}
+		
+		public void Reload (Element element, UITableViewRowAnimation animation)
+		{
+			if (element == null)
+				throw new ArgumentNullException ("element");
+			var section = element.Parent as Section;
+			if (section == null)
+				throw new ArgumentException ("Element is not attached to this root");
+			var root = section.Parent as RootElement;
+			if (root == null)
+				throw new ArgumentException ("Element is not attached to this root");
+			var path = element.IndexPath;
+			if (path == null)
+				return;
+			TableView.ReloadRows (new NSIndexPath [] { path }, animation);
+		}
+		
 	}
 }

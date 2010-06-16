@@ -3,8 +3,14 @@ MonoTouch.Dialog
 
 MonoTouch.Dialog is a foundation to create dialog boxes and show
 table-based information without having to write dozens of delegates
-and controllers for the user interface.  Currently this supports
-creating Dialogs based on navigation controllers that support:
+and controllers for the user interface.  Table support Pull-to-Refresh
+as well as built-in searching.
+
+MonoTouch.Dialog is a retained system for implementing UITableViews
+as opposed to the on-demand nature of UITableView.
+
+Currently this supports creating Dialogs based on navigation controllers 
+that support:
 
   * On/Off controls
   * Slider (floats)
@@ -16,6 +22,7 @@ creating Dialogs based on navigation controllers that support:
   * Dates, Times and Dates+Times
   * Arbitary UIViews
   * Pull-to-refresh functionality.
+  * Activity indicators
 
 Miguel (miguel@gnome.org)
 
@@ -80,6 +87,47 @@ in the DialogViewController.   Setting this value will propagate to
 the various components that are shiped with MonoTouch.Dialog like the
 WebView and the date and time pickers
 
+Pull to Refresh Support
+-----------------------
+
+Pull to Refresh is a visual effect originally found in Tweetie2 which
+became a popular effect among many applications.
+
+To add automatic pull-to-refersh support to your dialogs, you only
+need to do two things: hook up an event handler to be notified when
+the user pulls the data and notify the DialogViewController when the
+data has been loaded to go back to its default state.
+
+Hooking up a notification is simple, just connect to the
+RefreshRequested event on the DialogViewController, like this:
+
+        dvc.RefreshRequested += OnUserRequestedRefresh;
+
+Then on your method OnUserRequestedRefresh, you would queue some data
+loading, request some data from the net, or spin a thread to compute
+the data.  Once the data has been loaded, you must notify the
+DialogViewController that the new data is in, and to restore the view
+to its default state, you do this by calling ReloadComplete:
+
+       dvc.ReloadComplete ();
+
+Search Support
+--------------
+
+To support searching, set the EnableSearch property on your
+DialogViewController.   You can also set the SearchPlaceholder
+property to use as the watermark text in the search bar.
+
+Searching will change the contents of the view as the user types, it
+searches the visible fields and shows those to the user.  The
+DialogViewController exposes three methods to programatically
+initiate, terminate or trigger a new filter operation on the results:
+
+	  StartSearch, FinishSearch, PerformFilter
+
+The system is extensible, so you can alter this behavior if you want,
+details are below.
+
 Samples Included
 ----------------
 
@@ -98,8 +146,6 @@ parameters:
   * An object that will be used to resolve Tap targets.
 
   * The object that will be edited.
-
-  * The title for the page to be rendered.
 
 A very simple dialog that contains a checkbox is shown here:
 
@@ -394,11 +440,43 @@ structure created by Sections() and Elements() are merely calls to
 either RootElement.Add () or Section.Add() that the C# compiler 
 invokes for us.
 
+The basic principle is that the DialogViewController shows one
+RootElement, and a RootElement is made up of Sections which in turn
+can contain any kind of Element (including other RootElements).
+
+RootElements inside a Section when tapped have the effect of activating
+a nested UI on a new DialogViewController. 
+
+The hierarchy of Elements looks like this:
+
+        Element
+           BadgeElement
+           BoolElement
+              BooleanElement       - uses an on/off slider
+              BooleanImageElement  - uses images for true/false
+           EntryElement
+           FloatElement
+           HtmlElement
+           ImageElement
+           MultilineElement
+	   RootElement (container for Sections)
+           Section (only valid container for Elements)
+           StringElement
+              CheckboxElement
+              DateTimeElement
+                  DateElement
+                  TimeElement
+              ImageStringElement
+              RadioElement
+              StyleStringElement
+          UIViewElement
+        
 Additionally notice that when adding elements to a section, you
 can use either Elements or UIViews directly.   The UIViews are
 just wrapped in a special UIViewElement element.
 
-In addition
+You can also create your own Elements by subclassing one of the 
+above elements and overriding a handful of methods.
 
 RootElement
 -----------
@@ -553,9 +631,27 @@ email address input (The values of UIKeyboardType).
 UIViewElement
 -------------
 
-Use this element to quickly add a standard UIView as cell in a UITableView.
+Use this element to quickly add a standard UIView as cell in a UITableView,
+you can control whether the cell can be selected or whether it is transparent
+by passing one of the CellFlags to the constructor.
 
+ActivityElement
+---------------
 
+This element shows a UIActivity indicator in the view, use this while your
+application is loading data and you want to provide the user with some
+visual feedback that your application is busy.
+
+LoadMoreElement
+---------------
+
+Use this element to allow users to load more items in your list. 
+You can customize the normal and loading captions, as well as the
+font and text color.  The UIActivity indicator starts animating,
+and the loading caption is displayed when a user taps the cell,
+and then the NSAction passed into the constructor is executed.
+Once your code in the NSAction is finished, the UIActivity indicator
+stops animating and the normal caption is displayed again.
 
 Booleans
 --------
@@ -592,10 +688,12 @@ Element or by deriving from the root class Element.
 To create your own Element, you will want to override the following
 methods:
 
-        // To release any resources 
+        // To release any heavy resources that you might have
         void Dispose (bool disposing);
 
         // To retrieve the UITableViewCell for your element
+	// you would need to prepare the cell to be reused, in the
+	// same way that UITableView expects reusable cells to work
         UITableViewCell GetCell (UITableView tv)
 
         // To retrieve a "summary" that can be used with
@@ -605,37 +703,22 @@ methods:
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 
-Pull to Refresh Support
-=======================
+	// If you support search, to probe if the cell matches the user input
+	bool Matches (string text)
 
-Pull to Refresh is a visual effect originally found in Tweetie2 which
-became a popular effect among many applications.
+If your element can have a variable size, you need to implement the
+IElementSizing interface, which contains one method:
 
-To add automatic pull-to-refersh support to your dialogs, you only
-need to do two things: hook up an event handler to be notified when
-the user pulls the data and notify the DialogViewController when the
-data has been loaded to go back to its default state.
-
-Hooking up a notification is simple, just connect to the
-RefreshRequested event on the DialogViewController, like this:
-
-        dvc.RefreshRequested += OnUserRequestedRefresh;
-
-Then on your method OnUserRequestedRefresh, you would queue some data
-loading, request some data from the net, or spin a thread to compute
-the data.  Once the data has been loaded, you must notify the
-DialogViewController that the new data is in, and to restore the view
-to its default state, you do this by calling ReloadComplete:
-
-	dvc.ReloadComplete ();
-
+	// Returns the height for the cell at indexPath.Section, indexPath.Row
+        float GetHeight (UITableView tableView, NSIndexPath indexPath);
 
 Customizing the DialogViewController
 ====================================
 
 Both the Reflection and the Elements API use the same
 DialogViewController.  Sometimes you will want to customize the look
-of the view.   
+of the view or you might want to use some features of the
+UITableViewController that go beyond the basic creation of UIs.
 
 The DialogViewController is merely a subclass of the
 UITableViewController and you can customize it in the same way that
@@ -673,3 +756,37 @@ DialogViewController:
             ParentViewController.View.BackgroundColor = color;
         }
     }
+
+Another customization point is the following virtual methods in the
+DialogViewController:
+
+    public override Source CreateSizingSource (bool unevenRows)
+
+This method should return a subclass of DialogViewController.Source
+for cases where your cells are evenly sized, or a subclass of
+DialogViewController.SizingSource if your cells are uneven.
+
+You can use this override to capture any of the UITableViewSource
+methods.   For example, TweetStation uses this to track when the
+user has scrolled to the top and update accordingly the number
+of unread tweets.
+
+Editing Cells
+-------------
+
+Editing cells is one of those cases where you will need to customize
+the UITableView source.  To do this, you need to create a subclass of
+DialogViewController and override the CreateSizingSource method to
+return instances of custom versions of DialogViewController.Source or
+DialogViewController.SizingSource.
+
+In these methods you will need to override three methods:
+
+        bool CanEditRow (UITableView tableView, NSIndexPath indexPath)
+
+        UITableViewCellEditingStyle EditingStyleForRow (UITableView tableView, NSIndexPath indexPath)
+
+        void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
+
+See the DemoEditing.cs sample for an example that shows what these
+methods should do.
