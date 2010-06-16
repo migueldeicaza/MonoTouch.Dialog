@@ -13,7 +13,8 @@ namespace MonoTouch.Dialog
 			uia.StartAnimating ();
 			
 			var vbounds = View.Bounds;
-			View.Frame = new RectangleF ((sbounds.Width-vbounds.Width)/2, 4, vbounds.Width, vbounds.Height);
+			View.Frame = new RectangleF ((sbounds.Width-vbounds.Width)/2, 4, vbounds.Width, vbounds.Height + 0);
+			View.AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin;
 		}
 		
 		public bool Animating {

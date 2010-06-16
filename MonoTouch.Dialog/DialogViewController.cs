@@ -155,6 +155,15 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
+		{
+			base.DidRotate (fromInterfaceOrientation);
+			
+			//JON DID THIS
+			this.ReloadData();
+		}
+		
+		
 		Section [] originalSections;
 		Element [][] originalElements;
 		

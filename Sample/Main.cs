@@ -38,6 +38,7 @@ namespace Sample
 					new StringElement ("Assorted cells", DemoDate),
 					new StringElement ("Load More Sample", DemoLoadMore),
 					new StringElement ("Row Editing Support", DemoEditing),
+					new StringElement ("Owner Drawn Element", DemoOwnerDrawnElement),
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)
