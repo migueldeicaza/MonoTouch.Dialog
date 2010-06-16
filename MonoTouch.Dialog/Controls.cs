@@ -95,7 +95,8 @@ namespace MonoTouch.Dialog
 			AddSubview (arrowView);
 			
 			activity = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.Gray) {
-				HidesWhenStopped = true
+				HidesWhenStopped = true,
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
 			};
 			AddSubview (activity);
 		}
