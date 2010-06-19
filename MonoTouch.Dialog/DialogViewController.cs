@@ -536,6 +536,9 @@ namespace MonoTouch.Dialog
 
 		public void ReloadData ()
 		{
+			if (root == null)
+				return;
+			
 			root.Prepare ();
 			if (tableView != null){
 				UpdateSource ();
