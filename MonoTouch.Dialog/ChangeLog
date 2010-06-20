@@ -1,3 +1,11 @@
+2010-06-18	Eric Maupin	<me@ermau.com>
+ 
+ 	* Element.cs: EntryElement: Fixed an error with FetchValue
+	if the text field hadn't yet been generated.
+ 
+	StringElement: SelectionStyle is only blue when there's a
+	tap handler registered.
+	
 2010-06-17	Eric Maupin	<me@ermau.com>
 
 	* Reflect.cs: EntryAttribute: Removed placeholder requirement

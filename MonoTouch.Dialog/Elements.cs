@@ -525,7 +525,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
 			}
 			cell.Accessory = UITableViewCellAccessory.None;
 			cell.TextLabel.Text = Caption;
@@ -1070,6 +1070,9 @@ namespace MonoTouch.Dialog
 		
 		public void FetchValue ()
 		{
+			if (entry == null)
+				return;
+
 			var newValue = entry.Text;
 			var diff = newValue != Value;
 			Value = newValue;
