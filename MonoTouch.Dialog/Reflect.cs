@@ -21,11 +21,15 @@ namespace MonoTouch.Dialog
 {
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class EntryAttribute : Attribute {
+		public EntryAttribute () : this (null) { }
+
 		public EntryAttribute (string placeholder)
 		{
 			Placeholder = placeholder;
 		}
+
 		public string Placeholder;
+		public UIKeyboardType KeyboardType;
 	}
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
@@ -270,7 +274,7 @@ namespace MonoTouch.Dialog
 					if (pa != null)
 						element = new EntryElement (caption, pa.Placeholder, value, true);
 					else if (ea != null)
-						element = new EntryElement (caption, ea.Placeholder, value);
+						element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = ea.KeyboardType };
 					else if (multi)
 						element = new MultilineElement (caption, value);
 					else if (html != null)
