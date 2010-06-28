@@ -336,6 +336,7 @@ namespace MonoTouch.Dialog
 	///  Used to display a slider on the screen.
 	/// </summary>
 	public class FloatElement : Element {
+		public bool ShowCaption;
 		public float Value;
 		public float MinValue, MaxValue;
 		static NSString skey = new NSString ("FloatElement");
@@ -353,8 +354,22 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
+			var cell = tv.DequeueReusableCell (skey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			} else
+				RemoveTag (cell, 1);
+
+			SizeF captionSize = new SizeF (0, 0);
+			if (Caption != null && ShowCaption){
+				cell.TextLabel.Text = Caption;
+				captionSize = cell.TextLabel.StringSize (Caption, UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
+				captionSize.Width += 10; // Spacing
+			}
+
 			if (slider == null){
-				slider = new UISlider (new RectangleF (10f, 12f, 280f, 7f)){
+				slider = new UISlider (new RectangleF (10f + captionSize.Width, 12f, 280f - captionSize.Width, 7f)){
 					BackgroundColor = UIColor.Clear,
 					MinValue = this.MinValue,
 					MaxValue = this.MaxValue,
@@ -366,12 +381,6 @@ namespace MonoTouch.Dialog
 					Value = slider.Value;
 				};
 			}
-			var cell = tv.DequeueReusableCell (skey);
-			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-			} else
-				RemoveTag (cell, 1);
 			
 			cell.ContentView.AddSubview (slider);
 			return cell;

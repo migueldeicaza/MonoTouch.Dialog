@@ -291,6 +291,7 @@ namespace MonoTouch.Dialog
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
 					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
+					floatElement.Caption = caption;
 					element = floatElement;
 					
 					foreach (object attr in attrs){
@@ -298,6 +299,7 @@ namespace MonoTouch.Dialog
 							var ra = attr as RangeAttribute;
 							floatElement.MinValue = ra.Low;
 							floatElement.MaxValue = ra.High;
+							floatElement.ShowCaption = ra.ShowCaption;
 						}
 					}
 				} else if (mType == typeof (bool)){
