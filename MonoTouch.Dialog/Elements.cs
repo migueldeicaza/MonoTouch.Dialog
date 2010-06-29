@@ -1027,12 +1027,14 @@ namespace MonoTouch.Dialog
 			
 			if (entry == null){
 				SizeF size = ComputeEntryPosition (tv, cell);
-				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
+				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword
 				};
-				entry.Text = Value ?? "";
+				_entry.Text = Value ?? "";
+				entry = _entry;
+				
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
