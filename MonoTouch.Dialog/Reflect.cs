@@ -113,6 +113,7 @@ namespace MonoTouch.Dialog
 			High = high;
 		}
 		public float Low, High;
+		public bool ShowCaption;
 	}
 
 	public class BindingContext : IDisposable {
