@@ -506,28 +506,37 @@ namespace MonoTouch.Dialog
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
 		
-		public StringElement (string caption) : base (caption) {}
+		public StringElement (string caption) : base (caption) 
+		{
+			Accessory = UITableViewCellAccessory.None;
+		}
 		
 		public StringElement (string caption, string value) : base (caption)
 		{
 			this.Value = value;
+			Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public StringElement (string caption,  NSAction tapped) : base (caption)
 		{
 			Tapped += tapped;
+			Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public event NSAction Tapped;
-				
+		public UITableViewCellAccessory Accessory
+		{
+			get;set;	
+		}
+		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.SelectionStyle = Tapped == null ? UITableViewCellSelectionStyle.None : UITableViewCellSelectionStyle.Blue;
 			}
-			cell.Accessory = UITableViewCellAccessory.None;
+			cell.Accessory = Tapped == null ? UITableViewCellAccessory.None : Accessory;
 			cell.TextLabel.Text = Caption;
 			cell.TextLabel.TextAlignment = Alignment;
 			
