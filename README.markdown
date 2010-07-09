@@ -243,6 +243,12 @@ These are the current widgets supported by the Reflection API:
         [Password, Caption ("Password")]
         public string passwd;
 
+  You can also specify both the Placeholder and the keyboard type
+  to use on the Entry using a few of the Entry attributes:
+
+	[Entry (KeyboardType=UIKeyboardType.NumberPad,Placeholder="Your Zip code")]
+	public string ZipCode;
+
 ### On/off switches ###
 
   Use a bool value to store an on/off setting, by default you

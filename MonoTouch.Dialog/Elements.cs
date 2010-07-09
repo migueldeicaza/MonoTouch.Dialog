@@ -336,6 +336,7 @@ namespace MonoTouch.Dialog
 	///  Used to display a slider on the screen.
 	/// </summary>
 	public class FloatElement : Element {
+		public bool ShowCaption;
 		public float Value;
 		public float MinValue, MaxValue;
 		static NSString skey = new NSString ("FloatElement");
@@ -353,8 +354,22 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
+			var cell = tv.DequeueReusableCell (skey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			} else
+				RemoveTag (cell, 1);
+
+			SizeF captionSize = new SizeF (0, 0);
+			if (Caption != null && ShowCaption){
+				cell.TextLabel.Text = Caption;
+				captionSize = cell.TextLabel.StringSize (Caption, UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
+				captionSize.Width += 10; // Spacing
+			}
+
 			if (slider == null){
-				slider = new UISlider (new RectangleF (10f, 12f, 280f, 7f)){
+				slider = new UISlider (new RectangleF (10f + captionSize.Width, 12f, 280f - captionSize.Width, 7f)){
 					BackgroundColor = UIColor.Clear,
 					MinValue = this.MinValue,
 					MaxValue = this.MaxValue,
@@ -366,12 +381,6 @@ namespace MonoTouch.Dialog
 					Value = slider.Value;
 				};
 			}
-			var cell = tv.DequeueReusableCell (skey);
-			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-			} else
-				RemoveTag (cell, 1);
 			
 			cell.ContentView.AddSubview (slider);
 			return cell;
@@ -1027,12 +1036,14 @@ namespace MonoTouch.Dialog
 			
 			if (entry == null){
 				SizeF size = ComputeEntryPosition (tv, cell);
-				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
+				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword
 				};
-				entry.Text = Value ?? "";
+				_entry.Text = Value ?? "";
+				entry = _entry;
+				
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
@@ -1079,6 +1090,9 @@ namespace MonoTouch.Dialog
 		
 		public void FetchValue ()
 		{
+			if (entry == null)
+				return;
+
 			var newValue = entry.Text;
 			var diff = newValue != Value;
 			Value = newValue;

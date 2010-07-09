@@ -21,11 +21,15 @@ namespace MonoTouch.Dialog
 {
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class EntryAttribute : Attribute {
+		public EntryAttribute () : this (null) { }
+
 		public EntryAttribute (string placeholder)
 		{
 			Placeholder = placeholder;
 		}
+
 		public string Placeholder;
+		public UIKeyboardType KeyboardType;
 	}
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
@@ -109,6 +113,7 @@ namespace MonoTouch.Dialog
 			High = high;
 		}
 		public float Low, High;
+		public bool ShowCaption;
 	}
 
 	public class BindingContext : IDisposable {
@@ -270,7 +275,7 @@ namespace MonoTouch.Dialog
 					if (pa != null)
 						element = new EntryElement (caption, pa.Placeholder, value, true);
 					else if (ea != null)
-						element = new EntryElement (caption, ea.Placeholder, value);
+						element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = ea.KeyboardType };
 					else if (multi)
 						element = new MultilineElement (caption, value);
 					else if (html != null)
@@ -287,6 +292,7 @@ namespace MonoTouch.Dialog
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
 					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
+					floatElement.Caption = caption;
 					element = floatElement;
 					
 					foreach (object attr in attrs){
@@ -294,6 +300,7 @@ namespace MonoTouch.Dialog
 							var ra = attr as RangeAttribute;
 							floatElement.MinValue = ra.Low;
 							floatElement.MaxValue = ra.High;
+							floatElement.ShowCaption = ra.ShowCaption;
 						}
 					}
 				} else if (mType == typeof (bool)){

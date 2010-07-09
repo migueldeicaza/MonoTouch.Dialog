@@ -70,6 +70,9 @@ namespace MonoTouch.Dialog
 			   return enableSearch;
 			}
 			set {
+				if (enableSearch == value)
+					return;
+				
 				// After MonoTouch 3.0, we can allow for the search to be enabled/disable
 				if (tableView != null)
 					throw new ArgumentException ("You should set EnableSearch before the controller is shown");
@@ -543,6 +546,9 @@ namespace MonoTouch.Dialog
 
 		public void ReloadData ()
 		{
+			if (root == null)
+				return;
+			
 			root.Prepare ();
 			if (tableView != null){
 				UpdateSource ();
