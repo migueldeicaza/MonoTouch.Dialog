@@ -85,6 +85,9 @@ namespace MonoTouch.Dialog
 		{
 			tableView.DeselectRow (path, true);
 			
+			if (Animating)
+				return;
+			
 			if (tapped != null){
 				Animating = true;
 				Layout ();
