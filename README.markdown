@@ -49,7 +49,8 @@ RootElements can be created either manually with the "Elements" API by
 creating the various nodes necessary to render the information.  You
 would use this if you need control, if you want to extend the features
 supported by MonoTouch.Dialogs or if you want to dynamically generate
-the content for your dialog.
+the content for your dialog.   This is what is used for example in 
+TweetStation for the main timeline views.
 
 Additionally, there is a trivial Reflection-based constructor that can
 be used for quickly putting together dialogs, for example, creating an
@@ -224,9 +225,9 @@ These are the current widgets supported by the Reflection API:
         [Multiline]
         string multiline;
 
-	[Caption ("Date")]
-	[Alignment (UITextAlignment.Center)]
-	string centered;
+        [Caption ("Date")]
+        [Alignment (UITextAlignment.Center)]
+        string centered;
 
 ### Text Entry and Password Entries.###
 
@@ -353,7 +354,7 @@ These are the current widgets supported by the Reflection API:
 	    [Time] DateTime End;
 	}
 
-	To initialize:
+To initialize:
 
 	new MainSettings () {
 	    Subject = "Review designs",
@@ -361,7 +362,7 @@ These are the current widgets supported by the Reflection API:
 	    Time = new TimeRange {
 	        Start = DateTime.Now,
 		End   = DateTime.Now
-	    }
+            }
         }
 
 ### IEnumerable as a Radio Source ###
@@ -471,7 +472,7 @@ The hierarchy of Elements looks like this:
            HtmlElement
            ImageElement
            MultilineElement
-	   RootElement (container for Sections)
+           RootElement (container for Sections)
            Section (only valid container for Elements)
            StringElement
               CheckboxElement
@@ -575,7 +576,7 @@ UIViews.  Typically you will just use the strings, but to create
 custom UIs you can use any UIView as the header or the footer.  You
 can either use a string or a view, you would create them like this:
 
-	var section = new Section ("Header", "Footer")
+        var section = new Section ("Header", "Footer")
 
 To use views, just pass the views to the constructor:
 
@@ -746,8 +747,8 @@ methods:
         void Dispose (bool disposing);
 
         // To retrieve the UITableViewCell for your element
-	// you would need to prepare the cell to be reused, in the
-	// same way that UITableView expects reusable cells to work
+        // you would need to prepare the cell to be reused, in the
+        // same way that UITableView expects reusable cells to work
         UITableViewCell GetCell (UITableView tv)
 
         // To retrieve a "summary" that can be used with
@@ -757,8 +758,8 @@ methods:
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 
-	// If you support search, to probe if the cell matches the user input
-	bool Matches (string text)
+        // If you support search, to probe if the cell matches the user input
+        bool Matches (string text)
 
 If your element can have a variable size, you need to implement the
 IElementSizing interface, which contains one method:
