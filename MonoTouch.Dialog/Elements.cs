@@ -2086,7 +2086,7 @@ namespace MonoTouch.Dialog
 				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
 				
 				cell = new UITableViewCell (style, rkey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			} 
 		
 			cell.TextLabel.Text = Caption;
@@ -2161,6 +2161,7 @@ namespace MonoTouch.Dialog
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
+			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
