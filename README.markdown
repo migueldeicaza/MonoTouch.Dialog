@@ -24,6 +24,12 @@ that support:
   * Pull-to-refresh functionality.
   * Activity indicators
 
+The entire UI for TweetStation (http://github.com/migueldeicaza/TweetStation)
+an app published on the AppStore was built entirely using MonoTouch.Dialog.
+
+You can download the app from the AppStore, and read the code to learn about
+some advanced used cases of MonoTouch.Dialog.
+
 Miguel (miguel@gnome.org)
 
 Screenshot
