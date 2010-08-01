@@ -623,6 +623,34 @@ require any programmer intervention to fetch the state of the control.
 This is the behavior for all of the Elements that are part of
 MonoTouch.Dialog but it is not required for user-created elements.
 
+StringElement
+-------------
+
+You can use this element to show static strings as a cell in your table,
+and it is possible to use them as buttons by providing the constructor
+with an NSAction delegate.   If the cell is tapped, this method is invoked
+for example:
+
+	 var l = new StringElement ("Calculate Total", delegate { ComputeTotal (); });
+
+The cost of a StringElement is very low, it uses 8 bytes: 4 for the label alignment
+information, and 4 for the text to be displayed.
+
+StyleStringElement
+------------------
+
+This class derives from StringElement but lets developers customize a handful of
+properties like the Font, the text color, the background cell color, the line
+breaking mode, the number of lines to display and whether an accessory should
+be displayed.
+
+For example:
+
+	 var l = new StyleStringElement ("Report Spam") {
+		BackgroundColor = UIColor.Red,
+		TextColor = UIColor.White
+	 };
+
 EntryElement
 ------------
 
