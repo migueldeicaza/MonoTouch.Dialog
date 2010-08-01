@@ -807,7 +807,7 @@ DialogViewController:
         {
             base.LoadView ();
             var color = UIColor.FromPatternImage(image);
-            Root.TableView.BackgroundColor = UIColor.Clear;
+            TableView.BackgroundColor = UIColor.Clear;
             ParentViewController.View.BackgroundColor = color;
         }
     }
