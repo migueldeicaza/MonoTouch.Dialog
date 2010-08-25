@@ -3,8 +3,14 @@ MonoTouch.Dialog
 
 MonoTouch.Dialog is a foundation to create dialog boxes and show
 table-based information without having to write dozens of delegates
-and controllers for the user interface.  Currently this supports
-creating Dialogs based on navigation controllers that support:
+and controllers for the user interface.  Table support Pull-to-Refresh
+as well as built-in searching.
+
+MonoTouch.Dialog is a retained system for implementing UITableViews
+as opposed to the on-demand nature of UITableView.
+
+Currently this supports creating Dialogs based on navigation controllers 
+that support:
 
   * On/Off controls
   * Slider (floats)
@@ -16,6 +22,13 @@ creating Dialogs based on navigation controllers that support:
   * Dates, Times and Dates+Times
   * Arbitary UIViews
   * Pull-to-refresh functionality.
+  * Activity indicators
+
+The entire UI for TweetStation (http://github.com/migueldeicaza/TweetStation)
+an app published on the AppStore was built entirely using MonoTouch.Dialog.
+
+You can download the app from the AppStore, and read the code to learn about
+some advanced used cases of MonoTouch.Dialog.
 
 Miguel (miguel@gnome.org)
 
@@ -36,7 +49,8 @@ RootElements can be created either manually with the "Elements" API by
 creating the various nodes necessary to render the information.  You
 would use this if you need control, if you want to extend the features
 supported by MonoTouch.Dialogs or if you want to dynamically generate
-the content for your dialog.
+the content for your dialog.   This is what is used for example in 
+TweetStation for the main timeline views.
 
 Additionally, there is a trivial Reflection-based constructor that can
 be used for quickly putting together dialogs, for example, creating an
@@ -75,6 +89,52 @@ with [this code](http://gist.github.com/281469)
 To create nested UIs that provide automatic navigation, you would just
 create an instance of that class.  
 
+Autorotation is supported by default by setting the Autorotate property
+in the DialogViewController.   Setting this value will propagate to 
+the various components that are shiped with MonoTouch.Dialog like the
+WebView and the date and time pickers
+
+Pull to Refresh Support
+-----------------------
+
+Pull to Refresh is a visual effect originally found in Tweetie2 which
+became a popular effect among many applications.
+
+To add automatic pull-to-refersh support to your dialogs, you only
+need to do two things: hook up an event handler to be notified when
+the user pulls the data and notify the DialogViewController when the
+data has been loaded to go back to its default state.
+
+Hooking up a notification is simple, just connect to the
+RefreshRequested event on the DialogViewController, like this:
+
+        dvc.RefreshRequested += OnUserRequestedRefresh;
+
+Then on your method OnUserRequestedRefresh, you would queue some data
+loading, request some data from the net, or spin a thread to compute
+the data.  Once the data has been loaded, you must notify the
+DialogViewController that the new data is in, and to restore the view
+to its default state, you do this by calling ReloadComplete:
+
+       dvc.ReloadComplete ();
+
+Search Support
+--------------
+
+To support searching, set the EnableSearch property on your
+DialogViewController.   You can also set the SearchPlaceholder
+property to use as the watermark text in the search bar.
+
+Searching will change the contents of the view as the user types, it
+searches the visible fields and shows those to the user.  The
+DialogViewController exposes three methods to programatically
+initiate, terminate or trigger a new filter operation on the results:
+
+	  StartSearch, FinishSearch, PerformFilter
+
+The system is extensible, so you can alter this behavior if you want,
+details are below.
+
 Samples Included
 ----------------
 
@@ -93,8 +153,6 @@ parameters:
   * An object that will be used to resolve Tap targets.
 
   * The object that will be edited.
-
-  * The title for the page to be rendered.
 
 A very simple dialog that contains a checkbox is shown here:
 
@@ -150,6 +208,9 @@ These are the current widgets supported by the Reflection API:
   case the value of the string should contain the url
   to load in the embedded UIWebView. 
 
+  The [Aligntment] attribute takes a parameter a UITextAlingment
+  that determines how the string should be rendered
+
   Examples:
 
         public string Version = "1.2.3";
@@ -163,6 +224,10 @@ These are the current widgets supported by the Reflection API:
         [Caption ("This is a\nmultiline caption")]
         [Multiline]
         string multiline;
+
+        [Caption ("Date")]
+        [Alignment (UITextAlignment.Center)]
+        string centered;
 
 ### Text Entry and Password Entries.###
 
@@ -184,6 +249,12 @@ These are the current widgets supported by the Reflection API:
 
         [Password, Caption ("Password")]
         public string passwd;
+
+  You can also specify both the Placeholder and the keyboard type
+  to use on the Entry using a few of the Entry attributes:
+
+	[Entry (KeyboardType=UIKeyboardType.NumberPad,Placeholder="Your Zip code")]
+	public string ZipCode;
 
 ### On/off switches ###
 
@@ -283,7 +354,7 @@ These are the current widgets supported by the Reflection API:
 	    [Time] DateTime End;
 	}
 
-	To initialize:
+To initialize:
 
 	new MainSettings () {
 	    Subject = "Review designs",
@@ -291,7 +362,7 @@ These are the current widgets supported by the Reflection API:
 	    Time = new TimeRange {
 	        Start = DateTime.Now,
 		End   = DateTime.Now
-	    }
+            }
         }
 
 ### IEnumerable as a Radio Source ###
@@ -382,11 +453,43 @@ structure created by Sections() and Elements() are merely calls to
 either RootElement.Add () or Section.Add() that the C# compiler 
 invokes for us.
 
+The basic principle is that the DialogViewController shows one
+RootElement, and a RootElement is made up of Sections which in turn
+can contain any kind of Element (including other RootElements).
+
+RootElements inside a Section when tapped have the effect of activating
+a nested UI on a new DialogViewController. 
+
+The hierarchy of Elements looks like this:
+
+        Element
+           BadgeElement
+           BoolElement
+              BooleanElement       - uses an on/off slider
+              BooleanImageElement  - uses images for true/false
+           EntryElement
+           FloatElement
+           HtmlElement
+           ImageElement
+           MultilineElement
+           RootElement (container for Sections)
+           Section (only valid container for Elements)
+           StringElement
+              CheckboxElement
+              DateTimeElement
+                  DateElement
+                  TimeElement
+              ImageStringElement
+              RadioElement
+              StyleStringElement
+          UIViewElement
+        
 Additionally notice that when adding elements to a section, you
 can use either Elements or UIViews directly.   The UIViews are
 just wrapped in a special UIViewElement element.
 
-In addition
+You can also create your own Elements by subclassing one of the 
+above elements and overriding a handful of methods.
 
 RootElement
 -----------
@@ -473,7 +576,7 @@ UIViews.  Typically you will just use the strings, but to create
 custom UIs you can use any UIView as the header or the footer.  You
 can either use a string or a view, you would create them like this:
 
-	var section = new Section ("Header", "Footer")
+        var section = new Section ("Header", "Footer")
 
 To use views, just pass the views to the constructor:
 
@@ -496,6 +599,9 @@ use:
     To render static strings
     To render strings with a read-only value.
     To be used as "buttons", pass a delegate for this.
+  * StyledStringElement
+    Similar to StringElement but allows for the Font, TextColor, 
+    and BackgroundColor to be set on a per-cell basis.
   * MultilineElement
     Derives from StringElement, used to render multi-line cells.
   * RadioElements (to provide a radio-button feature).
@@ -516,6 +622,34 @@ require any programmer intervention to fetch the state of the control.
 
 This is the behavior for all of the Elements that are part of
 MonoTouch.Dialog but it is not required for user-created elements.
+
+StringElement
+-------------
+
+You can use this element to show static strings as a cell in your table,
+and it is possible to use them as buttons by providing the constructor
+with an NSAction delegate.   If the cell is tapped, this method is invoked
+for example:
+
+	 var l = new StringElement ("Calculate Total", delegate { ComputeTotal (); });
+
+The cost of a StringElement is very low, it uses 8 bytes: 4 for the label alignment
+information, and 4 for the text to be displayed.
+
+StyleStringElement
+------------------
+
+This class derives from StringElement but lets developers customize a handful of
+properties like the Font, the text color, the background cell color, the line
+breaking mode, the number of lines to display and whether an accessory should
+be displayed.
+
+For example:
+
+	 var l = new StyleStringElement ("Report Spam") {
+		BackgroundColor = UIColor.Red,
+		TextColor = UIColor.White
+	 };
 
 EntryElement
 ------------
@@ -538,9 +672,69 @@ email address input (The values of UIKeyboardType).
 UIViewElement
 -------------
 
-Use this element to quickly add a standard UIView as cell in a UITableView.
+Use this element to quickly add a standard UIView as cell in a UITableView,
+you can control whether the cell can be selected or whether it is transparent
+by passing one of the CellFlags to the constructor.
 
+ActivityElement
+---------------
 
+This element shows a UIActivity indicator in the view, use this while your
+application is loading data and you want to provide the user with some
+visual feedback that your application is busy.
+
+LoadMoreElement
+---------------
+
+Use this element to allow users to load more items in your list. 
+You can customize the normal and loading captions, as well as the
+font and text color.  The UIActivity indicator starts animating,
+and the loading caption is displayed when a user taps the cell,
+and then the NSAction passed into the constructor is executed.
+Once your code in the NSAction is finished, the UIActivity indicator
+stops animating and the normal caption is displayed again.
+
+OwnerDrawnElement
+-----------------
+
+This element must be subclassed as it is an abstract class.  You 
+should override the Height(RectangleF bounds) method in which you
+should return the height of the element, as well as 
+Draw(RectangleF bounds, CGContext context, UIView view) in which
+you should do all your customized drawing within the given bounds,
+using the context and view parameters.
+This element does the heavy lifting of subclassing a UIView, and 
+placing it in the Cell to be returned, leaving you only needing to
+implement two simple overrides.  You can see a better sample implementation
+in the Sample app in the DemoOwnerDrawnElement.cs file.
+
+Here's a very simple example of implementing the class:
+	public class SampleOwnerDrawnElement : OwnerDrawnElement
+	{
+		public SampleOwnerDrawnElement (string text) : base(UITableViewCellStyle.Default, "sampleOwnerDrawnElement")
+		{
+			this.Text = text;
+		}
+		
+		public string Text
+		{
+			get;set;	
+		}
+		
+		public override void Draw (RectangleF bounds, CGContext context, UIView view)
+		{
+			UIColor.White.SetFill();
+			context.FillRect(bounds);
+			
+			UIColor.Black.SetColor();	
+			view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
+		}
+		
+		public override float Height (RectangleF bounds)
+		{
+			return 44.0f;
+		}
+	}
 
 Booleans
 --------
@@ -577,10 +771,12 @@ Element or by deriving from the root class Element.
 To create your own Element, you will want to override the following
 methods:
 
-        // To release any resources 
+        // To release any heavy resources that you might have
         void Dispose (bool disposing);
 
         // To retrieve the UITableViewCell for your element
+        // you would need to prepare the cell to be reused, in the
+        // same way that UITableView expects reusable cells to work
         UITableViewCell GetCell (UITableView tv)
 
         // To retrieve a "summary" that can be used with
@@ -590,37 +786,22 @@ methods:
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 
-Pull to Refresh Support
-=======================
+        // If you support search, to probe if the cell matches the user input
+        bool Matches (string text)
 
-Pull to Refresh is a visual effect originally found in Tweetie2 which
-became a popular effect among many applications.
+If your element can have a variable size, you need to implement the
+IElementSizing interface, which contains one method:
 
-To add automatic pull-to-refersh support to your dialogs, you only
-need to do two things: hook up an event handler to be notified when
-the user pulls the data and notify the DialogViewController when the
-data has been loaded to go back to its default state.
-
-Hooking up a notification is simple, just connect to the
-RefreshRequested event on the DialogViewController, like this:
-
-        dvc.RefreshRequested += OnUserRequestedRefresh;
-
-Then on your method OnUserRequestedRefresh, you would queue some data
-loading, request some data from the net, or spin a thread to compute
-the data.  Once the data has been loaded, you must notify the
-DialogViewController that the new data is in, and to restore the view
-to its default state, you do this by calling ReloadComplete:
-
-	dvc.ReloadComplete ();
-
+	// Returns the height for the cell at indexPath.Section, indexPath.Row
+        float GetHeight (UITableView tableView, NSIndexPath indexPath);
 
 Customizing the DialogViewController
 ====================================
 
 Both the Reflection and the Elements API use the same
 DialogViewController.  Sometimes you will want to customize the look
-of the view.   
+of the view or you might want to use some features of the
+UITableViewController that go beyond the basic creation of UIs.
 
 The DialogViewController is merely a subclass of the
 UITableViewController and you can customize it in the same way that
@@ -654,7 +835,41 @@ DialogViewController:
         {
             base.LoadView ();
             var color = UIColor.FromPatternImage(image);
-            Root.TableView.BackgroundColor = UIColor.Clear;
+            TableView.BackgroundColor = UIColor.Clear;
             ParentViewController.View.BackgroundColor = color;
         }
     }
+
+Another customization point is the following virtual methods in the
+DialogViewController:
+
+    public override Source CreateSizingSource (bool unevenRows)
+
+This method should return a subclass of DialogViewController.Source
+for cases where your cells are evenly sized, or a subclass of
+DialogViewController.SizingSource if your cells are uneven.
+
+You can use this override to capture any of the UITableViewSource
+methods.   For example, TweetStation uses this to track when the
+user has scrolled to the top and update accordingly the number
+of unread tweets.
+
+Editing Cells
+-------------
+
+Editing cells is one of those cases where you will need to customize
+the UITableView source.  To do this, you need to create a subclass of
+DialogViewController and override the CreateSizingSource method to
+return instances of custom versions of DialogViewController.Source or
+DialogViewController.SizingSource.
+
+In these methods you will need to override three methods:
+
+        bool CanEditRow (UITableView tableView, NSIndexPath indexPath)
+
+        UITableViewCellEditingStyle EditingStyleForRow (UITableView tableView, NSIndexPath indexPath)
+
+        void CommitEditingStyle (UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
+
+See the DemoEditing.cs sample for an example that shows what these
+methods should do.

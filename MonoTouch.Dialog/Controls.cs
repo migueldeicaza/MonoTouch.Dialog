@@ -10,7 +10,7 @@ using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
 {
-	internal enum RefreshViewStatus {
+	public enum RefreshViewStatus {
 		ReleaseToReload,
 		PullToReload,
 		Loading
@@ -50,7 +50,7 @@ namespace MonoTouch.Dialog
 	
 	}
 	
-	internal class RefreshTableHeaderView : UIView {
+	public class RefreshTableHeaderView : UIView {
 		static UIImage arrow = Util.FromResource (null, "arrow.png");
 		UIActivityIndicatorView activity;
 		UILabel lastUpdateLabel, statusLabel;
@@ -58,19 +58,22 @@ namespace MonoTouch.Dialog
 			
 		public RefreshTableHeaderView (RectangleF rect) : base (rect)
 		{
+			this.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
+			
 			BackgroundColor = new UIColor (0.88f, 0.9f, 0.92f, 1);
-			lastUpdateLabel = new UILabel (new RectangleF (0, rect.Height - 30, 320, 20)){
+			lastUpdateLabel = new UILabel (){
 				Font = UIFont.SystemFontOfSize (13f),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
-				ShadowColor = UIColor.FromWhiteAlpha (0.9f, 1),
+				ShadowColor = UIColor.White, 
 				ShadowOffset = new SizeF (0, 1),
 				BackgroundColor = this.BackgroundColor,
 				Opaque = true,
-				TextAlignment = UITextAlignment.Center
+				TextAlignment = UITextAlignment.Center,
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
 			};
 			AddSubview (lastUpdateLabel);
 			
-			statusLabel = new UILabel (new RectangleF (0, rect.Height-48, 320, 20)){
+			statusLabel = new UILabel (){
 				Font = UIFont.BoldSystemFontOfSize (14),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = lastUpdateLabel.ShadowColor,
@@ -78,27 +81,40 @@ namespace MonoTouch.Dialog
 				BackgroundColor = this.BackgroundColor,
 				Opaque = true,
 				TextAlignment = UITextAlignment.Center,
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
 			};
 			AddSubview (statusLabel);
 			SetStatus (RefreshViewStatus.PullToReload);
 			
-			arrowView = new UIImageView (new RectangleF (20, rect.Height - 65, 30, 55)){
+			arrowView = new UIImageView (){
 				ContentMode = UIViewContentMode.ScaleAspectFill,
 				Image = arrow,
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
 			};
 			arrowView.Layer.Transform = CATransform3D.MakeRotation ((float) Math.PI, 0, 0, 1);
 			AddSubview (arrowView);
 			
 			activity = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.Gray) {
-				Frame = new RectangleF (25, rect.Height-38, 20, 20),
-				HidesWhenStopped = true
+				HidesWhenStopped = true,
+				AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin
 			};
 			AddSubview (activity);
 		}
 		
+		public override void LayoutSubviews ()
+		{
+			base.LayoutSubviews ();
+			var bounds = Bounds;
+			
+			lastUpdateLabel.Frame = new RectangleF (0, bounds.Height - 30, bounds.Width, 20);
+			statusLabel.Frame = new RectangleF (0, bounds.Height-48, bounds.Width, 20);
+			arrowView.Frame = new RectangleF (20, bounds.Height - 65, 30, 55);
+			activity.Frame = new RectangleF (25, bounds.Height-38, 20, 20);
+		}
+		
 		RefreshViewStatus status = (RefreshViewStatus) (-1);
 		
-		public void SetStatus (RefreshViewStatus status)
+		public virtual void SetStatus (RefreshViewStatus status)
 		{
 			if (this.status == status)
 				return;
@@ -170,5 +186,13 @@ namespace MonoTouch.Dialog
 				arrowView.Hidden = false;
 			}
 		}	
+	}
+	
+	public class SearchChangedEventArgs : EventArgs {
+		public SearchChangedEventArgs (string text) 
+		{
+			Text = text;
+		}
+		public string Text { get; set; }
 	}
 }

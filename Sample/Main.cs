@@ -36,20 +36,20 @@ namespace Sample
 					new StringElement ("Dynamically load data", DemoDynamic),
 					new StringElement ("Add/Remove demo", DemoAddRemove),
 					new StringElement ("Assorted cells", DemoDate),
+					new StringElement ("Load More Sample", DemoLoadMore),
+					new StringElement ("Row Editing Support", DemoEditing),
+					new StringElement ("Owner Drawn Element", DemoOwnerDrawnElement),
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)
 				},
 				new Section ("Other"){
-				 	new StringElement ("Headers and Footers", DemoHeadersFooters),
-					new StringElement("Login and Editable List",DemoEditableList)
+					new StringElement ("Headers and Footers", DemoHeadersFooters)
 				}
 			};
-			 
-			var dv = new DialogViewController (menu){
-				//Set this to false or omit for legacy bahaviour.  Portrait view only. 
-				//To enable auto-rotation and rendering of the DialogViewController include RotateUIEnabled=true.
-				RotateUIEnabled=false 
+
+			var dv = new DialogViewController (menu) {
+				Autorotate = true
 			};
 			navigation.PushViewController (dv, true);				
 			

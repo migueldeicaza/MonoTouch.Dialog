@@ -21,11 +21,15 @@ namespace MonoTouch.Dialog
 {
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class EntryAttribute : Attribute {
+		public EntryAttribute () : this (null) { }
+
 		public EntryAttribute (string placeholder)
 		{
 			Placeholder = placeholder;
 		}
+
 		public string Placeholder;
+		public UIKeyboardType KeyboardType;
 	}
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
@@ -49,6 +53,13 @@ namespace MonoTouch.Dialog
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class PasswordAttribute : EntryAttribute {
 		public PasswordAttribute (string placeholder) : base (placeholder) {}
+	}
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class AlignmentAttribute : Attribute {
+		public AlignmentAttribute (UITextAlignment alignment) {
+			Alignment = alignment;
+		}
+		public UITextAlignment Alignment;
 	}
 	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
@@ -94,17 +105,6 @@ namespace MonoTouch.Dialog
 		}
 		public string Caption, Footer;
 	}
-	
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
-	public class AlignmentAttribute : Attribute
-	{
-		public AlignmentAttribute (UITextAlignment alignment)
-		{
-			Alignment = alignment;
-		}
-
-		public UITextAlignment Alignment;
-	}
 
 	public class RangeAttribute : Attribute {
 		public RangeAttribute (float low, float high)
@@ -113,14 +113,14 @@ namespace MonoTouch.Dialog
 			High = high;
 		}
 		public float Low, High;
+		public bool ShowCaption;
 	}
 
 	public class BindingContext : IDisposable {
 		public RootElement Root;
-		protected Dictionary<Element, MemberAndInstance> mappings;
-
-		protected class MemberAndInstance
-		{
+		Dictionary<Element,MemberAndInstance> mappings;
+			
+		class MemberAndInstance {
 			public MemberAndInstance (MemberInfo mi, object o)
 			{
 				Member = mi;
@@ -129,8 +129,8 @@ namespace MonoTouch.Dialog
 			public MemberInfo Member;
 			public object Obj;
 		}
-
-		protected static object GetValue (MemberInfo mi, object o)
+		
+		static object GetValue (MemberInfo mi, object o)
 		{
 			var fi = mi as FieldInfo;
 			if (fi != null)
@@ -152,8 +152,8 @@ namespace MonoTouch.Dialog
 			var setMethod = pi.GetSetMethod ();
 			setMethod.Invoke (o, new object [] { val });
 		}
-
-		protected static string MakeCaption (string name)
+			
+		static string MakeCaption (string name)
 		{
 			var sb = new StringBuilder (name.Length);
 			bool nextUp = true;
@@ -176,8 +176,8 @@ namespace MonoTouch.Dialog
 		}
 
 		// Returns the type for fields and properties and null for everything else
-		protected static Type GetTypeForMember (MemberInfo mi)
-		{
+		static Type GetTypeForMember (MemberInfo mi)
+		{				
 			if (mi is FieldInfo)
 				return ((FieldInfo) mi).FieldType;
 			else if (mi is PropertyInfo)
@@ -195,8 +195,8 @@ namespace MonoTouch.Dialog
 			Root = new RootElement (title);
 			Populate (callbacks, o, Root);
 		}
-
-		protected virtual void Populate (object callbacks, object o, RootElement root)
+		
+		void Populate (object callbacks, object o, RootElement root)
 		{
 			MemberInfo last_radio_index = null;
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
@@ -212,7 +212,6 @@ namespace MonoTouch.Dialog
 
 				string caption = null;
 				object [] attrs = mi.GetCustomAttributes (false);
-				UITextAlignment alignment = UITextAlignment.Left;
 				bool skip = false;
 				foreach (var attr in attrs){
 					if (attr is SkipAttribute)
@@ -224,8 +223,6 @@ namespace MonoTouch.Dialog
 							root.Add (section);
 						var sa = attr as SectionAttribute;
 						section = new Section (sa.Caption, sa.Footer);
-					} else if (attr is AlignmentAttribute) {
-						alignment = ((AlignmentAttribute)attr).Alignment;
 					}
 				}
 				if (skip)
@@ -240,6 +237,7 @@ namespace MonoTouch.Dialog
 				Element element = null;
 				if (mType == typeof (string)){
 					PasswordAttribute pa = null;
+					AlignmentAttribute align = null;
 					EntryAttribute ea = null;
 					object html = null;
 					NSAction invoke = null;
@@ -254,6 +252,8 @@ namespace MonoTouch.Dialog
 							multi = true;
 						else if (attr is HtmlAttribute)
 							html = attr;
+						else if (attr is AlignmentAttribute)
+							align = attr as AlignmentAttribute;
 						
 						if (attr is OnTapAttribute){
 							string mname = ((OnTapAttribute) attr).Method;
@@ -275,18 +275,24 @@ namespace MonoTouch.Dialog
 					if (pa != null)
 						element = new EntryElement (caption, pa.Placeholder, value, true);
 					else if (ea != null)
-						element = new EntryElement (caption, ea.Placeholder, value);
+						element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = ea.KeyboardType };
 					else if (multi)
 						element = new MultilineElement (caption, value);
 					else if (html != null)
 						element = new HtmlElement (caption, value);
-					else
-						element = new StringElement (caption, value);
+					else {
+						var selement = new StringElement (caption, value);
+						element = selement;
+						
+						if (align != null)
+							selement.Alignment = align.Alignment;
+					}
 					
 					if (invoke != null)
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
 					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
+					floatElement.Caption = caption;
 					element = floatElement;
 					
 					foreach (object attr in attrs){
@@ -294,6 +300,7 @@ namespace MonoTouch.Dialog
 							var ra = attr as RangeAttribute;
 							floatElement.MinValue = ra.Low;
 							floatElement.MaxValue = ra.High;
+							floatElement.ShowCaption = ra.ShowCaption;
 						}
 					}
 				} else if (mType == typeof (bool)){
@@ -376,10 +383,6 @@ namespace MonoTouch.Dialog
 				
 				if (element == null)
 					continue;
-				
-				if (element is StringElement)
-					((StringElement)element).Alignment = alignment;
-				
 				section.Add (element);
 				mappings [element] = new MemberAndInstance (mi, o);
 			}
@@ -409,8 +412,8 @@ namespace MonoTouch.Dialog
 				mappings = null;
 			}
 		}
-
-		public virtual void Fetch ()
+		
+		public void Fetch ()
 		{
 			foreach (var dk in mappings){
 				Element element = dk.Key;
