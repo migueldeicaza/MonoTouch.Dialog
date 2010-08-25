@@ -921,8 +921,6 @@ namespace MonoTouch.Dialog
 		
 		public string Value { 
 			get {
-				if (entry != null)
-					val = entry.Text;
 				return val;
 			}
 			set {
