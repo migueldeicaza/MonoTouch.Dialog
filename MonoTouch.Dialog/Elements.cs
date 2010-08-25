@@ -926,8 +926,11 @@ namespace MonoTouch.Dialog
 		
 		public string Value { 
 			get {
+<<<<<<< HEAD
 				if (entry != null)
 					val = entry.Text;
+=======
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 				return val;
 			}
 			set {

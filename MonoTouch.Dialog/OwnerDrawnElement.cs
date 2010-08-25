@@ -37,9 +37,19 @@ namespace MonoTouch.Dialog
 			if (cell == null)
 			{
 				cell = new OwnerDrawnCell(this, this.Style, this.CellReuseIdentifier);
+<<<<<<< HEAD
 				cell.Update();
 			}
 
+=======
+			}
+			else
+			{
+				cell.Element = this;
+			}
+			
+			cell.Update();
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 			return cell;
 		}	
 		
@@ -53,18 +63,52 @@ namespace MonoTouch.Dialog
 			
 			public OwnerDrawnCell(OwnerDrawnElement element, UITableViewCellStyle style, string cellReuseIdentifier) : base(style, cellReuseIdentifier)
 			{
+<<<<<<< HEAD
 				view = new OwnerDrawnCellView(element);
 				ContentView.Add(view);
 			}
+=======
+				Element = element;
+			}
+			
+			public OwnerDrawnElement Element
+			{
+				get {
+					return view.Element;
+				}
+				set {
+					if (view == null)
+					{
+						view = new OwnerDrawnCellView (value);
+						ContentView.Add (view);
+					}
+					else
+					{
+						view.Element = value;
+					}
+				}
+			}
+				
+			
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 
 			public void Update()
 			{
 				SetNeedsDisplay();
+<<<<<<< HEAD
 			}		
 	
 			public override void LayoutSubviews ()
 			{
 				base.LayoutSubviews ();
+=======
+				view.SetNeedsDisplay();
+			}		
+	
+			public override void LayoutSubviews()
+			{
+				base.LayoutSubviews();
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 				
 				view.Frame = ContentView.Bounds;
 			}
@@ -76,7 +120,20 @@ namespace MonoTouch.Dialog
 			
 			public OwnerDrawnCellView(OwnerDrawnElement element)
 			{
+<<<<<<< HEAD
 				this.element = element;	
+=======
+				this.element = element;
+			}
+			
+			
+			public OwnerDrawnElement Element
+			{
+				get { return element; }
+				set {
+					element = value; 
+				}
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 			}
 			
 			public void Update()

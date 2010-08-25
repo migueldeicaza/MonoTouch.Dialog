@@ -27,7 +27,11 @@ namespace MonoTouch.Dialog
 		bool pushing;
 		bool dirty;
 		bool reloading;
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 		/// <summary>
 		/// The root element displayed by the DialogViewController, the value can be changed during runtime to update the contents.
 		/// </summary>
@@ -432,6 +436,7 @@ namespace MonoTouch.Dialog
 		/// based on the kind of container we are hosted in.
 		/// </summary>
 		public void DeactivateController (bool animated)
+<<<<<<< HEAD
 		{
 			var parent = ParentViewController;
 			var nav = parent as UINavigationController;
@@ -462,6 +467,38 @@ namespace MonoTouch.Dialog
 			var section = root.Sections [indexPath.Section];
 			var element = section.Elements [indexPath.Row];
 
+=======
+		{
+			var parent = ParentViewController;
+			var nav = parent as UINavigationController;
+			
+			if (nav != null)
+				nav.PopViewControllerAnimated (animated);
+			else
+				DismissModalViewControllerAnimated (animated);
+		}
+
+		void SetupSearch ()
+		{
+			if (enableSearch){
+				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+					Delegate = new SearchDelegate (this)
+				};
+				if (SearchPlaceholder != null)
+					searchBar.Placeholder = this.SearchPlaceholder;
+				tableView.TableHeaderView = searchBar;					
+			} else {
+				// Does not work with current Monotouch, will work with 3.0
+				// tableView.TableHeaderView = null;
+			}
+		}
+		
+		public virtual void Selected (NSIndexPath indexPath)
+		{
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
+
+>>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 			element.Selected (this, tableView, indexPath);
 		}
 		
