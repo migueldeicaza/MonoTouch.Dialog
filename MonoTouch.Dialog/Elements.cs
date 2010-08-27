@@ -184,7 +184,7 @@ namespace MonoTouch.Dialog
 			if (sw == null){				       
 				float fX = (float)(tv.Frame.Width * 0.94) - 105;
 				
-				if(UIDevice.CurrentDevice.Model.ToLower().IndexOf("ipad") >= 0)
+				if(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
 					fX = (float)(tv.Frame.Width * 0.93) - 140;
 				
 				sw = new UISwitch (new RectangleF(fX, 10, 94, 27)){
@@ -780,6 +780,7 @@ namespace MonoTouch.Dialog
 		
 		// Apple leaks this one, so share across all.
 		static UIImagePickerController picker;
+		static UIPopoverController popover;
 		
 		// Height for rows
 		const int dimx = 48;
@@ -798,6 +799,7 @@ namespace MonoTouch.Dialog
 					return UIImage.FromImage (bit.ToImage ());
 				}
 			}
+		
 		}
 		
 		UIImage Scale (UIImage source)
@@ -897,7 +899,17 @@ namespace MonoTouch.Dialog
 		{
 			Value = image;
 			scaled = Scale (image);
-			currentController.DismissModalViewControllerAnimated (true);
+			switch(UIDevice.CurrentDevice.UserInterfaceIdiom)
+			{
+				case UIUserInterfaceIdiom.Pad:
+					popover.Dismiss(true);
+					break;
+					
+				case UIUserInterfaceIdiom.Phone:
+				default:
+					currentController.DismissModalViewControllerAnimated (true);
+					break;
+			}
 		}
 		
 		UIViewController currentController;
@@ -906,9 +918,24 @@ namespace MonoTouch.Dialog
 			if (picker == null)
 				picker = new UIImagePickerController ();
 			picker.Delegate = new MyDelegate (this);
-			dvc.ActivateController (picker);
+			
+			switch(UIDevice.CurrentDevice.UserInterfaceIdiom)
+			{
+				case UIUserInterfaceIdiom.Pad:
+					popover = new UIPopoverController(picker);
+					popover.PresentFromRect(rect,dvc.View,UIPopoverArrowDirection.Any,true);
+					break;
+					
+				case UIUserInterfaceIdiom.Phone:
+				default:
+					dvc.ActivateController (picker);
+					break;
+			}
+			
 			currentController = dvc;
+		
 		}
+		
 	}
 	
 	/// <summary>
