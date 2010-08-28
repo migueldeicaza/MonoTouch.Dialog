@@ -785,6 +785,7 @@ namespace MonoTouch.Dialog
 		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ImageElement");
 		UIImage scaled;
+		UIPopoverController popover;
 		
 		// Apple leaks this one, so share across all.
 		static UIImagePickerController picker;
@@ -914,7 +915,24 @@ namespace MonoTouch.Dialog
 			if (picker == null)
 				picker = new UIImagePickerController ();
 			picker.Delegate = new MyDelegate (this);
-			dvc.ActivateController (picker);
+			
+			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
+			case UIUserInterfaceIdiom.Pad:
+				RectangleF rect;
+				popover = new UIPopoverController (picker);
+				var cell = tableView.CellAt (path);
+				if (cell == null)
+					rect = new RectangleF (0, 0, dimx, dimy);
+				else
+					rect = cell.Frame;
+				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
+				break;
+				
+			default:
+			case UIUserInterfaceIdiom.Phone:
+				dvc.ActivateController (picker);
+				break;
+			}
 			currentController = dvc;
 		}
 	}
