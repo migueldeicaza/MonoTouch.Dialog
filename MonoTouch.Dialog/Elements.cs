@@ -181,13 +181,8 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			if (sw == null){				       
-				float fX = (float)(tv.Frame.Width * 0.94) - 105;
-				
-				if(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
-					fX = (float)(tv.Frame.Width * 0.93) - 140;
-				
-				sw = new UISwitch (new RectangleF(fX, 10, 94, 27)){
+			if (sw == null){
+				sw = new UISwitch (new RectangleF (198, 12, 94, 27)){
 					BackgroundColor = UIColor.Clear,
 					Tag = 1,
 					On = Value
@@ -812,7 +807,6 @@ namespace MonoTouch.Dialog
 					return UIImage.FromImage (bit.ToImage ());
 				}
 			}
-		
 		}
 		
 		UIImage Scale (UIImage source)
@@ -895,9 +889,9 @@ namespace MonoTouch.Dialog
 			base.Dispose (disposing);
 		}
 
-		class MyDelegate : UIImagePickerControllerDelegate {
+		class ImagePickerDelegate : UIImagePickerControllerDelegate {
 			ImageElement container;
-			public MyDelegate (ImageElement container)
+			public ImagePickerDelegate(ImageElement container)
 			{
 				this.container = container;
 			}
@@ -905,24 +899,24 @@ namespace MonoTouch.Dialog
 			public override void FinishedPickingImage (UIImagePickerController picker, UIImage image, NSDictionary editingInfo)
 			{
 				container.Picked (image);
+			
 			}
+			
 		}
 		
 		void Picked (UIImage image)
 		{
 			Value = image;
 			scaled = Scale (image);
-			switch(UIDevice.CurrentDevice.UserInterfaceIdiom)
+			
+			if(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
 			{
-				case UIUserInterfaceIdiom.Pad:
-					popover.Dismiss(true);
-					break;
-					
-				case UIUserInterfaceIdiom.Phone:
-				default:
-					currentController.DismissModalViewControllerAnimated (true);
-					break;
+				popover.Dismiss(true);
+				currentController.LoadView();	
 			}
+			
+			currentController.DismissModalViewControllerAnimated (true);
+		
 		}
 		
 		UIViewController currentController;
@@ -930,17 +924,21 @@ namespace MonoTouch.Dialog
 		{
 			if (picker == null)
 				picker = new UIImagePickerController ();
-			picker.Delegate = new MyDelegate (this);
+			picker.Delegate = new ImagePickerDelegate (this);
 			
 			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
 			case UIUserInterfaceIdiom.Pad:
 				RectangleF rect;
-				popover = new UIPopoverController (picker);
 				var cell = tableView.CellAt (path);
+				
 				if (cell == null)
 					rect = new RectangleF (0, 0, dimx, dimy);
 				else
+					//cell.Selected = false;
 					rect = cell.Frame;
+				
+				popover = new UIPopoverController (picker);
+				
 				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
 				break;
 				
@@ -949,11 +947,8 @@ namespace MonoTouch.Dialog
 				dvc.ActivateController (picker);
 				break;
 			}
-
 			currentController = dvc;
-		
 		}
-		
 	}
 	
 	/// <summary>
@@ -971,8 +966,6 @@ namespace MonoTouch.Dialog
 		
 		public string Value { 
 			get {
-				if (entry != null)
-					val = entry.Text;
 				return val;
 			}
 			set {
