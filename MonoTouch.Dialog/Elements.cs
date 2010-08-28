@@ -583,7 +583,7 @@ namespace MonoTouch.Dialog
 		public UIFont Font;
 		public UIColor TextColor;
 		public UIColor BackgroundColor;
-		public UILineBreakMode LineBreakMode = UILineBreakMode.CharacterWrap;
+		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
@@ -601,7 +601,7 @@ namespace MonoTouch.Dialog
 			tl.TextColor = TextColor == null ? UIColor.Black : TextColor;
 			tl.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
 			tl.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
-			tl.LineBreakMode = UILineBreakMode.WordWrap;
+			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = 0;			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
@@ -609,6 +609,19 @@ namespace MonoTouch.Dialog
 			
 			return cell;
 		}		
+	}
+	
+	public class StyledMultilineElement : StyledStringElement, IElementSizing {
+		public StyledMultilineElement (string caption) : base (caption) {}
+		public StyledMultilineElement (string caption, string value) : base (caption, value) {}
+		public StyledMultilineElement (string caption, NSAction tapped) : base (caption, tapped) {}
+
+		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		{
+			SizeF size = new SizeF (280, float.MaxValue);
+			using (var font = UIFont.FromName ("Helvetica", 17f))
+				return tableView.StringSize (Caption, font, size, LineBreakMode).Height;
+		}
 	}
 	
 	public class ImageStringElement : StringElement {
@@ -777,10 +790,10 @@ namespace MonoTouch.Dialog
 		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ImageElement");
 		UIImage scaled;
+		UIPopoverController popover;
 		
 		// Apple leaks this one, so share across all.
 		static UIImagePickerController picker;
-		static UIPopoverController popover;
 		
 		// Height for rows
 		const int dimx = 48;
@@ -919,19 +932,24 @@ namespace MonoTouch.Dialog
 				picker = new UIImagePickerController ();
 			picker.Delegate = new MyDelegate (this);
 			
-			switch(UIDevice.CurrentDevice.UserInterfaceIdiom)
-			{
-				case UIUserInterfaceIdiom.Pad:
-					popover = new UIPopoverController(picker);
-					popover.PresentFromRect(rect, dvc.View, UIPopoverArrowDirection.Any, true);
-					break;
-					
-				case UIUserInterfaceIdiom.Phone:
-				default:
-					dvc.ActivateController (picker);
-					break;
+			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
+			case UIUserInterfaceIdiom.Pad:
+				RectangleF rect;
+				popover = new UIPopoverController (picker);
+				var cell = tableView.CellAt (path);
+				if (cell == null)
+					rect = new RectangleF (0, 0, dimx, dimy);
+				else
+					rect = cell.Frame;
+				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
+				break;
+				
+			default:
+			case UIUserInterfaceIdiom.Phone:
+				dvc.ActivateController (picker);
+				break;
 			}
-			
+
 			currentController = dvc;
 		
 		}

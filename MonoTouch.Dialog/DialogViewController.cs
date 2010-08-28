@@ -184,6 +184,7 @@ namespace MonoTouch.Dialog
 			originalSections = null;
 			originalElements = null;
 			searchBar.ResignFirstResponder ();
+			ReloadData ();
 		}
 		
 		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
