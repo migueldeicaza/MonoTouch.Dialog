@@ -891,14 +891,20 @@ namespace MonoTouch.Dialog
 
 		class MyDelegate : UIImagePickerControllerDelegate {
 			ImageElement container;
-			public MyDelegate (ImageElement container)
+			UITableView table;
+			NSIndexPath path;
+			
+			public MyDelegate (ImageElement container, UITableView table, NSIndexPath path)
 			{
 				this.container = container;
+				this.table = table;
+				this.path = path;
 			}
 			
 			public override void FinishedPickingImage (UIImagePickerController picker, UIImage image, NSDictionary editingInfo)
 			{
 				container.Picked (image);
+				table.ReloadRows (new NSIndexPath [] { path }, UITableViewRowAnimation.None);
 			}
 		}
 		
@@ -907,6 +913,7 @@ namespace MonoTouch.Dialog
 			Value = image;
 			scaled = Scale (image);
 			currentController.DismissModalViewControllerAnimated (true);
+			
 		}
 		
 		UIViewController currentController;
@@ -914,15 +921,15 @@ namespace MonoTouch.Dialog
 		{
 			if (picker == null)
 				picker = new UIImagePickerController ();
-			picker.Delegate = new MyDelegate (this);
+			picker.Delegate = new MyDelegate (this, tableView, path);
 			
 			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
 			case UIUserInterfaceIdiom.Pad:
-				RectangleF rect;
+				RectangleF useRect;
 				popover = new UIPopoverController (picker);
 				var cell = tableView.CellAt (path);
 				if (cell == null)
-					rect = new RectangleF (0, 0, dimx, dimy);
+					useRect = rect;
 				else
 					rect = cell.Frame;
 				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
