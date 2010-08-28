@@ -923,7 +923,7 @@ namespace MonoTouch.Dialog
 			{
 				case UIUserInterfaceIdiom.Pad:
 					popover = new UIPopoverController(picker);
-					popover.PresentFromRect(rect,dvc.View,UIPopoverArrowDirection.Any,true);
+					popover.PresentFromRect(rect, dvc.View, UIPopoverArrowDirection.Any, true);
 					break;
 					
 				case UIUserInterfaceIdiom.Phone:
