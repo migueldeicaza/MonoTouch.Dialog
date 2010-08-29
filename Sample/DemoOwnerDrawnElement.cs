@@ -4,44 +4,22 @@ using MonoTouch.CoreFoundation;
 using MonoTouch.CoreGraphics;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
-<<<<<<< HEAD
-=======
 using MonoTouch.Foundation;
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 
 namespace Sample
 {
 	public partial class AppDelegate
 	{
-<<<<<<< HEAD
-=======
 		private const string SmallText="Lorem ipsum dolor sit amet";
 		private const string MediumText = "Integer molestie rhoncus bibendum. Cras ullamcorper magna a enim laoreet";
 		private const string LargeText = "Phasellus laoreet, massa non cursus porttitor, sapien tellus placerat metus, vitae ornare urna mi sit amet dui.";
 		private const string WellINeverWhatAWhopperString="Nulla mattis tempus placerat. Curabitur euismod ullamcorper lorem. Praesent massa magna, pulvinar nec condimentum ac, blandit blandit mi. Donec vulputate sapien a felis aliquam consequat. Sed sit amet libero non sem rhoncus semper sed at tortor.";		
 
 		
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 		public void DemoOwnerDrawnElement () 
 		{
 			var root = new RootElement("Owner Drawn") {
 				new Section() {
-<<<<<<< HEAD
-					new SampleOwnerDrawnElement("Element 1"),
-					new SampleOwnerDrawnElement("Element 2"),
-					new SampleOwnerDrawnElement("Element 3"),
-					new SampleOwnerDrawnElement("Element 4"),
-					new SampleOwnerDrawnElement("Element 5"),
-					new SampleOwnerDrawnElement("Element 6"),
-					new SampleOwnerDrawnElement("Element 7"),
-					new SampleOwnerDrawnElement("Element 8"),
-					new SampleOwnerDrawnElement("Element 9"),
-					new SampleOwnerDrawnElement("Element 10"),
-				}
-			};
-			
-			var dvc = new DialogViewController (root, true);
-=======
 					new SampleOwnerDrawnElement("000 - "+SmallText, DateTime.Now, "David Black"),
 					new SampleOwnerDrawnElement("001 - "+MediumText, DateTime.Now - TimeSpan.FromDays(1), "Peter Brian Telescope"),
 					new SampleOwnerDrawnElement("002 - "+LargeText, DateTime.Now - TimeSpan.FromDays(3), "John Raw Vegitable"),
@@ -57,7 +35,6 @@ namespace Sample
 			root.UnevenRows = true;
 			var dvc = new DialogViewController (root, true);
 			
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 			navigation.PushViewController (dvc, true);
 		}
 	}
@@ -70,13 +47,6 @@ namespace Sample
 	public class SampleOwnerDrawnElement : OwnerDrawnElement
 	{
 		CGGradient gradient;
-<<<<<<< HEAD
-		
-		public SampleOwnerDrawnElement (string text) : base(UITableViewCellStyle.Default, "sampleOwnerDrawnElement")
-		{
-			this.Text = text;
-			
-=======
 		private UIFont subjectFont = UIFont.SystemFontOfSize(10.0f);
 		private UIFont fromFont = UIFont.BoldSystemFontOfSize(14.0f);
 		private UIFont dateFont = UIFont.BoldSystemFontOfSize(14.0f);
@@ -87,7 +57,6 @@ namespace Sample
 			this.Subject = text;
 			this.From = from;
 			this.Sent = FormatDate(sent);
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 			CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB();
 			gradient = new CGGradient(
 			    colorSpace,
@@ -96,11 +65,6 @@ namespace Sample
 				new float[] { 0, 1 } );
 		}
 		
-<<<<<<< HEAD
-		public string Text
-		{
-			get;set;	
-=======
 		public string Subject
 		{
 			get; set; 
@@ -128,21 +92,10 @@ namespace Sample
 			{
 				return date.ToShortDateString ();			
 			}
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 		}
 		
 		public override void Draw (RectangleF bounds, CGContext context, UIView view)
 		{
-<<<<<<< HEAD
-			UIColor.White.SetFill();
-			context.FillRect(bounds);
-			
-			context.DrawLinearGradient(gradient, new PointF(bounds.Left, bounds.Top), new PointF(bounds.Left, bounds.Bottom), CGGradientDrawingOptions.DrawsAfterEndLocation);
-			
-			UIColor.Black.SetColor();
-			
-			view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
-=======
 			UIColor.White.SetFill ();
 			context.FillRect (bounds);
 			
@@ -156,14 +109,10 @@ namespace Sample
 			
 			UIColor.DarkGray.SetColor();
 			view.DrawString(this.Subject, new RectangleF(10, 30, bounds.Width - 20, TextHeight(bounds) ), subjectFont, UILineBreakMode.WordWrap);
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 		}
 		
 		public override float Height (RectangleF bounds)
 		{
-<<<<<<< HEAD
-			return 44.0f;
-=======
 			var height = 40.0f + TextHeight (bounds);
 			return height;
 		}
@@ -181,7 +130,6 @@ namespace Sample
 		public override string ToString ()
 		{
 			return string.Format (Subject);
->>>>>>> b301c4059a63479ccc119679e9c3aef3d385f734
 		}
 	}
 }

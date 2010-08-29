@@ -44,7 +44,6 @@ namespace MonoTouch.Dialog
 			}
 			
 			cell.Update();
-
 			return cell;
 		}	
 		
@@ -79,6 +78,8 @@ namespace MonoTouch.Dialog
 				}
 			}
 				
+			
+
 			public void Update()
 			{
 				SetNeedsDisplay();
