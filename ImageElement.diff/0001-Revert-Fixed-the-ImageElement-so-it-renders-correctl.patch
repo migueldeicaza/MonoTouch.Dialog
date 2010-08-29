@@ -1,0 +1,159 @@
+From d46922e846cf085a6ab02de61cd2a17fb56af2d1 Mon Sep 17 00:00:00 2001
+From: Administrator <Administrator@Administrators-Mac.local>
+Date: Sat, 28 Aug 2010 16:39:07 -0700
+Subject: [PATCH] Revert "Fixed the ImageElement so it renders correctly when an image is selected."
+
+This reverts commit 08f81440dfdb9fc5cb40ed12ac92261029b794fb.
+---
+ MonoTouch.Dialog/DialogViewController.cs |    3 +-
+ MonoTouch.Dialog/Elements.cs             |   47 +++++++++++++++++------------
+ 2 files changed, 28 insertions(+), 22 deletions(-)
+
+diff --git a/MonoTouch.Dialog/DialogViewController.cs b/MonoTouch.Dialog/DialogViewController.cs
+index dbdb85e..ea25812 100644
+--- a/MonoTouch.Dialog/DialogViewController.cs
++++ b/MonoTouch.Dialog/DialogViewController.cs
+@@ -462,7 +462,6 @@ namespace MonoTouch.Dialog
+ 		{
+ 			var section = root.Sections [indexPath.Section];
+ 			var element = section.Elements [indexPath.Row];
+-
+ 			element.Selected (this, tableView, indexPath);
+ 		}
+ 		
+@@ -601,4 +600,4 @@ namespace MonoTouch.Dialog
+ 		}
+ 	}
+ 	
+-}
+\ No newline at end of file
++}
+diff --git a/MonoTouch.Dialog/Elements.cs b/MonoTouch.Dialog/Elements.cs
+index f10c474..1fefac0 100644
+--- a/MonoTouch.Dialog/Elements.cs
++++ b/MonoTouch.Dialog/Elements.cs
+@@ -181,8 +181,13 @@ namespace MonoTouch.Dialog
+ 		
+ 		public override UITableViewCell GetCell (UITableView tv)
+ 		{
+-			if (sw == null){
+-				sw = new UISwitch (new RectangleF (198, 12, 94, 27)){
++			if (sw == null){				       
++				float fX = (float)(tv.Frame.Width * 0.94) - 105;
++				
++				if(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
++					fX = (float)(tv.Frame.Width * 0.93) - 140;
++				
++				sw = new UISwitch (new RectangleF(fX, 10, 94, 27)){
+ 					BackgroundColor = UIColor.Clear,
+ 					Tag = 1,
+ 					On = Value
+@@ -807,6 +812,7 @@ namespace MonoTouch.Dialog
+ 					return UIImage.FromImage (bit.ToImage ());
+ 				}
+ 			}
++		
+ 		}
+ 		
+ 		UIImage Scale (UIImage source)
+@@ -889,9 +895,9 @@ namespace MonoTouch.Dialog
+ 			base.Dispose (disposing);
+ 		}
+ 
+-		class ImagePickerDelegate : UIImagePickerControllerDelegate {
++		class MyDelegate : UIImagePickerControllerDelegate {
+ 			ImageElement container;
+-			public ImagePickerDelegate(ImageElement container)
++			public MyDelegate (ImageElement container)
+ 			{
+ 				this.container = container;
+ 			}
+@@ -899,24 +905,24 @@ namespace MonoTouch.Dialog
+ 			public override void FinishedPickingImage (UIImagePickerController picker, UIImage image, NSDictionary editingInfo)
+ 			{
+ 				container.Picked (image);
+-			
+ 			}
+-			
+ 		}
+ 		
+ 		void Picked (UIImage image)
+ 		{
+ 			Value = image;
+ 			scaled = Scale (image);
+-			
+-			if(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
++			switch(UIDevice.CurrentDevice.UserInterfaceIdiom)
+ 			{
+-				popover.Dismiss(true);
+-				currentController.LoadView();	
++				case UIUserInterfaceIdiom.Pad:
++					popover.Dismiss(true);
++					break;
++					
++				case UIUserInterfaceIdiom.Phone:
++				default:
++					currentController.DismissModalViewControllerAnimated (true);
++					break;
+ 			}
+-			
+-			currentController.DismissModalViewControllerAnimated (true);
+-		
+ 		}
+ 		
+ 		UIViewController currentController;
+@@ -924,21 +930,17 @@ namespace MonoTouch.Dialog
+ 		{
+ 			if (picker == null)
+ 				picker = new UIImagePickerController ();
+-			picker.Delegate = new ImagePickerDelegate (this);
++			picker.Delegate = new MyDelegate (this);
+ 			
+ 			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
+ 			case UIUserInterfaceIdiom.Pad:
+ 				RectangleF rect;
++				popover = new UIPopoverController (picker);
+ 				var cell = tableView.CellAt (path);
+-				
+ 				if (cell == null)
+ 					rect = new RectangleF (0, 0, dimx, dimy);
+ 				else
+-					//cell.Selected = false;
+ 					rect = cell.Frame;
+-				
+-				popover = new UIPopoverController (picker);
+-				
+ 				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
+ 				break;
+ 				
+@@ -947,8 +949,11 @@ namespace MonoTouch.Dialog
+ 				dvc.ActivateController (picker);
+ 				break;
+ 			}
++
+ 			currentController = dvc;
++		
+ 		}
++		
+ 	}
+ 	
+ 	/// <summary>
+@@ -966,6 +971,8 @@ namespace MonoTouch.Dialog
+ 		
+ 		public string Value { 
+ 			get {
++				if (entry != null)
++					val = entry.Text;
+ 				return val;
+ 			}
+ 			set {
+@@ -2244,4 +2251,4 @@ namespace MonoTouch.Dialog
+ 		}
+ 		
+ 	}
+-}
+\ No newline at end of file
++}
+-- 
+1.7.2
+
