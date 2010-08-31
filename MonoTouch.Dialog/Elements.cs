@@ -182,7 +182,7 @@ namespace MonoTouch.Dialog
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			if (sw == null){
-				sw = new UISwitch (new RectangleF (198, 12, 94, 27)){
+				sw = new UISwitch (){
 					BackgroundColor = UIColor.Clear,
 					Tag = 1,
 					On = Value
@@ -200,7 +200,7 @@ namespace MonoTouch.Dialog
 				RemoveTag (cell, 1);
 		
 			cell.TextLabel.Text = Caption;
-			cell.ContentView.AddSubview (sw);
+			cell.AccessoryView = sw;
 
 			return cell;
 		}
