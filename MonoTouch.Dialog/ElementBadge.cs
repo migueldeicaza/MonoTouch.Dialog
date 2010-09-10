@@ -129,9 +129,6 @@ namespace MonoTouch.Dialog
 					context.ShowText (smallText);
 					var width = context.TextPosition.X - start;
 					
-					var ns = new NSString (smallText);
-					UIFont ff = UIFont.FromName ("Helvetica", 10);
-					
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
 					context.ShowTextAtPoint ((57-width)/2, 46, smallText);
 					

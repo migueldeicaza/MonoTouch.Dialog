@@ -203,7 +203,6 @@ namespace MonoTouch.Dialog
 			
 			OnSearchTextChanged (text);
 			
-			bool changed = false;
 			var newSections = new List<Section> ();
 			
 			for (int sidx = 0; sidx < originalSections.Length; sidx++){

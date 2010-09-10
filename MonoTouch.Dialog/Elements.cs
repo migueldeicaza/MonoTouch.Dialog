@@ -181,8 +181,13 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			if (sw == null){
-				sw = new UISwitch (new RectangleF (198, 12, 94, 27)){
+			if (sw == null){				       
+				float fX = (float)(tv.Frame.Width * 0.94) - 105;
+				
+				if(UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad)
+					fX = (float)(tv.Frame.Width * 0.93) - 140;
+				
+				sw = new UISwitch (new RectangleF(fX, 10, 94, 27)){
 					BackgroundColor = UIColor.Clear,
 					Tag = 1,
 					On = Value
@@ -1086,8 +1091,10 @@ namespace MonoTouch.Dialog
 						if (e == this)
 							focus = this;
 						else if (focus != null && e is EntryElement)
+						{
 							focus = e as EntryElement;
 							break;
+						}
 						
 					}
 					if (focus != this)
@@ -1105,7 +1112,10 @@ namespace MonoTouch.Dialog
 						if (e == this)
 							self = this;
 						else if (self != null && e is EntryElement)
+						{
 							returnType = UIReturnKeyType.Next;
+							break;
+						}
 					}
 					entry.ReturnKeyType = returnType;
 				};
