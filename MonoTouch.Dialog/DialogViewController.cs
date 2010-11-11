@@ -79,6 +79,11 @@ namespace MonoTouch.Dialog
 				enableSearch = value;
 			}
 		}
+		
+		// If set, we automatically scroll the content to avoid showing the search bar until 
+		// the user manually pulls it down.
+		public bool AutoHideSearch { get; set; }
+		
 		public string SearchPlaceholder { get; set; }
 			
 		/// <summary>
@@ -508,6 +513,12 @@ namespace MonoTouch.Dialog
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			if (AutoHideSearch){
+				if (enableSearch){
+					if (TableView.ContentOffset.Y < 44)
+						TableView.ContentOffset = new PointF (0, 44);
+				}
+			}
 			if (root == null)
 				return;
 			
