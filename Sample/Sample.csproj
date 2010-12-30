@@ -25,7 +25,6 @@
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
     <MtouchExtraArgs>--nostrip</MtouchExtraArgs>
-    <MtouchSdkVersion>3.2</MtouchSdkVersion>
     <MtouchMinimumOS>3.2</MtouchMinimumOS>
     <MtouchI18n />
   </PropertyGroup>
