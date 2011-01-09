@@ -1440,7 +1440,7 @@ namespace MonoTouch.Dialog
 				return header as string;
 			}
 			set {
-				footer = value;
+				header = value;
 			}
 		}
 		
