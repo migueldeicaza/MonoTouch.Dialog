@@ -532,7 +532,7 @@ namespace MonoTouch.Dialog
 				
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (value == null ? skey : skeyvalue);
+			var cell = tv.DequeueReusableCell (Value == null ? skey : skeyvalue);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
