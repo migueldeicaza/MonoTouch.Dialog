@@ -512,6 +512,7 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
+                static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
 		
@@ -531,7 +532,7 @@ namespace MonoTouch.Dialog
 				
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (skey);
+			var cell = tv.DequeueReusableCell (value == null ? skey : skeyvalue);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
