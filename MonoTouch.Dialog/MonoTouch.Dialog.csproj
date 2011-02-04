@@ -9,8 +9,6 @@
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -24,6 +22,8 @@
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -33,6 +33,8 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <MtouchLink>None</MtouchLink>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,6 +46,8 @@
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>True</MtouchDebug>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -53,14 +57,17 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AdHoc|iPhone' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin</OutputPath>
+    <OutputPath>bin\iPhone\AdHoc</OutputPath>
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <AssemblyName>MonoTouchDialog</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
     <DebugType>none</DebugType>
@@ -69,6 +76,8 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <MtouchSdkVersion>3.0</MtouchSdkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -91,13 +100,40 @@
     <Compile Include="ActivityElement.cs" />
     <Compile Include="LoadMoreElement.cs" />
     <Compile Include="OwnerDrawnElement.cs" />
+    <Compile Include="CalendarMonthView.cs" />
+    <Compile Include="CalendarMonthViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="Images\calendar\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\arrow.png">
       <LogicalName>arrow.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\leftarrow.png">
+      <LogicalName>leftarrow.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\datecell.png">
+      <LogicalName>datecell.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\datecellselected.png">
+      <LogicalName>datecellselected.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\rightarrow.png">
+      <LogicalName>rightarrow.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\shadow.png">
+      <LogicalName>shadow.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\today.png">
+      <LogicalName>today.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\todayselected.png">
+      <LogicalName>todayselected.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\calendar\topbar.png">
+      <LogicalName>topbar.png</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

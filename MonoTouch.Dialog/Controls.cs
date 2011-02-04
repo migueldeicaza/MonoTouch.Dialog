@@ -7,6 +7,8 @@ using MonoTouch.CoreGraphics;
 using MonoTouch.CoreAnimation;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using System.Linq;
+using MonoTouch.EventKit;
 
 namespace MonoTouch.Dialog
 {
@@ -19,6 +21,31 @@ namespace MonoTouch.Dialog
 	// This cute method will be added to UIImage.FromResource, but for old installs 
 	// make a copy here
 	internal static class Util {
+		
+		public static DateTime DateTimeMin
+		{
+			get{return DateTime.FromFileTimeUtc(0);}
+		}
+		
+		
+		public static DateTime NSDateToDateTime(MonoTouch.Foundation.NSDate date)
+		{
+			var nsDateNow = (DateTime)NSDate.Now;
+			var diff = DateTime.Now.Subtract(nsDateNow);
+			var newDate = ((DateTime)date).Add(diff);
+		   	return newDate;
+			// return (new DateTime(2001,1,1,0,0,0)).AddSeconds(date.SecondsSinceReferenceDate);
+		}
+		public static NSDate DateTimeToNSDate(DateTime date)
+		{
+			//var nsDateNow = (DateTime)NSDate.Now;
+			//var diff = DateTime.Now.Subtract(nsDateNow);
+			//var newDate = (NSDate)date.Add(-diff);
+			var newDate = (NSDate)date;
+			return newDate;
+		}
+		
+		
 		public static UIImage FromResource (Assembly assembly, string name)
 		{
 			if (name == null)
@@ -168,7 +195,7 @@ namespace MonoTouch.Dialog
 					return;
 				
 				lastUpdateTime = value;
-				if (value == DateTime.MinValue){
+				if (value <= Util.DateTimeMin){
 					lastUpdateLabel.Text = "Last Updated: never";
 				} else 
 					lastUpdateLabel.Text = String.Format ("Last Updated: {0:g}", value);

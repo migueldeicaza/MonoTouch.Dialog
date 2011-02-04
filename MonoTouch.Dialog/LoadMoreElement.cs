@@ -75,7 +75,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 				
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			Layout ();
 			return cell;

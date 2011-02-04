@@ -14,7 +14,14 @@ namespace Sample
 			var root = CreateRoot ();
 				
 			var dv = new DialogViewController (root, true);
-			navigation.PushViewController (dv, true);				
+			navigation.PushViewController (dv, true);
+			UIBarButtonItem backButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, delegate 
+			{
+				Console.WriteLine("You Pushed BAck!!!!");	
+				
+			});
+			dv.NavigationItem.LeftBarButtonItem = backButton;
+			//navigation.NavigationBar.BackItem.LeftBarButtonItem = backButton;
 		}
 
 		RootElement CreateRoot ()

@@ -38,6 +38,8 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Caption;
 		
+		public string Detail;
+		
 		/// <summary>
 		///  Initializes the element with the given caption.
 		/// </summary>
@@ -49,6 +51,12 @@ namespace MonoTouch.Dialog
 			this.Caption = caption;
 		}	
 		
+		public Element(string caption, string detail)
+		{
+			this.Caption = caption;
+			this.Detail = detail;	
+		}
+		
 		public void Dispose ()
 		{
 			Dispose (true);
@@ -58,7 +66,8 @@ namespace MonoTouch.Dialog
 		{
 		}
 		
-		public virtual UITableViewCell GetCell (UITableView tv)
+		
+		public virtual UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			return new UITableViewCell (UITableViewCellStyle.Default, "xx");
 		}
@@ -95,6 +104,9 @@ namespace MonoTouch.Dialog
 		/// The <see cref="NSIndexPath"/> that contains the Section and Row for the element.
 		/// </param>
 		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+		}
+		public virtual void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 		}
 		
@@ -160,6 +172,11 @@ namespace MonoTouch.Dialog
 			val = value;
 		}
 		
+		public BoolElement (string caption, string detail, bool value) : base (caption, detail)
+		{
+			val = value;
+		}
+		
 		public override string Summary ()
 		{
 			return val ? "On" : "Off";
@@ -179,7 +196,10 @@ namespace MonoTouch.Dialog
 		public BooleanElement (string caption, bool value, string key) : base (caption, value)
 		{  }
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public BooleanElement (string caption, string detail, bool value, string key) : base (caption, detail, value)
+		{  }
+		
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			if (sw == null){
 				sw = new UISwitch (new RectangleF (198, 12, 94, 27)){
@@ -194,7 +214,7 @@ namespace MonoTouch.Dialog
 			
 			var cell = tv.DequeueReusableCell (bkey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, bkey);
+				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, bkey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else
 				RemoveTag (cell, 1);
@@ -208,7 +228,6 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				sw.Dispose ();
 				sw = null;
 			}
 		}
@@ -297,13 +316,14 @@ namespace MonoTouch.Dialog
 		
 		protected abstract UIImage GetImage ();
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (key) as TextWithImageCellView;
 			if (cell == null)
 				cell = new TextWithImageCellView (this);
 			else
 				cell.UpdateFrom (this);
+			cell.SelectionStyle =  UITableViewCellSelectionStyle.None;
 			return cell;
 		}
 	}
@@ -351,7 +371,7 @@ namespace MonoTouch.Dialog
 			Value = value;
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			if (slider == null){
 				slider = new UISlider (new RectangleF (10f, 12f, 280f, 7f)){
@@ -418,7 +438,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (hkey);
 			if (cell == null){
@@ -518,13 +538,19 @@ namespace MonoTouch.Dialog
 			Tapped += tapped;
 		}
 		
+		public StringElement (string caption,string value,  NSAction tapped) : base (caption)
+		{
+			this.Value = value;
+			Tapped += tapped;
+		}
+		
 		public event NSAction Tapped;
 				
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
-				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
+				cell = new UITableViewCell (UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
 			cell.Accessory = UITableViewCellAccessory.None;
@@ -573,7 +599,9 @@ namespace MonoTouch.Dialog
 		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public UIView BackgroundView;
+		
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
@@ -592,6 +620,12 @@ namespace MonoTouch.Dialog
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
+			
+			if (BackgroundView != null)
+			{
+				//BackgroundView.Frame = cell.ContentView.Bounds;
+				cell.BackgroundView = BackgroundView;
+			}
 			
 			return cell;
 		}		
@@ -620,7 +654,7 @@ namespace MonoTouch.Dialog
 			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
@@ -648,6 +682,12 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class MultilineElement : StringElement, IElementSizing {
+		private EntryScreen entryScreen;
+		public bool EnableEntry;
+		public NSAction EditingDone;
+		public int MaxLength {get;set;}
+		
+		
 		public MultilineElement (string caption) : base (caption)
 		{
 		}
@@ -660,42 +700,162 @@ namespace MonoTouch.Dialog
 		{
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public MultilineElement (string caption,string theValue, NSAction tapped) : base (caption, tapped)
 		{
-			var cell = base.GetCell (tv);				
-			var tl = cell.TextLabel;
+			this.Value= theValue;
+		}
+		
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+		{
+			var cell = base.GetCell (dvc,tv);				
+			var tl = cell.DetailTextLabel;
 			tl.LineBreakMode = UILineBreakMode.WordWrap;
 			tl.Lines = 0;
+			tl.TextAlignment = UITextAlignment.Left;
 
 			return cell;
 		}
 		
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF size = new SizeF (280, float.MaxValue);
+			var text  = Value;
+			if (string.IsNullOrEmpty(text))
+				text = "";
+			float width;
+			SizeF sizeC = new SizeF (280, float.MaxValue);
 			using (var font = UIFont.FromName ("Helvetica", 17f))
-				return tableView.StringSize (Caption, font, size, UILineBreakMode.WordWrap).Height + 10;
+			{
+				width = tableView.StringSize (Caption, font, sizeC, UILineBreakMode.WordWrap).Width  + 10;
+			}
+			
+			SizeF size = new SizeF (280 - width, float.MaxValue);
+			using (var font = UIFont.FromName ("Helvetica", 17f))
+			{
+				var height = tableView.StringSize (text, font, size, UILineBreakMode.WordWrap).Height;
+				if (height <= 12)
+					height  = 17;
+				return height + 10;
+			}
 		}
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			if(!EnableEntry)
+				return;
+			entryScreen = new EntryScreen(Value){MaxLength = this.MaxLength};
+			entryScreen.Title = Caption;
+			entryScreen.EditingDone += delegate
+			{
+				Value = entryScreen.Text;
+				if (EditingDone != null)
+					EditingDone();
+			};
+			dvc.NavigationController.PushViewController(entryScreen,true);
+			base.Selected (dvc, tableView, path);
+		}
+	}
+	
+	internal class EntryScreen : UIViewController
+	{
+		public string Text {get;set;}
+		public NSAction EditingDone;
+		internal UITextView textView;
+		public int MaxLength {get;set;}
+		
+		public EntryScreen(string text)
+		{
+			Text = text;
+			
+			textView = new UITextView () {
+				Font = UIFont.SystemFontOfSize (18),
+				Text = Text,
+			};
+			textView.Delegate = new textDelegate( this);
+			this.Add(textView);
+		}
+		public override void ViewDidAppear (bool animated)
+		{
+			setHeight();
+			textView.BecomeFirstResponder();
+		}
+		public override void ViewDidDisappear (bool animated)
+		{
+			Text = textView.Text;
+			if (EditingDone != null)
+				EditingDone();
+			base.ViewDidDisappear (animated);
+		}
+		 float PORTRAIT_KEYBOARD_HEIGHT = 216f;
+		 float LANDSCAPE_KEYBOARD_HEIGHT = 162f;
+		private void setHeight()
+		{
+			
+
+			var frame = this.View.Frame;
+			switch(InterfaceOrientation)
+			{
+				case UIInterfaceOrientation.Portrait:
+				case UIInterfaceOrientation.PortraitUpsideDown:
+						frame.Height -= PORTRAIT_KEYBOARD_HEIGHT;
+						break;
+				default:
+					frame.Height -= LANDSCAPE_KEYBOARD_HEIGHT;
+					break;
+						
+					
+			}
+			textView.Frame = frame;
+		}
+		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
+		{
+			base.DidRotate (fromInterfaceOrientation);
+			setHeight();
+		}
+		
+		internal class textDelegate : UITextViewDelegate
+		{
+			public textDelegate( EntryScreen entryScreen)
+			{
+				parent = entryScreen;	
+			}
+			public EntryScreen parent;
+			public override bool ShouldChangeText (UITextView textView, NSRange range, string text)
+			{
+				if(parent.MaxLength == 0)
+					return true;
+				return textView.Text.Length < parent.MaxLength;
+			}	
+		}
+		
 	}
 	
 	public class RadioElement : StringElement {
 		public string Group;
 		internal int RadioIdx;
 		
-		public RadioElement (string caption, string group) : base (caption)
+		public RadioElement (string caption,string value ,string group) : base (caption,value)
 		{
 			Group = group;
 		}
+		
+		
+		public RadioElement (string caption, string group, NSAction tapped) : base (caption)
+		{
+			Tapped += tapped;
+			Group = group;
+		}
 				
-		public RadioElement (string caption) : base (caption)
+		public RadioElement (string caption,string value ) : base (caption,value)
+		{
+		}	
+		public RadioElement (string caption ) : base (caption)
 		{
 		}
 
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
-			var cell = base.GetCell (tv);			
+			var cell = base.GetCell (dvc,tv);			
 			var root = (RootElement) Parent.Parent;
-			
+			cell.DetailTextLabel.Text = "";
 			if (!(root.group is RadioGroup))
 				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
 			
@@ -717,10 +877,91 @@ namespace MonoTouch.Dialog
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
 				root.RadioSelected = RadioIdx;
 			}
+			dvc.NavigationController.PopViewControllerAnimated(true);
+			base.Selected (dvc, tableView, indexPath);
+		}
+	}
+	
+	
+	public class RadioImageElement : BadgeElement {
+		public string Group;
+		internal int RadioIdx;
+		public string Value;
+		
+		public override string Summary ()
+		{
+			return Caption;
+		}
+		
+		public RadioImageElement (string caption,string value ,string group) : base (null,caption,value)
+		{
+			Value = value;
+			Group = group;
+		}
+		
+		
+		public RadioImageElement (string caption, string group, NSAction tapped) : base (null,caption,"")
+		{
+			Tapped += tapped;
+			Group = group;
+		}
+		
+		
+		public RadioImageElement (string caption, string group,string value, UIImage image, NSAction tapped) : base (image,caption,"")
+		{
+			Tapped += tapped;
+			Group = group;
+			Value = value;
+		}
+				
+		public RadioImageElement (string caption,string value ) : base (null,caption,value)
+		{
+			
+			Value = value;
+		}	
+		
+		public RadioImageElement (string caption,string value, UIImage image ) : base (image,caption,"")
+		{
+			
+			Value = value;
+		}	
+		public RadioImageElement (string caption ) : base (null,caption,"")
+		{
+		}
+
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+		{
+			var cell = base.GetCell (dvc,tv);			
+			var root = (RootElement) Parent.Parent;
+			
+			if (!(root.group is RadioGroup))
+				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
+			
+			bool selected; 
+			selected = ((Value == ((RadioGroup)(root.group)).SelectedValue && !string.IsNullOrEmpty(Value)));
+			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+
+			return cell;
+		}
+
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
+			RootElement root = (RootElement) Parent.Parent;
+			if (Value  != root.RadioSelectedValue ){
+				var cell = tableView.CellAt (root.PathForRadio (root.RadioSelected));
+				if (cell != null)
+					cell.Accessory = UITableViewCellAccessory.None;
+				cell = tableView.CellAt (indexPath);
+				if (cell != null)
+					cell.Accessory = UITableViewCellAccessory.Checkmark;
+				//root.RadioSelected
+				root.RadioSelectedValue = Value;
+			}
 			
 			base.Selected (dvc, tableView, indexPath);
 		}
 	}
+	
 	
 	public class CheckboxElement : StringElement {
 		public new bool Value;
@@ -743,9 +984,9 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
-			return  ConfigCell (base.GetCell (tv));
+			return  ConfigCell (base.GetCell (dvc,tv));
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
@@ -816,7 +1057,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (ikey);
 			if (cell == null){
@@ -933,9 +1174,13 @@ namespace MonoTouch.Dialog
 		
 		static NSString ekey = new NSString ("EntryElement");
 		bool isPassword;
-		UITextField entry;
+		public UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
+		public void CloseKeyboard()
+		{
+			entry.ResignFirstResponder();
+		}
 
 		public event EventHandler Changed;
 		
@@ -955,6 +1200,8 @@ namespace MonoTouch.Dialog
 		{
 			Value = value;
 			this.placeholder = placeholder;
+			
+			
 		}
 		
 		/// <summary>
@@ -983,6 +1230,21 @@ namespace MonoTouch.Dialog
 		{
 			return Value;
 		}
+		public override void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			/*
+			foreach (var e in (Parent as Section).Elements){
+						if  (e is EntryElement)
+							((EntryElement)e).entry.ResignFirstResponder ();
+			}
+			*/
+			entry.ResignFirstResponder();
+		}
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			entry.BecomeFirstResponder();
+			base.Selected (dvc, tableView, path);
+		}
 
 		// 
 		// Computes the X position for the entry by aligning all the entries in the Section
@@ -990,15 +1252,11 @@ namespace MonoTouch.Dialog
 		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
 			Section s = Parent as Section;
-			if (s.EntryAlignment.Width != 0)
-				return s.EntryAlignment;
-			
 			SizeF max = new SizeF (-1, -1);
 			foreach (var e in s.Elements){
 				var ee = e as EntryElement;
 				if (ee == null)
 					continue;
-				
 				var size = tv.StringSize (ee.Caption, font);
 				if (size.Width > max.Width)
 					max = size;				
@@ -1007,7 +1265,7 @@ namespace MonoTouch.Dialog
 			return s.EntryAlignment;
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (ekey);
 			if (cell == null){
@@ -1021,8 +1279,10 @@ namespace MonoTouch.Dialog
 				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
-					SecureTextEntry = isPassword
+					SecureTextEntry = isPassword,
+					Text = val
 				};
+				
 				entry.Text = Value ?? "";
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
@@ -1049,6 +1309,10 @@ namespace MonoTouch.Dialog
 					return true;
 				};
 				entry.Started += delegate {
+				
+			 	//	tv.SelectRow(this.IndexPath,true, UITableViewScrollPosition.Middle);
+			
+					
 					EntryElement self = null;
 					var returnType = UIReturnKeyType.Default;
 					
@@ -1060,6 +1324,21 @@ namespace MonoTouch.Dialog
 					}
 					entry.ReturnKeyType = returnType;
 				};
+				entry.EditingDidBegin += delegate {
+					if (tv.IndexPathForSelectedRow != null && tv.IndexPathForSelectedRow != this.IndexPath)
+						dvc.Deselected(tv.IndexPathForSelectedRow);
+					tv.SelectRow(this.IndexPath,true, UITableViewScrollPosition.None);
+					dvc.Selected(this.IndexPath);
+					
+			
+				};
+			}
+			else 
+			{
+				
+				SizeF size = ComputeEntryPosition (tv, cell);
+				
+				entry.Frame = 	new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height);
 			}
 			entry.KeyboardType = KeyboardType;
 			
@@ -1083,7 +1362,8 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				entry.Dispose ();
+				if (entry != null)
+					entry.Dispose ();
 				entry = null;
 			}
 		}
@@ -1094,23 +1374,53 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
+	
+	
+	
 	public class DateTimeElement : StringElement {
+		public enum PickerTypes {
+			DatePicker,Calendar	
+		}
+		public PickerTypes PickerType;
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
+		public CalendarMonthView calView;
+		private UIBarButtonItem leftOld;
+		private UIBarButtonItem rightOld;
+		private UIBarButtonItem switchButon;
+		private UIBarButtonItem doneButton;
+		public bool DisableSwitching;
+		public NSAction DoneEditing;
+		public DateSelected OnDateSelected;
+		public bool closeOnSelect;
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
 		};
 		
 		public DateTimeElement (string caption, DateTime date) : base (caption)
 		{
+			PickerType  = DateTimeElement.PickerTypes.Calendar;
 			DateValue = date;
-			Value = FormatDate (date);
+			Value = DateValue.ToShortDateString();
+		}	
+				
+		public DateTimeElement (string caption, DateTime date, PickerTypes pickerType) : base (caption)
+		{
+			PickerType = pickerType;
+			DateValue = date;
+			Value = DateValue.ToShortDateString();
 		}	
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
-			Value = FormatDate (DateValue);
-			return base.GetCell (tv);
+			if (DateValue.Year < 2000)
+				Value = "No Due Date";
+			else
+				Value = FormatDate(DateValue);
+			var cell =  base.GetCell (dvc,tv);
+			
+			
+			return cell;
 		}
  
 		protected override void Dispose (bool disposing)
@@ -1163,46 +1473,300 @@ namespace MonoTouch.Dialog
 			return new RectangleF (fX, fY, size.Width, size.Height);
 		}                                                                                                                                    
 
-		class MyViewController : UIViewController {
-			DateTimeElement container;
-			
-			public MyViewController (DateTimeElement container)
+		public override void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			//tableView.DeselectRow(path,true);
+			if (datePicker != null) 
 			{
-				this.container = container;
+				this.DateValue = (DateTime)datePicker.Date;
+				SlideDown(dvc,tableView,path);
 			}
+			if (calView != null)
+				CloseCalendar(dvc,tableView,path);
 			
-			public override void ViewWillDisappear (bool animated)
-			{
-				base.ViewWillDisappear (animated);
-				container.DateValue = container.datePicker.Date;
-			}
-			
-			public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
-			{
-				base.DidRotate (fromInterfaceOrientation);
-				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (SizeF.Empty));
-			}
-			
-			public bool Autorotate { get; set; }
-			
-			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
-			{
-				return Autorotate;
-			}
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			var vc = new MyViewController (this) {
-				Autorotate = dvc.Autorotate
-			};
-			datePicker = CreatePicker ();
-			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
-			                            
-			vc.View.BackgroundColor = UIColor.Black;
-			vc.View.AddSubview (datePicker);
-			dvc.ActivateController (vc);
+			if (DisableSwitching)
+				ShowDatePicker(dvc,tableView,path);			
+			else if (PickerType == DateTimeElement.PickerTypes.Calendar)
+				ShowCalendar(dvc,tableView,path);
+			else
+				ShowDatePicker(dvc,tableView,path);
+			
+			
 		}
+		
+		private void ShowCalendar(DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			if (calView == null)
+				calView = new CalendarMonthView(DateValue){
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth };
+			if (calView.Superview == null)
+			{
+				if (DateValue.Year < 2010)
+					DateValue = DateTime.Today;
+				calView.SizeThatFits(SizeF.Empty);
+				calView.OnDateSelected += (date) => {
+					if (OnDateSelected != null)
+						OnDateSelected(date);
+					DateValue = date;
+					Console.WriteLine(String.Format("Selected {0}", date.ToShortDateString()));					
+					if(closeOnSelect)
+						CloseCalendar(dvc,tableView,path);
+				};
+				
+				
+				tableView.Window.AddSubview(calView);
+				//dvc.View.Window.AddSubview(datePicker);	
+			    //
+				// size up the picker view to our screen and compute the start/end frame origin for our slide up animation
+				//
+				// compute the start frame
+				RectangleF screenRect =  tableView.Window.Frame;
+				
+				SizeF pickerSize = calView.Frame.Size;
+				RectangleF startRect = new RectangleF(0.0f,
+				                      screenRect.Y + screenRect.Size.Height,
+				                      pickerSize.Width, pickerSize.Height);
+				calView.Frame = startRect;
+				
+				// compute the end frame
+				RectangleF pickerRect = new RectangleF(0.0f,
+				                       screenRect.Y + screenRect.Size.Height - pickerSize.Height,
+				                       pickerSize.Width,
+				                       pickerSize.Height);
+				// start the slide up animation
+				UIView.BeginAnimations(null);
+				UIView.SetAnimationDuration(0.3);
+				
+				// we need to perform some post operations after the animation is complete
+				UIView.SetAnimationDelegate(dvc);
+				
+				calView.Frame = pickerRect;
+				
+				// shrink the table vertical size to make room for the date picker
+				RectangleF newFrame =  new RectangleF(tableView.Frame.X, tableView.Frame.Y,
+				                                      tableView.Frame.Size.Width, tableView.Frame.Size.Height + 55 - calView.Frame.Height) ;
+				// newFrame.Size.Height -= datePicker.Frame.Height;
+				tableView.Frame = newFrame;
+				UIView.CommitAnimations();
+				rightOld = dvc.NavigationItem.RightBarButtonItem;
+				//Multi Buttons
+				
+				// create a toolbar to have two buttons in the right
+				UIToolbar tools = new UIToolbar(new RectangleF(0, 0, 133, 44.01f));
+				// create the array to hold the buttons, which then gets added to the toolbar
+				List<UIBarButtonItem> buttons = new List<UIBarButtonItem>(3);
+
+				// create switch button
+				switchButon = new UIBarButtonItem("Switch",UIBarButtonItemStyle.Bordered,delegate{
+					CloseCalendar(dvc,tableView,path);
+					ShowDatePicker(dvc,tableView,path);
+				});
+				
+				buttons.Add(switchButon);
+				
+				// create a spacer
+				UIBarButtonItem spacer = new UIBarButtonItem(UIBarButtonSystemItem.FixedSpace,null,null);
+				buttons.Add(spacer);
+				
+				//create done button
+				doneButton = new UIBarButtonItem("Done",UIBarButtonItemStyle.Done, delegate{
+					//DateValue = calView.CurrentDate;
+					CloseCalendar(dvc,tableView,path);
+				});
+				buttons.Add(doneButton);
+
+				tools.SetItems(buttons.ToArray(),false);
+
+				//
+				dvc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(tools);
+
+				leftOld = dvc.NavigationItem.LeftBarButtonItem;
+				dvc.NavigationItem.LeftBarButtonItem =  new UIBarButtonItem("No Due Date",UIBarButtonItemStyle.Bordered, delegate{
+					DateValue = DateTime.MinValue;
+					if (OnDateSelected != null)
+						OnDateSelected(Util.DateTimeMin);
+					CloseCalendar(dvc,tableView,path);
+				});
+				// add the "Done" button to the nav bar
+				//dvc.NavigationItem.SetRightBarButtonItem(doneButton,true);
+				//
+			}
+		}
+		
+		private void CloseCalendar(DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			tableView.ReloadRows(new NSIndexPath[]{path},UITableViewRowAnimation.None);
+			RectangleF screenRect =  dvc.View.Window.Frame;
+			RectangleF endFrame = new RectangleF( calView.Frame.X,calView.Frame.Y + screenRect.Size.Height,
+			                                     calView.Frame.Size.Width,calView.Frame.Size.Height);
+			//endFrame.origin.y = screenRect.Y + screenRect.Size.Height;
+			
+			// start the slide down animation
+			UIView.BeginAnimations(null);
+			UIView.SetAnimationDuration(0.3);
+			
+			// we need to perform some post operations after the animation is complete
+			UIView.SetAnimationDelegate(dvc);
+			//UIView.SetAnimationDidStopSelector(slideDownDidStop());
+			
+			calView.Frame = endFrame;
+			UIView.CommitAnimations();
+			
+			// grow the table back again in vertical size to make room for the date picker
+			RectangleF newFrame = new RectangleF(tableView.Frame.X,tableView.Frame.Y
+			                                     ,tableView.Frame.Size.Width,tableView.Frame.Size.Height + calView.Frame.Size.Height);
+			
+			tableView.Frame = newFrame;
+			
+			// remove the "Done" button in the nav bar
+			dvc.NavigationItem.RightBarButtonItem = rightOld;
+			dvc.NavigationItem.LeftBarButtonItem = leftOld;
+			
+			// deselect the current table row
+			tableView.DeselectRow(path,true); 
+			calView.RemoveFromSuperview();	
+			calView = null;
+			if (DoneEditing != null)
+				DoneEditing();
+		}
+		
+		private void ShowDatePicker(DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			if (datePicker == null)
+				datePicker = CreatePicker();
+			if (datePicker.Superview == null)
+			{
+				if (DateValue.Year < 2010)
+					datePicker.Date = DateTime.Today;
+				else
+					datePicker.Date = DateValue ;
+				datePicker.MinimumDate = new DateTime(2010,1,1);
+				tableView.Window.AddSubview(datePicker);
+				//dvc.View.Window.AddSubview(datePicker);	
+			    //
+				// size up the picker view to our screen and compute the start/end frame origin for our slide up animation
+				//
+				// compute the start frame
+				RectangleF screenRect =  tableView.Window.Frame;
+				
+				SizeF pickerSize = datePicker.Frame.Size;
+				RectangleF startRect = new RectangleF(0.0f,
+				                      screenRect.Y + screenRect.Size.Height,
+				                      pickerSize.Width, pickerSize.Height);
+				datePicker.Frame = startRect;
+				
+				// compute the end frame
+				RectangleF pickerRect = new RectangleF(0.0f,
+				                       screenRect.Y + screenRect.Size.Height - pickerSize.Height,
+				                       pickerSize.Width,
+				                       pickerSize.Height);
+				// start the slide up animation
+				UIView.BeginAnimations(null);
+				UIView.SetAnimationDuration(0.3);
+				
+				// we need to perform some post operations after the animation is complete
+				UIView.SetAnimationDelegate(dvc);
+				
+				datePicker.Frame = pickerRect;
+				
+				// shrink the table vertical size to make room for the date picker
+				RectangleF newFrame =  new RectangleF(tableView.Frame.X, tableView.Frame.Y,
+				                                      tableView.Frame.Size.Width, tableView.Frame.Size.Height + 55 - datePicker.Frame.Height) ;
+				// newFrame.Size.Height -= datePicker.Frame.Height;
+				tableView.Frame = newFrame;
+				UIView.CommitAnimations();
+				rightOld = dvc.NavigationItem.RightBarButtonItem;
+				
+				
+				//create done button
+				doneButton = new UIBarButtonItem("Done",UIBarButtonItemStyle.Bordered, delegate{
+					SlideDown(dvc,tableView,path);
+				});
+				// create a toolbar to have two buttons in the right
+				
+				if(DisableSwitching)
+					dvc.NavigationItem.RightBarButtonItem = doneButton;
+				else 
+				{
+					UIToolbar tools = new UIToolbar(new RectangleF(0, 0, 133, 44.01f));
+				// create the array to hold the buttons, which then gets added to the toolbar
+					List<UIBarButtonItem> buttons = new List<UIBarButtonItem>(3);
+
+				// create switch button
+					switchButon = new UIBarButtonItem("Switch",UIBarButtonItemStyle.Bordered,delegate{
+						SlideDown(dvc,tableView,path);
+						ShowCalendar(dvc,tableView,path);
+					});
+				
+					buttons.Add(switchButon);
+					
+					// create a spacer
+					UIBarButtonItem spacer = new UIBarButtonItem(UIBarButtonSystemItem.FixedSpace,null,null);
+					buttons.Add(spacer);
+					
+					buttons.Add(doneButton);
+	
+					tools.SetItems(buttons.ToArray(),false);
+	
+					//
+					dvc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(tools);
+				}
+				
+
+				leftOld = dvc.NavigationItem.LeftBarButtonItem;
+				dvc.NavigationItem.LeftBarButtonItem =  new UIBarButtonItem("No Due Date",UIBarButtonItemStyle.Bordered, delegate{
+					datePicker.Date = DateTime.MinValue;
+					SlideDown(dvc,tableView,path);
+				});
+				// add the "Done" button to the nav bar
+				//dvc.NavigationItem.SetRightBarButtonItem(doneButton,true);
+				//
+			}
+		}
+		private void SlideDown(DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			
+			this.DateValue = datePicker.Date;
+			tableView.ReloadRows(new NSIndexPath[]{path},UITableViewRowAnimation.None);
+			RectangleF screenRect =  dvc.View.Window.Frame;
+			RectangleF endFrame = new RectangleF( datePicker.Frame.X,datePicker.Frame.Y + screenRect.Size.Height,
+			                                     datePicker.Frame.Size.Width,datePicker.Frame.Size.Height);
+			//endFrame.origin.y = screenRect.Y + screenRect.Size.Height;
+			
+			// start the slide down animation
+			UIView.BeginAnimations(null);
+			UIView.SetAnimationDuration(0.3);
+			
+			// we need to perform some post operations after the animation is complete
+			UIView.SetAnimationDelegate(dvc);
+			//UIView.SetAnimationDidStopSelector(slideDownDidStop());
+			
+			datePicker.Frame = endFrame;
+			UIView.CommitAnimations();
+			
+			// grow the table back again in vertical size to make room for the date picker
+			RectangleF newFrame = new RectangleF(tableView.Frame.X,tableView.Frame.Y
+			                                     ,tableView.Frame.Size.Width,tableView.Frame.Size.Height + datePicker.Frame.Size.Height);
+			
+			tableView.Frame = newFrame;
+			
+			// remove the "Done" button in the nav bar
+			dvc.NavigationItem.RightBarButtonItem = rightOld;
+			dvc.NavigationItem.LeftBarButtonItem = leftOld;
+			
+			// deselect the current table row
+			tableView.DeselectRow(path,true); 
+			datePicker.RemoveFromSuperview();	
+			datePicker = null;
+			if (DoneEditing != null)
+				DoneEditing();
+			
+		}
+		
 	}
 	
 	public class DateElement : DateTimeElement {
@@ -1225,13 +1789,13 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class TimeElement : DateTimeElement {
-		public TimeElement (string caption, DateTime date) : base (caption, date)
+		public TimeElement (string caption, DateTime date) : base (caption,date)
 		{
 		}
 		
 		public override string FormatDate (DateTime dt)
 		{
-			return dt.ToLocalTime ().ToShortTimeString ();
+			return dt.ToLocalTime().ToShortTimeString ();
 		}
 		
 		public override UIDatePicker CreatePicker ()
@@ -1281,7 +1845,7 @@ namespace MonoTouch.Dialog
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
@@ -1442,8 +2006,8 @@ namespace MonoTouch.Dialog
 			if (element == null)
 				return;
 			
-			Elements.Add (element);
 			element.Parent = this;
+			Elements.Add (element);
 			
 			if (Parent != null)
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
@@ -1674,7 +2238,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 			
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = new UITableViewCell (UITableViewCellStyle.Default, "");
 			cell.TextLabel.Text = "Section was used for Element";
@@ -1699,15 +2263,27 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class RadioGroup : Group {
 		public int Selected;
+		public string SelectedValue;
+		
+		public RadioGroup (string key, string theValue) : base (key)
+		{
+			SelectedValue = theValue;
+		}
 		
 		public RadioGroup (string key, int selected) : base (key)
 		{
 			Selected = selected;
+			SelectedValue = "";
 		}
 		
+		public RadioGroup (string theValue) : base (null)
+		{
+			SelectedValue = theValue;
+		}
 		public RadioGroup (int selected) : base (null)
 		{
-			Selected = selected;
+			Selected = selected;			
+			SelectedValue = "";
 		}
 	}
 	
@@ -1817,7 +2393,7 @@ namespace MonoTouch.Dialog
 				uint row = 0;
 				
 				foreach (Element e in s.Elements){
-					if (!(e is RadioElement))
+					if (!(e is RadioElement || e is RadioImageElement))
 						continue;
 					
 					if (current == idx){
@@ -2065,7 +2641,22 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		
+		public string RadioSelectedValue {
+			get {
+				var radio = group as RadioGroup;
+				if (radio != null)
+					return radio.SelectedValue;
+				return "";
+			}
+			set {
+				var radio = group as RadioGroup;
+				if (radio != null)
+					radio.SelectedValue = value;
+			}
+		}
+		
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (rkey);
 			if (cell == null){
@@ -2076,15 +2667,24 @@ namespace MonoTouch.Dialog
 			} 
 		
 			cell.TextLabel.Text = Caption;
+			
 			var radio = group as RadioGroup;
 			if (radio != null){
 				int selected = radio.Selected;
+				
 				int current = 0;
 				
 				foreach (var s in Sections){
 					foreach (var e in s.Elements){
-						if (!(e is RadioElement))
-							continue;
+						if (!(e is RadioElement ))
+							if (e is RadioImageElement)
+								if( (e as RadioImageElement).Value == radio.SelectedValue)
+								{
+									cell.DetailTextLabel.Text = e.Summary ();
+									goto le;
+								}
+							else									
+								continue;
 						
 						if (current == selected){
 							cell.DetailTextLabel.Text = e.Summary ();

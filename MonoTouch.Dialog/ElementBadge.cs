@@ -15,6 +15,7 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
+using MonoTouch.OpenGLES;
 
 namespace MonoTouch.Dialog
 {	
@@ -42,12 +43,12 @@ namespace MonoTouch.Dialog
 		UIImage image;
 		UIFont font;
 	
-		public BadgeElement (UIImage badgeImage, string cellText)
-			: this (badgeImage, cellText, null)
+		public BadgeElement (UIImage badgeImage, string cellText, string detail)
+			: this (badgeImage, cellText, detail,null)
 		{
 		}
 
-		public BadgeElement (UIImage badgeImage, string cellText, NSAction tapped) : base (cellText)
+		public BadgeElement (UIImage badgeImage, string cellText, string detail, NSAction tapped) : base (cellText,detail)
 		{
 			if (badgeImage == null)
 				throw new ArgumentNullException ("badgeImage");
@@ -70,11 +71,11 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public override UITableViewCell GetCell (UITableView tv)
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (ckey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, ckey) {
+				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, ckey) {
 					SelectionStyle = UITableViewCellSelectionStyle.Blue
 				};
 			}
@@ -85,7 +86,8 @@ namespace MonoTouch.Dialog
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = Lines;
 			tl.ContentMode = ContentMode;
-			
+			if (Detail != null)
+			    cell.DetailTextLabel.Text = Detail;
 			cell.ImageView.Image = image;
 			
 			return cell;
@@ -114,6 +116,7 @@ namespace MonoTouch.Dialog
 		
 		public static UIImage MakeCalendarBadge (UIImage template, string smallText, string bigText)
 		{
+			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
 				using (var context = new CGBitmapContext (IntPtr.Zero, 57, 57, 8, 57*4, cs, CGImageAlphaInfo.PremultipliedLast)){
 					//context.ScaleCTM (0.5f, -1);
@@ -152,5 +155,6 @@ namespace MonoTouch.Dialog
 				}
 			}
 		}
-	}
+		
+		}
 }
