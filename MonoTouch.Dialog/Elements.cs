@@ -512,7 +512,7 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
-                static NSString skeyvalue = new NSString ("StringElementValue");
+		static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
 		
@@ -594,9 +594,9 @@ namespace MonoTouch.Dialog
 			var tl = cell.TextLabel;
 			tl.Text = Caption;
 			tl.TextAlignment = Alignment;
-			tl.TextColor = TextColor == null ? UIColor.Black : TextColor;
-			tl.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
-			tl.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
+			tl.TextColor = TextColor ?? UIColor.Black;
+			tl.BackgroundColor = BackgroundColor ?? UIColor.White;
+			tl.Font = Font ?? UIFont.SystemFontOfSize (14);
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = 0;			
 			// The check is needed because the cell might have been recycled.
@@ -615,8 +615,9 @@ namespace MonoTouch.Dialog
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (280, float.MaxValue);
-			using (var font = UIFont.FromName ("Helvetica", 17f))
-				return tableView.StringSize (Caption, font, size, LineBreakMode).Height;
+			
+			var font = Font ?? UIFont.SystemFontOfSize (14);
+			return tableView.StringSize (Caption, font, size, LineBreakMode).Height;
 		}
 	}
 	
