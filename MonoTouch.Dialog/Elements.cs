@@ -8,6 +8,11 @@
 //
 // Code licensed under the MIT X11 license
 //
+// TODO: StyledStringElement: merge with multi-line?
+// TODO: StyledStringElement: add image scaling features?
+// TODO: StyledStringElement: add sizing based on image size?
+// TODO: Move image rendering to StyledImageElement?
+//
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +21,7 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
+using MonoTouch.Dialog.Utilities;
 
 namespace MonoTouch.Dialog
 {
@@ -96,6 +102,17 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
+		}
+
+		/// <summary>
+		/// If the cell is attached will return the immediate RootElement
+		/// </summary>
+		public RootElement GetImmediateRootElement ()
+		{
+				var section = Parent as Section;
+				if (section == null)
+					return null;
+				return section.Parent as RootElement;
 		}
 		
 		/// <summary>
@@ -565,11 +582,13 @@ namespace MonoTouch.Dialog
 			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
 		}
 	}
-
+	
 	/// <summary>
-	///   A version of the StringElement that can be styled with a number of options.
+	///   A version of the StringElement that can be styled with a number of formatting 
+	///   options and can render images or background images either from UIImage parameters 
+	///   or by downloading them from the net.
 	/// </summary>
-	public class StyledStringElement : StringElement {
+	public class StyledStringElement : StringElement, IImageUpdated {
 		static NSString skey = new NSString ("StyledStringElement");
 
 		public StyledStringElement (string caption) : base (caption) {}
@@ -578,14 +597,75 @@ namespace MonoTouch.Dialog
 		
 		public UIFont Font;
 		public UIColor TextColor;
-		public UIColor BackgroundColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
+		UITableViewCell cell;
 		
+		// To keep the size down for a StyleStringElement, we put all the image information
+		// on a separate structure, and create this on demand.
+		ImageInfo imageInfo;
+		
+		class ImageInfo {
+			public UIImage Image; // Maybe add BackgroundImage?
+			public UIColor BackgroundColor;
+			public Uri Uri, BackgroundUri;
+		}
+
+		ImageInfo OnImageInfo ()
+		{
+			if (imageInfo == null)
+				imageInfo = new ImageInfo ();
+			return imageInfo;
+		}
+		
+		// Uses the specified image (use this or ImageUri)
+		public UIImage Image {
+			get {
+				return imageInfo == null ? null : imageInfo.Image;
+			}
+			set {
+				OnImageInfo ().Image = value;
+				imageInfo.Uri = null;
+			}
+		}
+		
+		// Loads the image from the specified uri (use this or Image)
+		public Uri ImageUri {
+			get {
+				return imageInfo == null ? null : imageInfo.Uri;
+			}
+			set {
+				OnImageInfo ().Uri = value;
+				imageInfo.Image = null;
+			}
+		}
+		
+		// Background color for the cell (alternative: BackgroundUri)
+		public UIColor BackgroundColor {
+			get {
+				return imageInfo == null ? null : imageInfo.BackgroundColor;
+			}
+			set {
+				OnImageInfo ().BackgroundColor = value;
+				imageInfo.BackgroundUri = null;
+			}
+		}
+		
+		// Uri for a Background image (alternatiev: BackgroundColor)
+		public Uri BackgroundUri {
+			get {
+				return imageInfo == null ? null : imageInfo.BackgroundUri;
+			}
+			set {
+				OnImageInfo ().BackgroundUri = value;
+				imageInfo.BackgroundColor = null;
+			}
+		}
+			
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (skey);
+			cell = tv.DequeueReusableCell (skey);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
@@ -595,16 +675,58 @@ namespace MonoTouch.Dialog
 			tl.Text = Caption;
 			tl.TextAlignment = Alignment;
 			tl.TextColor = TextColor ?? UIColor.Black;
-			tl.BackgroundColor = BackgroundColor ?? UIColor.White;
-			tl.Font = Font ?? UIFont.SystemFontOfSize (14);
+			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = 0;			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
 			
+			if (imageInfo == null){
+				cell.ContentView.BackgroundColor = null;
+				tl.BackgroundColor = null;
+			} else {
+				var imgView = cell.ImageView;
+				UIImage img;
+				
+				if (imageInfo.Uri != null)
+					img = ImageLoader.RequestImage (imageInfo.Uri, this);
+				else if (imageInfo.Image != null)
+					img = imageInfo.Image;
+				else 
+					img = null;
+				imgView.Image = img;
+				
+				// 
+				// Technically, this should be done in the WillDisplay handler, and not
+				// in getcell, but I do not want every DVC to pay the price for WillDisplay
+				// when it is only this cell that uses it.
+				//
+				if (imageInfo.BackgroundColor != null){
+					cell.ContentView.BackgroundColor = imageInfo.BackgroundColor;
+					tl.BackgroundColor = UIColor.Clear;
+				} else if (imageInfo.BackgroundUri != null){
+					img = ImageLoader.RequestImage (imageInfo.BackgroundUri, this);
+					//cell.ContentView.BackgroundColor = img == null ? UIColor.White : UIColor.FromPatternImage (img);
+					//tl.BackgroundColor = UIColor.Clear;
+					cell.BackgroundColor = img == null ? null : UIColor.FromPatternImage (img);
+				} else {
+					cell.ContentView.BackgroundColor = null;
+					tl.BackgroundColor = null;
+				}
+			}
 			return cell;
-		}		
+		}	
+
+		void IImageUpdated.UpdatedImage (Uri uri)
+		{
+			if (uri == null || imageInfo == null || cell == null)
+				return;
+			var root = GetImmediateRootElement ();
+			if (root == null || root.TableView == null)
+				return;
+			root.TableView.ReloadRows (new NSIndexPath [] { IndexPath }, UITableViewRowAnimation.None);
+		}	
 	}
 	
 	public class StyledMultilineElement : StyledStringElement, IElementSizing {
