@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
+using MonoTouch.Dialog.Utilities;
 using System.Threading;
+using System.Drawing;
 
 namespace Sample
 {
@@ -10,11 +12,18 @@ namespace Sample
 	{
 		public void DemoStyled () 
 		{
+			var imageBackground = new Uri ("file://" + Path.GetFullPath ("background.png"));
+			var image = ImageLoader.RequestImage (imageBackground, null);
+			var small = image.Scale (new SizeF (32, 32));
+			
+			var imageIcon = new StyledStringElement ("Local image icon") {
+				Image = small
+			};
 			var backgroundImage = new StyledStringElement ("Image downloaded") {
 				BackgroundUri = new Uri ("http://www.google.com/images/logos/ps_logo2.png")
 			};
 			var localImage = new StyledStringElement ("Local image"){
-				BackgroundUri = new Uri ("file://" + Path.GetFullPath ("background.png"))
+				BackgroundUri = imageBackground
 			};
 			
 			var backgroundSolid = new StyledStringElement ("Solid background") {
@@ -26,6 +35,9 @@ namespace Sample
 				DetailColor = UIColor.Green,
 			};
 			var root = new RootElement("Styled Elements") {
+				new Section ("Image icon"){
+					imageIcon
+				},
 				new Section ("Background") { 
 					backgroundImage, backgroundSolid, localImage
 				},
