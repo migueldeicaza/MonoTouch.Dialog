@@ -121,7 +121,7 @@ namespace MonoTouch.Dialog.Utilities
 					return null;
 			}
 
-			string picfile = PicDir + md5 (uri.AbsoluteUri);
+			string picfile = uri.IsFile ? uri.LocalPath : PicDir + md5 (uri.AbsoluteUri);
 			if (File.Exists (picfile)){
 				ret = UIImage.FromFileUncached (picfile);
 				if (ret != null){
@@ -130,6 +130,8 @@ namespace MonoTouch.Dialog.Utilities
 					return ret;
 				}
 			} 
+			if (uri.IsFile)
+				return null;
 			QueueRequest (uri, picfile, notify);
 			return null;
 		}
