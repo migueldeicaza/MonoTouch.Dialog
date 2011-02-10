@@ -88,6 +88,7 @@
     <Compile Include="DemoLoadMore.cs" />
     <Compile Include="DemoEditing.cs" />
     <Compile Include="DemoOwnerDrawnElement.cs" />
+    <Compile Include="DemoStyled.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />
@@ -110,5 +111,6 @@
     <Content Include="jakub-calendar.png" />
     <Content Include="favorite.png" />
     <Content Include="favorited.png" />
+    <Content Include="background.png" />
   </ItemGroup>
 </Project>

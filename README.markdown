@@ -601,7 +601,7 @@ use:
     To be used as "buttons", pass a delegate for this.
   * StyledStringElement
     Similar to StringElement but allows for the Font, TextColor, 
-    and BackgroundColor to be set on a per-cell basis.
+    images and accessories to be set on a per-cell basis.
   * MultilineElement
     Derives from StringElement, used to render multi-line cells.
   * RadioElements (to provide a radio-button feature).
@@ -636,8 +636,8 @@ for example:
 The cost of a StringElement is very low, it uses 8 bytes: 4 for the label alignment
 information, and 4 for the text to be displayed.
 
-StyleStringElement
-------------------
+StyledStringElement
+-------------------
 
 This class derives from StringElement but lets developers customize a handful of
 properties like the Font, the text color, the background cell color, the line
@@ -647,9 +647,22 @@ be displayed.
 For example:
 
 	 var l = new StyleStringElement ("Report Spam") {
-		BackgroundColor = UIColor.Red,
+		BackgroundUri = new Uri ("file://" + Path.GetFullPath ("cute.png"),
 		TextColor = UIColor.White
 	 };
+
+The StyledStringElement also can be configured at creation time to
+pick one of the four standard cell types to render information, for example:
+
+	 new StyledStringElement ("Default", "Invisible value", UITableViewCellStyle.Default),
+	 new StyledStringElement ("Value1", "Aligned on each side", UITableViewCellStyle.Value1),
+	 new StyledStringElement ("Value2", "Like the Addressbook", UITableViewCellStyle.Value2),
+	 new StyledStringElement ("Subtitle", "Makes it sound more important", UITableViewCellStyle.Subtitle),
+	 new StyledStringElement ("Subtitle", "Brown subtitle", UITableViewCellStyle.Subtitle) {
+	 	 DetailColor = UIColor.Brown
+	 }
+
+See the Styled element sample for more information
 
 EntryElement
 ------------

@@ -320,6 +320,17 @@ namespace MonoTouch.Dialog
 				return element.GetCell (tableView);
 			}
 			
+			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+			{
+				if (Root.NeedColorUpdate){
+					var section = Root.Sections [indexPath.Section];
+					var element = section.Elements [indexPath.Row];
+					var colorized = element as IColorizeBackground;
+					if (colorized != null)
+						colorized.WillDisplay (tableView, cell, indexPath);
+				}
+			}
+			
 			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
 				Container.Selected (indexPath);

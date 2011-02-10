@@ -588,86 +588,102 @@ namespace MonoTouch.Dialog
 	///   options and can render images or background images either from UIImage parameters 
 	///   or by downloading them from the net.
 	/// </summary>
-	public class StyledStringElement : StringElement, IImageUpdated {
-		static NSString skey = new NSString ("StyledStringElement");
-
-		public StyledStringElement (string caption) : base (caption) {}
-		public StyledStringElement (string caption, string value) : base (caption, value) {}
-		public StyledStringElement (string caption, NSAction tapped) : base (caption, tapped) {}
+	public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
+		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
 		
+		public StyledStringElement (string caption) : base (caption) {}
+		public StyledStringElement (string caption, NSAction tapped) : base (caption, tapped) {}
+		public StyledStringElement (string caption, string value) : base (caption, value) 
+		{
+			style = UITableViewCellStyle.Value1;	
+		}
+		public StyledStringElement (string caption, string value, UITableViewCellStyle style) : base (caption, value) 
+		{ 
+			this.style = style;
+		}
+		
+		UITableViewCellStyle style;
 		public UIFont Font;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
-		UITableViewCell cell;
 		
 		// To keep the size down for a StyleStringElement, we put all the image information
 		// on a separate structure, and create this on demand.
-		ImageInfo imageInfo;
+		ExtraInfo extraInfo;
 		
-		class ImageInfo {
+		class ExtraInfo {
 			public UIImage Image; // Maybe add BackgroundImage?
-			public UIColor BackgroundColor;
+			public UIColor BackgroundColor, DetailColor;
 			public Uri Uri, BackgroundUri;
 		}
 
-		ImageInfo OnImageInfo ()
+		ExtraInfo OnImageInfo ()
 		{
-			if (imageInfo == null)
-				imageInfo = new ImageInfo ();
-			return imageInfo;
+			if (extraInfo == null)
+				extraInfo = new ExtraInfo ();
+			return extraInfo;
 		}
 		
 		// Uses the specified image (use this or ImageUri)
 		public UIImage Image {
 			get {
-				return imageInfo == null ? null : imageInfo.Image;
+				return extraInfo == null ? null : extraInfo.Image;
 			}
 			set {
 				OnImageInfo ().Image = value;
-				imageInfo.Uri = null;
+				extraInfo.Uri = null;
 			}
 		}
 		
 		// Loads the image from the specified uri (use this or Image)
 		public Uri ImageUri {
 			get {
-				return imageInfo == null ? null : imageInfo.Uri;
+				return extraInfo == null ? null : extraInfo.Uri;
 			}
 			set {
 				OnImageInfo ().Uri = value;
-				imageInfo.Image = null;
+				extraInfo.Image = null;
 			}
 		}
 		
 		// Background color for the cell (alternative: BackgroundUri)
 		public UIColor BackgroundColor {
 			get {
-				return imageInfo == null ? null : imageInfo.BackgroundColor;
+				return extraInfo == null ? null : extraInfo.BackgroundColor;
 			}
 			set {
 				OnImageInfo ().BackgroundColor = value;
-				imageInfo.BackgroundUri = null;
+				extraInfo.BackgroundUri = null;
+			}
+		}
+		
+		public UIColor DetailColor {
+			get {
+				return extraInfo == null ? null : extraInfo.DetailColor;
+			}
+			set {
+				OnImageInfo ().DetailColor = value;
 			}
 		}
 		
 		// Uri for a Background image (alternatiev: BackgroundColor)
 		public Uri BackgroundUri {
 			get {
-				return imageInfo == null ? null : imageInfo.BackgroundUri;
+				return extraInfo == null ? null : extraInfo.BackgroundUri;
 			}
 			set {
 				OnImageInfo ().BackgroundUri = value;
-				imageInfo.BackgroundColor = null;
+				extraInfo.BackgroundColor = null;
 			}
 		}
 			
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			cell = tv.DequeueReusableCell (skey);
+			var cell = tv.DequeueReusableCell (skey [(int)style]);
 			if (cell == null){
-				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
+				cell = new UITableViewCell (style, skey [(int)style]);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
 			cell.Accessory = Accessory;
@@ -677,50 +693,60 @@ namespace MonoTouch.Dialog
 			tl.TextColor = TextColor ?? UIColor.Black;
 			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
 			tl.LineBreakMode = LineBreakMode;
-			tl.Lines = 0;			
+			tl.Lines = 0;	
+			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
 			
-			if (imageInfo == null){
+			if (extraInfo == null){
 				cell.ContentView.BackgroundColor = null;
 				tl.BackgroundColor = null;
 			} else {
 				var imgView = cell.ImageView;
 				UIImage img;
 				
-				if (imageInfo.Uri != null)
-					img = ImageLoader.RequestImage (imageInfo.Uri, this);
-				else if (imageInfo.Image != null)
-					img = imageInfo.Image;
+				if (extraInfo.Uri != null)
+					img = ImageLoader.RequestImage (extraInfo.Uri, this);
+				else if (extraInfo.Image != null)
+					img = extraInfo.Image;
 				else 
 					img = null;
 				imgView.Image = img;
 				
-				// 
-				// Technically, this should be done in the WillDisplay handler, and not
-				// in getcell, but I do not want every DVC to pay the price for WillDisplay
-				// when it is only this cell that uses it.
-				//
-				if (imageInfo.BackgroundColor != null){
-					cell.ContentView.BackgroundColor = imageInfo.BackgroundColor;
-					tl.BackgroundColor = UIColor.Clear;
-				} else if (imageInfo.BackgroundUri != null){
-					img = ImageLoader.RequestImage (imageInfo.BackgroundUri, this);
-					//cell.ContentView.BackgroundColor = img == null ? UIColor.White : UIColor.FromPatternImage (img);
-					//tl.BackgroundColor = UIColor.Clear;
-					cell.BackgroundColor = img == null ? null : UIColor.FromPatternImage (img);
-				} else {
-					cell.ContentView.BackgroundColor = null;
-					tl.BackgroundColor = null;
-				}
+				if (cell.DetailTextLabel != null)
+					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
 			}
 			return cell;
 		}	
+	
+		void ClearBackground (UITableViewCell cell)
+		{
+			cell.BackgroundColor = UIColor.White;
+			cell.TextLabel.BackgroundColor = UIColor.Clear;
+		}
+
+		void IColorizeBackground.WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+		{
+			if (extraInfo == null){
+				ClearBackground (cell);
+				return;
+			}
+			
+			if (extraInfo.BackgroundColor != null){
+				cell.BackgroundColor = extraInfo.BackgroundColor;
+				cell.TextLabel.BackgroundColor = UIColor.Clear;
+			} else if (extraInfo.BackgroundUri != null){
+				var img = ImageLoader.RequestImage (extraInfo.BackgroundUri, this);
+				cell.BackgroundColor = img == null ? UIColor.White : UIColor.FromPatternImage (img);
+				cell.TextLabel.BackgroundColor = UIColor.Clear;
+			} else 
+				ClearBackground (cell);
+		}
 
 		void IImageUpdated.UpdatedImage (Uri uri)
 		{
-			if (uri == null || imageInfo == null || cell == null)
+			if (uri == null || extraInfo == null)
 				return;
 			var root = GetImmediateRootElement ();
 			if (root == null || root.TableView == null)
@@ -789,8 +815,22 @@ namespace MonoTouch.Dialog
 		
 	}
 	
+	/// <summary>
+	///   This interface is implemented by Element classes that will have
+	///   different heights
+	/// </summary>
 	public interface IElementSizing {
 		float GetHeight (UITableView tableView, NSIndexPath indexPath);
+	}
+	
+	/// <summary>
+	///   This interface is implemented by Elements that needs to update
+	///   their cells Background properties just before they are displayed
+	///   to the user.   This is an iOS 3 requirement to properly render
+	///   a cell.
+	/// </summary>
+	public interface IColorizeBackground {
+		void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath);
 	}
 	
 	public class MultilineElement : StringElement, IElementSizing {
@@ -1918,6 +1958,11 @@ namespace MonoTouch.Dialog
 		public Func<RootElement, UIViewController> createOnSelected;
 		internal UITableView TableView;
 		
+		// This is used to indicate that we need the DVC to dispatch calls to
+		// WillDisplayCell so we can prepare the color of the cell before 
+		// display
+		public bool NeedColorUpdate;
+		
 		/// <summary>
 		///  Initializes a RootSection with a caption
 		/// </summary>
@@ -2038,6 +2083,8 @@ namespace MonoTouch.Dialog
 						re.RadioIdx = current++;
 					if (UnevenRows == false && e is IElementSizing)
 						UnevenRows = true;
+					if (NeedColorUpdate == false && e is IColorizeBackground)
+						NeedColorUpdate = true;
 				}
 			}
 		}
