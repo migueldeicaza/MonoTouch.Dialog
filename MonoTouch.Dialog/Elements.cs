@@ -11,7 +11,7 @@
 // TODO: StyledStringElement: merge with multi-line?
 // TODO: StyledStringElement: add image scaling features?
 // TODO: StyledStringElement: add sizing based on image size?
-// TODO: Move image rendering to StyledImageElement?
+// TODO: Move image rendering to StyledImageElement, reason to do this: the image loader would only be imported in this case, linked out otherwise
 //
 using System;
 using System.Collections;

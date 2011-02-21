@@ -43,12 +43,13 @@ namespace Sample
 					new StringElement ("Row Editing Support", DemoEditing),
 					new StringElement ("Owner Drawn Element", DemoOwnerDrawnElement),
 				},
+				new Section ("Container features"){
+					new StringElement ("Pull to Refresh", DemoRefresh),
+					new StringElement ("Headers and Footers", DemoHeadersFooters)
+				}
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)
 				},
-				new Section ("Other"){
-					new StringElement ("Headers and Footers", DemoHeadersFooters)
-				}
 			};
 
 			var dv = new DialogViewController (menu) {
