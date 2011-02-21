@@ -112,7 +112,7 @@ namespace MonoTouch.Dialog
 				refreshView.SetActivity (true);
 			refreshRequested (this, EventArgs.Empty);
 
-			if (showStatus && refreshView != null){
+			if (reloading && showStatus && refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
 				UIView.SetAnimationDuration (0.2);
 				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
