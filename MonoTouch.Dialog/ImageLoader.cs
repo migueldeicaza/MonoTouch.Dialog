@@ -1,8 +1,5 @@
 // Copyright 2010-2011 Miguel de Icaza
 //
-// TODO:
-//   Make the LRUcache also track image sizes, and limit the size of the cache that way
-//
 // Based on the TweetStation specific ImageStore
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,6 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,14 +36,35 @@ using System.Security.Cryptography;
 
 namespace MonoTouch.Dialog.Utilities 
 {
+	/// <summary>
+	///    This interface needs to be implemented to be notified when an image
+	///    has been downloaded.   The notification will happen on the UI thread.
+	///    Upon notification, the code should call RequestImage again, this time
+	///    the image will be loaded from the on-disk cache or the in-memory cache.
+	/// </summary>
 	public interface IImageUpdated {
 		void UpdatedImage (Uri uri);
 	}
 	
-	//
-	// Provides an interface to download pictures in the background
-	// and keep a local cache of the original files + rounded versions
-	// 
+	/// <summary>
+	///   Network image loader, with local file system cache and in-memory cache
+	/// </summary>
+	/// <remarks>
+	///   By default, using the static public methods will use an in-memory cache
+	///   for 50 images and 4 megs total.   The behavior of the static methods 
+	///   can be modified by setting the public DefaultLoader property to a value
+	///   that the user configured.
+	/// 
+	///   The instance methods can be used to create different imageloader with 
+	///   different properties.
+	///  
+	///   Keep in mind that the phone does not have a lot of memory, and using
+	///   the cache with the unlimited value (0) even with a number of items in
+	///   the cache can consume memory very quickly.
+	/// 
+	///   Use the Purge method to release all the memory kept in the caches on
+	///   low memory conditions, or when the application is sent to the background.
+	/// </remarks>
 
 	public class ImageLoader
 	{
@@ -69,7 +88,13 @@ namespace MonoTouch.Dialog.Utilities
 		
 		static MD5CryptoServiceProvider checksum = new MD5CryptoServiceProvider ();
 		
-		readonly public static ImageLoader DefaultLoader = new ImageLoader (50);
+		/// <summary>
+		///    This contains the default loader which is configured to be 50 images
+		///    up to 4 megs of memory.   Assigning to this property a new value will
+		///    change the behavior.   This property is lazyly computed, the first time
+		///    an image is requested.
+		/// </summary>
+		public static ImageLoader DefaultLoader;
 		
 		static ImageLoader ()
 		{
@@ -83,16 +108,39 @@ namespace MonoTouch.Dialog.Utilities
 			requestQueue = new Stack<Uri> ();
 		}
 		
-		public ImageLoader (int cacheSize)
+		/// <summary>
+		///   Creates a new instance of the image loader
+		/// </summary>
+		/// <param name="cacheSize">
+		/// The maximum number of entries in the LRU cache
+		/// </param>
+		/// <param name="memoryLimit">
+		/// The maximum number of bytes to consume by the image loader cache.
+		/// </param>
+		public ImageLoader (int cacheSize, int memoryLimit)
 		{
-			cache = new LRUCache<Uri, UIImage> (cacheSize);
+			cache = new LRUCache<Uri, UIImage> (cacheSize, memoryLimit, sizer);
 		}
 		
+		static int sizer (UIImage img)
+		{
+			var cg = img.CGImage;
+			return cg.BytesPerRow * cg.Height;
+		}
+		
+		/// <summary>
+		///    Purges the contents of the DefaultLoader
+		/// </summary>
 		public static void Purge ()
 		{
-			DefaultLoader.PurgeCache ();
+			if (DefaultLoader != null)
+				DefaultLoader.PurgeCache ();
 		}
 		
+		/// <summary>
+		///    Purges the cache of this instance of the ImageLoader, releasing 
+		///    all the memory used by the images in the caches.
+		/// </summary>
 		public void PurgeCache ()
 		{
 			cache.Purge ();
@@ -107,7 +155,6 @@ namespace MonoTouch.Dialog.Utilities
 
 		static string md5 (string input)
 		{
-			var checksum  = new MD5CryptoServiceProvider ();
 			var bytes = checksum.ComputeHash (Encoding.UTF8.GetBytes (input));
 			var ret = new char [32];
 			for (int i = 0; i < 16; i++){
@@ -117,11 +164,37 @@ namespace MonoTouch.Dialog.Utilities
 			return new string (ret);
 		}
 		
+		/// <summary>
+		///   Requests an image to be loaded using the default image loader
+		/// </summary>
+		/// <param name="uri">
+		/// The URI for the image to load
+		/// </param>
+		/// <param name="notify">
+		/// A class implementing the IImageUpdated interface that will be invoked when the image has been loaded
+		/// </param>
+		/// <returns>
+		/// If the image has already been downloaded, or is in the cache, this will return the image as a UIImage.
+		/// </returns>
 		public static UIImage DefaultRequestImage (Uri uri, IImageUpdated notify)
 		{
+			if (DefaultLoader == null)
+				DefaultLoader = new ImageLoader (50, 4*1024*1024);
 			return DefaultLoader.RequestImage (uri, notify);
 		}
 		
+		/// <summary>
+		///   Requests an image to be loaded from the network
+		/// </summary>
+		/// <param name="uri">
+		/// The URI for the image to load
+		/// </param>
+		/// <param name="notify">
+		/// A class implementing the IImageUpdated interface that will be invoked when the image has been loaded
+		/// </param>
+		/// <returns>
+		/// If the image has already been downloaded, or is in the cache, this will return the image as a UIImage.
+		/// </returns>
 		public UIImage RequestImage (Uri uri, IImageUpdated notify)
 		{
 			UIImage ret;
