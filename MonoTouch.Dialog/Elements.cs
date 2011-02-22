@@ -707,7 +707,7 @@ namespace MonoTouch.Dialog
 				UIImage img;
 				
 				if (extraInfo.Uri != null)
-					img = ImageLoader.RequestImage (extraInfo.Uri, this);
+					img = ImageLoader.DefaultRequestImage (extraInfo.Uri, this);
 				else if (extraInfo.Image != null)
 					img = extraInfo.Image;
 				else 
@@ -737,7 +737,7 @@ namespace MonoTouch.Dialog
 				cell.BackgroundColor = extraInfo.BackgroundColor;
 				cell.TextLabel.BackgroundColor = UIColor.Clear;
 			} else if (extraInfo.BackgroundUri != null){
-				var img = ImageLoader.RequestImage (extraInfo.BackgroundUri, this);
+				var img = ImageLoader.DefaultLoader.RequestImage (extraInfo.BackgroundUri, this);
 				cell.BackgroundColor = img == null ? UIColor.White : UIColor.FromPatternImage (img);
 				cell.TextLabel.BackgroundColor = UIColor.Clear;
 			} else 

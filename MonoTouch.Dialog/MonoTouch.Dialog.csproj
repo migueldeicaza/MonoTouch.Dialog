@@ -93,9 +93,12 @@
     <Compile Include="OwnerDrawnElement.cs" />
     <Compile Include="ImageLoader.cs" />
     <Compile Include="LRUCache.cs" />
+    <Compile Include="MessageElement.cs" />
+    <Compile Include="Utilities\Graphics.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
+    <Folder Include="Utilities\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\arrow.png">

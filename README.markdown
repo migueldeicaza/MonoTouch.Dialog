@@ -6,11 +6,17 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
+In addition to being a simple way to create dialogs, it also has been
+growing to contains a number of utility functions that are useful for
+iPhone development.
+
 MonoTouch.Dialog is a retained system for implementing UITableViews
 as opposed to the on-demand nature of UITableView.
 
 Currently this supports creating Dialogs based on navigation controllers 
-that support:
+that support both basic and advanced cells.
+
+Some basic cells include:
 
   * On/Off controls
   * Slider (floats)
@@ -20,9 +26,13 @@ that support:
   * Jump to HTML page
   * Radio elements
   * Dates, Times and Dates+Times
-  * Arbitary UIViews
   * Pull-to-refresh functionality.
   * Activity indicators
+
+Advanced cells include:
+  * Container for arbitrary UIViews
+  * Mail-like message displays
+  * Styled cells, with optional image downloading
 
 The entire UI for TweetStation (http://github.com/migueldeicaza/TweetStation)
 an app published on the AppStore was built entirely using MonoTouch.Dialog.
@@ -662,7 +672,7 @@ pick one of the four standard cell types to render information, for example:
 	 	 DetailColor = UIColor.Brown
 	 }
 
-See the Styled element sample for more information
+See the Styled element sample for more information.
 
 EntryElement
 ------------
@@ -886,3 +896,26 @@ In these methods you will need to override three methods:
 
 See the DemoEditing.cs sample for an example that shows what these
 methods should do.
+
+Image Loading
+=============
+
+MonoTouch.Dialog now incorporates TweetStation's image loader.  This
+image loader can be used to load images in the background, supports
+caching and can notify your code when the image has been loaded.
+
+It will also limit the number of outgoing network connections.
+
+The image loader is implemented in the ImageLoader class, all you need
+to do is call the DefaultRequestImage method, you will need to provide
+the Uri for the image you want to load, as well as an instance of the
+IImageUpdated interface which will be invoked when the image has been
+loaded.
+
+The ImageLoader exposes a "Purge()" method that you can call when you
+want to release all of the images that are currently cached in memory.
+The current code has a cache for 50 images.  If you want to use a
+different cache size (for instance, if you are expecting the images to
+be too large that 50 images would be too much), you can just create
+instances of ImageLoader and pass the number of images you want to
+keep in the cache.

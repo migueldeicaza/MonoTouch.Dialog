@@ -47,14 +47,14 @@ namespace MonoTouch.Dialog.Utilities
 	// and keep a local cache of the original files + rounded versions
 	// 
 
-	public static class ImageLoader
+	public class ImageLoader
 	{
         public readonly static string BaseDir = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.Personal), "..");
 		const int MaxRequests = 6;
 		static string PicDir; 
 		
 		// Cache of recently used images
-		static LRUCache<Uri,UIImage> cache;
+		LRUCache<Uri,UIImage> cache;
 		
 		// A list of requests that have been issues, with a list of objects to notify.
 		static Dictionary<Uri, List<IImageUpdated>> pendingRequests;
@@ -69,6 +69,8 @@ namespace MonoTouch.Dialog.Utilities
 		
 		static MD5CryptoServiceProvider checksum = new MD5CryptoServiceProvider ();
 		
+		readonly public static ImageLoader DefaultLoader = new ImageLoader (50);
+		
 		static ImageLoader ()
 		{
 			PicDir = Path.Combine (BaseDir, "Library/Caches/Pictures.MonoTouch.Dialog/");
@@ -76,17 +78,26 @@ namespace MonoTouch.Dialog.Utilities
 			if (!Directory.Exists (PicDir))
 				Directory.CreateDirectory (PicDir);
 			
-			cache = new LRUCache<Uri,UIImage> (50);
 			pendingRequests = new Dictionary<Uri,List<IImageUpdated>> ();
 			queuedUpdates = new HashSet<Uri>();
 			requestQueue = new Stack<Uri> ();
 		}
 		
+		public ImageLoader (int cacheSize)
+		{
+			cache = new LRUCache<Uri, UIImage> (cacheSize);
+		}
+		
 		public static void Purge ()
+		{
+			DefaultLoader.PurgeCache ();
+		}
+		
+		public void PurgeCache ()
 		{
 			cache.Purge ();
 		}
-
+		
 		static int hex (int v)
 		{
 			if (v < 10)
@@ -106,7 +117,12 @@ namespace MonoTouch.Dialog.Utilities
 			return new string (ret);
 		}
 		
-		public static UIImage RequestImage (Uri uri, IImageUpdated notify)
+		public static UIImage DefaultRequestImage (Uri uri, IImageUpdated notify)
+		{
+			return DefaultLoader.RequestImage (uri, notify);
+		}
+		
+		public UIImage RequestImage (Uri uri, IImageUpdated notify)
 		{
 			UIImage ret;
 			

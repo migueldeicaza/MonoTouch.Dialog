@@ -13,7 +13,7 @@ namespace Sample
 		public void DemoStyled () 
 		{
 			var imageBackground = new Uri ("file://" + Path.GetFullPath ("background.png"));
-			var image = ImageLoader.RequestImage (imageBackground, null);
+			var image = ImageLoader.DefaultRequestImage (imageBackground, null);
 			var small = image.Scale (new SizeF (32, 32));
 			
 			var imageIcon = new StyledStringElement ("Local image icon") {
