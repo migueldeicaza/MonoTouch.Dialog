@@ -3,7 +3,7 @@ using MonoTouch.CoreGraphics;
 using System.Drawing;
 namespace MonoTouch.Dialog
 {
-	public static class Graphics {
+	public static class GraphicsUtil {
 		
 		/// <summary>
 		///    Creates a path for a rectangle with rounded corners
@@ -35,9 +35,24 @@ namespace MonoTouch.Dialog
 		
 		public static void FillRoundedRect (CGContext ctx, RectangleF rect, float radius)
 		{
-				var p = Graphics.MakeRoundedRectPath (rect, 3);
+				var p = GraphicsUtil.MakeRoundedRectPath (rect, 3);
 				ctx.AddPath (p);
 				ctx.FillPath ();
+		}
+
+		public static CGPath MakeRoundedPath (float size, float radius)
+		{
+			float hsize = size/2;
+			
+			var path = new CGPath ();
+			path.MoveToPoint (size, hsize);
+			path.AddArcToPoint (size, size, hsize, size, radius);
+			path.AddArcToPoint (0, size, 0, hsize, radius);
+			path.AddArcToPoint (0, 0, hsize, 0, radius);
+			path.AddArcToPoint (size, 0, size, hsize, radius);
+			path.CloseSubpath ();
+			
+			return path;
 		}
 	}
 }
