@@ -13,15 +13,19 @@ namespace MonoTouch.Dialog
 {
 	public class LoadMoreElement : Element, IElementSizing
 	{
+		static NSString key = new NSString ("LoadMoreElement");
 		public string NormalCaption { get; set; }
 		public string LoadingCaption { get; set; }
+		public UIColor TextColor { get; set; }
+		public UIColor BackgroundColor { get; set; }
+		public event Action<LoadMoreElement> Tapped = null;
+		public UIFont Font;
+		UITextAlignment alignment = UITextAlignment.Center;
+		bool animating;
 		
-		Action<LoadMoreElement> tapped = null;
-		
-		UITableViewCell cell;
-		UIActivityIndicatorView activityIndicator;
-		UILabel caption;
-		UIFont font;
+		public LoadMoreElement () : base ("")
+		{
+		}
 		
 		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped) : this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (16), UIColor.Black)
 		{
@@ -29,39 +33,66 @@ namespace MonoTouch.Dialog
 		
 		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped, UIFont font, UIColor textColor) : base ("")
 		{
-			this.NormalCaption = normalCaption;
-			this.LoadingCaption = loadingCaption;
-			this.tapped = tapped;
-			this.font = font;
+			NormalCaption = normalCaption;
+			LoadingCaption = loadingCaption;
+			Tapped += tapped;
+			Font = font;
+			TextColor = textColor;
+		}
+		
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (key);
+			UIActivityIndicatorView activityIndicator;
+			UILabel caption;
 			
-			cell = new UITableViewCell (UITableViewCellStyle.Default, "loadMoreElement");
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
 			
-			activityIndicator = new UIActivityIndicatorView () {
-				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
-				Hidden = true
-			};
-			activityIndicator.StopAnimating ();
-			
-			caption = new UILabel () {
-				Font = font,
-				Text = this.NormalCaption,
-				TextColor = textColor,
-				BackgroundColor = UIColor.Clear,
-				TextAlignment = UITextAlignment.Center,
-				AdjustsFontSizeToFitWidth = false,
-			};
-			
-			Layout ();
-			
-			cell.ContentView.AddSubview (caption);
-			cell.ContentView.AddSubview (activityIndicator);
+				activityIndicator = new UIActivityIndicatorView () {
+					ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
+					Tag = 1
+				};
+				caption = new UILabel () {
+					AdjustsFontSizeToFitWidth = false,
+					Tag = 2
+				};
+				cell.ContentView.AddSubview (caption);
+				cell.ContentView.AddSubview (activityIndicator);
+			} else {
+				activityIndicator = cell.ContentView.ViewWithTag (1) as UIActivityIndicatorView;
+				caption = cell.ContentView.ViewWithTag (2) as UILabel;
+			}
+			if (Animating){
+				caption.Text = LoadingCaption;
+				activityIndicator.Hidden = false;
+				activityIndicator.StartAnimating ();
+			} else {
+				caption.Text = NormalCaption;
+				activityIndicator.Hidden = true;
+				activityIndicator.StopAnimating ();
+			}
+			caption.BackgroundColor = BackgroundColor ?? UIColor.Clear;
+			caption.TextColor = TextColor ?? UIColor.Black;
+			caption.Font = Font ?? UIFont.BoldSystemFontOfSize (16);
+			caption.TextAlignment = Alignment;
+			Layout (cell, activityIndicator, caption);
+			return cell;
 		}
 		
 		public bool Animating {
 			get {
-				return activityIndicator.IsAnimating;
+				return animating;
 			}
 			set {
+				if (animating == value)
+					return;
+				animating = value;
+				var cell = GetActiveCell ();
+				if (cell == null)
+					return;
+				var activityIndicator = cell.ContentView.ViewWithTag (1) as UIActivityIndicatorView;
+				var caption = cell.ContentView.ViewWithTag (2) as UILabel;
 				if (value){
 					caption.Text = LoadingCaption;
 					activityIndicator.Hidden = false;
@@ -71,14 +102,8 @@ namespace MonoTouch.Dialog
 					activityIndicator.Hidden = true;
 					caption.Text = NormalCaption;
 				}
-				Layout ();
+				Layout (cell, activityIndicator, caption);
 			}
-		}
-				
-		public override UITableViewCell GetCell (UITableView tv)
-		{
-			Layout ();
-			return cell;
 		}
 				
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
@@ -88,18 +113,15 @@ namespace MonoTouch.Dialog
 			if (Animating)
 				return;
 			
-			if (tapped != null){
+			if (Tapped != null){
 				Animating = true;
-				Layout ();
+				Tapped (this);
 			}
-			
-			if (tapped != null)
-				tapped (this);
 		}
 		
-		SizeF GetTextSize ()
+		SizeF GetTextSize (string text)
 		{
-			return new NSString (caption.Text).StringSize (font, UIScreen.MainScreen.Bounds.Width, UILineBreakMode.TailTruncation);
+			return new NSString (text).StringSize (Font, UIScreen.MainScreen.Bounds.Width, UILineBreakMode.TailTruncation);
 		}
 		
 		const int pad = 10;
@@ -107,14 +129,14 @@ namespace MonoTouch.Dialog
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return GetTextSize ().Height + 2*pad;
+			return GetTextSize (Animating ? LoadingCaption : NormalCaption).Height + 2*pad;
 		}
 		
-		void Layout ()
+		void Layout (UITableViewCell cell, UIActivityIndicatorView activityIndicator, UILabel caption)
 		{
 			var sbounds = cell.ContentView.Bounds;
 
-			var size = GetTextSize ();
+			var size = GetTextSize (Animating ? LoadingCaption : NormalCaption);
 			
 			if (!activityIndicator.Hidden)
 				activityIndicator.Frame = new RectangleF ((sbounds.Width-size.Width)/2-isize*2, pad, isize, isize);
@@ -122,22 +144,11 @@ namespace MonoTouch.Dialog
 			caption.Frame = new RectangleF (10, pad, sbounds.Width-20, size.Height);
 		}
 		
-		public UITextAlignment Alignment {
-			get {
-				return caption.TextAlignment;
-			}
-			set {
-				caption.TextAlignment = value;
-			}
+		public UITextAlignment Alignment { 
+			get { return alignment; } 
+			set { alignment = value; }
 		}
-		public UITableViewCellAccessory Accessory {
-			get {
-				return cell.Accessory;
-			}
-			set {
-				cell.Accessory = value;
-			}
-		}
+		public UITableViewCellAccessory Accessory { get; set; }
 	}
 }
 
