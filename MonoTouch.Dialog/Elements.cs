@@ -737,7 +737,7 @@ namespace MonoTouch.Dialog
 				cell.BackgroundColor = extraInfo.BackgroundColor;
 				cell.TextLabel.BackgroundColor = UIColor.Clear;
 			} else if (extraInfo.BackgroundUri != null){
-				var img = ImageLoader.DefaultLoader.RequestImage (extraInfo.BackgroundUri, this);
+				var img = ImageLoader.DefaultRequestImage (extraInfo.BackgroundUri, this);
 				cell.BackgroundColor = img == null ? UIColor.White : UIColor.FromPatternImage (img);
 				cell.TextLabel.BackgroundColor = UIColor.Clear;
 			} else 

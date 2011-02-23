@@ -57,7 +57,7 @@ namespace MonoTouch.Dialog {
 				var crect = new RectangleF (Bounds.Width-20-boxWidth, 32, boxWidth, 16);
 				
 				UIColor.Gray.SetFill ();
-				Graphics.FillRoundedRect (ctx, crect, 3);
+				GraphicsUtil.FillRoundedRect (ctx, crect, 3);
 				UIColor.White.SetColor ();
 				crect.X += 5;
 				DrawString (ms, crect, CountFont);
