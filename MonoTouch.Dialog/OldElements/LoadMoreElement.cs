@@ -20,6 +20,7 @@ namespace MonoTouch.Dialog
 		public UIColor BackgroundColor { get; set; }
 		public event Action<LoadMoreElement> Tapped = null;
 		public UIFont Font;
+		public float? Height;
 		UITextAlignment alignment = UITextAlignment.Center;
 		bool animating;
 		
@@ -72,7 +73,12 @@ namespace MonoTouch.Dialog
 				activityIndicator.Hidden = true;
 				activityIndicator.StopAnimating ();
 			}
-			caption.BackgroundColor = BackgroundColor ?? UIColor.Clear;
+			if (BackgroundColor != null){
+				cell.ContentView.BackgroundColor = BackgroundColor ?? UIColor.Clear;
+			} else {
+				cell.ContentView.BackgroundColor = null;
+			}
+			caption.BackgroundColor = UIColor.Clear;
 			caption.TextColor = TextColor ?? UIColor.Black;
 			caption.Font = Font ?? UIFont.BoldSystemFontOfSize (16);
 			caption.TextAlignment = Alignment;
@@ -129,7 +135,7 @@ namespace MonoTouch.Dialog
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return GetTextSize (Animating ? LoadingCaption : NormalCaption).Height + 2*pad;
+			return Height ?? GetTextSize (Animating ? LoadingCaption : NormalCaption).Height + 2*pad;
 		}
 		
 		void Layout (UITableViewCell cell, UIActivityIndicatorView activityIndicator, UILabel caption)
