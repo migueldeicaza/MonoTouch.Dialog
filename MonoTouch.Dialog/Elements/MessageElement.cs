@@ -121,7 +121,6 @@ namespace MonoTouch.Dialog {
 		
 		class MessageCell : UITableViewCell {
 			MessageSummaryView view;
-			MessageElement me;
 			
 			public MessageCell () : base (UITableViewCellStyle.Default, mKey)
 			{

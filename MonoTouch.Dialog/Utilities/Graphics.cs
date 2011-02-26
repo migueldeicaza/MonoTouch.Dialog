@@ -19,15 +19,19 @@ namespace MonoTouch.Dialog
 		/// </returns>
 		public static CGPath MakeRoundedRectPath (RectangleF rect, float radius)
 		{
-			float size = rect.Width;
-			float hsize = size/2;
-			
+			float minx = rect.Left;
+			float midx = rect.Left + (rect.Width)/2;
+			float maxx = rect.Right;
+			float miny = rect.Top;
+			float midy = rect.Y+rect.Size.Width/2;
+			float maxy = rect.Bottom;
+
 			var path = new CGPath ();
-			path.MoveToPoint (rect.Right, rect.Top+hsize);
-			path.AddArcToPoint (rect.Right, rect.Bottom, rect.Left+hsize, rect.Bottom, radius);
-			path.AddArcToPoint (rect.Left, rect.Bottom, rect.Left, rect.Top+hsize, radius);
-			path.AddArcToPoint (rect.Left, rect.Top, rect.Left+hsize, rect.Top, radius);
-			path.AddArcToPoint (rect.Right, rect.Top, rect.Right, rect.Top+hsize, radius);
+			path.MoveToPoint (minx, midy);
+			path.AddArcToPoint (minx, miny, midx, miny, radius);
+			path.AddArcToPoint (maxx, miny, maxx, midy, radius);
+			path.AddArcToPoint (maxx, maxy, midx, maxy, radius);
+			path.AddArcToPoint (minx, maxy, minx, midy, radius);
 			path.CloseSubpath ();
 			
 			return path;
