@@ -240,7 +240,7 @@ namespace MonoTouch.Dialog.Utilities
 				slot.Add (notify);
 				pendingRequests [uri] = slot;
 				
-				if (requestQueue.Count >= MaxRequests)
+				if (picDownloaders >= MaxRequests)
 					requestQueue.Push (uri);
 				else {
 					ThreadPool.QueueUserWorkItem (delegate { 
