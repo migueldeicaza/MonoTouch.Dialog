@@ -23,7 +23,7 @@ namespace MonoTouch.Dialog
 			float midx = rect.Left + (rect.Width)/2;
 			float maxx = rect.Right;
 			float miny = rect.Top;
-			float midy = rect.Y+rect.Size.Width/2;
+			float midy = rect.Y+rect.Size.Height/2;
 			float maxy = rect.Bottom;
 
 			var path = new CGPath ();
@@ -31,7 +31,7 @@ namespace MonoTouch.Dialog
 			path.AddArcToPoint (minx, miny, midx, miny, radius);
 			path.AddArcToPoint (maxx, miny, maxx, midy, radius);
 			path.AddArcToPoint (maxx, maxy, midx, maxy, radius);
-			path.AddArcToPoint (minx, maxy, minx, midy, radius);
+			path.AddArcToPoint (minx, maxy, minx, midy, radius);		
 			path.CloseSubpath ();
 			
 			return path;
