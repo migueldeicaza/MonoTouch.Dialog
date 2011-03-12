@@ -107,6 +107,7 @@
     <Compile Include="DemoStyled.cs" />
     <Compile Include="DemoRefresh.cs" />
     <Compile Include="DemoContainerStyle.cs" />
+    <Compile Include="DemoIndex.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />

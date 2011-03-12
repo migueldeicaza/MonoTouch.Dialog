@@ -1986,7 +1986,7 @@ namespace MonoTouch.Dialog
 	///    Sections are added by calling the Add method which supports the
 	///    C# 4.0 syntax to initialize a RootElement in one pass.
 	/// </remarks>
-	public class RootElement : Element, IEnumerable {
+	public class RootElement : Element, IEnumerable, IEnumerable<Section> {
 		static NSString rkey = new NSString ("RootElement");
 		int summarySection, summaryElement;
 		internal Group group;
@@ -2299,7 +2299,13 @@ namespace MonoTouch.Dialog
 		/// <returns>
 		/// A <see cref="IEnumerator"/>
 		/// </returns>
-		public IEnumerator GetEnumerator ()
+		IEnumerator IEnumerable.GetEnumerator ()
+		{
+			foreach (var s in Sections)
+				yield return s;
+		}
+		
+		IEnumerator<Section> IEnumerable<Section>.GetEnumerator ()
 		{
 			foreach (var s in Sections)
 				yield return s;
