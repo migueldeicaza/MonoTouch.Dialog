@@ -41,6 +41,7 @@ namespace Sample
 					new StyledStringElement ("Styled Elements", DemoStyled) { BackgroundUri = new Uri ("file://" + p) },
 					new StringElement ("Load More Sample", DemoLoadMore),
 					new StringElement ("Row Editing Support", DemoEditing),
+					new StringElement ("Advanced Editing Support", DemoAdvancedEditing),
 					new StringElement ("Owner Drawn Element", DemoOwnerDrawnElement),
 				},
 				new Section ("Container features"){
