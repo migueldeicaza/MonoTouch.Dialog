@@ -531,12 +531,17 @@ namespace MonoTouch.Dialog
 			};
 			web.LoadStarted += delegate {
 				NetworkActivity = true;
+				var indicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.White);
+				vc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(indicator);
+				indicator.StartAnimating();
 			};
 			web.LoadFinished += delegate {
 				NetworkActivity = false;
+				vc.NavigationItem.RightBarButtonItem = null;
 			};
 			web.LoadError += (webview, args) => {
 				NetworkActivity = false;
+				vc.NavigationItem.RightBarButtonItem = null;
 				if (web != null)
 					web.LoadHtmlString (String.Format ("<html><center><font size=+5 color='red'>An error occurred:<br>{0}</font></center></html>", args.Error.LocalizedDescription), null);
 			};
