@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/MonoTouch.Dialog/!svn/ver/5/trunk/MonoTouch.Dialog/Elements
+END
+ElementBadge.cs
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/MonoTouch.Dialog/!svn/ver/5/trunk/MonoTouch.Dialog/Elements/ElementBadge.cs
+END
+MessageElement.cs
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/MonoTouch.Dialog/!svn/ver/5/trunk/MonoTouch.Dialog/Elements/MessageElement.cs
+END
+OwnerDrawnElement.cs
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/MonoTouch.Dialog/!svn/ver/5/trunk/MonoTouch.Dialog/Elements/OwnerDrawnElement.cs
+END
+ActivityElement.cs
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/MonoTouch.Dialog/!svn/ver/5/trunk/MonoTouch.Dialog/Elements/ActivityElement.cs
+END

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/MonoTouch.Dialog/!svn/ver/7/trunk/MonoTouch.Dialog
+END
+Elements.cs
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/MonoTouch.Dialog/!svn/ver/9/trunk/MonoTouch.Dialog/Elements.cs
+END
+DialogViewController.cs
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/MonoTouch.Dialog/!svn/ver/7/trunk/MonoTouch.Dialog/DialogViewController.cs
+END
+MonoTouch.Dialog.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/MonoTouch.Dialog/!svn/ver/5/trunk/MonoTouch.Dialog/MonoTouch.Dialog.csproj
+END
+Reflect.cs
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/MonoTouch.Dialog/!svn/ver/8/trunk/MonoTouch.Dialog/Reflect.cs
+END
