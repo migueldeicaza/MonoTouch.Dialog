@@ -1339,8 +1339,8 @@ namespace MonoTouch.Dialog
 					Tag = 1,
 					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword
+					Text = Value ?? ""
 				};
-				entry.Text = Value ?? "";
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
