@@ -1338,9 +1338,9 @@ namespace MonoTouch.Dialog
 				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
-					SecureTextEntry = isPassword
+					SecureTextEntry = isPassword,
+					Text = Value ?? ""
 				};
-				entry.Text = Value ?? "";
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
