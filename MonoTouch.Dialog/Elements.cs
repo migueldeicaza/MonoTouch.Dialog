@@ -1182,7 +1182,7 @@ namespace MonoTouch.Dialog
 		public UIKeyboardType KeyboardType = UIKeyboardType.Default;
 		
 		static NSString ekey = new NSString ("EntryElement");
-		bool isPassword;
+		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
@@ -1313,6 +1313,10 @@ namespace MonoTouch.Dialog
 					entry.ReturnKeyType = returnType;
 				};
 			}
+			if (becomeResponder){
+				entry.BecomeFirstResponder ();
+				becomeResponder = false;
+			}
 			entry.KeyboardType = KeyboardType;
 			
 			cell.TextLabel.Text = Caption;
@@ -1320,6 +1324,9 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
+		/// <summary>
+		///  Copies the value from the currently entry UIView to the Value property and raises the Changed event if necessary.
+		/// </summary>
 		public void FetchValue ()
 		{
 			if (entry == null)
@@ -1346,6 +1353,25 @@ namespace MonoTouch.Dialog
 		public override bool Matches (string text)
 		{
 			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
+		}
+		
+		/// <summary>
+		/// Makes this cell the first responder (get the focus)
+		/// </summary>
+		/// <param name="animated">
+		/// Whether scrolling to the location of this cell should be animated
+		/// </param>
+		public void BecomeFirstResponder (bool animated)
+		{
+			becomeResponder = true;
+			var tv = GetContainerTableView ();
+			if (tv == null)
+				return;
+			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
+			if (entry != null){
+				entry.BecomeFirstResponder ();
+				becomeResponder = false;
+			}
 		}
 	}
 	
