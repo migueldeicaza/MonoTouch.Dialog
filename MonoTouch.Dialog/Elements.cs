@@ -8,6 +8,11 @@
 //
 // Code licensed under the MIT X11 license
 //
+// TODO: StyledStringElement: merge with multi-line?
+// TODO: StyledStringElement: add image scaling features?
+// TODO: StyledStringElement: add sizing based on image size?
+// TODO: Move image rendering to StyledImageElement, reason to do this: the image loader would only be imported in this case, linked out otherwise
+//
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +21,7 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
+using MonoTouch.Dialog.Utilities;
 
 namespace MonoTouch.Dialog
 {
@@ -112,6 +118,42 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
+		/// If the cell is attached will return the immediate RootElement
+		/// </summary>
+		public RootElement GetImmediateRootElement ()
+		{
+				var section = Parent as Section;
+				if (section == null)
+					return null;
+				return section.Parent as RootElement;
+		}
+		
+		/// <summary>
+		/// Returns the UITableView associated with this element, or null if this cell is not currently attached to a UITableView
+		/// </summary>
+		public UITableView GetContainerTableView ()
+		{
+			var root = GetImmediateRootElement ();
+			if (root == null)
+				return null;
+			return root.TableView;
+		}
+		
+		/// <summary>
+		/// Returns the currently active UITableViewCell for this element, or null if the element is not currently visible
+		/// </summary>
+		public UITableViewCell GetActiveCell ()
+		{
+			var tv = GetContainerTableView ();
+			if (tv == null)
+				return null;
+			var path = IndexPath;
+			if (path == null)
+				return null;
+			return tv.CellAt (path);
+		}
+		
+		/// <summary>
 		///  Returns the IndexPath of a given element.   This is only valid for leaf elements,
 		///  it does not work for a toplevel RootElement or a Section of if the Element has
 		///  not been attached yet.
@@ -203,7 +245,7 @@ namespace MonoTouch.Dialog
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
 			if (sw == null){
-				sw = new UISwitch (new RectangleF (198, 12, 94, 27)){
+				sw = new UISwitch (){
 					BackgroundColor = UIColor.Clear,
 					Tag = 1,
 					On = Value
@@ -221,7 +263,7 @@ namespace MonoTouch.Dialog
 				RemoveTag (cell, 1);
 		
 			cell.TextLabel.Text = Caption;
-			cell.ContentView.AddSubview (sw);
+			cell.AccessoryView = sw;
 
 			return cell;
 		}
@@ -357,6 +399,7 @@ namespace MonoTouch.Dialog
 	///  Used to display a slider on the screen.
 	/// </summary>
 	public class FloatElement : Element {
+		public bool ShowCaption;
 		public float Value;
 		public float MinValue, MaxValue;
 		static NSString skey = new NSString ("FloatElement");
@@ -374,8 +417,22 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
+			var cell = tv.DequeueReusableCell (skey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
+				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			} else
+				RemoveTag (cell, 1);
+
+			SizeF captionSize = new SizeF (0, 0);
+			if (Caption != null && ShowCaption){
+				cell.TextLabel.Text = Caption;
+				captionSize = cell.TextLabel.StringSize (Caption, UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
+				captionSize.Width += 10; // Spacing
+			}
+
 			if (slider == null){
-				slider = new UISlider (new RectangleF (10f, 12f, 280f, 7f)){
+				slider = new UISlider (new RectangleF (10f + captionSize.Width, 12f, 280f - captionSize.Width, 7f)){
 					BackgroundColor = UIColor.Clear,
 					MinValue = this.MinValue,
 					MaxValue = this.MaxValue,
@@ -387,12 +444,6 @@ namespace MonoTouch.Dialog
 					Value = slider.Value;
 				};
 			}
-			var cell = tv.DequeueReusableCell (skey);
-			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-			} else
-				RemoveTag (cell, 1);
 			
 			cell.ContentView.AddSubview (slider);
 			return cell;
@@ -501,12 +552,17 @@ namespace MonoTouch.Dialog
 			};
 			web.LoadStarted += delegate {
 				NetworkActivity = true;
+				var indicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.White);
+				vc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(indicator);
+				indicator.StartAnimating();
 			};
 			web.LoadFinished += delegate {
 				NetworkActivity = false;
+				vc.NavigationItem.RightBarButtonItem = null;
 			};
 			web.LoadError += (webview, args) => {
 				NetworkActivity = false;
+				vc.NavigationItem.RightBarButtonItem = null;
 				if (web != null)
 					web.LoadHtmlString (String.Format ("<html><center><font size=+5 color='red'>An error occurred:<br>{0}</font></center></html>", args.Error.LocalizedDescription), null);
 			};
@@ -524,6 +580,7 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
+		static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
 		
@@ -549,10 +606,10 @@ namespace MonoTouch.Dialog
 				
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (skey);
+			var cell = tv.DequeueReusableCell (Value == null ? skey : skeyvalue);
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Value1, skey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
 			}
 			cell.Accessory = UITableViewCellAccessory.None;
 			cell.TextLabel.Text = Caption;
@@ -584,52 +641,199 @@ namespace MonoTouch.Dialog
 	}
 
 	/// <summary>
-	///   A version of the StringElement that can be styled with a number of options.
+	///   A version of the StringElement that can be styled with a number of formatting 
+	///   options and can render images or background images either from UIImage parameters 
+	///   or by downloading them from the net.
 	/// </summary>
-	public class StyledStringElement : StringElement {
-		static NSString skey = new NSString ("StyledStringElement");
+	public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
+		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
 
 		public StyledStringElement (string caption) : base (caption) {}
-		public StyledStringElement (string caption, string value) : base (caption, value) {}
 		public StyledStringElement (string caption, NSAction tapped) : base (caption, tapped) {}
+		public StyledStringElement (string caption, string value) : base (caption, value) 
+		{
+			style = UITableViewCellStyle.Value1;	
+		}
+		public StyledStringElement (string caption, string value, UITableViewCellStyle style) : base (caption, value) 
+		{ 
+			this.style = style;
+		}
 		
+		UITableViewCellStyle style;
 		public UIFont Font;
 		public UIColor TextColor;
-		public UIColor BackgroundColor;
-		public UILineBreakMode LineBreakMode = UILineBreakMode.CharacterWrap;
+		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
-		public UIView BackgroundView;
+		// To keep the size down for a StyleStringElement, we put all the image information
+		// on a separate structure, and create this on demand.
+		ExtraInfo extraInfo;
 		
-		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+		class ExtraInfo {
+			public UIImage Image; // Maybe add BackgroundImage?
+			public UIColor BackgroundColor, DetailColor;
+			public Uri Uri, BackgroundUri;
+		}
+
+		ExtraInfo OnImageInfo ()
 		{
-			var cell = tv.DequeueReusableCell (skey);
+			if (extraInfo == null)
+				extraInfo = new ExtraInfo ();
+			return extraInfo;
+		}
+		
+		// Uses the specified image (use this or ImageUri)
+		public UIImage Image {
+			get {
+				return extraInfo == null ? null : extraInfo.Image;
+			}
+			set {
+				OnImageInfo ().Image = value;
+				extraInfo.Uri = null;
+			}
+		}
+		
+		// Loads the image from the specified uri (use this or Image)
+		public Uri ImageUri {
+			get {
+				return extraInfo == null ? null : extraInfo.Uri;
+			}
+			set {
+				OnImageInfo ().Uri = value;
+				extraInfo.Image = null;
+			}
+		}
+		
+		// Background color for the cell (alternative: BackgroundUri)
+		public UIColor BackgroundColor {
+			get {
+				return extraInfo == null ? null : extraInfo.BackgroundColor;
+			}
+			set {
+				OnImageInfo ().BackgroundColor = value;
+				extraInfo.BackgroundUri = null;
+			}
+		}
+		
+		public UIColor DetailColor {
+			get {
+				return extraInfo == null ? null : extraInfo.DetailColor;
+			}
+			set {
+				OnImageInfo ().DetailColor = value;
+			}
+		}
+		
+		// Uri for a Background image (alternatiev: BackgroundColor)
+		public Uri BackgroundUri {
+			get {
+				return extraInfo == null ? null : extraInfo.BackgroundUri;
+			}
+			set {
+				OnImageInfo ().BackgroundUri = value;
+				extraInfo.BackgroundColor = null;
+			}
+		}
+			
+		protected virtual string GetKey (int style)
+		{
+			return skey [style];
+		}
+		
+		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)		{
+			var key = GetKey ((int) style);
+			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
-				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
+				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
+			PrepareCell (cell);
+			return cell;
+		}
+		
+		void PrepareCell (UITableViewCell cell)
+		{
 			cell.Accessory = Accessory;
 			var tl = cell.TextLabel;
 			tl.Text = Caption;
 			tl.TextAlignment = Alignment;
-			tl.TextColor = TextColor == null ? UIColor.Black : TextColor;
-			tl.BackgroundColor = BackgroundColor == null ? UIColor.White : BackgroundColor;
-			tl.Font = Font == null ? UIFont.SystemFontOfSize (14) : Font;
-			tl.LineBreakMode = UILineBreakMode.WordWrap;
+			tl.TextColor = TextColor ?? UIColor.Black;
+			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
+			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = 0;			
+			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
 			
-			if (BackgroundView != null)
-			{
-				//BackgroundView.Frame = cell.ContentView.Bounds;
-				cell.BackgroundView = BackgroundView;
+			if (extraInfo == null){
+				cell.ContentView.BackgroundColor = null;
+				tl.BackgroundColor = null;
+			} else {
+				var imgView = cell.ImageView;
+				UIImage img;
+				
+				if (extraInfo.Uri != null)
+					img = ImageLoader.DefaultRequestImage (extraInfo.Uri, this);
+				else if (extraInfo.Image != null)
+					img = extraInfo.Image;
+				else 
+					img = null;
+				imgView.Image = img;
+				
+				if (cell.DetailTextLabel != null)
+					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+		}		
+	}
+	
+		void ClearBackground (UITableViewCell cell)
+		{
+			cell.BackgroundColor = UIColor.White;
+			cell.TextLabel.BackgroundColor = UIColor.Clear;
+		}
+
+		void IColorizeBackground.WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+		{
+			if (extraInfo == null){
+				ClearBackground (cell);
+				return;
 			}
 			
-			return cell;
-		}		
+			if (extraInfo.BackgroundColor != null){
+				cell.BackgroundColor = extraInfo.BackgroundColor;
+				cell.TextLabel.BackgroundColor = UIColor.Clear;
+			} else if (extraInfo.BackgroundUri != null){
+				var img = ImageLoader.DefaultRequestImage (extraInfo.BackgroundUri, this);
+				cell.BackgroundColor = img == null ? UIColor.White : UIColor.FromPatternImage (img);
+				cell.TextLabel.BackgroundColor = UIColor.Clear;
+			} else 
+				ClearBackground (cell);
+		}
+
+		void IImageUpdated.UpdatedImage (Uri uri)
+		{
+			if (uri == null || extraInfo == null)
+				return;
+			var root = GetImmediateRootElement ();
+			if (root == null || root.TableView == null)
+				return;
+			root.TableView.ReloadRows (new NSIndexPath [] { IndexPath }, UITableViewRowAnimation.None);
+		}	
+	}
+	
+	public class StyledMultilineElement : StyledStringElement, IElementSizing {
+		public StyledMultilineElement (string caption) : base (caption) {}
+		public StyledMultilineElement (string caption, string value) : base (caption, value) {}
+		public StyledMultilineElement (string caption, NSAction tapped) : base (caption, tapped) {}
+
+		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		{
+			SizeF size = new SizeF (280, float.MaxValue);
+			
+			var font = Font ?? UIFont.SystemFontOfSize (14);
+			return tableView.StringSize (Caption, font, size, LineBreakMode).Height;
+		}
 	}
 	
 	public class ImageStringElement : StringElement {
@@ -678,8 +882,22 @@ namespace MonoTouch.Dialog
 		
 	}
 	
+	/// <summary>
+	///   This interface is implemented by Element classes that will have
+	///   different heights
+	/// </summary>
 	public interface IElementSizing {
 		float GetHeight (UITableView tableView, NSIndexPath indexPath);
+	}
+	
+	/// <summary>
+	///   This interface is implemented by Elements that needs to update
+	///   their cells Background properties just before they are displayed
+	///   to the user.   This is an iOS 3 requirement to properly render
+	///   a cell.
+	/// </summary>
+	public interface IColorizeBackground {
+		void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath);
 	}
 	
 	public class MultilineElement : StringElement, IElementSizing {
@@ -1005,6 +1223,7 @@ namespace MonoTouch.Dialog
 		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ImageElement");
 		UIImage scaled;
+		UIPopoverController popover;
 		
 		// Apple leaks this one, so share across all.
 		static UIImagePickerController picker;
@@ -1110,14 +1329,20 @@ namespace MonoTouch.Dialog
 
 		class MyDelegate : UIImagePickerControllerDelegate {
 			ImageElement container;
-			public MyDelegate (ImageElement container)
+			UITableView table;
+			NSIndexPath path;
+			
+			public MyDelegate (ImageElement container, UITableView table, NSIndexPath path)
 			{
 				this.container = container;
+				this.table = table;
+				this.path = path;
 			}
 			
 			public override void FinishedPickingImage (UIImagePickerController picker, UIImage image, NSDictionary editingInfo)
 			{
 				container.Picked (image);
+				table.ReloadRows (new NSIndexPath [] { path }, UITableViewRowAnimation.None);
 			}
 		}
 		
@@ -1126,6 +1351,7 @@ namespace MonoTouch.Dialog
 			Value = image;
 			scaled = Scale (image);
 			currentController.DismissModalViewControllerAnimated (true);
+			
 		}
 		
 		UIViewController currentController;
@@ -1133,8 +1359,25 @@ namespace MonoTouch.Dialog
 		{
 			if (picker == null)
 				picker = new UIImagePickerController ();
-			picker.Delegate = new MyDelegate (this);
+			picker.Delegate = new MyDelegate (this, tableView, path);
+			
+			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
+			case UIUserInterfaceIdiom.Pad:
+				RectangleF useRect;
+				popover = new UIPopoverController (picker);
+				var cell = tableView.CellAt (path);
+				if (cell == null)
+					useRect = rect;
+				else
+					rect = cell.Frame;
+				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
+				break;
+				
+			default:
+			case UIUserInterfaceIdiom.Phone:
 			dvc.ActivateController (picker);
+				break;
+			}
 			currentController = dvc;
 		}
 	}
@@ -1154,8 +1397,6 @@ namespace MonoTouch.Dialog
 		
 		public string Value { 
 			get {
-				if (entry != null)
-					val = entry.Text;
 				return val;
 			}
 			set {
@@ -1174,7 +1415,7 @@ namespace MonoTouch.Dialog
 		public UIKeyboardType KeyboardType = UIKeyboardType.Default;
 		
 		static NSString ekey = new NSString ("EntryElement");
-		bool isPassword;
+		bool isPassword, becomeResponder;
 		public UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
@@ -1277,14 +1518,15 @@ namespace MonoTouch.Dialog
 			
 			if (entry == null){
 				SizeF size = ComputeEntryPosition (tv, cell);
-				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
+				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword,
 					Text = val
 				};
+				_entry.Text = Value ?? "";
+				entry = _entry;
 				
-				entry.Text = Value ?? "";
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
 				
@@ -1334,12 +1576,9 @@ namespace MonoTouch.Dialog
 			
 				};
 			}
-			else 
-			{
-				
-				SizeF size = ComputeEntryPosition (tv, cell);
-				
-				entry.Frame = 	new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height);
+			if (becomeResponder){
+				entry.BecomeFirstResponder ();
+				becomeResponder = false;
 			}
 			entry.KeyboardType = KeyboardType;
 			
@@ -1348,8 +1587,14 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
+		/// <summary>
+		///  Copies the value from the currently entry UIView to the Value property and raises the Changed event if necessary.
+		/// </summary>
 		public void FetchValue ()
 		{
+			if (entry == null)
+				return;
+
 			var newValue = entry.Text;
 			var diff = newValue != Value;
 			Value = newValue;
@@ -1372,6 +1617,25 @@ namespace MonoTouch.Dialog
 		public override bool Matches (string text)
 		{
 			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
+		}
+		
+		/// <summary>
+		/// Makes this cell the first responder (get the focus)
+		/// </summary>
+		/// <param name="animated">
+		/// Whether scrolling to the location of this cell should be animated
+		/// </param>
+		public void BecomeFirstResponder (bool animated)
+		{
+			becomeResponder = true;
+			var tv = GetContainerTableView ();
+			if (tv == null)
+				return;
+			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
+			if (entry != null){
+				entry.BecomeFirstResponder ();
+				becomeResponder = false;
+	}
 		}
 	}
 	
@@ -1955,7 +2219,7 @@ namespace MonoTouch.Dialog
 				return header as string;
 			}
 			set {
-				footer = value;
+				header = value;
 			}
 		}
 		
@@ -2313,13 +2577,18 @@ namespace MonoTouch.Dialog
 	///    Sections are added by calling the Add method which supports the
 	///    C# 4.0 syntax to initialize a RootElement in one pass.
 	/// </remarks>
-	public class RootElement : Element, IEnumerable {
+	public class RootElement : Element, IEnumerable, IEnumerable<Section> {
 		static NSString rkey = new NSString ("RootElement");
 		int summarySection, summaryElement;
 		internal Group group;
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		internal UITableView TableView;
+		
+		// This is used to indicate that we need the DVC to dispatch calls to
+		// WillDisplayCell so we can prepare the color of the cell before 
+		// display
+		public bool NeedColorUpdate;
 		
 		/// <summary>
 		///  Initializes a RootSection with a caption
@@ -2441,6 +2710,8 @@ namespace MonoTouch.Dialog
 						re.RadioIdx = current++;
 					if (UnevenRows == false && e is IElementSizing)
 						UnevenRows = true;
+					if (NeedColorUpdate == false && e is IColorizeBackground)
+						NeedColorUpdate = true;
 				}
 			}
 		}
@@ -2619,7 +2890,13 @@ namespace MonoTouch.Dialog
 		/// <returns>
 		/// A <see cref="IEnumerator"/>
 		/// </returns>
-		public IEnumerator GetEnumerator ()
+		IEnumerator IEnumerable.GetEnumerator ()
+		{
+			foreach (var s in Sections)
+				yield return s;
+		}
+
+		IEnumerator<Section> IEnumerable<Section>.GetEnumerator ()
 		{
 			foreach (var s in Sections)
 				yield return s;
@@ -2664,7 +2941,7 @@ namespace MonoTouch.Dialog
 				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
 				
 				cell = new UITableViewCell (style, rkey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			} 
 		
 			cell.TextLabel.Text = Caption;
@@ -2748,6 +3025,7 @@ namespace MonoTouch.Dialog
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
+			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);

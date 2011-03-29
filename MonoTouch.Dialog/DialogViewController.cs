@@ -71,12 +71,20 @@ namespace MonoTouch.Dialog
 			   return enableSearch;
 			}
 			set {
+				if (enableSearch == value)
+					return;
+				
 				// After MonoTouch 3.0, we can allow for the search to be enabled/disable
 				if (tableView != null)
 					throw new ArgumentException ("You should set EnableSearch before the controller is shown");
 				enableSearch = value;
 			}
 		}
+		
+		// If set, we automatically scroll the content to avoid showing the search bar until 
+		// the user manually pulls it down.
+		public bool AutoHideSearch { get; set; }
+		
 		public string SearchPlaceholder { get; set; }
 			
 		/// <summary>
@@ -105,7 +113,7 @@ namespace MonoTouch.Dialog
 				refreshView.SetActivity (true);
 			refreshRequested (this, EventArgs.Empty);
 
-			if (showStatus && refreshView != null){
+			if (reloading && showStatus && refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
 				UIView.SetAnimationDuration (0.2);
 				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
@@ -186,7 +194,7 @@ namespace MonoTouch.Dialog
 			originalElements = null;
 			//searchBar.BecomeFirstResponder();
 			searchBar.ResignFirstResponder();
-			//this.ReloadData();
+			ReloadData ();
 		}
 		
 		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
@@ -205,7 +213,6 @@ namespace MonoTouch.Dialog
 			
 			OnSearchTextChanged (text);
 			
-			bool changed = false;
 			var newSections = new List<Section> ();
 			
 			for (int sidx = 0; sidx < originalSections.Length; sidx++){
@@ -315,6 +322,17 @@ namespace MonoTouch.Dialog
 				var element = section.Elements [indexPath.Row];
 				element.Row = indexPath.Row;
 				return element.GetCell (Container,tableView);
+			}
+			
+			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+			{
+				if (Root.NeedColorUpdate){
+					var section = Root.Sections [indexPath.Section];
+					var element = section.Elements [indexPath.Row];
+					var colorized = element as IColorizeBackground;
+					if (colorized != null)
+						colorized.WillDisplay (tableView, cell, indexPath);
+				}
 			}
 			
 			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
@@ -539,6 +557,12 @@ namespace MonoTouch.Dialog
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			if (AutoHideSearch){
+				if (enableSearch){
+					if (TableView.ContentOffset.Y < 44)
+						TableView.ContentOffset = new PointF (0, 44);
+				}
+			}
 			if (root == null)
 				return;
 			

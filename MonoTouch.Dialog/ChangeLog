@@ -1,3 +1,23 @@
+2010-06-16	Eric Maupin	<me@ermau.com>
+
+	* Elements.cs: Added support on FloatElement for an optional
+	caption (default is still no caption).
+
+	* Reflect.cs: Added [Range] optional captions support.
+
+2010-06-18	Eric Maupin	<me@ermau.com>
+
+ 	* Element.cs: EntryElement: Fixed an error with FetchValue
+	if the text field hadn't yet been generated.
+
+	StringElement: SelectionStyle is only blue when there's a
+	tap handler registered.
+
+2010-06-17	Eric Maupin	<me@ermau.com>
+
+	* Reflect.cs: EntryAttribute: Removed placeholder requirement
+	and added KeyboardType support.
+
 2010-05-16  Miguel de Icaza  <miguel@novell.com>
 
 	* DialogViewController.cs (StartSearch, FinishSearch,

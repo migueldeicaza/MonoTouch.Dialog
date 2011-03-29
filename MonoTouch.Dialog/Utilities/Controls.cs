@@ -91,7 +91,7 @@ namespace MonoTouch.Dialog
 			lastUpdateLabel = new UILabel (){
 				Font = UIFont.SystemFontOfSize (13f),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
-				ShadowColor = UIColor.FromWhiteAlpha (0.9f, 1),
+				ShadowColor = UIColor.White, 
 				ShadowOffset = new SizeF (0, 1),
 				BackgroundColor = this.BackgroundColor,
 				Opaque = true,
