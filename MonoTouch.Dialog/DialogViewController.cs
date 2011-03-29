@@ -313,7 +313,7 @@ namespace MonoTouch.Dialog
 			{
 				var section = Root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
-				
+				element.Row = indexPath.Row;
 				return element.GetCell (Container,tableView);
 			}
 			

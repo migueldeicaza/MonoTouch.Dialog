@@ -156,5 +156,5 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		}
+	}
 }

@@ -23,6 +23,7 @@ namespace MonoTouch.Dialog
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
 	public class Element : IDisposable {
+		public int Row;
 		/// <summary>
 		///  Handle to the container object.
 		/// </summary>
@@ -1353,10 +1354,10 @@ namespace MonoTouch.Dialog
 			var diff = newValue != Value;
 			Value = newValue;
 			
-			if (diff){
+		//	if (diff){
 				if (Changed != null)
 					Changed (this, EventArgs.Empty);
-			}
+		//	}
 		}
 		
 		protected override void Dispose (bool disposing)
