@@ -11,6 +11,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using MonoTouch.UIKit;
@@ -198,7 +199,6 @@ namespace MonoTouch.Dialog
 		
 		void Populate (object callbacks, object o, RootElement root)
 		{
-			MemberInfo last_radio_index = null;
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -353,9 +353,13 @@ namespace MonoTouch.Dialog
 				} else if (typeof (System.Collections.IEnumerable).IsAssignableFrom (mType)){
 					var csection = new Section ();
 					int count = 0;
-					
-					if (last_radio_index == null)
-						throw new Exception ("IEnumerable found, but no previous int found");
+
+				    var last_radio_index = members.FirstOrDefault(
+				            m =>
+                                GetTypeForMember(m) == typeof(int) &&
+                                m.GetCustomAttributes(false).OfType<RadioSelectionAttribute>().Any(r => r.Target == mi.Name));
+                    if (last_radio_index == null)
+						throw new Exception ("IEnumerable found, but no int with it's target was found");
 					foreach (var e in (IEnumerable) GetValue (mi, o)){
 						csection.Add (new RadioElement (e.ToString ()));
 						count++;
@@ -364,14 +368,13 @@ namespace MonoTouch.Dialog
 					if (selected >= count || selected < 0)
 						selected = 0;
 					element = new RootElement (caption, new MemberRadioGroup (null, selected, last_radio_index)) { csection };
-					last_radio_index = null;
-				} else if (typeof (int) == mType){
-					foreach (object attr in attrs){
-						if (attr is RadioSelectionAttribute){
-							last_radio_index = mi;
-							break;
-						}
-					}
+                } else if (typeof (int) == mType){
+                //    foreach (object attr in attrs){
+                //        if (attr is RadioSelectionAttribute){
+                //            last_radio_index = mi;
+                //            break;
+                //        }
+                //    }
 				} else {
 					var nested = GetValue (mi, o);
 					if (nested != null){
