@@ -1288,15 +1288,24 @@ namespace MonoTouch.Dialog
 				entry.ShouldReturn += delegate {
 					EntryElement focus = null;
 					foreach (var e in (Parent as Section).Elements){
-						if (e == this)
-							focus = this;
-						else if (focus != null && e is EntryElement)
-							focus = e as EntryElement;
+                        if (e == this)
+                        {
+                            focus = this;
+                        }
+                        else if (focus != null && e is EntryElement)
+                        {
+                            focus = e as EntryElement;
+                            break;
+                        }
 					}
-					if (focus != this)
-						focus.entry.BecomeFirstResponder ();
-					else 
-						focus.entry.ResignFirstResponder ();
+                    if (focus != this)
+                    {
+                        focus.BecomeFirstResponder(true);
+                    }
+                    else
+                    {
+                        focus.ResignFirstResponder(true);
+                    }
 					
 					return true;
 				};
@@ -1373,7 +1382,26 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 			}
 		}
-	}
+
+        /// <summary>
+        /// Makes this cell the first responder no-more (loose the focus)
+        /// </summary>
+        /// <param name="animated">
+        /// Whether scrolling to the location of this cell should be animated
+        /// </param>
+        public void ResignFirstResponder(bool animated)
+        {
+            becomeResponder = false;
+            var tv = GetContainerTableView();
+            if (tv == null)
+                return;
+            tv.ScrollToRow(IndexPath, UITableViewScrollPosition.Middle, animated);
+            if (entry != null)
+            {
+                entry.ResignFirstResponder();
+            }
+        }
+    }
 	
 	public class DateTimeElement : StringElement {
 		public DateTime DateValue;
