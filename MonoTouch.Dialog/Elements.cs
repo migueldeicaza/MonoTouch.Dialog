@@ -251,6 +251,10 @@ namespace MonoTouch.Dialog
 					Value = sw.On;
 				}, UIControlEvent.ValueChanged);
 			}
+			else
+			{
+				sw.On = Value;
+			}
 			
 			var cell = tv.DequeueReusableCell (bkey);
 			if (cell == null){
@@ -261,7 +265,7 @@ namespace MonoTouch.Dialog
 		
 			cell.TextLabel.Text = Caption;
 			cell.AccessoryView = sw;
-
+			
 			return cell;
 		}
 		
@@ -1338,7 +1342,7 @@ namespace MonoTouch.Dialog
 				entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
-					SecureTextEntry = isPassword
+					SecureTextEntry = isPassword,
 					Text = Value ?? ""
 				};
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
