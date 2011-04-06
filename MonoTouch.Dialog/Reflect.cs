@@ -11,9 +11,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using MonoTouch.UIKit;
 using System.Drawing;
 using MonoTouch.Foundation;
@@ -119,19 +122,10 @@ namespace MonoTouch.Dialog
 
 	public class BindingContext : IDisposable {
 		public RootElement Root;
-		Dictionary<Element,MemberAndInstance> mappings;
-			
-		class MemberAndInstance {
-			public MemberAndInstance (MemberInfo mi, object o)
-			{
-				Member = mi;
-				Obj = o;
-			}
-			public MemberInfo Member;
-			public object Obj;
-		}
-		
-		static object GetValue (MemberInfo mi, object o)
+		Dictionary<Element,MemberInfo> mappings;
+	    public object Obj;
+
+	    static object GetValue (MemberInfo mi, object o)
 		{
 			var fi = mi as FieldInfo;
 			if (fi != null)
@@ -144,7 +138,27 @@ namespace MonoTouch.Dialog
 
 		static void SetValue (MemberInfo mi, object o, object val)
 		{
-			var fi = mi as FieldInfo;
+            var mtype = GetTypeForMember(mi);
+            if (val != null && !mtype.IsAssignableFrom(val.GetType()))
+            {
+                if (mtype == typeof(decimal))
+                {
+                    decimal dec;
+                    decimal.TryParse(val.ToString(), NumberStyles.Any, Thread.CurrentThread.CurrentUICulture, out dec);
+                    val = dec;
+                }
+                else if (mtype == typeof(int))
+                {
+                    int intval;
+                    int.TryParse(val.ToString(), NumberStyles.Any, Thread.CurrentThread.CurrentUICulture, out intval);
+                    val = intval;
+                }
+                else
+                {
+                    val = new TypeConverter().ConvertTo(val, mtype);
+                }
+            }
+		    var fi = mi as FieldInfo;
 			if (fi != null){
 				fi.SetValue (o, val);
 				return;
@@ -191,9 +205,10 @@ namespace MonoTouch.Dialog
 			if (o == null)
 				throw new ArgumentNullException ("o");
 			
-			mappings = new Dictionary<Element,MemberAndInstance> ();
+			mappings = new Dictionary<Element,MemberInfo> ();
 			
 			Root = new RootElement (title);
+		    Obj = o;
 			Populate (callbacks, o, Root);
 		}
 		
@@ -368,14 +383,18 @@ namespace MonoTouch.Dialog
 					if (selected >= count || selected < 0)
 						selected = 0;
 					element = new RootElement (caption, new MemberRadioGroup (null, selected, last_radio_index)) { csection };
-                } else if (typeof (int) == mType){
-                //    foreach (object attr in attrs){
-                //        if (attr is RadioSelectionAttribute){
-                //            last_radio_index = mi;
-                //            break;
-                //        }
-                //    }
-				} else {
+                } else if (typeof (int) == mType || typeof(decimal) == mType) {
+                    if (!attrs.OfType<RadioSelectionAttribute>().Any())
+                    {
+                        element = new EntryElement(caption, null, GetValue(mi, o) as string)
+                                      {
+                                          KeyboardType =
+                                              typeof (int) == mType
+                                                  ? UIKeyboardType.NumberPad
+                                                  : UIKeyboardType.DecimalPad
+                                      };
+                    }
+                } else {
 					var nested = GetValue (mi, o);
 					if (nested != null){
 						var newRoot = new RootElement (caption);
@@ -387,7 +406,7 @@ namespace MonoTouch.Dialog
 				if (element == null)
 					continue;
 				section.Add (element);
-				mappings [element] = new MemberAndInstance (mi, o);
+				mappings [element] = mi;
 			}
 			root.Add (section);
 		}
@@ -416,40 +435,42 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public void Fetch ()
+		public object Fetch ()
 		{
-			foreach (var dk in mappings){
+            foreach (var dk in mappings)
+            {
 				Element element = dk.Key;
-				MemberInfo mi = dk.Value.Member;
-				object obj = dk.Value.Obj;
+				MemberInfo mi = dk.Value;
 				
 				if (element is DateTimeElement)
-					SetValue (mi, obj, ((DateTimeElement) element).DateValue);
+					SetValue (mi, Obj, ((DateTimeElement) element).DateValue);
 				else if (element is FloatElement)
-					SetValue (mi, obj, ((FloatElement) element).Value);
+					SetValue (mi, Obj, ((FloatElement) element).Value);
 				else if (element is BooleanElement)
-					SetValue (mi, obj, ((BooleanElement) element).Value);
+					SetValue (mi, Obj, ((BooleanElement) element).Value);
 				else if (element is CheckboxElement)
-					SetValue (mi, obj, ((CheckboxElement) element).Value);
+					SetValue (mi, Obj, ((CheckboxElement) element).Value);
 				else if (element is EntryElement){
 					var entry = (EntryElement) element;
 					entry.FetchValue ();
-					SetValue (mi, obj, entry.Value);
+					SetValue (mi, Obj, entry.Value);
 				} else if (element is ImageElement)
-					SetValue (mi, obj, ((ImageElement) element).Value);
+					SetValue (mi, Obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;
 					if (re.group as MemberRadioGroup != null){
 						var group = re.group as MemberRadioGroup;
-						SetValue (group.mi, obj, re.RadioSelected);
+						SetValue (group.mi, Obj, re.RadioSelected);
 					} else if (re.group as RadioGroup != null){
 						var mType = GetTypeForMember (mi);
 						var fi = mType.GetFields (BindingFlags.Public | BindingFlags.Static) [re.RadioSelected];
 						
-						SetValue (mi, obj, fi.GetValue (null));
+						SetValue (mi, Obj, fi.GetValue (null));
 					}
 				}
 			}
+
+		    return Obj;
 		}
 	}
 }
