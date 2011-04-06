@@ -1353,7 +1353,7 @@ namespace MonoTouch.Dialog
 		
 		protected override void Dispose (bool disposing)
 		{
-			if (disposing){
+			if (disposing && entry != null){
 				entry.Dispose ();
 				entry = null;
 			}
