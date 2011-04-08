@@ -39,7 +39,7 @@ namespace MonoTouch.Dialog
 		
 		public static void FillRoundedRect (CGContext ctx, RectangleF rect, float radius)
 		{
-				var p = GraphicsUtil.MakeRoundedRectPath (rect, 3);
+				var p = GraphicsUtil.MakeRoundedRectPath (rect, radius);
 				ctx.AddPath (p);
 				ctx.FillPath ();
 		}
