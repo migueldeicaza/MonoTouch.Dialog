@@ -1290,8 +1290,10 @@ namespace MonoTouch.Dialog
 					foreach (var e in (Parent as Section).Elements){
 						if (e == this)
 							focus = this;
-						else if (focus != null && e is EntryElement)
+						else if (focus != null && e is EntryElement){
 							focus = e as EntryElement;
+							break;
+						}
 					}
 					if (focus != this)
 						focus.entry.BecomeFirstResponder ();
@@ -1373,7 +1375,17 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 			}
 		}
-	}
+
+		public void ResignFirstResponder (bool animated)
+		{
+			becomeResponder = false;
+			var tv = GetContainerTableView ();
+			if (tv == null)
+				return;
+			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
+			if (entry != null)
+				entry.ResignFirstResponder ();
+        }	}
 	
 	public class DateTimeElement : StringElement {
 		public DateTime DateValue;
