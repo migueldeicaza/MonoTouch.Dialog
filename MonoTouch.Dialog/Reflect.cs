@@ -181,7 +181,7 @@ namespace MonoTouch.Dialog
 			if (o == null)
 				throw new ArgumentNullException ("o");
 			
-			mappings = new Dictionary<Element,MemberAndInstance> ();
+			mappings = new Dictionary<Element,MemberInfo> ();
 			
 			Root = new RootElement (title);
 			obj = o;
