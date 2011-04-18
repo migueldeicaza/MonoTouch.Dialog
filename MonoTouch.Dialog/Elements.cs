@@ -232,7 +232,8 @@ namespace MonoTouch.Dialog
 				sw.AddTarget (delegate {
 					Value = sw.On;
 				}, UIControlEvent.ValueChanged);
-			}
+			} else
+				sw.On = Value;
 			
 			var cell = tv.DequeueReusableCell (bkey);
 			if (cell == null){
