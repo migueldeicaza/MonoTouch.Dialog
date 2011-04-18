@@ -118,9 +118,18 @@ namespace MonoTouch.Dialog
 
 	public class BindingContext : IDisposable {
 		public RootElement Root;
-		Dictionary<Element,MemberInfo> mappings;
-		object obj;
+		Dictionary<Element,MemberAndInstance> mappings;
 			
+		class MemberAndInstance {
+			public MemberAndInstance (MemberInfo mi, object o)
+			{
+				Member = mi;
+				Obj = o;
+			}
+			public MemberInfo Member;
+			public object Obj;
+		}
+		
 		static object GetValue (MemberInfo mi, object o)
 		{
 			var fi = mi as FieldInfo;
@@ -184,7 +193,6 @@ namespace MonoTouch.Dialog
 			mappings = new Dictionary<Element,MemberAndInstance> ();
 			
 			Root = new RootElement (title);
-			obj = o;
 			Populate (callbacks, o, Root);
 		}
 		
@@ -376,7 +384,7 @@ namespace MonoTouch.Dialog
 				if (element == null)
 					continue;
 				section.Add (element);
-				mappings [element] = mi;
+				mappings [element] = new MemberAndInstance (mi, o);
 			}
 			root.Add (section);
 		}
@@ -405,11 +413,12 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public object Fetch ()
+		public void Fetch ()
 		{
 			foreach (var dk in mappings){
 				Element element = dk.Key;
-				MemberInfo mi = dk.Value;
+				MemberInfo mi = dk.Value.Member;
+				object obj = dk.Value.Obj;
 				
 				if (element is DateTimeElement)
 					SetValue (mi, obj, ((DateTimeElement) element).DateValue);
@@ -438,7 +447,6 @@ namespace MonoTouch.Dialog
 					}
 				}
 			}
-			return obj;
 		}
 	}
 }
