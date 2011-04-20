@@ -11,9 +11,9 @@
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
     <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
-    <ReleaseVersion>0.9</ReleaseVersion>
+    <ReleaseVersion>1.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -108,11 +108,6 @@
     <Reference Include="monotouch" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties InternalTargetFrameworkVersion="IPhone" />
-    </MonoDevelop>
-  </ProjectExtensions>
   <ItemGroup>
     <Compile Include="Elements.cs" />
     <Compile Include="DialogViewController.cs" />

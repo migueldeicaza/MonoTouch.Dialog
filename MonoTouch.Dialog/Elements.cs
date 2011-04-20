@@ -1257,7 +1257,8 @@ namespace MonoTouch.Dialog
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
-
+		public bool ShowClearButton = true;
+		
 		public event EventHandler Changed;
 		
 		/// <summary>
@@ -1347,6 +1348,9 @@ namespace MonoTouch.Dialog
 				};
 				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
 					UIViewAutoresizing.FlexibleLeftMargin;
+				
+				if(ShowClearButton)
+					entry.ClearButtonMode = UITextFieldViewMode.WhileEditing;
 				
 				entry.ValueChanged += delegate {
 					FetchValue ();
