@@ -122,9 +122,18 @@ namespace MonoTouch.Dialog
 
 	public class BindingContext : IDisposable {
 		public RootElement Root;
-		Dictionary<Element,MemberInfo> mappings;
-	    public object Obj;
+		Dictionary<Element,MemberAndInstance> mappings;
 
+	    class MemberAndInstance {
+			public MemberAndInstance (MemberInfo mi, object o)
+			{
+				Member = mi;
+				Obj = o;
+			}
+			public MemberInfo Member;
+			public object Obj;
+		}
+		
 	    static object GetValue (MemberInfo mi, object o)
 		{
 			var fi = mi as FieldInfo;
@@ -205,14 +214,13 @@ namespace MonoTouch.Dialog
 			if (o == null)
 				throw new ArgumentNullException ("o");
 			
-			mappings = new Dictionary<Element,MemberInfo> ();
+			mappings = new Dictionary<Element, MemberAndInstance>();
 			
 			Root = new RootElement (title);
-		    Obj = o;
 			Populate (callbacks, o, Root);
 		}
-		
-		void Populate (object callbacks, object o, RootElement root)
+
+	    void Populate (object callbacks, object o, RootElement root)
 		{
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
@@ -406,7 +414,7 @@ namespace MonoTouch.Dialog
 				if (element == null)
 					continue;
 				section.Add (element);
-				mappings [element] = mi;
+                mappings [element] = new MemberAndInstance(mi, o);
 			}
 			root.Add (section);
 		}
@@ -437,40 +445,43 @@ namespace MonoTouch.Dialog
 		
 		public object Fetch ()
 		{
+		    object boundObject = null;
             foreach (var dk in mappings)
             {
 				Element element = dk.Key;
-				MemberInfo mi = dk.Value;
-				
+                MemberInfo mi = dk.Value.Member;
+                object obj = dk.Value.Obj;
+                if (boundObject == null) boundObject = obj;
+
 				if (element is DateTimeElement)
-					SetValue (mi, Obj, ((DateTimeElement) element).DateValue);
+					SetValue (mi, obj, ((DateTimeElement) element).DateValue);
 				else if (element is FloatElement)
-					SetValue (mi, Obj, ((FloatElement) element).Value);
+					SetValue (mi, obj, ((FloatElement) element).Value);
 				else if (element is BooleanElement)
-					SetValue (mi, Obj, ((BooleanElement) element).Value);
+					SetValue (mi, obj, ((BooleanElement) element).Value);
 				else if (element is CheckboxElement)
-					SetValue (mi, Obj, ((CheckboxElement) element).Value);
+					SetValue (mi, obj, ((CheckboxElement) element).Value);
 				else if (element is EntryElement){
 					var entry = (EntryElement) element;
 					entry.FetchValue ();
-					SetValue (mi, Obj, entry.Value);
+					SetValue (mi, obj, entry.Value);
 				} else if (element is ImageElement)
-					SetValue (mi, Obj, ((ImageElement) element).Value);
+					SetValue (mi, obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;
 					if (re.group as MemberRadioGroup != null){
 						var group = re.group as MemberRadioGroup;
-						SetValue (group.mi, Obj, re.RadioSelected);
+						SetValue (group.mi, obj, re.RadioSelected);
 					} else if (re.group as RadioGroup != null){
 						var mType = GetTypeForMember (mi);
 						var fi = mType.GetFields (BindingFlags.Public | BindingFlags.Static) [re.RadioSelected];
 						
-						SetValue (mi, Obj, fi.GetValue (null));
+						SetValue (mi, obj, fi.GetValue (null));
 					}
 				}
 			}
 
-		    return Obj;
+		    return boundObject;
 		}
 	}
 }
