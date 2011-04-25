@@ -35,6 +35,9 @@ namespace Sample
 		[Caption ("Favorite CLR type")]
 		public TypeCode FavoriteType;
 		
+		[Caption ("Make a selection")]
+		public Options SelectedOption;
+		
 	[Section ("Checkboxes")]
 		[Checkbox]
 		bool English = true;
@@ -56,6 +59,16 @@ namespace Sample
 		[RadioSelection ("ListOfString")] 
 		public int selected = 1;
 		public IList<string> ListOfString;
+	}
+	
+	public enum Options
+	{
+		[Caption("Option 1")]
+		Option1,
+		[Caption("Option 2")]		
+		Option2,
+		[Caption("Option 3")]
+		Option3
 	}
 
 	public class TimeSettings {
@@ -111,11 +124,12 @@ namespace Sample
 				    "Birthday:        {4}\n" +
 				    "Alarm:           {5}\n" +
 				    "Favorite Type:   {6}\n" + 
-				    "IEnumerable idx: {7}", 
+				    "IEnumerable idx: {7}\n" +
+					"Selected option: {8}",
 				    settings.AccountEnabled, settings.Login, settings.Password, 
 				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, 
 				    settings.TimeSamples.Alarm, settings.FavoriteType,
-				    settings.selected);
+				    settings.selected, settings.SelectedOption);
 			};
 			navigation.PushViewController (dv, true);	
 		}
