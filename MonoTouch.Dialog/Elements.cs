@@ -581,12 +581,24 @@ namespace MonoTouch.Dialog
 		}
 		
 		public event NSAction Tapped;
-				
-		public override UITableViewCell GetCell (UITableView tv)
+
+        UITableViewCellStyle tableViewCellStyle = (UITableViewCellStyle)int.MaxValue;
+        public UITableViewCellStyle TableViewCellStyle
+        {
+            get
+            {
+                if (tableViewCellStyle == (UITableViewCellStyle)int.MaxValue)
+                    return Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
+                return tableViewCellStyle;
+            }
+            set { tableViewCellStyle = value; }
+        }
+        
+        public override UITableViewCell GetCell(UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (Value == null ? skey : skeyvalue);
 			if (cell == null){
-				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
+				cell = new UITableViewCell (TableViewCellStyle, skey);
 				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
 			}
 			cell.Accessory = UITableViewCellAccessory.None;
@@ -899,14 +911,22 @@ namespace MonoTouch.Dialog
 			tl.LineBreakMode = UILineBreakMode.WordWrap;
 			tl.Lines = 0;
 
+		    var dtl = cell.DetailTextLabel;
+            if (dtl != null)
+            {
+                dtl.LineBreakMode = UILineBreakMode.WordWrap;
+                dtl.Lines = 0;
+            }
+
 			return cell;
 		}
 		
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (280, float.MaxValue);
-			using (var font = UIFont.FromName ("Helvetica", 17f))
-				return tableView.StringSize (Caption, font, size, UILineBreakMode.WordWrap).Height + 10;
+			return Math.Max(
+                tableView.StringSize(Caption, tableView.CellAt(indexPath).TextLabel.Font, size, UILineBreakMode.WordWrap).Height + 10,
+                tableView.StringSize(Value, tableView.CellAt(indexPath).DetailTextLabel.Font, size, UILineBreakMode.WordWrap).Height + 10);
 		}
 	}
 	
