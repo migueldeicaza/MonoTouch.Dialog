@@ -10,6 +10,7 @@
 // MIT X11 license
 //
 using System;
+using System.Diagnostics;
 using MonoTouch.UIKit;
 using System.Drawing;
 using System.Collections.Generic;
@@ -22,7 +23,8 @@ namespace MonoTouch.Dialog
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		UISearchBar searchBar;
 		UITableView tableView;
-		RefreshTableHeaderView refreshView;
+		protected RefreshTableHeaderView refreshView;
+        protected LoadMoreTableFooterView loadMoreView;
 		RootElement root;
 		bool pushing;
 		bool dirty;
@@ -62,8 +64,27 @@ namespace MonoTouch.Dialog
 				refreshRequested -= value;
 			}
 		}
-		
-		// If the value is 1, we are enabled, used in the source for quick computation
+
+        EventHandler loadMoreRequested;
+        /// <summary>
+        /// If you assign a handler to this event before the view is shown, the
+        /// DialogViewController will have support for pull-to-refresh UI.
+        /// </summary>
+        public event EventHandler LoadMoreRequested
+        {
+            add
+            {
+                if (tableView != null)
+                    throw new ArgumentException("You should set the handler before the controller is shown");
+                loadMoreRequested += value;
+            }
+            remove
+            {
+                loadMoreRequested -= value;
+            }
+        }
+        
+        // If the value is 1, we are enabled, used in the source for quick computation
 		bool enableSearch;
 		public bool EnableSearch {
 			get {
@@ -101,7 +122,7 @@ namespace MonoTouch.Dialog
 		
 		void TriggerRefresh (bool showStatus)
 		{
-			if (refreshRequested == null)
+            if (refreshRequested == null)
 				return;
 
 			if (reloading)
@@ -110,37 +131,92 @@ namespace MonoTouch.Dialog
 			reloading = true;
 			if (refreshView != null)
 				refreshView.SetActivity (true);
+
 			refreshRequested (this, EventArgs.Empty);
 
-			if (reloading && showStatus && refreshView != null){
+            if (reloading && showStatus && refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
 				UIView.SetAnimationDuration (0.2);
 				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
 				UIView.CommitAnimations ();
 			}
 		}
-		
-		/// <summary>
+
+        /// <summary>
+        /// Invoke this method to trigger a data refresh.   
+        /// </summary>
+        /// <remarks>
+        /// This will invoke the RerfeshRequested event handler, the code attached to it
+        /// should start the background operation to fetch the data and when it completes
+        /// it should call ReloadComplete to restore the control state.
+        /// </remarks>
+        public void TriggerLoadMore()
+        {
+            TriggerLoadMore(false);
+        }
+
+        
+        void TriggerLoadMore(bool showStatus)
+        {
+            if (loadMoreRequested == null)
+                return;
+
+            if (reloading)
+                return;
+
+            reloading = true;
+            if (loadMoreView != null)
+                loadMoreView.SetActivity(true);
+
+            loadMoreRequested(this, EventArgs.Empty);
+
+            if (reloading && showStatus && loadMoreView != null && !loadMoreView.Hidden)
+            {
+                UIView.BeginAnimations("reloadingData");
+                UIView.SetAnimationDuration(0.2);
+                TableView.ContentInset = new UIEdgeInsets(0, 0, 65, 0);
+                UIView.CommitAnimations();
+            }
+        }
+
+        
+        /// <summary>
 		/// Invoke this method to signal that a reload has completed, this will update the UI accordingly.
 		/// </summary>
 		public void ReloadComplete ()
 		{
 			if (refreshView != null)
 				refreshView.LastUpdate = DateTime.Now;
+            if (loadMoreView != null)
+                loadMoreView.LastUpdate = DateTime.Now;
+
 			if (!reloading)
 				return;
 
-			reloading = false;
-			if (refreshView == null)
-				return;
-			
-			refreshView.SetActivity (false);
-			refreshView.Flip (false);
-			UIView.BeginAnimations ("doneReloading");
-			UIView.SetAnimationDuration (0.3f);
-			TableView.ContentInset = new UIEdgeInsets (0, 0, 0, 0);
-			refreshView.SetStatus (RefreshViewStatus.PullToReload);
-			UIView.CommitAnimations ();
+			InvokeOnMainThread(() => {
+			                           reloading = false;
+			                           if (refreshView != null)
+			                           {
+			                               refreshView.SetActivity(false);
+			                               refreshView.Flip(false);
+			                           }
+			                           if (loadMoreView != null)
+			                           {
+			                               loadMoreView.SetActivity(false);
+			                               loadMoreView.Flip(false);
+			                               loadMoreView.Frame = new RectangleF(loadMoreView.Frame.X, TableView.ContentSize.Height,
+			                                                                   loadMoreView.Frame.Width,
+			                                                                   loadMoreView.Frame.Height);
+			                           }
+			                           UIView.BeginAnimations("doneReloading");
+			                           UIView.SetAnimationDuration(0.3f);
+			                           TableView.ContentInset = new UIEdgeInsets(0, 0, 0, 0);
+			                           if (refreshView != null)
+			                               refreshView.SetStatus(RefreshViewStatus.PullToReload);
+			                           if (loadMoreView != null)
+			                               loadMoreView.SetStatus(RefreshViewStatus.PullToReload);
+			                           UIView.CommitAnimations();
+			                       });
 		}
 		
 		/// <summary>
@@ -287,7 +363,7 @@ namespace MonoTouch.Dialog
 				this.Container = container;
 				Root = container.root;
 			}
-			
+
 			public override int RowsInSection (UITableView tableview, int section)
 			{
 				var s = Root.Sections [section];
@@ -321,7 +397,11 @@ namespace MonoTouch.Dialog
 			
 			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
 			{
-				if (Root.NeedColorUpdate){
+                if (Container.loadMoreView != null)
+                    Container.loadMoreView.Frame = new RectangleF(0, Container.TableView.ContentSize.Height, Container.loadMoreView.Frame.Width, Container.loadMoreView.Frame.Height);
+                
+                if (Root.NeedColorUpdate)
+                {
 					var section = Root.Sections [indexPath.Section];
 					var element = section.Elements [indexPath.Row];
 					var colorized = element as IColorizeBackground;
@@ -364,41 +444,64 @@ namespace MonoTouch.Dialog
 			}
 			
 			#region Pull to Refresh support
-			public override void Scrolled (UIScrollView scrollView)
-			{
-				if (!checkForRefresh)
-					return;
-				if (Container.reloading)
-					return;
-				var view  = Container.refreshView;
-				if (view == null)
-					return;
-				
-				var point = Container.TableView.ContentOffset;
-				
-				if (view.IsFlipped && point.Y > -yboundary && point.Y < 0){
-					view.Flip (true);
-					view.SetStatus (RefreshViewStatus.PullToReload);
-				} else if (!view.IsFlipped && point.Y < -yboundary){
-					view.Flip (true);
-					view.SetStatus (RefreshViewStatus.ReleaseToReload);
-				}
-			}
-			
-			public override void DraggingStarted (UIScrollView scrollView)
+            public override void Scrolled(UIScrollView scrollView)
+            {
+                if (Container.reloading)
+                    return;
+                if (!checkForRefresh)
+                    return;
+                
+                if (Container.refreshView != null)
+                {
+                    var point = Container.TableView.ContentOffset;
+
+                    if (Container.refreshView.IsFlipped && point.Y > -yboundary && point.Y < 0)
+                    {
+                        Container.refreshView.Flip(true);
+                        Container.refreshView.SetStatus(RefreshViewStatus.PullToReload);
+                    }
+                    else if (!Container.refreshView.IsFlipped && point.Y < -yboundary)
+                    {
+                        Container.refreshView.Flip(true);
+                        Container.refreshView.SetStatus(RefreshViewStatus.ReleaseToReload);
+                    }
+
+                }
+                if (Container.loadMoreView != null && !Container.loadMoreView.Hidden)
+                {
+                    var point = Container.TableView.ContentOffset;
+                    point.Y += Container.TableView.Bounds.Height;
+                    if (Container.loadMoreView.IsFlipped && point.Y > Container.TableView.ContentSize.Height + yboundary)
+                    {
+                        Container.loadMoreView.Flip(true);
+                        Container.loadMoreView.SetStatus(RefreshViewStatus.ReleaseToReload);
+                    }
+                    else if (!Container.loadMoreView.IsFlipped && point.Y < Container.TableView.ContentSize.Height + yboundary)
+                    {
+                        Container.loadMoreView.Flip(true);
+                        Container.loadMoreView.SetStatus(RefreshViewStatus.PullToReload);
+                    }
+                }
+            }
+
+		    public override void DraggingStarted (UIScrollView scrollView)
 			{
 				checkForRefresh = true;
 			}
 			
 			public override void DraggingEnded (UIScrollView scrollView, bool willDecelerate)
 			{
-				if (Container.refreshView == null)
-					return;
-				
-				checkForRefresh = false;
-				if (Container.TableView.ContentOffset.Y > -yboundary)
-					return;
-				Container.TriggerRefresh (true);
+                checkForRefresh = false;
+                if (Container.refreshView != null && (Container.TableView.ContentOffset.Y < -yboundary))
+                {
+                    Container.TriggerRefresh(true);
+                }
+                if ((Container.loadMoreView != null) 
+                    && (Container.TableView.ContentOffset.Y + Container.TableView.Bounds.Height > Container.TableView.ContentSize.Height + yboundary)
+                    && !Container.loadMoreView.Hidden)
+                {
+                    Container.TriggerLoadMore(true);
+                }
 			}
 			#endregion
 		}
@@ -513,14 +616,30 @@ namespace MonoTouch.Dialog
 					refreshView.SetActivity (true);
 				TableView.AddSubview (refreshView);
 			}
-		}
+            if (loadMoreRequested != null)
+            {
+                // The dimensions should be large enough so that even if the user scrolls, we render the
+                // whole are with the background color.
+                var bounds = View.Bounds;
+                
+                loadMoreView = MakeLoadMoreTableFooterView(new RectangleF(0, TableView.ContentSize.Height, bounds.Width, bounds.Height));
+                if (reloading)
+                    loadMoreView.SetActivity(true);
+                TableView.AddSubview(loadMoreView);
+            }
+        }
 		
 		public virtual RefreshTableHeaderView MakeRefreshTableHeaderView (RectangleF rect)
 		{
 			return new RefreshTableHeaderView (rect);
 		}
 
-		public override void ViewWillAppear (bool animated)
+        public virtual LoadMoreTableFooterView MakeLoadMoreTableFooterView(RectangleF rect)
+        {
+            return new LoadMoreTableFooterView(rect);
+        }
+        
+        public override void ViewWillAppear(bool animated)
 		{
 			base.ViewWillAppear (animated);
 			if (AutoHideSearch){
@@ -554,10 +673,10 @@ namespace MonoTouch.Dialog
 		{
 			if (root == null)
 				return;
-			
+		    Debug.WriteLine("Creating sizingsource: " + root.UnevenRows);
 			TableSource = CreateSizingSource (root.UnevenRows);
 			tableView.Source = TableSource;
-		}
+        }
 
 		public void ReloadData ()
 		{

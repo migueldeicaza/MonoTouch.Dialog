@@ -49,18 +49,40 @@ namespace MonoTouch.Dialog
 		}
 	
 	}
+
+    public class LoadMoreTableFooterView: DragMoreView
+    {
+        public LoadMoreTableFooterView(RectangleF rect) : base(rect, false)
+        {
+        }
+
+
+    }
 	
-	public class RefreshTableHeaderView : UIView {
-		static UIImage arrow = Util.FromResource (null, "arrow.png");
+	public class RefreshTableHeaderView: DragMoreView
+	{
+	    public RefreshTableHeaderView(RectangleF rect) : base(rect, true)
+	    {
+	    }
+	}
+    public abstract class DragMoreView : UIView {
+        private readonly bool isHeader;
+        static UIImage arrow = Util.FromResource (null, "arrow.png");
 		UIActivityIndicatorView activity;
 		UILabel lastUpdateLabel, statusLabel;
-		UIImageView arrowView;		
-			
-		public RefreshTableHeaderView (RectangleF rect) : base (rect)
+		UIImageView arrowView;
+
+        public DragMoreView(RectangleF rect, bool isHeader): base(rect)
 		{
-			this.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
-			
-			BackgroundColor = new UIColor (0.88f, 0.9f, 0.92f, 1);
+            this.isHeader = isHeader;
+            this.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
+
+            ReleaseLabelText = !isHeader ? "Release to load more" : "Release to refresh";
+            PullLabelText = !isHeader ? "Pull up to load more" : "Pull down to refresh...";
+            LoadingLabelText = "Loading...";
+            LastUpdateLabelText = "Last Updated: {0:g}";
+
+            BackgroundColor = new UIColor(0.88f, 0.9f, 0.92f, 1);
 			lastUpdateLabel = new UILabel (){
 				Font = UIFont.SystemFontOfSize (13f),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
@@ -100,16 +122,21 @@ namespace MonoTouch.Dialog
 			};
 			AddSubview (activity);
 		}
-		
-		public override void LayoutSubviews ()
+
+        public string LastUpdateLabelText { get; set; }
+        public string PullLabelText { get; set; }
+        public string ReleaseLabelText { get; set; }
+        public string LoadingLabelText { get; set; }
+
+        public override void LayoutSubviews ()
 		{
 			base.LayoutSubviews ();
 			var bounds = Bounds;
 			
-			lastUpdateLabel.Frame = new RectangleF (0, bounds.Height - 30, bounds.Width, 20);
-			statusLabel.Frame = new RectangleF (0, bounds.Height-48, bounds.Width, 20);
-			arrowView.Frame = new RectangleF (20, bounds.Height - 65, 30, 55);
-			activity.Frame = new RectangleF (25, bounds.Height-38, 20, 20);
+			lastUpdateLabel.Frame = new RectangleF (0, isHeader ? bounds.Height - 30 : 30, bounds.Width, 20);
+			statusLabel.Frame = new RectangleF (0, isHeader ? bounds.Height-48 : 12, bounds.Width, 20);
+			arrowView.Frame = new RectangleF (20, isHeader ? bounds.Height - 65 : 0, 30, 55);
+			activity.Frame = new RectangleF (25, isHeader ? bounds.Height-38 : 22, 20, 20);
 		}
 		
 		RefreshViewStatus status = (RefreshViewStatus) (-1);
@@ -119,28 +146,28 @@ namespace MonoTouch.Dialog
 			if (this.status == status)
 				return;
 			
-			string s = "Release to refresh";
+			string s = ReleaseLabelText;
 	
 			switch (status){
 			case RefreshViewStatus.Loading:
-				s = "Loading..."; 
+				s = LoadingLabelText; 
 				break;
 				
 			case RefreshViewStatus.PullToReload:
-				s = "Pull down to refresh...";
+				s = PullLabelText;
 				break;
 			}
 			statusLabel.Text = s;
 		}
-		
+
 		public override void Draw (RectangleF rect)
 		{
 			var context = UIGraphics.GetCurrentContext ();
 			context.DrawPath (CGPathDrawingMode.FillStroke);
 			statusLabel.TextColor.SetStroke ();
 			context.BeginPath ();
-			context.MoveTo (0, Bounds.Height-1);
-			context.AddLineToPoint (Bounds.Width, Bounds.Height-1);
+			context.MoveTo (0, isHeader ? Bounds.Height-1 : 1);
+			context.AddLineToPoint (Bounds.Width, isHeader ? Bounds.Height-1 : 1);
 			context.StrokePath ();
 		}		
 		
@@ -168,10 +195,13 @@ namespace MonoTouch.Dialog
 					return;
 				
 				lastUpdateTime = value;
-				if (value == DateTime.MinValue){
-					lastUpdateLabel.Text = "Last Updated: never";
-				} else 
-					lastUpdateLabel.Text = String.Format ("Last Updated: {0:g}", value);
+				if (value == DateTime.MinValue)
+				{
+				    lastUpdateLabel.Text = "";
+				} else if (LastUpdateLabelText.Contains("{0"))
+					lastUpdateLabel.Text = String.Format (LastUpdateLabelText, value);
+                else
+                    lastUpdateLabel.Text = LastUpdateLabelText;
 			}
 		}
 		
