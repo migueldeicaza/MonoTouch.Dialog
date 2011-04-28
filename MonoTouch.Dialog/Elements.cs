@@ -253,7 +253,8 @@ namespace MonoTouch.Dialog
 				sw.AddTarget (delegate {
 					Value = sw.On;
 				}, UIControlEvent.ValueChanged);
-			}
+			} else
+				sw.On = Value;
 			
 			var cell = tv.DequeueReusableCell (bkey);
 			if (cell == null){
@@ -271,7 +272,10 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				sw = null;
+				if (sw != null){
+					sw.Dispose ();
+					sw = null;
+				}
 			}
 		}
 	}
@@ -457,8 +461,10 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				slider.Dispose ();
-				slider = null;
+				if (slider != null){
+					slider.Dispose ();
+					slider = null;
+				}
 			}
 		}		
 	}
@@ -1320,8 +1326,12 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				scaled.Dispose ();
-				Value.Dispose ();
+				if (scaled != null){
+					scaled.Dispose ();
+					Value.Dispose ();
+					scaled = null;
+					Value = null;
+				}
 			}
 			base.Dispose (disposing);
 		}
@@ -1540,8 +1550,10 @@ namespace MonoTouch.Dialog
 					foreach (var e in (Parent as Section).Elements){
 						if (e == this)
 							focus = this;
-						else if (focus != null && e is EntryElement)
+						else if (focus != null && e is EntryElement){
 							focus = e as EntryElement;
+							break;
+						}
 					}
 					if (focus != this)
 						focus.entry.BecomeFirstResponder ();
@@ -1607,9 +1619,10 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				if (entry != null)
+				if (entry != null){
 					entry.Dispose ();
-				entry = null;
+					entry = null;
+				}
 			}
 		}
 		
@@ -1636,7 +1649,17 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 	}
 		}
-	}
+
+		public void ResignFirstResponder (bool animated)
+		{
+			becomeResponder = false;
+			var tv = GetContainerTableView ();
+			if (tv == null)
+				return;
+			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
+			if (entry != null)
+				entry.ResignFirstResponder ();
+        }	}
 	
 	
 	
@@ -1691,8 +1714,10 @@ namespace MonoTouch.Dialog
 		{
 			base.Dispose (disposing);
 			if (disposing){
-				fmt.Dispose ();
-				fmt = null;
+				if (fmt != null){
+					fmt.Dispose ();
+					fmt = null;
+				}
 				if (datePicker != null){
 					datePicker.Dispose ();
 					datePicker = null;
@@ -2154,8 +2179,10 @@ namespace MonoTouch.Dialog
 		{
 			base.Dispose (disposing);
 			if (disposing){
-				View.Dispose ();
-				View = null;
+				if (View != null){
+					View.Dispose ();
+					View = null;
+				}
 			}
 		}
 	}
@@ -2496,8 +2523,10 @@ namespace MonoTouch.Dialog
 
 		public void Clear ()
 		{
-			foreach (var e in Elements)
-				e.Dispose ();
+			if (Elements != null){
+				foreach (var e in Elements)
+					e.Dispose ();
+			}
 			Elements = new List<Element> ();
 
 			var root = Parent as RootElement;

@@ -9,6 +9,8 @@
     <ProjectTypeGuids>{E613F3A2-FE9C-494F-B74E-F63BCB86FEA6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
   </PropertyGroup>
@@ -22,8 +24,6 @@
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseThumb>false</MtouchUseThumb>
@@ -37,8 +37,6 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <MtouchLink>None</MtouchLink>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseThumb>false</MtouchUseThumb>
@@ -54,8 +52,6 @@
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>True</MtouchDebug>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseThumb>false</MtouchUseThumb>
@@ -69,8 +65,6 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseThumb>false</MtouchUseThumb>
@@ -83,7 +77,6 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>MonoTouchDialog</AssemblyName>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseThumb>false</MtouchUseThumb>
@@ -96,8 +89,6 @@
     <WarningLevel>4</WarningLevel>
     <MtouchDebug>False</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchUseLlvm>false</MtouchUseLlvm>
     <MtouchArch>ARMv6</MtouchArch>
     <MtouchUseThumb>false</MtouchUseThumb>
@@ -148,6 +139,7 @@
     <Compile Include="Elements\ElementBadge.cs" />
     <Compile Include="Utilities\Controls.cs" />
     <Compile Include="CalendarMonthView.cs" />
+    <Compile Include="Utilities\GlassButton.cs" />
     <Compile Include="CalendarMonthViewController.cs" />
     <Compile Include="RotatingViewController.cs" />
   </ItemGroup>
