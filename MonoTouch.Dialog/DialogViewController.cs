@@ -10,7 +10,6 @@
 // MIT X11 license
 //
 using System;
-using System.Diagnostics;
 using MonoTouch.UIKit;
 using System.Drawing;
 using System.Collections.Generic;
@@ -673,7 +672,6 @@ namespace MonoTouch.Dialog
 		{
 			if (root == null)
 				return;
-		    Debug.WriteLine("Creating sizingsource: " + root.UnevenRows);
 			TableSource = CreateSizingSource (root.UnevenRows);
 			tableView.Source = TableSource;
         }
