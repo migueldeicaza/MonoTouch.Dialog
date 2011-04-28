@@ -16,6 +16,7 @@ using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.OpenGLES;
+using MonoTouch.CoreAnimation;
 
 namespace MonoTouch.Dialog
 {	
@@ -75,9 +76,8 @@ namespace MonoTouch.Dialog
 		{
 			var cell = tv.DequeueReusableCell (ckey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, ckey) {
-					SelectionStyle = UITableViewCellSelectionStyle.Blue
-				};
+				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, ckey);				
+				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
 			}
 			cell.Accessory = Accessory;
 			var tl = cell.TextLabel;
@@ -86,10 +86,13 @@ namespace MonoTouch.Dialog
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = Lines;
 			tl.ContentMode = ContentMode;
+			tl.BackgroundColor = UIColor.White;
 			if (Detail != null)
-			    cell.DetailTextLabel.Text = Detail;
+			{
+				cell.DetailTextLabel.Text = Detail;
+				cell.DetailTextLabel.BackgroundColor = UIColor.White;
+			}
 			cell.ImageView.Image = image;
-			
 			return cell;
 		}
 
@@ -101,6 +104,7 @@ namespace MonoTouch.Dialog
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (280, float.MaxValue);
+			Caption = Caption ?? "";
 			float height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
 			
 			// Image is 57 pixels tall, add some padding

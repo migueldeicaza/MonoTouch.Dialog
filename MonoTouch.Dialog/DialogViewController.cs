@@ -23,7 +23,7 @@ namespace MonoTouch.Dialog
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		UISearchBar searchBar;
 		public UITableView tableView;
-		RefreshTableHeaderView refreshView;
+		public RefreshTableHeaderView refreshView;
 		RootElement root;
 		bool pushing;
 		bool dirty;
@@ -79,6 +79,20 @@ namespace MonoTouch.Dialog
 					throw new ArgumentException ("You should set EnableSearch before the controller is shown");
 				enableSearch = value;
 			}
+		}
+		UIColor searchBarTintColor;
+		public UIColor SearchBarTintColor {
+			get {
+				return searchBarTintColor;}
+			set {
+				if(searchBarTintColor == value)
+					return;
+				searchBarTintColor = value;
+				if(searchBar == null)
+					return;
+				searchBar.TintColor = searchBarTintColor;
+			}
+		
 		}
 		
 		// If set, we automatically scroll the content to avoid showing the search bar until 
@@ -164,6 +178,15 @@ namespace MonoTouch.Dialog
 		
 		Section [] originalSections;
 		Element [][] originalElements;
+		public int SectionCount
+		{
+			get {return Root.Sections.Count();}
+		}
+		
+		public int RowsInSection( int section) {
+				return Root.Sections[section].Count;
+		}
+		
 		
 		/// <summary>
 		/// Allows caller to programatically activate the search bar and start the search process
@@ -205,7 +228,7 @@ namespace MonoTouch.Dialog
 			if (SearchTextChanged != null)
 				SearchTextChanged (this, new SearchChangedEventArgs (text));
 		}
-		                                     
+		
 		public void PerformFilter (string text)
 		{
 			if (originalSections == null)
@@ -487,7 +510,8 @@ namespace MonoTouch.Dialog
 		{
 			if (enableSearch){
 				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
-					Delegate = new SearchDelegate (this)
+					Delegate = new SearchDelegate (this),
+					TintColor = searchBarTintColor
 				};
 				if (SearchPlaceholder != null)
 					searchBar.Placeholder = this.SearchPlaceholder;

@@ -98,7 +98,7 @@ namespace MonoTouch.Dialog.Utilities
 		
 		static ImageLoader ()
 		{
-			PicDir = Path.Combine (BaseDir, "Library/Caches/Pictures.MonoTouch.Dialog/");
+			PicDir = Path.Combine (BaseDir, "Library/Caches/Pictures/");
 			
 			if (!Directory.Exists (PicDir))
 				Directory.CreateDirectory (PicDir);
@@ -179,7 +179,7 @@ namespace MonoTouch.Dialog.Utilities
 		public static UIImage DefaultRequestImage (Uri uri, IImageUpdated notify)
 		{
 			if (DefaultLoader == null)
-				DefaultLoader = new ImageLoader (50, 4*1024*1024);
+				DefaultLoader = new ImageLoader (100, 4*1024*1024);
 			return DefaultLoader.RequestImage (uri, notify);
 		}
 		

@@ -659,7 +659,7 @@ namespace MonoTouch.Dialog
 			this.style = style;
 		}
 		
-		UITableViewCellStyle style;
+		public UITableViewCellStyle style;
 		public UIFont Font;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
@@ -668,9 +668,9 @@ namespace MonoTouch.Dialog
 		
 		// To keep the size down for a StyleStringElement, we put all the image information
 		// on a separate structure, and create this on demand.
-		ExtraInfo extraInfo;
+		public ExtraInfo extraInfo;
 		
-		class ExtraInfo {
+		public class ExtraInfo {
 			public UIImage Image; // Maybe add BackgroundImage?
 			public UIColor BackgroundColor, DetailColor;
 			public Uri Uri, BackgroundUri;
@@ -744,10 +744,10 @@ namespace MonoTouch.Dialog
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)		{
 			var key = GetKey ((int) style);
 			var cell = tv.DequeueReusableCell (key);
-			if (cell == null){
+			//if (cell == null){
 				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
-			}
+			//}
 			PrepareCell (cell);
 			return cell;
 		}
@@ -948,13 +948,13 @@ namespace MonoTouch.Dialog
 			}
 			
 			SizeF size = new SizeF (280 - width, float.MaxValue);
+			float height;
 			using (var font = UIFont.FromName ("Helvetica", 17f))
 			{
-				var height = tableView.StringSize (text, font, size, UILineBreakMode.WordWrap).Height;
-				if (height <= 12)
-					height  = 17;
-				return height + 10;
+				height = tableView.StringSize (text, font, size, UILineBreakMode.WordWrap).Height + 10;
 			}
+			
+			return Math.Max(height,50);
 		}
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
@@ -1007,8 +1007,6 @@ namespace MonoTouch.Dialog
 		 float LANDSCAPE_KEYBOARD_HEIGHT = 162f;
 		private void setHeight()
 		{
-			
-
 			var frame = this.View.Frame;
 			switch(InterfaceOrientation)
 			{
@@ -1106,6 +1104,7 @@ namespace MonoTouch.Dialog
 		public string Group;
 		internal int RadioIdx;
 		public string Value;
+		public UITableViewCellAccessory theAccessory = UITableViewCellAccessory.Checkmark;
 		
 		public override string Summary ()
 		{
@@ -1158,7 +1157,7 @@ namespace MonoTouch.Dialog
 			
 			bool selected; 
 			selected = ((Value == ((RadioGroup)(root.group)).SelectedValue && !string.IsNullOrEmpty(Value)));
-			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			cell.Accessory = selected ? theAccessory : UITableViewCellAccessory.None;
 
 			return cell;
 		}
@@ -1715,9 +1714,9 @@ namespace MonoTouch.Dialog
 			};
 			return picker;
 		}
-		                                                                                                                                
+	
 		static RectangleF PickerFrameWithSize (SizeF size)
-		{                                                                                                                                    
+		{
 			var screenRect = UIScreen.MainScreen.ApplicationFrame;
 			float fY = 0, fX = 0;
 			
@@ -1736,8 +1735,8 @@ namespace MonoTouch.Dialog
 			}
 			
 			return new RectangleF (fX, fY, size.Width, size.Height);
-		}                                                                                                                                    
-
+		}
+		
 		public override void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			//tableView.DeselectRow(path,true);
@@ -1766,8 +1765,33 @@ namespace MonoTouch.Dialog
 		private void ShowCalendar(DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			if (calView == null)
-				calView = new CalendarMonthView(DateValue){
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth };
+			{
+				calView = new CalendarMonthView(DateValue,true){					
+					AutoresizingMask = UIViewAutoresizing.FlexibleWidth };
+				calView.ToolbarColor = dvc.SearchBarTintColor;
+				calView.SizeChanged += delegate {
+					RectangleF screenRect =  tableView.Window.Frame;
+					
+					SizeF pickerSize = calView.Size;
+					// compute the end frame
+					RectangleF pickerRect = new RectangleF(0.0f,
+											screenRect.Y + screenRect.Size.Height - pickerSize.Height,
+											pickerSize.Width,
+											pickerSize.Height);
+					// start the slide up animation
+					UIView.BeginAnimations(null);
+					UIView.SetAnimationDuration(0.3);
+					
+					// we need to perform some post operations after the animation is complete
+					UIView.SetAnimationDelegate(dvc);
+					
+					calView.Frame = pickerRect;
+					
+					UIView.CommitAnimations();
+						
+					
+				};
+			}
 			if (calView.Superview == null)
 			{
 				if (DateValue.Year < 2010)
@@ -1777,7 +1801,7 @@ namespace MonoTouch.Dialog
 					if (OnDateSelected != null)
 						OnDateSelected(date);
 					DateValue = date;
-					Console.WriteLine(String.Format("Selected {0}", date.ToShortDateString()));					
+					//Console.WriteLine(String.Format("Selected {0}", date.ToShortDateString()));					
 					if(closeOnSelect)
 						CloseCalendar(dvc,tableView,path);
 				};
@@ -1785,23 +1809,23 @@ namespace MonoTouch.Dialog
 				
 				tableView.Window.AddSubview(calView);
 				//dvc.View.Window.AddSubview(datePicker);	
-			    //
+				//
 				// size up the picker view to our screen and compute the start/end frame origin for our slide up animation
 				//
 				// compute the start frame
 				RectangleF screenRect =  tableView.Window.Frame;
 				
-				SizeF pickerSize = calView.Frame.Size;
+				SizeF pickerSize = calView.Size;
 				RectangleF startRect = new RectangleF(0.0f,
-				                      screenRect.Y + screenRect.Size.Height,
-				                      pickerSize.Width, pickerSize.Height);
+										screenRect.Y + screenRect.Size.Height,
+										pickerSize.Width, pickerSize.Height);
 				calView.Frame = startRect;
 				
 				// compute the end frame
 				RectangleF pickerRect = new RectangleF(0.0f,
-				                       screenRect.Y + screenRect.Size.Height - pickerSize.Height,
-				                       pickerSize.Width,
-				                       pickerSize.Height);
+										screenRect.Y + screenRect.Size.Height - pickerSize.Height,
+										pickerSize.Width,
+										pickerSize.Height);
 				// start the slide up animation
 				UIView.BeginAnimations(null);
 				UIView.SetAnimationDuration(0.3);
@@ -1813,15 +1837,16 @@ namespace MonoTouch.Dialog
 				
 				// shrink the table vertical size to make room for the date picker
 				RectangleF newFrame =  new RectangleF(tableView.Frame.X, tableView.Frame.Y,
-				                                      tableView.Frame.Size.Width, tableView.Frame.Size.Height + 55 - calView.Frame.Height) ;
+											tableView.Frame.Size.Width, tableView.Frame.Size.Height + 55 - calView.Frame.Height) ;
 				// newFrame.Size.Height -= datePicker.Frame.Height;
-				tableView.Frame = newFrame;
+				//tableView.Frame = newFrame;
 				UIView.CommitAnimations();
 				rightOld = dvc.NavigationItem.RightBarButtonItem;
 				//Multi Buttons
 				
 				// create a toolbar to have two buttons in the right
 				UIToolbar tools = new UIToolbar(new RectangleF(0, 0, 133, 44.01f));
+				tools.TintColor = dvc.SearchBarTintColor;
 				// create the array to hold the buttons, which then gets added to the toolbar
 				List<UIBarButtonItem> buttons = new List<UIBarButtonItem>(3);
 
@@ -1850,7 +1875,7 @@ namespace MonoTouch.Dialog
 				dvc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(tools);
 
 				leftOld = dvc.NavigationItem.LeftBarButtonItem;
-				dvc.NavigationItem.LeftBarButtonItem =  new UIBarButtonItem("No Due Date",UIBarButtonItemStyle.Bordered, delegate{
+				dvc.NavigationItem.LeftBarButtonItem =  new UIBarButtonItem("None",UIBarButtonItemStyle.Bordered, delegate{
 					DateValue = DateTime.MinValue;
 					if (OnDateSelected != null)
 						OnDateSelected(Util.DateTimeMin);
@@ -1880,12 +1905,6 @@ namespace MonoTouch.Dialog
 			
 			calView.Frame = endFrame;
 			UIView.CommitAnimations();
-			
-			// grow the table back again in vertical size to make room for the date picker
-			RectangleF newFrame = new RectangleF(tableView.Frame.X,tableView.Frame.Y
-			                                     ,tableView.Frame.Size.Width,tableView.Frame.Size.Height + calView.Frame.Size.Height);
-			
-			tableView.Frame = newFrame;
 			
 			// remove the "Done" button in the nav bar
 			dvc.NavigationItem.RightBarButtonItem = rightOld;
@@ -1938,17 +1957,12 @@ namespace MonoTouch.Dialog
 				
 				datePicker.Frame = pickerRect;
 				
-				// shrink the table vertical size to make room for the date picker
-				RectangleF newFrame =  new RectangleF(tableView.Frame.X, tableView.Frame.Y,
-				                                      tableView.Frame.Size.Width, tableView.Frame.Size.Height + 55 - datePicker.Frame.Height) ;
-				// newFrame.Size.Height -= datePicker.Frame.Height;
-				tableView.Frame = newFrame;
 				UIView.CommitAnimations();
 				rightOld = dvc.NavigationItem.RightBarButtonItem;
 				
 				
 				//create done button
-				doneButton = new UIBarButtonItem("Done",UIBarButtonItemStyle.Bordered, delegate{
+				doneButton = new UIBarButtonItem("Done",UIBarButtonItemStyle.Done, delegate{
 					SlideDown(dvc,tableView,path);
 				});
 				// create a toolbar to have two buttons in the right
@@ -1958,6 +1972,7 @@ namespace MonoTouch.Dialog
 				else 
 				{
 					UIToolbar tools = new UIToolbar(new RectangleF(0, 0, 133, 44.01f));
+					tools.TintColor = dvc.SearchBarTintColor;
 				// create the array to hold the buttons, which then gets added to the toolbar
 					List<UIBarButtonItem> buttons = new List<UIBarButtonItem>(3);
 
@@ -1983,9 +1998,11 @@ namespace MonoTouch.Dialog
 				
 
 				leftOld = dvc.NavigationItem.LeftBarButtonItem;
-				dvc.NavigationItem.LeftBarButtonItem =  new UIBarButtonItem("No Due Date",UIBarButtonItemStyle.Bordered, delegate{
+				dvc.NavigationItem.LeftBarButtonItem =  new UIBarButtonItem("None",UIBarButtonItemStyle.Bordered, delegate{
 					datePicker.Date = DateTime.MinValue;
 					SlideDown(dvc,tableView,path);
+					if (OnDateSelected != null)
+						OnDateSelected(Util.DateTimeMin);
 				});
 				// add the "Done" button to the nav bar
 				//dvc.NavigationItem.SetRightBarButtonItem(doneButton,true);
@@ -2012,12 +2029,6 @@ namespace MonoTouch.Dialog
 			
 			datePicker.Frame = endFrame;
 			UIView.CommitAnimations();
-			
-			// grow the table back again in vertical size to make room for the date picker
-			RectangleF newFrame = new RectangleF(tableView.Frame.X,tableView.Frame.Y
-			                                     ,tableView.Frame.Size.Width,tableView.Frame.Size.Height + datePicker.Frame.Size.Height);
-			
-			tableView.Frame = newFrame;
 			
 			// remove the "Done" button in the nav bar
 			dvc.NavigationItem.RightBarButtonItem = rightOld;
@@ -2583,7 +2594,7 @@ namespace MonoTouch.Dialog
 		internal Group group;
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
-		internal UITableView TableView;
+		public UITableView TableView;
 		
 		// This is used to indicate that we need the DVC to dispatch calls to
 		// WillDisplayCell so we can prepare the color of the cell before 
