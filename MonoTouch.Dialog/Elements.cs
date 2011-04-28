@@ -924,9 +924,10 @@ namespace MonoTouch.Dialog
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (280, float.MaxValue);
-			return Math.Max(
-                tableView.StringSize(Caption, tableView.CellAt(indexPath).TextLabel.Font, size, UILineBreakMode.WordWrap).Height + 10,
-                tableView.StringSize(Value, tableView.CellAt(indexPath).DetailTextLabel.Font, size, UILineBreakMode.WordWrap).Height + 10);
+            using (var font = UIFont.FromName("Helvetica", 17))
+			    return Math.Max(
+                    tableView.StringSize(Caption ?? "", font, size, UILineBreakMode.WordWrap).Height + 10,
+                    tableView.StringSize(Value ?? "", font, size, UILineBreakMode.WordWrap).Height + 10);
 		}
 	}
 	
