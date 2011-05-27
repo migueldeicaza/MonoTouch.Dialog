@@ -1,3 +1,5 @@
 *~
 *.userprefs
 *.pidb
+
+/Sample/obj/Debug/monotouch_dll_content_processed
