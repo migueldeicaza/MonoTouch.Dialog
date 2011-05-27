@@ -326,7 +326,7 @@ namespace MonoTouch.Dialog
 				UpdateImage ();
 			}
 
-			void UpdateImage ()
+			public void UpdateImage ()
 			{
 				button.SetImage (parent.GetImage (), UIControlState.Normal);
 			}
@@ -362,14 +362,14 @@ namespace MonoTouch.Dialog
 		public event NSAction Tapped;
 		
 		protected abstract UIImage GetImage ();
-		
+		public UITableViewCell cell;
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (key) as TextWithImageCellView;
-			if (cell == null)
+			cell = tv.DequeueReusableCell (key) as TextWithImageCellView;
+			//if (cell == null)
 				cell = new TextWithImageCellView (this);
-			else
-				cell.UpdateFrom (this);
+			//else
+			//	cell.UpdateFrom (this);
 			cell.SelectionStyle =  UITableViewCellSelectionStyle.None;
 			return cell;
 		}
@@ -1217,6 +1217,7 @@ namespace MonoTouch.Dialog
 		{
 			Value = !Value;
 			var cell = tableView.CellAt (path);
+			cell.TextLabel.BackgroundColor = UIColor.Clear;
 			ConfigCell (cell);
 			base.Selected (dvc, tableView, path);
 		}

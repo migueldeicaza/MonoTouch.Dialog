@@ -20,7 +20,7 @@ namespace MonoTouch.Dialog
 
 	// This cute method will be added to UIImage.FromResource, but for old installs 
 	// make a copy here
-	internal static class Util {
+	static class Util {
 		
 		public static DateTime DateTimeMin
 		{

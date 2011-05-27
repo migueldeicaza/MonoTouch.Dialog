@@ -21,7 +21,7 @@ namespace MonoTouch.Dialog
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
-		UISearchBar searchBar;
+		public UISearchBar searchBar;
 		public UITableView tableView;
 		public RefreshTableHeaderView refreshView;
 		RootElement root;
@@ -75,8 +75,8 @@ namespace MonoTouch.Dialog
 					return;
 				
 				// After MonoTouch 3.0, we can allow for the search to be enabled/disable
-				if (tableView != null)
-					throw new ArgumentException ("You should set EnableSearch before the controller is shown");
+			//	if (tableView != null)
+			//		throw new ArgumentException ("You should set EnableSearch before the controller is shown");
 				enableSearch = value;
 			}
 		}
@@ -601,6 +601,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+
 		public virtual Source CreateSizingSource (bool unevenRows)
 		{
 			return unevenRows ? new SizingSource (this) : new Source (this);
@@ -634,7 +635,6 @@ namespace MonoTouch.Dialog
 		
 		public override void ViewWillDisappear (bool animated)
 		{
-			base.ViewWillDisappear (animated);
 			FinishSearch();
 			if (ViewDissapearing != null)
 				ViewDissapearing (this, EventArgs.Empty);
