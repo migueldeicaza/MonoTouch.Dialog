@@ -1304,10 +1304,14 @@ namespace MonoTouch.Dialog
 							break;
 						}
 					}
-					if (focus != this)
-						focus.entry.BecomeFirstResponder ();
-					else 
-						focus.entry.ResignFirstResponder ();
+                    if (focus != this)
+                    {
+                        focus.BecomeFirstResponder(true);
+                    }
+                    else
+                    {
+                        focus.ResignFirstResponder(true);
+                    }
 					
 					return true;
 				};
@@ -1355,7 +1359,7 @@ namespace MonoTouch.Dialog
 		
 		protected override void Dispose (bool disposing)
 		{
-			if (disposing){
+			if (disposing && entry != null){
 				if (entry != null){
 					entry.Dispose ();
 					entry = null;

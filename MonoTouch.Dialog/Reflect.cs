@@ -11,8 +11,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using MonoTouch.UIKit;
 using System.Drawing;
 using MonoTouch.Foundation;
@@ -119,8 +123,8 @@ namespace MonoTouch.Dialog
 	public class BindingContext : IDisposable {
 		public RootElement Root;
 		Dictionary<Element,MemberAndInstance> mappings;
-			
-		class MemberAndInstance {
+
+	    class MemberAndInstance {
 			public MemberAndInstance (MemberInfo mi, object o)
 			{
 				Member = mi;
@@ -130,7 +134,7 @@ namespace MonoTouch.Dialog
 			public object Obj;
 		}
 		
-		static object GetValue (MemberInfo mi, object o)
+	    static object GetValue (MemberInfo mi, object o)
 		{
 			var fi = mi as FieldInfo;
 			if (fi != null)
@@ -143,7 +147,27 @@ namespace MonoTouch.Dialog
 
 		static void SetValue (MemberInfo mi, object o, object val)
 		{
-			var fi = mi as FieldInfo;
+            var mtype = GetTypeForMember(mi);
+            if (val != null && !mtype.IsAssignableFrom(val.GetType()))
+            {
+                if (mtype == typeof(decimal))
+                {
+                    decimal dec;
+                    decimal.TryParse(val.ToString(), NumberStyles.Any, Thread.CurrentThread.CurrentUICulture, out dec);
+                    val = dec;
+                }
+                else if (mtype == typeof(int))
+                {
+                    int intval;
+                    int.TryParse(val.ToString(), NumberStyles.Any, Thread.CurrentThread.CurrentUICulture, out intval);
+                    val = intval;
+                }
+                else
+                {
+                    val = new TypeConverter().ConvertTo(val, mtype);
+                }
+            }
+		    var fi = mi as FieldInfo;
 			if (fi != null){
 				fi.SetValue (o, val);
 				return;
@@ -190,15 +214,14 @@ namespace MonoTouch.Dialog
 			if (o == null)
 				throw new ArgumentNullException ("o");
 			
-			mappings = new Dictionary<Element,MemberAndInstance> ();
+			mappings = new Dictionary<Element, MemberAndInstance>();
 			
 			Root = new RootElement (title);
 			Populate (callbacks, o, Root);
 		}
-		
-		void Populate (object callbacks, object o, RootElement root)
+
+	    void Populate (object callbacks, object o, RootElement root)
 		{
-			MemberInfo last_radio_index = null;
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
 							       BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -353,9 +376,13 @@ namespace MonoTouch.Dialog
 				} else if (typeof (System.Collections.IEnumerable).IsAssignableFrom (mType)){
 					var csection = new Section ();
 					int count = 0;
-					
-					if (last_radio_index == null)
-						throw new Exception ("IEnumerable found, but no previous int found");
+
+				    var last_radio_index = members.FirstOrDefault(
+				            m =>
+                                GetTypeForMember(m) == typeof(int) &&
+                                m.GetCustomAttributes(false).OfType<RadioSelectionAttribute>().Any(r => r.Target == mi.Name));
+                    if (last_radio_index == null)
+						throw new Exception ("IEnumerable found, but no int with it's target was found");
 					foreach (var e in (IEnumerable) GetValue (mi, o)){
 						csection.Add (new RadioElement (e.ToString ()));
 						count++;
@@ -364,15 +391,18 @@ namespace MonoTouch.Dialog
 					if (selected >= count || selected < 0)
 						selected = 0;
 					element = new RootElement (caption, new MemberRadioGroup (null, selected, last_radio_index)) { csection };
-					last_radio_index = null;
-				} else if (typeof (int) == mType){
-					foreach (object attr in attrs){
-						if (attr is RadioSelectionAttribute){
-							last_radio_index = mi;
-							break;
-						}
-					}
-				} else {
+                } else if (typeof (int) == mType || typeof(decimal) == mType) {
+                    if (!attrs.OfType<RadioSelectionAttribute>().Any())
+                    {
+                        element = new EntryElement(caption, null, GetValue(mi, o) as string)
+                                      {
+                                          KeyboardType =
+                                              typeof (int) == mType
+                                                  ? UIKeyboardType.NumberPad
+                                                  : UIKeyboardType.DecimalPad
+                                      };
+                    }
+                } else {
 					var nested = GetValue (mi, o);
 					if (nested != null){
 						var newRoot = new RootElement (caption);
@@ -384,7 +414,7 @@ namespace MonoTouch.Dialog
 				if (element == null)
 					continue;
 				section.Add (element);
-				mappings [element] = new MemberAndInstance (mi, o);
+                mappings [element] = new MemberAndInstance(mi, o);
 			}
 			root.Add (section);
 		}
@@ -413,13 +443,16 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public void Fetch ()
+		public object Fetch ()
 		{
-			foreach (var dk in mappings){
+		    object boundObject = null;
+            foreach (var dk in mappings)
+            {
 				Element element = dk.Key;
-				MemberInfo mi = dk.Value.Member;
-				object obj = dk.Value.Obj;
-				
+                MemberInfo mi = dk.Value.Member;
+                object obj = dk.Value.Obj;
+                if (boundObject == null) boundObject = obj;
+
 				if (element is DateTimeElement)
 					SetValue (mi, obj, ((DateTimeElement) element).DateValue);
 				else if (element is FloatElement)
@@ -447,6 +480,8 @@ namespace MonoTouch.Dialog
 					}
 				}
 			}
+
+		    return boundObject;
 		}
 	}
 }
