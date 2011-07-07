@@ -1,10 +1,8 @@
 using System;
-using System.Drawing;
 
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.MapKit;
-using MonoTouch.CoreLocation;
 
 namespace MonoTouch.Dialog
 {
@@ -50,8 +48,7 @@ namespace MonoTouch.Dialog
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
 			};
 			MapView.Frame = new System.Drawing.RectangleF(UIScreen.MainScreen.ApplicationFrame.Left, UIScreen.MainScreen.ApplicationFrame.Top - 20, UIScreen.MainScreen.ApplicationFrame.Right, UIScreen.MainScreen.ApplicationFrame.Bottom - 20);
-			// MapView.Delegate = mkViewDelegate;	
-			MapView.Delegate = new MurderMapViewDelegate(dvc);	
+			MapView.Delegate = mkViewDelegate;			
 			
 			if ( mkAnnotationObjects != null )
 			{
