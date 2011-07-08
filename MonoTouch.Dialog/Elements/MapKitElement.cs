@@ -10,13 +10,19 @@ namespace MonoTouch.Dialog
 	{
 		static NSString mkey = new NSString ("MapKitElement");
 		public MKMapView MapView = null;
-		private MKMapViewDelegate mkViewDelegate = null;
 		private MKAnnotation[] mkAnnotationObjects;
 		
-		public MapKitElement ( string aCaption, MKMapViewDelegate aMapViewDelegate, MKAnnotation[] aMKAnnotationObjects ) : base(aCaption)
+		EventHandler<MKMapViewAccessoryTappedEventArgs> mkHandleMapViewCalloutAccessoryControlTapped;
+		EventHandler<MKAnnotationViewEventArgs> mkHandleMapViewDidSelectAnnotationView;
+		public delegate MKAnnotationView HandleGetViewForAnnotation(MKMapView mapView, NSObject annotation);
+		HandleGetViewForAnnotation mkHandleGetViewForAnnotation;
+		
+		public MapKitElement ( string aCaption, MKAnnotation[] aMKAnnotationObjects, HandleGetViewForAnnotation aHandleGetViewForAnnotation, EventHandler<MKMapViewAccessoryTappedEventArgs> aHandleMapViewCalloutAccessoryControlTapped, EventHandler<MKAnnotationViewEventArgs> aHandleMapViewDidSelectAnnotationView ) : base(aCaption)
 		{
-			mkViewDelegate = aMapViewDelegate;
 			mkAnnotationObjects = aMKAnnotationObjects;
+			mkHandleGetViewForAnnotation = aHandleGetViewForAnnotation;
+			mkHandleMapViewCalloutAccessoryControlTapped = aHandleMapViewCalloutAccessoryControlTapped;
+			mkHandleMapViewDidSelectAnnotationView = aHandleMapViewDidSelectAnnotationView;
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -48,7 +54,22 @@ namespace MonoTouch.Dialog
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
 			};
 			MapView.Frame = new System.Drawing.RectangleF(UIScreen.MainScreen.ApplicationFrame.Left, UIScreen.MainScreen.ApplicationFrame.Top - 20, UIScreen.MainScreen.ApplicationFrame.Right, UIScreen.MainScreen.ApplicationFrame.Bottom - 20);
-			MapView.Delegate = mkViewDelegate;			
+			if (mkHandleGetViewForAnnotation != null )
+			{
+				MapView.GetViewForAnnotation = delegate(MKMapView mapView, NSObject annotation) {
+					return mkHandleGetViewForAnnotation(mapView, annotation);
+				};
+			}
+			
+			if ( mkHandleMapViewCalloutAccessoryControlTapped != null )
+			{
+				MapView.CalloutAccessoryControlTapped += mkHandleMapViewCalloutAccessoryControlTapped;
+			}
+			
+			if (mkHandleMapViewDidSelectAnnotationView != null)
+			{
+				MapView.DidSelectAnnotationView += mkHandleMapViewDidSelectAnnotationView;
+			}
 			
 			if ( mkAnnotationObjects != null )
 			{
@@ -66,6 +87,8 @@ namespace MonoTouch.Dialog
 			MapView.LoadingMapFailed += delegate(object sender, NSErrorEventArgs e) {			
 				// Display an error of sorts
 			};
+			
+			MapView.ShowsUserLocation = true;
 			
 			vc.NavigationItem.Title = Caption;
 			vc.View.AddSubview(MapView);
