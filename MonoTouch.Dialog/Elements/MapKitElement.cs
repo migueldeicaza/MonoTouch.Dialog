@@ -23,6 +23,11 @@ namespace MonoTouch.Dialog
 			mkHandleGetViewForAnnotation = aHandleGetViewForAnnotation;
 			mkHandleMapViewCalloutAccessoryControlTapped = aHandleMapViewCalloutAccessoryControlTapped;
 			mkHandleMapViewDidSelectAnnotationView = aHandleMapViewDidSelectAnnotationView;
+			
+			MapView = new MKMapView(){				
+				BackgroundColor = UIColor.White,				
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+			};
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
@@ -49,10 +54,16 @@ namespace MonoTouch.Dialog
 			var vc = new MapKitViewController (this) {
 				Autorotate = dvc.Autorotate
 			};
-			MapView = new MKMapView(){				
-				BackgroundColor = UIColor.White,				
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
-			};
+			
+			
+			if ( MapView == null )
+			{
+				MapView = new MKMapView(){				
+					BackgroundColor = UIColor.White,				
+					AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+				};
+			}
+			
 			MapView.Frame = new System.Drawing.RectangleF(UIScreen.MainScreen.ApplicationFrame.Left, UIScreen.MainScreen.ApplicationFrame.Top - 20, UIScreen.MainScreen.ApplicationFrame.Right, UIScreen.MainScreen.ApplicationFrame.Bottom - 20);
 			if (mkHandleGetViewForAnnotation != null )
 			{
@@ -88,12 +99,34 @@ namespace MonoTouch.Dialog
 				// Display an error of sorts
 			};
 			
+			if ( ReverseGeocoderDelegate !=  null )
+			{
+				if ( MapView != null )
+				{
+					MapView.DidUpdateUserLocation += delegate(object sender, MKUserLocationEventArgs e) {
+						if ( MapView != null )
+						{
+							var ul = MapView.UserLocation.Location;
+							var gc = new MKReverseGeocoder(ul.Coordinate);
+							gc.Delegate = ReverseGeocoderDelegate;
+							gc.Start();
+						}
+					};
+				}
+			}
+			
 			MapView.ShowsUserLocation = true;
 			
 			vc.NavigationItem.Title = Caption;
 			vc.View.AddSubview(MapView);
 			
 			dvc.ActivateController (vc);
+		}
+		
+		public MKReverseGeocoderDelegate ReverseGeocoderDelegate 
+		{
+			get;
+			set;
 		}
 		
 		// We use this class to dispose the MapKit control when it is not
