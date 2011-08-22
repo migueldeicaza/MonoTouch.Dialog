@@ -16,6 +16,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
@@ -1318,16 +1319,20 @@ namespace MonoTouch.Dialog
             
             if (entry == null){
                 SizeF size = ComputeEntryPosition (tv, cell);
-                var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
+                var _entry = new UITextField (new RectangleF (
+                        size.Width, 
+                        (cell.ContentView.Bounds.Height-size.Height)/2-1, cell.ContentView.Bounds.Width-size.Width, size.Height)){
                     Tag = 1,
                     Placeholder = placeholder ?? "",
                     SecureTextEntry = isPassword
                 };
+                Debug.WriteLine(Caption + " bounds: w:" + cell.ContentView.Bounds.Width + ",r:" +cell.ContentView.Bounds.Right);
+                Debug.WriteLine(Caption + " width: " + _entry.Frame.Width);
                 _entry.Text = Value ?? "";
                 entry = _entry;
                 entry.EditingDidEndOnExit += (sender, args) => { if (EditingDidEndOnExit != null) { EditingDidEndOnExit(sender, args); };};
                                                                    
-                entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |  UIViewAutoresizing.FlexibleLeftMargin;
+                entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
                 
                 entry.ValueChanged += delegate {
                     FetchValue ();
