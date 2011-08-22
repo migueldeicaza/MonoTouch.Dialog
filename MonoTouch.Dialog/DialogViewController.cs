@@ -397,7 +397,7 @@ namespace MonoTouch.Dialog
 			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
 			{
                 if (Container.loadMoreView != null)
-                    Container.loadMoreView.Frame = new RectangleF(0, Container.TableView.ContentSize.Height, Container.loadMoreView.Frame.Width, Container.loadMoreView.Frame.Height);
+                    InvokeOnMainThread(() => { Container.loadMoreView.Frame = new RectangleF(0, Container.TableView.ContentSize.Height, Container.loadMoreView.Frame.Width, Container.loadMoreView.Frame.Height);});
                 
                 if (Root.NeedColorUpdate)
                 {
@@ -621,7 +621,7 @@ namespace MonoTouch.Dialog
                 // whole are with the background color.
                 var bounds = View.Bounds;
                 
-                loadMoreView = MakeLoadMoreTableFooterView(new RectangleF(0, TableView.ContentSize.Height, bounds.Width, bounds.Height));
+                loadMoreView = MakeLoadMoreTableFooterView(new RectangleF(0, Math.Max(TableView.ContentSize.Height, bounds.Height), bounds.Width, bounds.Height));
                 if (reloading)
                     loadMoreView.SetActivity(true);
                 TableView.AddSubview(loadMoreView);
@@ -713,6 +713,7 @@ namespace MonoTouch.Dialog
 		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
 			PrepareRoot (root);
+		    Style = style;
 		}
 		
 		/// <summary>
@@ -735,6 +736,7 @@ namespace MonoTouch.Dialog
 		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
 		{
 			this.pushing = pushing;
+		    Style = style;
 			PrepareRoot (root);
 		}
 	}

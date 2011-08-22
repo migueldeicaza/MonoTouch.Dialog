@@ -394,7 +394,7 @@ namespace MonoTouch.Dialog
                 } else if (typeof (int) == mType || typeof(decimal) == mType) {
                     if (!attrs.OfType<RadioSelectionAttribute>().Any())
                     {
-                        element = new EntryElement(caption, null, GetValue(mi, o) as string)
+                        element = new EntryElement(caption, null, GetValue(mi, o) + "")
                                       {
                                           KeyboardType =
                                               typeof (int) == mType

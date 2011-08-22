@@ -1,3 +1,9 @@
 *~
 *.userprefs
 *.pidb
+
+_UpgradeReport_Files/*
+*.user
+*.suo
+MonoTouch.Dialog/obj/**
+Sample/obj/**
