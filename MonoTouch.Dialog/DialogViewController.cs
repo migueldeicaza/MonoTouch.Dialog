@@ -22,7 +22,7 @@ namespace MonoTouch.Dialog
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		public UISearchBar searchBar;
-		public UITableView tableView;
+		private UITableView tableView;
 		public RefreshTableHeaderView refreshView;
 		RootElement root;
 		bool pushing;
@@ -515,7 +515,8 @@ namespace MonoTouch.Dialog
 				};
 				if (SearchPlaceholder != null)
 					searchBar.Placeholder = this.SearchPlaceholder;
-				tableView.TableHeaderView = searchBar;
+				tableView.TableHeaderView = new UIView(new RectangleF(0,0,tableView.Bounds.Width,100));
+				tableView.TableHeaderView.AddSubview(searchBar);
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;

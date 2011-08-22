@@ -85,6 +85,13 @@ namespace MonoTouch.Dialog
 			if (viewToRemove != null)
 				viewToRemove.RemoveFromSuperview ();
 		}
+		public void Reload()
+		{
+			var root = GetImmediateRootElement ();
+			if (root == null || root.TableView == null)
+				return;
+			root.TableView.ReloadRows (new NSIndexPath [] { IndexPath }, UITableViewRowAnimation.None);	
+		}
 		
 		/// <summary>
 		/// Returns a summary of the value represented by this object, suitable 
@@ -1370,6 +1377,7 @@ namespace MonoTouch.Dialog
 			if (picker == null)
 				picker = new UIImagePickerController ();
 			picker.Delegate = new MyDelegate (this, tableView, path);
+			picker.SourceType = UIImagePickerControllerSourceType.Camera;
 			
 			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
 			case UIUserInterfaceIdiom.Pad:
@@ -1416,6 +1424,15 @@ namespace MonoTouch.Dialog
 			}
 		}
 		string val;
+		public UITextAlignment TextAlignment {
+			get{return alignment;}
+			set{
+				alignment = value;
+				if (entry != null)
+					entry.TextAlignment = value;
+			}
+		}	
+		UITextAlignment alignment;
 		
 		/// <summary>
 		/// The type of keyboard used for input, you can change
@@ -1528,11 +1545,12 @@ namespace MonoTouch.Dialog
 			
 			if (entry == null){
 				SizeF size = ComputeEntryPosition (tv, cell);
-				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
+				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width - 15, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
 					SecureTextEntry = isPassword,
-					Text = val
+					Text = val,
+					TextAlignment = alignment,
 				};
 				_entry.Text = Value ?? "";
 				entry = _entry;
@@ -1660,7 +1678,9 @@ namespace MonoTouch.Dialog
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
 			if (entry != null)
 				entry.ResignFirstResponder ();
-        }	}
+        }	
+	
+	}
 	
 	
 	
@@ -1823,10 +1843,10 @@ namespace MonoTouch.Dialog
 				if (DateValue.Year < 2010)
 					DateValue = DateTime.Today;
 				calView.SizeThatFits(SizeF.Empty);
-				calView.OnDateSelected += (date) => {
+				calView.OnDateSelected += (date) => {					
+					DateValue = date;
 					if (OnDateSelected != null)
 						OnDateSelected(date);
-					DateValue = date;
 					//Console.WriteLine(String.Format("Selected {0}", date.ToShortDateString()));					
 					if(closeOnSelect)
 						CloseCalendar(dvc,tableView,path);
