@@ -492,6 +492,9 @@ namespace MonoTouch.Dialog
 			tableView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin;
 			tableView.AutosizesSubviews = true;
 			
+			if (root != null)
+				root.Prepare ();
+			
 			UpdateSource ();
 			View = tableView;
 			SetupSearch ();
@@ -580,23 +583,16 @@ namespace MonoTouch.Dialog
 			if (ViewDissapearing != null)
 				ViewDissapearing (this, EventArgs.Empty);
 		}
-
-		void PrepareRoot (RootElement root)
-		{
-			this.root = root;
-			if (root != null)
-				root.Prepare ();
-		}
 		
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
 		{
-			PrepareRoot (root);
+			this.root = root;
 		}
 		
 		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
 			Style = style;
-			PrepareRoot (root);
+			this.root = root;
 		}
 		
 		/// <summary>
@@ -613,14 +609,14 @@ namespace MonoTouch.Dialog
 		public DialogViewController (RootElement root, bool pushing) : base (UITableViewStyle.Grouped)
 		{
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 
 		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
 		{
 			Style = style;
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 	}
 	
