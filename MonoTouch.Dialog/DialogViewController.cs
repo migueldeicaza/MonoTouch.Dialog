@@ -330,7 +330,12 @@ namespace MonoTouch.Dialog
 				}
 			}
 			
-			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override void RowDeselected (UITableView tableView, NSIndexPath indexPath)
+			{
+				Container.Deselected (indexPath);
+			}
+			
+			public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 			{
 				Container.Selected (indexPath);
 			}			
@@ -471,6 +476,14 @@ namespace MonoTouch.Dialog
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
 			}
+		}
+		
+		public virtual void Deselected (NSIndexPath indexPath)
+		{
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
+			
+			element.Deselected (this, tableView, indexPath);
 		}
 		
 		public virtual void Selected (NSIndexPath indexPath)

@@ -89,7 +89,23 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
-		/// Invoked when the given element has been tapped by the user.
+		/// Invoked when the given element has been deslected by the user.
+		/// </summary>
+		/// <param name="dvc">
+		/// The <see cref="DialogViewController"/> where the deselection took place
+		/// </param>
+		/// <param name="tableView">
+		/// The <see cref="UITableView"/> that contains the element.
+		/// </param>
+		/// <param name="path">
+		/// The <see cref="NSIndexPath"/> that contains the Section and Row for the element.
+		/// </param>
+		public virtual void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
+		}
+		
+		/// <summary>
+		/// Invoked when the given element has been selected by the user.
 		/// </summary>
 		/// <param name="dvc">
 		/// The <see cref="DialogViewController"/> where the selection took place
