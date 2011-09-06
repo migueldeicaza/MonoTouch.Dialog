@@ -1371,13 +1371,13 @@ namespace MonoTouch.Dialog
 				return;
 
 			var newValue = entry.Text;
-			var diff = newValue != Value;
+			if (newValue == Value)
+				return;
+			
 			Value = newValue;
 			
-			if (diff){
-				if (Changed != null)
-					Changed (this, EventArgs.Empty);
-			}
+			if (Changed != null)
+				Changed (this, EventArgs.Empty);
 		}
 		
 		protected override void Dispose (bool disposing)
