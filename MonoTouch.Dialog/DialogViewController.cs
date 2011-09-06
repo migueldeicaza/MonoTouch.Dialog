@@ -63,7 +63,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		// If the value is 1, we are enabled, used in the source for quick computation
+		// If the value is true, we are enabled, used in the source for quick computation
 		bool enableSearch;
 		public bool EnableSearch {
 			get {
@@ -632,5 +632,4 @@ namespace MonoTouch.Dialog
 			this.root = root;
 		}
 	}
-	
 }
