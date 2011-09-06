@@ -100,7 +100,7 @@ namespace MonoTouch.Dialog
 		/// <param name="path">
 		/// The <see cref="NSIndexPath"/> that contains the Section and Row for the element.
 		/// </param>
-		public virtual void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		public virtual void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 		}
 		
@@ -1231,7 +1231,7 @@ namespace MonoTouch.Dialog
 		/// The caption to use
 		/// </param>
 		/// <param name="placeholder">
-		/// Placeholder to display.
+		/// Placeholder to display when no value is set.
 		/// </param>
 		/// <param name="value">
 		/// Initial value.
@@ -1243,13 +1243,13 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
-		/// Constructs  an EntryElement for password entry with the given caption, placeholder and initial value.
+		/// Constructs an EntryElement for password entry with the given caption, placeholder and initial value.
 		/// </summary>
 		/// <param name="caption">
-		/// The caption to use
+		/// The caption to use.
 		/// </param>
 		/// <param name="placeholder">
-		/// Placeholder to display.
+		/// Placeholder to display when no value is set.
 		/// </param>
 		/// <param name="value">
 		/// Initial value.
@@ -1362,7 +1362,8 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
-		///  Copies the value from the currently entry UIView to the Value property and raises the Changed event if necessary.
+		///  Copies the value from the UITextField in the EntryElement to the
+		//   Value property and raises the Changed event if necessary.
 		/// </summary>
 		public void FetchValue ()
 		{
@@ -1422,7 +1423,8 @@ namespace MonoTouch.Dialog
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
 			if (entry != null)
 				entry.ResignFirstResponder ();
-        }	}
+		}
+	}
 	
 	public class DateTimeElement : StringElement {
 		public DateTime DateValue;
