@@ -1214,9 +1214,8 @@ namespace MonoTouch.Dialog
 					entry.KeyboardType = value;
 			}
 		}
+
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
-		
-		static NSString ekey = new NSString ("EntryElement");
 		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
@@ -1309,9 +1308,9 @@ namespace MonoTouch.Dialog
 
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (ekey);
+			var cell = tv.DequeueReusableCell (GetType ().FullName);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, ekey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, GetType ().FullName);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else 
 				RemoveTag (cell, 1);
