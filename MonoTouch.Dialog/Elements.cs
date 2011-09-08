@@ -1214,7 +1214,7 @@ namespace MonoTouch.Dialog
 					entry.KeyboardType = value;
 			}
 		}
-		public UIKeyboardType keyboardType = UIKeyboardType.Default;
+		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		
 		static NSString ekey = new NSString ("EntryElement");
 		bool isPassword, becomeResponder;
