@@ -1329,19 +1329,30 @@ namespace MonoTouch.Dialog
 					FetchValue ();
 				};
 				entry.ShouldReturn += delegate {
+					RootElement root = GetImmediateRootElement ();
 					EntryElement focus = null;
-					foreach (var e in (Parent as Section).Elements){
-						if (e == this)
-							focus = this;
-						else if (focus != null && e is EntryElement){
-							focus = e as EntryElement;
-							break;
+					
+					if (root == null)
+						return true;
+					
+					foreach (var s in root.Sections) {
+						foreach (var e in s.Elements) {
+							if (e == this) {
+								focus = this;
+							} else if (focus != null && e is EntryElement) {
+								focus = e as EntryElement;
+								break;
+							}
 						}
+						
+						if (focus != null && focus != this)
+							break;
 					}
+					
 					if (focus != this)
-						focus.entry.BecomeFirstResponder ();
+						focus.BecomeFirstResponder (true);
 					else 
-						focus.entry.ResignFirstResponder ();
+						focus.ResignFirstResponder (true);
 					
 					return true;
 				};
