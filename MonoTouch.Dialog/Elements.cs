@@ -980,6 +980,7 @@ namespace MonoTouch.Dialog
 				Value = entryScreen.Text;
 				if (EditingDone != null)
 					EditingDone();
+				tableView.ReloadRows(new NSIndexPath[]{path},UITableViewRowAnimation.None);
 			};
 			dvc.NavigationController.PushViewController(entryScreen,true);
 			base.Selected (dvc, tableView, path);
@@ -2280,6 +2281,52 @@ namespace MonoTouch.Dialog
 			FooterView = footer;
 		}
 		
+		private bool collaped;
+		public bool Collapsed {
+			get{return collaped;}
+			set{if(collaped == value)
+				return;
+				collaped = value;
+				if(collaped)
+					collapse();
+				else
+					expand();
+			}
+		}
+		
+		private void collapse()
+		{
+			if(tableView == null)
+				return;
+			
+			
+			List<NSIndexPath> indexPathsToInsert = new List<NSIndexPath>();
+			for (int i = 0; i < this.Count; i++) {
+						indexPathsToInsert.Add(NSIndexPath.FromRowSection(i,Index));
+			}
+			
+			tableView.BeginUpdates();
+			tableView.DeleteRows(indexPathsToInsert.ToArray(),UITableViewRowAnimation.Bottom);
+			tableView.EndUpdates();
+		}
+		
+		internal int Index;
+		private void expand()
+		{
+		if(tableView == null)
+				return;
+			
+			
+			List<NSIndexPath> indexPathsToInsert = new List<NSIndexPath>();
+			for (int i = 0; i < this.Count; i++) {
+						indexPathsToInsert.Add(NSIndexPath.FromRowSection(i,Index));
+			}
+			
+			tableView.BeginUpdates();
+			tableView.InsertRows(indexPathsToInsert.ToArray(),UITableViewRowAnimation.Top);
+			tableView.EndUpdates();
+		}
+		
 		/// <summary>
 		///    The section header, as a string
 		/// </summary>
@@ -2573,9 +2620,10 @@ namespace MonoTouch.Dialog
 				Elements = null;
 			}
 		}
-			
+		internal UITableView tableView;
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
+			tableView = tv;
 			var cell = new UITableViewCell (UITableViewCellStyle.Default, "");
 			cell.TextLabel.Text = "Section was used for Element";
 			

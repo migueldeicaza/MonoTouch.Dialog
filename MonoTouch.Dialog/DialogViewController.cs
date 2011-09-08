@@ -319,7 +319,7 @@ namespace MonoTouch.Dialog
 			public override int RowsInSection (UITableView tableview, int section)
 			{
 				var s = Root.Sections [section];
-				var count = s.Elements.Count;
+				var count = s.Collapsed ? 0 : s.Elements.Count;
 				
 				return count;
 			}
@@ -370,6 +370,8 @@ namespace MonoTouch.Dialog
 			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
 			{
 				var section = Root.Sections [sectionIdx];
+				section.tableView = tableView;
+				section.Index = sectionIdx;
 				return section.HeaderView;
 			}
 
