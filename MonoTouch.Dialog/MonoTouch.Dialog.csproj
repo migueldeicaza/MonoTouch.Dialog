@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
@@ -120,6 +120,7 @@
     <Compile Include="Elements\ElementBadge.cs" />
     <Compile Include="Utilities\Controls.cs" />
     <Compile Include="Utilities\GlassButton.cs" />
+    <Compile Include="DialogViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
