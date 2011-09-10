@@ -1186,7 +1186,6 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		///   The value of the EntryElement
 		/// </summary>
-		
 		public string Value { 
 			get {
 				return val;
@@ -1198,7 +1197,17 @@ namespace MonoTouch.Dialog
 			}
 		}
 		string val;
-		
+
+		/// <summary>
+		/// The key used for reusable UITableViewCells.
+		/// </summary>
+		static NSString entryKey = new NSString ("EntryElement");
+		protected virtual NSString EntryKey {
+			get {
+				return entryKey;
+			}
+		}
+
 		/// <summary>
 		/// The type of keyboard used for input, you can change
 		/// this to use this for numeric input, email addressed,
@@ -1308,9 +1317,9 @@ namespace MonoTouch.Dialog
 
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (GetType ().FullName);
+			var cell = tv.DequeueReusableCell (EntryKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, GetType ().FullName);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, EntryKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else 
 				RemoveTag (cell, 1);
