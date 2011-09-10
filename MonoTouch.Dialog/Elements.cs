@@ -89,7 +89,23 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
-		/// Invoked when the given element has been tapped by the user.
+		/// Invoked when the given element has been deslected by the user.
+		/// </summary>
+		/// <param name="dvc">
+		/// The <see cref="DialogViewController"/> where the deselection took place
+		/// </param>
+		/// <param name="tableView">
+		/// The <see cref="UITableView"/> that contains the element.
+		/// </param>
+		/// <param name="path">
+		/// The <see cref="NSIndexPath"/> that contains the Section and Row for the element.
+		/// </param>
+		public virtual void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+		}
+		
+		/// <summary>
+		/// Invoked when the given element has been selected by the user.
 		/// </summary>
 		/// <param name="dvc">
 		/// The <see cref="DialogViewController"/> where the selection took place
@@ -1198,9 +1214,8 @@ namespace MonoTouch.Dialog
 					entry.KeyboardType = value;
 			}
 		}
-		public UIKeyboardType keyboardType = UIKeyboardType.Default;
-		
-		static NSString ekey = new NSString ("EntryElement");
+
+		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
@@ -1215,7 +1230,7 @@ namespace MonoTouch.Dialog
 		/// The caption to use
 		/// </param>
 		/// <param name="placeholder">
-		/// Placeholder to display.
+		/// Placeholder to display when no value is set.
 		/// </param>
 		/// <param name="value">
 		/// Initial value.
@@ -1227,13 +1242,13 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
-		/// Constructs  an EntryElement for password entry with the given caption, placeholder and initial value.
+		/// Constructs an EntryElement for password entry with the given caption, placeholder and initial value.
 		/// </summary>
 		/// <param name="caption">
-		/// The caption to use
+		/// The caption to use.
 		/// </param>
 		/// <param name="placeholder">
-		/// Placeholder to display.
+		/// Placeholder to display when no value is set.
 		/// </param>
 		/// <param name="value">
 		/// Initial value.
@@ -1262,41 +1277,50 @@ namespace MonoTouch.Dialog
 			if (s.EntryAlignment.Width != 0)
 				return s.EntryAlignment;
 			
-			SizeF max = new SizeF (-1, -1);
+			// If all EntryElements have a null Caption, align UITextField with the Caption
+			// offset of normal cells (at 10px).
+			SizeF max = new SizeF (-15, tv.StringSize ("M", font).Height);
 			foreach (var e in s.Elements){
 				var ee = e as EntryElement;
 				if (ee == null)
 					continue;
 				
-				var size = tv.StringSize (ee.Caption, font);
-				if (size.Width > max.Width)
-					max = size;				
+				if (ee.Caption != null) {
+					var size = tv.StringSize (ee.Caption, font);
+					if (size.Width > max.Width)
+						max = size;
+				}
 			}
 			s.EntryAlignment = new SizeF (25 + Math.Min (max.Width, 160), max.Height);
 			return s.EntryAlignment;
 		}
-		
+
+		protected virtual UITextField CreateTextField (RectangleF frame)
+		{
+			return new UITextField (frame) {
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
+				Placeholder = placeholder ?? "",
+				SecureTextEntry = isPassword,
+				Text = Value ?? "",
+				Tag = 1
+			};
+		}
+
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (ekey);
+			var cell = tv.DequeueReusableCell (GetType ().FullName);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, ekey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, GetType ().FullName);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else 
 				RemoveTag (cell, 1);
 			
 			if (entry == null){
 				SizeF size = ComputeEntryPosition (tv, cell);
-				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width, size.Height)){
-					Tag = 1,
-					Placeholder = placeholder ?? "",
-					SecureTextEntry = isPassword
-				};
-				_entry.Text = Value ?? "";
-				entry = _entry;
+				float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
+				float width = cell.ContentView.Bounds.Width - size.Width;
 				
-				entry.AutoresizingMask = UIViewAutoresizing.FlexibleWidth |
-					UIViewAutoresizing.FlexibleLeftMargin;
+				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
 				entry.ValueChanged += delegate {
 					FetchValue ();
@@ -1305,19 +1329,30 @@ namespace MonoTouch.Dialog
 					FetchValue ();
 				};
 				entry.ShouldReturn += delegate {
+					RootElement root = GetImmediateRootElement ();
 					EntryElement focus = null;
-					foreach (var e in (Parent as Section).Elements){
-						if (e == this)
-							focus = this;
-						else if (focus != null && e is EntryElement){
-							focus = e as EntryElement;
-							break;
+					
+					if (root == null)
+						return true;
+					
+					foreach (var s in root.Sections) {
+						foreach (var e in s.Elements) {
+							if (e == this) {
+								focus = this;
+							} else if (focus != null && e is EntryElement) {
+								focus = e as EntryElement;
+								break;
+							}
 						}
+						
+						if (focus != null && focus != this)
+							break;
 					}
+					
 					if (focus != this)
-						focus.entry.BecomeFirstResponder ();
+						focus.BecomeFirstResponder (true);
 					else 
-						focus.entry.ResignFirstResponder ();
+						focus.ResignFirstResponder (true);
 					
 					return true;
 				};
@@ -1346,7 +1381,8 @@ namespace MonoTouch.Dialog
 		}
 		
 		/// <summary>
-		///  Copies the value from the currently entry UIView to the Value property and raises the Changed event if necessary.
+		///  Copies the value from the UITextField in the EntryElement to the
+		//   Value property and raises the Changed event if necessary.
 		/// </summary>
 		public void FetchValue ()
 		{
@@ -1354,13 +1390,13 @@ namespace MonoTouch.Dialog
 				return;
 
 			var newValue = entry.Text;
-			var diff = newValue != Value;
+			if (newValue == Value)
+				return;
+			
 			Value = newValue;
 			
-			if (diff){
-				if (Changed != null)
-					Changed (this, EventArgs.Empty);
-			}
+			if (Changed != null)
+				Changed (this, EventArgs.Empty);
 		}
 		
 		protected override void Dispose (bool disposing)
@@ -1406,7 +1442,8 @@ namespace MonoTouch.Dialog
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
 			if (entry != null)
 				entry.ResignFirstResponder ();
-        }	}
+		}
+	}
 	
 	public class DateTimeElement : StringElement {
 		public DateTime DateValue;
