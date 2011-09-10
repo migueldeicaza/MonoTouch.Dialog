@@ -64,9 +64,34 @@ namespace MonoTouch.Dialog
 		{
 		}
 		
+		static NSString cellkey = new NSString ("xx");
+		/// <summary>
+		/// Subclasses that override the GetCell method should override this method as well
+		/// </summary>
+		/// <remarks>
+		/// This method should return the key passed to UITableView.DequeueReusableCell.
+		/// If your code overrides the GetCell method to change the cell, you must also 
+		/// override this method and return a unique key for it.
+		/// 
+		/// This works in most subclasses with a couple of exceptions: StringElement and
+		/// various derived classes do not use this setting as they need a wider range
+		/// of keys for different uses, so you need to look at the source code for those
+		/// if you are trying to override StringElement or StyledStringElement.
+		/// </remarks>
+		protected virtual NSString CellKey { 
+			get {
+				return cellkey;
+			}
+		}
+		
+		/// <summary>
+		/// Gets a UITableViewCell for this element.   Can be overridden, but if you 
+		/// customize the style or contents of the cell you must also override the CellKey 
+		/// property in your derived class.
+		/// </summary>
 		public virtual UITableViewCell GetCell (UITableView tv)
 		{
-			return new UITableViewCell (UITableViewCellStyle.Default, "xx");
+			return new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 		}
 		
 		static protected void RemoveTag (UITableViewCell cell, int tag)
@@ -237,6 +262,11 @@ namespace MonoTouch.Dialog
 		public BooleanElement (string caption, bool value, string key) : base (caption, value)
 		{  }
 		
+		protected override NSString CellKey {
+			get {
+				return bkey;
+			}
+		}
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			if (sw == null){
@@ -251,9 +281,9 @@ namespace MonoTouch.Dialog
 			} else
 				sw.On = Value;
 			
-			var cell = tv.DequeueReusableCell (bkey);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, bkey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else
 				RemoveTag (cell, 1);
@@ -301,7 +331,7 @@ namespace MonoTouch.Dialog
 			const int ImageSpace = 32;
 			const int Padding = 8;
 	
-			public TextWithImageCellView (BaseBooleanImageElement parent) : base (UITableViewCellStyle.Value1, key)
+			public TextWithImageCellView (BaseBooleanImageElement parent) : base (UITableViewCellStyle.Value1, parent.CellKey)
 			{
 				this.parent = parent;
 				label = new UILabel () {
@@ -358,9 +388,14 @@ namespace MonoTouch.Dialog
 		
 		protected abstract UIImage GetImage ();
 		
+		protected override NSString CellKey {
+			get {
+				return key;
+			}
+		}
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (key) as TextWithImageCellView;
+			var cell = tv.DequeueReusableCell (CellKey) as TextWithImageCellView;
 			if (cell == null)
 				cell = new TextWithImageCellView (this);
 			else
@@ -413,11 +448,16 @@ namespace MonoTouch.Dialog
 			Value = value;
 		}
 		
+		protected override NSString CellKey {
+			get {
+				return skey;
+			}
+		}
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (skey);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, skey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else
 				RemoveTag (cell, 1);
@@ -481,6 +521,11 @@ namespace MonoTouch.Dialog
 			nsUrl = url;
 		}
 		
+		protected override NSString CellKey {
+			get {
+				return hkey;
+			}
+		}
 		public string Url {
 			get {
 				return nsUrl.ToString ();
@@ -492,9 +537,9 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (hkey);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, hkey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
@@ -854,11 +899,16 @@ namespace MonoTouch.Dialog
 			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
+		protected override NSString CellKey {
+			get {
+				return skey;
+			}
+		}
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (skey);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle, skey);
+				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
 			
@@ -1065,11 +1115,17 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		protected override NSString CellKey {
+			get {
+				return ikey;
+			}
+		}
+		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (ikey);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, ikey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 			}
 			
 			if (scaled == null)
@@ -1308,31 +1364,17 @@ namespace MonoTouch.Dialog
 		
 		static NSString cellkey = new NSString ("EntryElement");
 		
-		/// <summary>
-		/// Subclasses that override the GetCell method should override this method as well
-		/// </summary>
-		/// <value>
-		/// This method should return the key passed to UITableView.DequeueReusableCell.
-		/// If your code overrides the GetCell method to change the cell, you must also 
-		/// override this method and return a unique key for it.
-		/// </value>
-		
-		protected virtual NSString EntryCellKey {
+		protected override NSString CellKey {
 			get {
 				return cellkey;
 			}
 		}
 		
-		/// <summary>
-		/// Gets a UITableViewCell for this element.   Can be overridden, but if you 
-		/// customize the style or contents of the cell you must also override the EntryCellKey 
-		/// property in your derived class.
-		/// </summary>
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (EntryCellKey);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, EntryCellKey);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else 
 				RemoveTag (cell, 1);
@@ -1656,11 +1698,16 @@ namespace MonoTouch.Dialog
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
+		protected override NSString CellKey {
+			get {
+				return key;
+			}
+		}
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (key);
+			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				if ((Flags & CellFlags.Transparent) != 0){
 					cell.BackgroundColor = UIColor.Clear;
 					
