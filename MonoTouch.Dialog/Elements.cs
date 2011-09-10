@@ -1305,12 +1305,34 @@ namespace MonoTouch.Dialog
 				Tag = 1
 			};
 		}
-
+		
+		static NSString cellkey = new NSString ("EntryElement");
+		
+		/// <summary>
+		/// Subclasses that override the GetCell method should override this method as well
+		/// </summary>
+		/// <value>
+		/// This method should return the key passed to UITableView.DequeueReusableCell.
+		/// If your code overrides the GetCell method to change the cell, you must also 
+		/// override this method and return a unique key for it.
+		/// </value>
+		
+		protected virtual NSString EntryCellKey {
+			get {
+				return cellkey;
+			}
+		}
+		
+		/// <summary>
+		/// Gets a UITableViewCell for this element.   Can be overridden, but if you 
+		/// customize the style or contents of the cell you must also override the EntryCellKey 
+		/// property in your derived class.
+		/// </summary>
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (GetType ().FullName);
+			var cell = tv.DequeueReusableCell (EntryCellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Default, GetType ().FullName);
+				cell = new UITableViewCell (UITableViewCellStyle.Default, EntryCellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else 
 				RemoveTag (cell, 1);
