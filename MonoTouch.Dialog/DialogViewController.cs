@@ -631,5 +631,29 @@ namespace MonoTouch.Dialog
 			this.pushing = pushing;
 			this.root = root;
 		}
+		
+		public DialogViewController (IDialogViewModel viewModel) : base (UITableViewStyle.Grouped)
+		{
+			this.root = viewModel.CreateRoot();
+		}
+		
+		public DialogViewController (UITableViewStyle style, IDialogViewModel viewModel) : base (style)
+		{
+			Style = style;
+			this.root = viewModel.CreateRoot();
+		}
+		
+		public DialogViewController (IDialogViewModel viewModel, bool pushing) : base (UITableViewStyle.Grouped)
+		{
+			this.pushing = pushing;
+			this.root = viewModel.CreateRoot();
+		}
+		
+		public DialogViewController (UITableViewStyle style, IDialogViewModel viewModel, bool pushing) : base(style)
+		{
+			Style = style;
+			this.pushing = pushing;
+			this.root = viewModel.CreateRoot();
+		}
 	}
 }
