@@ -98,7 +98,7 @@ namespace MonoTouch.Dialog
 
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF size = new SizeF (280, float.MaxValue);
+			SizeF size = new SizeF (tableView.Bounds.Width - 40, float.MaxValue);
 			float height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
 			
 			// Image is 57 pixels tall, add some padding
@@ -128,9 +128,6 @@ namespace MonoTouch.Dialog
 					context.SetTextDrawingMode (CGTextDrawingMode.Invisible);
 					context.ShowText (smallText);
 					var width = context.TextPosition.X - start;
-					
-					var ns = new NSString (smallText);
-					UIFont ff = UIFont.FromName ("Helvetica", 10);
 					
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
 					context.ShowTextAtPoint ((57-width)/2, 46, smallText);

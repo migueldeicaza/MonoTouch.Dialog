@@ -37,9 +37,13 @@ namespace MonoTouch.Dialog
 			if (cell == null)
 			{
 				cell = new OwnerDrawnCell(this, this.Style, this.CellReuseIdentifier);
-				cell.Update();
 			}
-
+			else
+			{
+				cell.Element = this;
+			}
+			
+			cell.Update();
 			return cell;
 		}	
 		
@@ -53,18 +57,38 @@ namespace MonoTouch.Dialog
 			
 			public OwnerDrawnCell(OwnerDrawnElement element, UITableViewCellStyle style, string cellReuseIdentifier) : base(style, cellReuseIdentifier)
 			{
-				view = new OwnerDrawnCellView(element);
-				ContentView.Add(view);
+				Element = element;
 			}
+			
+			public OwnerDrawnElement Element
+			{
+				get {
+					return view.Element;
+				}
+				set {
+					if (view == null)
+					{
+						view = new OwnerDrawnCellView (value);
+						ContentView.Add (view);
+					}
+					else
+					{
+						view.Element = value;
+					}
+				}
+			}
+				
+			
 
 			public void Update()
 			{
 				SetNeedsDisplay();
+				view.SetNeedsDisplay();
 			}		
 	
-			public override void LayoutSubviews ()
+			public override void LayoutSubviews()
 			{
-				base.LayoutSubviews ();
+				base.LayoutSubviews();
 				
 				view.Frame = ContentView.Bounds;
 			}
@@ -76,7 +100,16 @@ namespace MonoTouch.Dialog
 			
 			public OwnerDrawnCellView(OwnerDrawnElement element)
 			{
-				this.element = element;	
+				this.element = element;
+			}
+			
+			
+			public OwnerDrawnElement Element
+			{
+				get { return element; }
+				set {
+					element = value; 
+				}
 			}
 			
 			public void Update()
