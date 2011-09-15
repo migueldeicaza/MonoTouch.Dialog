@@ -93,6 +93,37 @@ Which produces this UI:
 
 ![Rendering of AccountInfo](MonoTouch.Dialog/raw/master/sample.png)
 
+This is what the Elements API usage looks like, it is a more flexible 
+API and the one I suggest you use for anything that requires
+customizations and goes beyond the basics of the Reflection-based
+attributes:
+
+        var root = new RootElement ("Settings") {
+          new Section (){
+            new BooleanElement ("Airplane Mode", false),
+            new RootElement ("Notifications", 0, 0) {
+              new Section (null, 
+                  "Turn off Notifications to disable Sounds\n" +
+                  "Alerts and Home Screen Badges for the."){
+                new BooleanElement ("Notifications", false)
+              }
+            }},
+          new Section (){
+            new RootElement ("Brightness"){
+              new Section (){
+                new FloatElement (null, null, 0.5f),
+                new BooleanElement ("Auto-brightness", false),
+		new UILabel ("I am a simple UILabel!"),
+              }
+            },
+          },
+          new Section () {
+            new EntryElement ("Login", "enter", "miguel"),
+            new EntryElement ("Password", "enter", "password", true),
+            new DateElement ("Select Date", DateTime.Now),
+            new TimeElement ("Select Time", DateTime.Now),
+          },
+
 Also see this [screenshot](http://tirania.org/tmp/a.png) was created
 with [this code](http://gist.github.com/281469)
 
@@ -423,8 +454,8 @@ favorite handler, and at that point you can also call
 context.Dispose() to assist the GC in releasing any large resources it
 might have held.
 
-The Low-Level Elements API
-==========================
+The Elements API
+================
 
 All that the Reflection API does is create a set of nodes from the
 Elements API.   
@@ -447,7 +478,7 @@ C# 3.0 initializers:
               new Section (){
                 new FloatElement (null, null, 0.5f),
                 new BooleanElement ("Auto-brightness", false),
-		new UILabel ("I am a simple UILabel!"),
+				new UILabel ("I am a simple UILabel!"),
               }
             },
           },
@@ -815,8 +846,24 @@ methods:
 If your element can have a variable size, you need to implement the
 IElementSizing interface, which contains one method:
 
-	// Returns the height for the cell at indexPath.Section, indexPath.Row
+    	// Returns the height for the cell at indexPath.Section, indexPath.Row
         float GetHeight (UITableView tableView, NSIndexPath indexPath);
+
+If you are planning on implemeneting your GetCell method by calling
+"base.GetCell(tv)" and customizing the returned cell, you need to also
+override the CellKey property to return a key that will be unique to
+your Element, like this:
+
+	    static NSString MyKey = new NSString ("MyKey");
+	    protected override NSString CellKey {
+	        get {
+	            return MyKey;
+	        }
+	    }
+
+This works for most elements, but not for the StringElement and StyledStringElement
+as those use their own set of keys for various rendering scenarios.   You would have
+to replicate the code in those classes.
 
 Customizing the DialogViewController
 ====================================
