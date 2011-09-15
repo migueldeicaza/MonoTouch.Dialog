@@ -5,6 +5,7 @@
 using System;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
+using MonoTouch.Foundation;
 
 namespace Sample
 {
@@ -59,6 +60,25 @@ namespace Sample
 				new BooleanImageElement ("Policy Academy 38", false, favorited, favorite),
 			};
 			
+			var messageSection = new Section ("Message Elements"){
+				new MessageElement (msgSelected) { 
+					Sender = "Miguel de Icaza (mdeicaza.home@emailserver.com)", 
+					Subject = "Re: [Gtk-sharp-list] Glib Timeout and other ways to handle idle",
+					Body = "Please bring friends, but make sure that you also bring eggs and bacon as we are running short of those for the coctails tonight",
+					Date = DateTime.Now - TimeSpan.FromHours (23),
+					NewFlag = true,
+					MessageCount = 0
+				},
+				new MessageElement (msgSelected) { 
+					Sender = "Nat Friedman (nfriedman.home@emailserver.com)", 
+					Subject = "Pictures from Vietnam",
+					Body = "Hey dude, here are the pictures that I promised from Vietnam",
+					Date = new DateTime (2010, 10, 20),
+					NewFlag = false,
+					MessageCount = 2
+				}
+			};
+			
 			var entrySection = new Section ("Keyboard styles for entry"){
 				new EntryElement ("Number ", "Some cute number", "1.2") { KeyboardType = UIKeyboardType.NumberPad },
 				new EntryElement ("Email ", "", null) { KeyboardType = UIKeyboardType.EmailAddress },
@@ -68,6 +88,7 @@ namespace Sample
 			
 			var root = new RootElement ("Assorted Elements") {
 				imageSection,
+				messageSection,
 				entrySection,
 				calendarSection,
 				badgeSection,
@@ -77,5 +98,20 @@ namespace Sample
 			
 			navigation.PushViewController (dvc, true);
 		}
+
+		void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
+		{
+			var np = new DialogViewController (new RootElement ("Message Display") {
+				new Section () {
+					new StyledMultilineElement (
+	                    "From: foo\n" +
+	                    "To: bar\n" +
+	                    "Subject: Hey there\n\n" +
+	                    "This is very simple!")
+				}
+			}, true);
+			dvc.ActivateController (np);
+		}
 	}
+	
 }

@@ -6,11 +6,17 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
+In addition to being a simple way to create dialogs, it also has been
+growing to contains a number of utility functions that are useful for
+iPhone development.
+
 MonoTouch.Dialog is a retained system for implementing UITableViews
 as opposed to the on-demand nature of UITableView.
 
 Currently this supports creating Dialogs based on navigation controllers 
-that support:
+that support both basic and advanced cells.
+
+Some basic cells include:
 
   * On/Off controls
   * Slider (floats)
@@ -20,9 +26,19 @@ that support:
   * Jump to HTML page
   * Radio elements
   * Dates, Times and Dates+Times
-  * Arbitary UIViews
   * Pull-to-refresh functionality.
   * Activity indicators
+
+Advanced cells include:
+  * Container for arbitrary UIViews
+  * Mail-like message displays
+  * Styled cells, with optional image downloading
+
+The entire UI for TweetStation (http://github.com/migueldeicaza/TweetStation)
+an app published on the AppStore was built entirely using MonoTouch.Dialog.
+
+You can download the app from the AppStore, and read the code to learn about
+some advanced used cases of MonoTouch.Dialog.
 
 Miguel (miguel@gnome.org)
 
@@ -43,7 +59,8 @@ RootElements can be created either manually with the "Elements" API by
 creating the various nodes necessary to render the information.  You
 would use this if you need control, if you want to extend the features
 supported by MonoTouch.Dialogs or if you want to dynamically generate
-the content for your dialog.
+the content for your dialog.   This is what is used for example in 
+TweetStation for the main timeline views.
 
 Additionally, there is a trivial Reflection-based constructor that can
 be used for quickly putting together dialogs, for example, creating an
@@ -75,6 +92,37 @@ account page is as trivial as:
 Which produces this UI:
 
 ![Rendering of AccountInfo](MonoTouch.Dialog/raw/master/sample.png)
+
+This is what the Elements API usage looks like, it is a more flexible 
+API and the one I suggest you use for anything that requires
+customizations and goes beyond the basics of the Reflection-based
+attributes:
+
+        var root = new RootElement ("Settings") {
+          new Section (){
+            new BooleanElement ("Airplane Mode", false),
+            new RootElement ("Notifications", 0, 0) {
+              new Section (null, 
+                  "Turn off Notifications to disable Sounds\n" +
+                  "Alerts and Home Screen Badges for the."){
+                new BooleanElement ("Notifications", false)
+              }
+            }},
+          new Section (){
+            new RootElement ("Brightness"){
+              new Section (){
+                new FloatElement (null, null, 0.5f),
+                new BooleanElement ("Auto-brightness", false),
+		new UILabel ("I am a simple UILabel!"),
+              }
+            },
+          },
+          new Section () {
+            new EntryElement ("Login", "enter", "miguel"),
+            new EntryElement ("Password", "enter", "password", true),
+            new DateElement ("Select Date", DateTime.Now),
+            new TimeElement ("Select Time", DateTime.Now),
+          },
 
 Also see this [screenshot](http://tirania.org/tmp/a.png) was created
 with [this code](http://gist.github.com/281469)
@@ -218,9 +266,9 @@ These are the current widgets supported by the Reflection API:
         [Multiline]
         string multiline;
 
-	[Caption ("Date")]
-	[Alignment (UITextAlignment.Center)]
-	string centered;
+        [Caption ("Date")]
+        [Alignment (UITextAlignment.Center)]
+        string centered;
 
 ### Text Entry and Password Entries.###
 
@@ -347,7 +395,7 @@ These are the current widgets supported by the Reflection API:
 	    [Time] DateTime End;
 	}
 
-	To initialize:
+To initialize:
 
 	new MainSettings () {
 	    Subject = "Review designs",
@@ -355,7 +403,7 @@ These are the current widgets supported by the Reflection API:
 	    Time = new TimeRange {
 	        Start = DateTime.Now,
 		End   = DateTime.Now
-	    }
+            }
         }
 
 ### IEnumerable as a Radio Source ###
@@ -406,8 +454,8 @@ favorite handler, and at that point you can also call
 context.Dispose() to assist the GC in releasing any large resources it
 might have held.
 
-The Low-Level Elements API
-==========================
+The Elements API
+================
 
 All that the Reflection API does is create a set of nodes from the
 Elements API.   
@@ -430,7 +478,7 @@ C# 3.0 initializers:
               new Section (){
                 new FloatElement (null, null, 0.5f),
                 new BooleanElement ("Auto-brightness", false),
-		new UILabel ("I am a simple UILabel!"),
+				new UILabel ("I am a simple UILabel!"),
               }
             },
           },
@@ -465,7 +513,7 @@ The hierarchy of Elements looks like this:
            HtmlElement
            ImageElement
            MultilineElement
-	   RootElement (container for Sections)
+           RootElement (container for Sections)
            Section (only valid container for Elements)
            StringElement
               CheckboxElement
@@ -569,7 +617,7 @@ UIViews.  Typically you will just use the strings, but to create
 custom UIs you can use any UIView as the header or the footer.  You
 can either use a string or a view, you would create them like this:
 
-	var section = new Section ("Header", "Footer")
+        var section = new Section ("Header", "Footer")
 
 To use views, just pass the views to the constructor:
 
@@ -594,7 +642,7 @@ use:
     To be used as "buttons", pass a delegate for this.
   * StyledStringElement
     Similar to StringElement but allows for the Font, TextColor, 
-    and BackgroundColor to be set on a per-cell basis.
+    images and accessories to be set on a per-cell basis.
   * MultilineElement
     Derives from StringElement, used to render multi-line cells.
   * RadioElements (to provide a radio-button feature).
@@ -615,6 +663,47 @@ require any programmer intervention to fetch the state of the control.
 
 This is the behavior for all of the Elements that are part of
 MonoTouch.Dialog but it is not required for user-created elements.
+
+StringElement
+-------------
+
+You can use this element to show static strings as a cell in your table,
+and it is possible to use them as buttons by providing the constructor
+with an NSAction delegate.   If the cell is tapped, this method is invoked
+for example:
+
+	 var l = new StringElement ("Calculate Total", delegate { ComputeTotal (); });
+
+The cost of a StringElement is very low, it uses 8 bytes: 4 for the label alignment
+information, and 4 for the text to be displayed.
+
+StyledStringElement
+-------------------
+
+This class derives from StringElement but lets developers customize a handful of
+properties like the Font, the text color, the background cell color, the line
+breaking mode, the number of lines to display and whether an accessory should
+be displayed.
+
+For example:
+
+	 var l = new StyleStringElement ("Report Spam") {
+		BackgroundUri = new Uri ("file://" + Path.GetFullPath ("cute.png"),
+		TextColor = UIColor.White
+	 };
+
+The StyledStringElement also can be configured at creation time to
+pick one of the four standard cell types to render information, for example:
+
+	 new StyledStringElement ("Default", "Invisible value", UITableViewCellStyle.Default),
+	 new StyledStringElement ("Value1", "Aligned on each side", UITableViewCellStyle.Value1),
+	 new StyledStringElement ("Value2", "Like the Addressbook", UITableViewCellStyle.Value2),
+	 new StyledStringElement ("Subtitle", "Makes it sound more important", UITableViewCellStyle.Subtitle),
+	 new StyledStringElement ("Subtitle", "Brown subtitle", UITableViewCellStyle.Subtitle) {
+	 	 DetailColor = UIColor.Brown
+	 }
+
+See the Styled element sample for more information.
 
 EntryElement
 ------------
@@ -740,8 +829,8 @@ methods:
         void Dispose (bool disposing);
 
         // To retrieve the UITableViewCell for your element
-	// you would need to prepare the cell to be reused, in the
-	// same way that UITableView expects reusable cells to work
+        // you would need to prepare the cell to be reused, in the
+        // same way that UITableView expects reusable cells to work
         UITableViewCell GetCell (UITableView tv)
 
         // To retrieve a "summary" that can be used with
@@ -751,14 +840,30 @@ methods:
         // To detect when the user has tapped on the cell
         void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 
-	// If you support search, to probe if the cell matches the user input
-	bool Matches (string text)
+        // If you support search, to probe if the cell matches the user input
+        bool Matches (string text)
 
 If your element can have a variable size, you need to implement the
 IElementSizing interface, which contains one method:
 
-	// Returns the height for the cell at indexPath.Section, indexPath.Row
+    	// Returns the height for the cell at indexPath.Section, indexPath.Row
         float GetHeight (UITableView tableView, NSIndexPath indexPath);
+
+If you are planning on implemeneting your GetCell method by calling
+"base.GetCell(tv)" and customizing the returned cell, you need to also
+override the CellKey property to return a key that will be unique to
+your Element, like this:
+
+	    static NSString MyKey = new NSString ("MyKey");
+	    protected override NSString CellKey {
+	        get {
+	            return MyKey;
+	        }
+	    }
+
+This works for most elements, but not for the StringElement and StyledStringElement
+as those use their own set of keys for various rendering scenarios.   You would have
+to replicate the code in those classes.
 
 Customizing the DialogViewController
 ====================================
@@ -800,7 +905,7 @@ DialogViewController:
         {
             base.LoadView ();
             var color = UIColor.FromPatternImage(image);
-            Root.TableView.BackgroundColor = UIColor.Clear;
+            TableView.BackgroundColor = UIColor.Clear;
             ParentViewController.View.BackgroundColor = color;
         }
     }
@@ -838,3 +943,26 @@ In these methods you will need to override three methods:
 
 See the DemoEditing.cs sample for an example that shows what these
 methods should do.
+
+Image Loading
+=============
+
+MonoTouch.Dialog now incorporates TweetStation's image loader.  This
+image loader can be used to load images in the background, supports
+caching and can notify your code when the image has been loaded.
+
+It will also limit the number of outgoing network connections.
+
+The image loader is implemented in the ImageLoader class, all you need
+to do is call the DefaultRequestImage method, you will need to provide
+the Uri for the image you want to load, as well as an instance of the
+IImageUpdated interface which will be invoked when the image has been
+loaded.
+
+The ImageLoader exposes a "Purge()" method that you can call when you
+want to release all of the images that are currently cached in memory.
+The current code has a cache for 50 images.  If you want to use a
+different cache size (for instance, if you are expecting the images to
+be too large that 50 images would be too much), you can just create
+instances of ImageLoader and pass the number of images you want to
+keep in the cache.

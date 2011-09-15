@@ -63,7 +63,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		// If the value is 1, we are enabled, used in the source for quick computation
+		// If the value is true, we are enabled, used in the source for quick computation
 		bool enableSearch;
 		public bool EnableSearch {
 			get {
@@ -79,6 +79,11 @@ namespace MonoTouch.Dialog
 				enableSearch = value;
 			}
 		}
+		
+		// If set, we automatically scroll the content to avoid showing the search bar until 
+		// the user manually pulls it down.
+		public bool AutoHideSearch { get; set; }
+		
 		public string SearchPlaceholder { get; set; }
 			
 		/// <summary>
@@ -107,7 +112,7 @@ namespace MonoTouch.Dialog
 				refreshView.SetActivity (true);
 			refreshRequested (this, EventArgs.Empty);
 
-			if (showStatus && refreshView != null){
+			if (reloading && showStatus && refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
 				UIView.SetAnimationDuration (0.2);
 				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
@@ -191,6 +196,7 @@ namespace MonoTouch.Dialog
 			originalSections = null;
 			originalElements = null;
 			searchBar.ResignFirstResponder ();
+			ReloadData ();
 		}
 		
 		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
@@ -209,7 +215,6 @@ namespace MonoTouch.Dialog
 			
 			OnSearchTextChanged (text);
 			
-			bool changed = false;
 			var newSections = new List<Section> ();
 			
 			for (int sidx = 0; sidx < originalSections.Length; sidx++){
@@ -321,7 +326,23 @@ namespace MonoTouch.Dialog
 				return element.GetCell (tableView);
 			}
 			
-			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+			{
+				if (Root.NeedColorUpdate){
+					var section = Root.Sections [indexPath.Section];
+					var element = section.Elements [indexPath.Row];
+					var colorized = element as IColorizeBackground;
+					if (colorized != null)
+						colorized.WillDisplay (tableView, cell, indexPath);
+				}
+			}
+			
+			public override void RowDeselected (UITableView tableView, NSIndexPath indexPath)
+			{
+				Container.Deselected (indexPath);
+			}
+			
+			public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 			{
 				Container.Selected (indexPath);
 			}			
@@ -464,6 +485,14 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public virtual void Deselected (NSIndexPath indexPath)
+		{
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
+			
+			element.Deselected (this, tableView, indexPath);
+		}
+		
 		public virtual void Selected (NSIndexPath indexPath)
 		{
 			var section = root.Sections [indexPath.Section];
@@ -482,6 +511,9 @@ namespace MonoTouch.Dialog
 			tableView = MakeTableView (UIScreen.MainScreen.Bounds, Style);
 			tableView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin;
 			tableView.AutosizesSubviews = true;
+			
+			if (root != null)
+				root.Prepare ();
 			
 			UpdateSource ();
 			View = tableView;
@@ -514,6 +546,12 @@ namespace MonoTouch.Dialog
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+			if (AutoHideSearch){
+				if (enableSearch){
+					if (TableView.ContentOffset.Y < 44)
+						TableView.ContentOffset = new PointF (0, 44);
+				}
+			}
 			if (root == null)
 				return;
 			
@@ -565,22 +603,16 @@ namespace MonoTouch.Dialog
 			if (ViewDissapearing != null)
 				ViewDissapearing (this, EventArgs.Empty);
 		}
-
-		void PrepareRoot (RootElement root)
-		{
-			this.root = root;
-			if (root != null)
-				root.Prepare ();
-		}
 		
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
 		{
-			PrepareRoot (root);
+			this.root = root;
 		}
 		
 		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
-			PrepareRoot (root);
+			Style = style;
+			this.root = root;
 		}
 		
 		/// <summary>
@@ -597,14 +629,14 @@ namespace MonoTouch.Dialog
 		public DialogViewController (RootElement root, bool pushing) : base (UITableViewStyle.Grouped)
 		{
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 
 		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
 		{
+			Style = style;
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 	}
-	
 }
