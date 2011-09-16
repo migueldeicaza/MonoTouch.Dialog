@@ -702,7 +702,7 @@ namespace MonoTouch.Dialog
 		public UIFont Font;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
-		public int Lines = 1;
+		public int Lines = 0;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
 		// To keep the size down for a StyleStringElement, we put all the image information
@@ -801,7 +801,7 @@ namespace MonoTouch.Dialog
 			tl.TextColor = TextColor ?? UIColor.Black;
 			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
 			tl.LineBreakMode = LineBreakMode;
-			tl.Lines = 0;	
+			tl.Lines = Lines;	
 			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
