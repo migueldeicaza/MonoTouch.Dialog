@@ -698,8 +698,9 @@ namespace MonoTouch.Dialog
 			this.style = style;
 		}
 		
-		UITableViewCellStyle style;
+		protected UITableViewCellStyle style;
 		public UIFont Font;
+		public UIFont SubtitleFont;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 0;
@@ -822,8 +823,12 @@ namespace MonoTouch.Dialog
 					img = null;
 				imgView.Image = img;
 				
-				if (cell.DetailTextLabel != null)
+				if (cell.DetailTextLabel != null){
 					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+					cell.DetailTextLabel.Lines = Lines;
+					cell.DetailTextLabel.LineBreakMode = LineBreakMode;
+					cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				}
 			}
 		}	
 	
@@ -866,13 +871,27 @@ namespace MonoTouch.Dialog
 		public StyledMultilineElement (string caption) : base (caption) {}
 		public StyledMultilineElement (string caption, string value) : base (caption, value) {}
 		public StyledMultilineElement (string caption, NSAction tapped) : base (caption, tapped) {}
+		public StyledMultilineElement (string caption, string value, UITableViewCellStyle style) : base (caption, value) 
+		{ 
+			this.style = style;
+		}
 
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF size = new SizeF (280, float.MaxValue);
+			SizeF maxSize = new SizeF (tableView.Bounds.Width-40, float.MaxValue);
 			
-			var font = Font ?? UIFont.SystemFontOfSize (14);
-			return tableView.StringSize (Caption, font, size, LineBreakMode).Height;
+			if (this.Accessory != UITableViewCellAccessory.None)
+				maxSize.Width -= 20;
+			
+			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
+			float height = tableView.StringSize (Caption, captionFont, maxSize, LineBreakMode).Height;
+			
+			if (this.style == UITableViewCellStyle.Subtitle){
+				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				height += tableView.StringSize (Value, subtitleFont, maxSize, LineBreakMode).Height;
+			}
+			
+			return height + 10;
 		}
 	}
 	
