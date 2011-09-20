@@ -157,12 +157,13 @@ namespace MonoTouch.Dialog
 		{
 			base.DidRotate (fromInterfaceOrientation);
 			
-			if (refreshView != null){
+			//Fixes the RefreshView's size if it is shown during rotation
+			if (refreshView != null) {
 				var bounds = View.Bounds;
 				
 				refreshView.Frame = new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height);
 			}
-			//Console.WriteLine (View.Bounds);
+			
 			ReloadData ();
 		}
 		
