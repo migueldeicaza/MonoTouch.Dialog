@@ -629,37 +629,28 @@ namespace MonoTouch.Dialog
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
 		
-		public StringElement (string caption) : base (caption) 
-		{
-			Accessory = UITableViewCellAccessory.None;
-		}
+		public StringElement (string caption) : base (caption) {}
 		
 		public StringElement (string caption, string value) : base (caption)
 		{
 			this.Value = value;
-			Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public StringElement (string caption,  NSAction tapped) : base (caption)
 		{
 			Tapped += tapped;
-			Accessory = UITableViewCellAccessory.None;
 		}
 		
 		public event NSAction Tapped;
-		public UITableViewCellAccessory Accessory
-		{
-			get;set;	
-		}
-		
+				
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (Value == null ? skey : skeyvalue);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
-				cell.SelectionStyle = Tapped == null ? UITableViewCellSelectionStyle.None : UITableViewCellSelectionStyle.Blue;
+				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
 			}
-			cell.Accessory = Tapped == null ? UITableViewCellAccessory.None : Accessory;
+			cell.Accessory = UITableViewCellAccessory.None;
 			cell.TextLabel.Text = Caption;
 			cell.TextLabel.TextAlignment = Alignment;
 			
@@ -707,11 +698,12 @@ namespace MonoTouch.Dialog
 			this.style = style;
 		}
 		
-		UITableViewCellStyle style;
+		protected UITableViewCellStyle style;
 		public UIFont Font;
+		public UIFont SubtitleFont;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
-		public int Lines = 1;
+		public int Lines = 0;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
 		// To keep the size down for a StyleStringElement, we put all the image information
@@ -810,7 +802,7 @@ namespace MonoTouch.Dialog
 			tl.TextColor = TextColor ?? UIColor.Black;
 			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
 			tl.LineBreakMode = LineBreakMode;
-			tl.Lines = 0;	
+			tl.Lines = Lines;	
 			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
@@ -831,8 +823,12 @@ namespace MonoTouch.Dialog
 					img = null;
 				imgView.Image = img;
 				
-				if (cell.DetailTextLabel != null)
+				if (cell.DetailTextLabel != null){
 					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+					cell.DetailTextLabel.Lines = Lines;
+					cell.DetailTextLabel.LineBreakMode = LineBreakMode;
+					cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				}
 			}
 		}	
 	
@@ -875,13 +871,27 @@ namespace MonoTouch.Dialog
 		public StyledMultilineElement (string caption) : base (caption) {}
 		public StyledMultilineElement (string caption, string value) : base (caption, value) {}
 		public StyledMultilineElement (string caption, NSAction tapped) : base (caption, tapped) {}
+		public StyledMultilineElement (string caption, string value, UITableViewCellStyle style) : base (caption, value) 
+		{ 
+			this.style = style;
+		}
 
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF size = new SizeF (280, float.MaxValue);
+			SizeF maxSize = new SizeF (tableView.Bounds.Width-40, float.MaxValue);
 			
-			var font = Font ?? UIFont.SystemFontOfSize (14);
-			return tableView.StringSize (Caption, font, size, LineBreakMode).Height;
+			if (this.Accessory != UITableViewCellAccessory.None)
+				maxSize.Width -= 20;
+			
+			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
+			float height = tableView.StringSize (Caption, captionFont, maxSize, LineBreakMode).Height;
+			
+			if (this.style == UITableViewCellStyle.Subtitle){
+				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				height += tableView.StringSize (Value, subtitleFont, maxSize, LineBreakMode).Height;
+			}
+			
+			return height + 10;
 		}
 	}
 	
@@ -2177,7 +2187,7 @@ namespace MonoTouch.Dialog
 		internal Group group;
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
-		public UITableView TableView;
+		internal UITableView TableView;
 		
 		// This is used to indicate that we need the DVC to dispatch calls to
 		// WillDisplayCell so we can prepare the color of the cell before 
