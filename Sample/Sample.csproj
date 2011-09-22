@@ -25,9 +25,13 @@
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>True</MtouchDebug>
     <MtouchExtraArgs>--nostrip</MtouchExtraArgs>
-    <MtouchSdkVersion>3.2</MtouchSdkVersion>
     <MtouchMinimumOS>3.2</MtouchMinimumOS>
     <MtouchI18n />
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -38,8 +42,13 @@
     <MtouchDebug>False</MtouchDebug>
     <MtouchLink>Full</MtouchLink>
     <MtouchI18n />
-    <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <MtouchSdkVersion>4.3</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +63,11 @@
     <MtouchLink>None</MtouchLink>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -67,6 +81,11 @@
     <MtouchI18n />
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
+    <MtouchUseLlvm>false</MtouchUseLlvm>
+    <MtouchUseArmv7>false</MtouchUseArmv7>
+    <MtouchUseThumb>false</MtouchUseThumb>
+    <MtouchUseSGen>false</MtouchUseSGen>
+    <MtouchArch>ARMv6</MtouchArch>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -89,6 +108,11 @@
     <Compile Include="DemoLoadMore.cs" />
     <Compile Include="DemoEditing.cs" />
     <Compile Include="DemoOwnerDrawnElement.cs" />
+    <Compile Include="DemoStyled.cs" />
+    <Compile Include="DemoRefresh.cs" />
+    <Compile Include="DemoContainerStyle.cs" />
+    <Compile Include="DemoIndex.cs" />
+    <Compile Include="DemoEditingAdvanced.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainWindow.xib" />
@@ -111,5 +135,6 @@
     <Content Include="jakub-calendar.png" />
     <Content Include="favorite.png" />
     <Content Include="favorited.png" />
+    <Content Include="background.png" />
   </ItemGroup>
 </Project>

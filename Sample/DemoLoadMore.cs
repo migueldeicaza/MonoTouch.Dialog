@@ -10,9 +10,15 @@ namespace Sample
 		public void DemoLoadMore () 
 		{
 			Section loadMore = new Section();
-			loadMore.Add(new StringElement("Element 1"));
-			loadMore.Add(new StringElement("Element 2"));
-			loadMore.Add(new StringElement("Element 3"));
+			
+			var s = new StyledStringElement ("Hola") {
+				BackgroundUri = new Uri ("http://www.google.com/images/logos/ps_logo2.png")
+				//BackgroundColor = UIColor.Red
+			};
+			loadMore.Add (s);
+			loadMore.Add (new StringElement("Element 1"));
+			loadMore.Add (new StringElement("Element 2"));
+			loadMore.Add (new StringElement("Element 3"));
 						
 			
 			loadMore.Add (new LoadMoreElement("Load More Elements...", "Loading Elements...", lme => {

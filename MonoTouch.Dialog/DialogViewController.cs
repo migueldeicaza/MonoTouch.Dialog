@@ -17,11 +17,11 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
-	public class DialogViewController : UITableViewController
+	public partial class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		UISearchBar searchBar;
-		public UITableView tableView;
+		UITableView tableView;
 		RefreshTableHeaderView refreshView;
 		RootElement root;
 		bool pushing;
@@ -63,7 +63,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		// If the value is 1, we are enabled, used in the source for quick computation
+		// If the value is true, we are enabled, used in the source for quick computation
 		bool enableSearch;
 		public bool EnableSearch {
 			get {
@@ -330,7 +330,12 @@ namespace MonoTouch.Dialog
 				}
 			}
 			
-			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override void RowDeselected (UITableView tableView, NSIndexPath indexPath)
+			{
+				Container.Deselected (indexPath);
+			}
+			
+			public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 			{
 				Container.Selected (indexPath);
 			}			
@@ -429,7 +434,7 @@ namespace MonoTouch.Dialog
 		/// will push the result.   Otherwise it will show it as a modal
 		/// dialog
 		/// </summary>
-		public void ActivateController (UIViewController controller, bool Animated)
+		public void ActivateController (UIViewController controller)
 		{
 			dirty = true;
 			
@@ -438,9 +443,9 @@ namespace MonoTouch.Dialog
 			
 			// We can not push a nav controller into a nav controller
 			if (nav != null && !(controller is UINavigationController))
-				nav.PushViewController (controller, Animated);
+				nav.PushViewController (controller, true);
 			else
-				PresentModalViewController (controller, Animated);
+				PresentModalViewController (controller, true);
 		}
 
 		/// <summary>
@@ -473,6 +478,14 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public virtual void Deselected (NSIndexPath indexPath)
+		{
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
+			
+			element.Deselected (this, tableView, indexPath);
+		}
+		
 		public virtual void Selected (NSIndexPath indexPath)
 		{
 			var section = root.Sections [indexPath.Section];
@@ -491,6 +504,9 @@ namespace MonoTouch.Dialog
 			tableView = MakeTableView (UIScreen.MainScreen.Bounds, Style);
 			tableView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin;
 			tableView.AutosizesSubviews = true;
+			
+			if (root != null)
+				root.Prepare ();
 			
 			UpdateSource ();
 			View = tableView;
@@ -580,22 +596,16 @@ namespace MonoTouch.Dialog
 			if (ViewDissapearing != null)
 				ViewDissapearing (this, EventArgs.Empty);
 		}
-
-		void PrepareRoot (RootElement root)
-		{
-			this.root = root;
-			if (root != null)
-				root.Prepare ();
-		}
 		
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
 		{
-			PrepareRoot (root);
+			this.root = root;
 		}
 		
 		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
-			PrepareRoot (root);
+			Style = style;
+			this.root = root;
 		}
 		
 		/// <summary>
@@ -612,14 +622,14 @@ namespace MonoTouch.Dialog
 		public DialogViewController (RootElement root, bool pushing) : base (UITableViewStyle.Grouped)
 		{
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 
 		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
 		{
+			Style = style;
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 	}
-	
 }

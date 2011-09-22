@@ -148,15 +148,9 @@ namespace MonoTouch.Dialog
 				fi.SetValue (o, val);
 				return;
 			}
-			
-			PropertyInfo  pi = mi as PropertyInfo;
+			var pi = mi as PropertyInfo;
 			var setMethod = pi.GetSetMethod ();
-			object[] newO = new object[]{
-				System.Convert.ChangeType(val, pi.PropertyType)
-			};
-			
-			setMethod.Invoke (o, newO);
-		
+			setMethod.Invoke (o, new object [] { val });
 		}
 			
 		static string MakeCaption (string name)
@@ -206,7 +200,7 @@ namespace MonoTouch.Dialog
 		{
 			MemberInfo last_radio_index = null;
 			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
-			                                       BindingFlags.Instance);
+							       BindingFlags.NonPublic | BindingFlags.Instance);
 
 			Section section = null;
 			
@@ -257,7 +251,7 @@ namespace MonoTouch.Dialog
 						else if (attr is MultilineAttribute)
 							multi = true;
 						else if (attr is HtmlAttribute)
-							html = attr as HtmlAttribute;
+							html = attr;
 						else if (attr is AlignmentAttribute)
 							align = attr as AlignmentAttribute;
 						
@@ -297,28 +291,17 @@ namespace MonoTouch.Dialog
 					if (invoke != null)
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
+					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
+					floatElement.Caption = caption;
+					element = floatElement;
+					
 					foreach (object attr in attrs){
-						if (attr is RangeAttribute)
-						{
-							var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
-							floatElement.Caption = caption;
-							element = floatElement;
+						if (attr is RangeAttribute){
 							var ra = attr as RangeAttribute;
 							floatElement.MinValue = ra.Low;
 							floatElement.MaxValue = ra.High;
 							floatElement.ShowCaption = ra.ShowCaption;
-							break;
 						}
-						else if (attr is EntryAttribute)
-						{
-							float fVal = (float)GetValue(mi, o);
-							string value = fVal.ToString();
-							
-							EntryAttribute ea = attr as EntryAttribute;
-							element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = UIKeyboardType.DecimalPad };
-							break;
-						}
-						
 					}
 				} else if (mType == typeof (bool)){
 					bool checkbox = false;
@@ -384,28 +367,8 @@ namespace MonoTouch.Dialog
 					last_radio_index = null;
 				} else if (typeof (int) == mType){
 					foreach (object attr in attrs){
-						if (attr is RadioSelectionAttribute)
-						{
+						if (attr is RadioSelectionAttribute){
 							last_radio_index = mi;
-							break;
-						}
-						else if (attr is EntryAttribute)
-						{
-							int iVal = (int)GetValue(mi, o);
-							string value = iVal.ToString();
-							EntryAttribute ea = attr as EntryAttribute;
-							element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = UIKeyboardType.NumberPad };
-							break;
-						}
-					}
-				} else if(typeof(decimal) == mType){
-					foreach (object attr in attrs){
-						if (attr is EntryAttribute)
-						{
-							decimal dVal = (decimal)GetValue(mi, o);
-							string value = dVal.ToString();
-							EntryAttribute ea = attr as EntryAttribute;
-							element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = UIKeyboardType.NumberPad };
 							break;
 						}
 					}
