@@ -28,19 +28,12 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
+<<<<<<< HEAD
 	public partial class Element : IDisposable {
-		public object DataItem;
-		
-		public NSAction Deleted;
-		
-		public void DeleteSource()
-		{
-			if(Deleted != null)
-				Deleted();
-			
-		}
-		
+=======
+	public class Element : IDisposable {
 		public int Row;
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		/// <summary>
 		///  Handle to the container object.
 		/// </summary>
@@ -69,14 +62,6 @@ namespace MonoTouch.Dialog
 			this.Caption = caption;
 		}	
 		
-		static NSString cellkey = new NSString("xx");
-		
-		protected virtual NSString CellKey {
-			get {
-				return cellkey;
-			}
-		}
-		
 		public Element(string caption, string detail)
 		{
 			this.Caption = caption;
@@ -92,8 +77,37 @@ namespace MonoTouch.Dialog
 		{
 		}
 		
+<<<<<<< HEAD
+		static NSString cellkey = new NSString ("xx");
+		/// <summary>
+		/// Subclasses that override the GetCell method should override this method as well
+		/// </summary>
+		/// <remarks>
+		/// This method should return the key passed to UITableView.DequeueReusableCell.
+		/// If your code overrides the GetCell method to change the cell, you must also 
+		/// override this method and return a unique key for it.
+		/// 
+		/// This works in most subclasses with a couple of exceptions: StringElement and
+		/// various derived classes do not use this setting as they need a wider range
+		/// of keys for different uses, so you need to look at the source code for those
+		/// if you are trying to override StringElement or StyledStringElement.
+		/// </remarks>
+		protected virtual NSString CellKey { 
+			get {
+				return cellkey;
+			}
+		}
+		
+		/// <summary>
+		/// Gets a UITableViewCell for this element.   Can be overridden, but if you 
+		/// customize the style or contents of the cell you must also override the CellKey 
+		/// property in your derived class.
+		/// </summary>
+		public virtual UITableViewCell GetCell (UITableView tv)
+=======
 		
 		public virtual UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		{
 			return new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 		}
@@ -155,7 +169,10 @@ namespace MonoTouch.Dialog
 		public virtual void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 		}
-				
+		public virtual void Deselected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+		}
+		
 		/// <summary>
 		/// If the cell is attached will return the immediate RootElement
 		/// </summary>
@@ -278,10 +295,19 @@ namespace MonoTouch.Dialog
 		public BooleanElement (string caption, bool value, string key) : base (caption, value)
 		{  }
 		
+<<<<<<< HEAD
+		protected override NSString CellKey {
+			get {
+				return bkey;
+			}
+		}
+		public override UITableViewCell GetCell (UITableView tv)
+=======
 		public BooleanElement (string caption, string detail, bool value, string key) : base (caption, detail, value)
 		{  }
 		
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		{
 			if (sw == null){
 				sw = new UISwitch (){
@@ -297,7 +323,11 @@ namespace MonoTouch.Dialog
 			
 			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, CellKey);
+<<<<<<< HEAD
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
+=======
+				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, bkey);
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else
 				RemoveTag (cell, 1);
@@ -401,18 +431,24 @@ namespace MonoTouch.Dialog
 		public event NSAction Tapped;
 		
 		protected abstract UIImage GetImage ();
+<<<<<<< HEAD
 		
 		protected override NSString CellKey {
 			get {
 				return key;
 			}
 		}
-
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (CellKey) as TextWithImageCellView;
+			if (cell == null)
+=======
 		public UITableViewCell cell;
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
 		{
-			cell = tv.DequeueReusableCell (CellKey) as TextWithImageCellView;
+			cell = tv.DequeueReusableCell (key) as TextWithImageCellView;
 			//if (cell == null)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 				cell = new TextWithImageCellView (this);
 			//else
 			//	cell.UpdateFrom (this);
@@ -465,12 +501,16 @@ namespace MonoTouch.Dialog
 			Value = value;
 		}
 		
+<<<<<<< HEAD
 		protected override NSString CellKey {
 			get {
 				return skey;
 			}
 		}
+		public override UITableViewCell GetCell (UITableView tv)
+=======
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		{
 			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
@@ -721,7 +761,11 @@ namespace MonoTouch.Dialog
 			this.style = style;
 		}
 		
+<<<<<<< HEAD
+		protected UITableViewCellStyle style;
+=======
 		public UITableViewCellStyle style;
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		public UIFont Font;
 		public UIFont SubtitleFont;
 		public UIColor TextColor;
@@ -824,7 +868,11 @@ namespace MonoTouch.Dialog
 			tl.TextColor = TextColor ?? UIColor.Black;
 			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
 			tl.LineBreakMode = LineBreakMode;
+<<<<<<< HEAD
 			tl.Lines = Lines;	
+=======
+			tl.Lines = 0;			
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 			
 			// The check is needed because the cell might have been recycled.
 			if (cell.DetailTextLabel != null)
@@ -847,12 +895,17 @@ namespace MonoTouch.Dialog
 				
 				if (cell.DetailTextLabel != null){
 					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+<<<<<<< HEAD
 					cell.DetailTextLabel.Lines = Lines;
 					cell.DetailTextLabel.LineBreakMode = LineBreakMode;
 					cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
 				}
 			}
 		}	
+=======
+		}		
+	}
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 	
 		void ClearBackground (UITableViewCell cell)
 		{
@@ -940,12 +993,16 @@ namespace MonoTouch.Dialog
 			this.Accessory = UITableViewCellAccessory.None;
 		}
 		
+<<<<<<< HEAD
 		protected override NSString CellKey {
 			get {
 				return skey;
 			}
 		}
+		public override UITableViewCell GetCell (UITableView tv)
+=======
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		{
 			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
@@ -1044,19 +1101,18 @@ namespace MonoTouch.Dialog
 		}
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			if(EnableEntry)
+			if(!EnableEntry)
+				return;
+			entryScreen = new EntryScreen(Value){MaxLength = this.MaxLength};
+			entryScreen.Title = Caption;
+			entryScreen.EditingDone += delegate
 			{
-				entryScreen = new EntryScreen(Value){MaxLength = this.MaxLength};
-				entryScreen.Title = Caption;
-				entryScreen.EditingDone += delegate
-				{
-					Value = entryScreen.Text;
-					if (EditingDone != null)
-						EditingDone();
-					tableView.ReloadRows(new NSIndexPath[]{path},UITableViewRowAnimation.None);
-				};
-				dvc.NavigationController.PushViewController(entryScreen,true);
-			}
+				Value = entryScreen.Text;
+				if (EditingDone != null)
+					EditingDone();
+				tableView.ReloadRows(new NSIndexPath[]{path},UITableViewRowAnimation.None);
+			};
+			dvc.NavigationController.PushViewController(entryScreen,true);
 			base.Selected (dvc, tableView, path);
 		}
 	}
@@ -1133,13 +1189,7 @@ namespace MonoTouch.Dialog
 		
 	}
 	
-	public class RadioElement : StringElement {
-		public RadioElement(string caption, string group, NSAction tapped) : base(caption, group)
-		{
-			Tapped += tapped;
-			Group = group;
-			
-		}
+	public partial class RadioElement : StringElement {
 		public string Group;
 		internal int RadioIdx;
 		
@@ -1148,6 +1198,12 @@ namespace MonoTouch.Dialog
 			Group = group;
 		}
 		
+		
+		public RadioElement (string caption, string group, NSAction tapped) : base (caption)
+		{
+			Tapped += tapped;
+			Group = group;
+		}
 				
 		public RadioElement (string caption,string value ) : base (caption,value)
 		{
@@ -1365,13 +1421,17 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+<<<<<<< HEAD
 		protected override NSString CellKey {
 			get {
 				return ikey;
 			}
 		}
 		
+		public override UITableViewCell GetCell (UITableView tv)
+=======
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		{
 			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
@@ -1611,22 +1671,32 @@ namespace MonoTouch.Dialog
 		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
 			Section s = Parent as Section;
+<<<<<<< HEAD
 			if (s.EntryAlignment.Width != 0)
 				return s.EntryAlignment;
 			
 			// If all EntryElements have a null Caption, align UITextField with the Caption
 			// offset of normal cells (at 10px).
 			SizeF max = new SizeF (-15, tv.StringSize ("M", font).Height);
+=======
+			SizeF max = new SizeF (-1, -1);
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 			foreach (var e in s.Elements){
 				var ee = e as EntryElement;
 				if (ee == null)
 					continue;
+<<<<<<< HEAD
 				
 				if (ee.Caption != null) {
 					var size = tv.StringSize (ee.Caption, font);
 					if (size.Width > max.Width)
 						max = size;
 				}
+=======
+				var size = tv.StringSize (ee.Caption, font);
+				if (size.Width > max.Width)
+					max = size;				
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 			}
 			s.EntryAlignment = new SizeF (25 + Math.Min (max.Width, 160), max.Height);
 			return s.EntryAlignment;
@@ -1662,6 +1732,10 @@ namespace MonoTouch.Dialog
 			
 			if (entry == null){
 				SizeF size = ComputeEntryPosition (tv, cell);
+<<<<<<< HEAD
+				float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
+				float width = cell.ContentView.Bounds.Width - size.Width;
+=======
 				var _entry = new UITextField (new RectangleF (size.Width, (cell.ContentView.Bounds.Height-size.Height)/2-1, 320-size.Width - 15, size.Height)){
 					Tag = 1,
 					Placeholder = placeholder ?? "",
@@ -1671,6 +1745,9 @@ namespace MonoTouch.Dialog
 				};
 				_entry.Text = Value ?? "";
 				entry = _entry;
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
+				
+				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
 				entry.ValueChanged += delegate {
 					FetchValue ();
@@ -1757,8 +1834,15 @@ namespace MonoTouch.Dialog
 			
 			Value = newValue;
 			
+<<<<<<< HEAD
 			if (Changed != null)
 				Changed (this, EventArgs.Empty);
+=======
+		//	if (diff){
+				if (Changed != null)
+					Changed (this, EventArgs.Empty);
+		//	}
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		}
 		
 		protected override void Dispose (bool disposing)
@@ -1804,8 +1888,17 @@ namespace MonoTouch.Dialog
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
 			if (entry != null)
 				entry.ResignFirstResponder ();
+<<<<<<< HEAD
 		}
 	}
+=======
+        }	
+	
+	}
+	
+	
+	
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 	
 	public class DateTimeElement : StringElement {
 		public enum PickerTypes {
@@ -2289,12 +2382,16 @@ namespace MonoTouch.Dialog
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
+<<<<<<< HEAD
 		protected override NSString CellKey {
 			get {
 				return key;
 			}
 		}
+		public override UITableViewCell GetCell (UITableView tv)
+=======
 		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+>>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
 		{
 			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
