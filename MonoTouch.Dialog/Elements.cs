@@ -1295,7 +1295,7 @@ namespace MonoTouch.Dialog
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
-
+		public UITextAutocapitalizationType AutocapitalizationType = UITextAutocapitalizationType.Sentences;
 		public event EventHandler Changed;
 		
 		/// <summary>
@@ -1376,6 +1376,7 @@ namespace MonoTouch.Dialog
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
 				Placeholder = placeholder ?? "",
 				SecureTextEntry = isPassword,
+				AutocapitalizationType = this.AutocapitalizationType,
 				Text = Value ?? "",
 				Tag = 1
 			};
