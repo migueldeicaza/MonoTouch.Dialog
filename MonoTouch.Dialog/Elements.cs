@@ -1252,7 +1252,7 @@ namespace MonoTouch.Dialog
 					entry.Text = value;
 			}
 		}
-		string val;
+		protected string val;
 
 		/// <summary>
 		/// The key used for reusable UITableViewCells.
@@ -2179,7 +2179,7 @@ namespace MonoTouch.Dialog
 		internal Group group;
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
-		internal UITableView TableView;
+		public UITableView TableView;
 		
 		// This is used to indicate that we need the DVC to dispatch calls to
 		// WillDisplayCell so we can prepare the color of the cell before 
@@ -2296,7 +2296,7 @@ namespace MonoTouch.Dialog
 			return -1;
 		}
 			
-		internal void Prepare ()
+		public void Prepare ()
 		{
 			int current = 0;
 			foreach (Section s in Sections){				
