@@ -822,13 +822,15 @@ namespace MonoTouch.Dialog
 				else 
 					img = null;
 				imgView.Image = img;
-				
-				if (cell.DetailTextLabel != null){
+
+				if (cell.DetailTextLabel != null)
 					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
-					cell.DetailTextLabel.Lines = Lines;
-					cell.DetailTextLabel.LineBreakMode = LineBreakMode;
-					cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
-				}
+			}
+				
+			if (cell.DetailTextLabel != null){
+				cell.DetailTextLabel.Lines = Lines;
+				cell.DetailTextLabel.LineBreakMode = LineBreakMode;
+				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
 			}
 		}	
 	
