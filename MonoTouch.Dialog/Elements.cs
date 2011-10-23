@@ -1893,7 +1893,7 @@ namespace MonoTouch.Dialog
 			if (Parent != null)
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
-
+		
 		/// <summary>
 		///    Add version that can be used with LINQ
 		/// </summary>
@@ -1901,7 +1901,7 @@ namespace MonoTouch.Dialog
 		/// An enumerable list that can be produced by something like:
 		///    from x in ... select (Element) new MyElement (...)
 		/// </param>
-		public int Add (IEnumerable<Element> elements)
+		public int AddAll (IEnumerable<Element> elements)
 		{
 			int count = 0;
 			foreach (var e in elements){
@@ -1909,6 +1909,15 @@ namespace MonoTouch.Dialog
 				count++;
 			}
 			return count;
+		}
+		
+		/// <summary>
+		///    This method is being obsoleted, use AddAll to add an IEnumerable<Element> instead.
+		/// </summary>
+		[Obsolete ("Please use AddAll since this version will not work in future versions of MonoTouch when we introduce 4.0 covariance")]
+		public int Add (IEnumerable<Element> elements)
+		{
+			return AddAll (elements);
 		}
 		
 		/// <summary>
@@ -2111,7 +2120,7 @@ namespace MonoTouch.Dialog
 			if (root != null && root.TableView != null)
 				root.TableView.ReloadData ();
 		}
-
+				
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
@@ -2119,8 +2128,9 @@ namespace MonoTouch.Dialog
 				Clear ();
 				Elements = null;
 			}
+			base.Dispose (disposing);
 		}
-			
+
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = new UITableViewCell (UITableViewCellStyle.Default, "");
