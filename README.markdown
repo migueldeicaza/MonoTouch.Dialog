@@ -45,7 +45,7 @@ Miguel (miguel@gnome.org)
 Screenshot
 ==========
 
-This [screenshot](http://tirania.org/tmp/a.png) was created with 
+This [screenshot](http://tirania.org/s/ac8f1451.png) was created with 
 [this code](http://gist.github.com/281469)
 
 Using MonoTouch.Dialog
