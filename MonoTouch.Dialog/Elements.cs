@@ -1297,7 +1297,9 @@ namespace MonoTouch.Dialog
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
-
+		public UITextAutocapitalizationType AutocapitalizationType = UITextAutocapitalizationType.Sentences;
+		public UIReturnKeyType ReturnKeyType = UIReturnKeyType.Default;
+		public event EventHandler Go;
 		public event EventHandler Changed;
 		
 		/// <summary>
@@ -1378,6 +1380,7 @@ namespace MonoTouch.Dialog
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
 				Placeholder = placeholder ?? "",
 				SecureTextEntry = isPassword,
+				AutocapitalizationType = this.AutocapitalizationType,
 				Text = Value ?? "",
 				Tag = 1
 			};
@@ -1438,18 +1441,24 @@ namespace MonoTouch.Dialog
 						focus.BecomeFirstResponder (true);
 					else 
 						focus.ResignFirstResponder (true);
-					
+
+					if (Go != null && entry.ReturnKeyType == UIReturnKeyType.Go) {
+						Go(this, EventArgs.Empty);
+					}
+
 					return true;
 				};
 				entry.Started += delegate {
 					EntryElement self = null;
-					var returnType = UIReturnKeyType.Default;
-					
-					foreach (var e in (Parent as Section).Elements){
-						if (e == this)
-							self = this;
-						else if (self != null && e is EntryElement)
-							returnType = UIReturnKeyType.Next;
+					var returnType = ReturnKeyType;
+
+					if (returnType != UIReturnKeyType.Default) {
+						foreach (var e in (Parent as Section).Elements){
+							if (e == this)
+								self = this;
+							else if (self != null && e is EntryElement)
+								returnType = UIReturnKeyType.Next;
+						}
 					}
 					entry.ReturnKeyType = returnType;
 				};
