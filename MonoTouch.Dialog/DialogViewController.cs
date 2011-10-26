@@ -156,6 +156,14 @@ namespace MonoTouch.Dialog
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
 			base.DidRotate (fromInterfaceOrientation);
+			
+			//Fixes the RefreshView's size if it is shown during rotation
+			if (refreshView != null) {
+				var bounds = View.Bounds;
+				
+				refreshView.Frame = new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height);
+			}
+			
 			ReloadData ();
 		}
 		
