@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{56459A5E-9126-4BDB-86B7-86B55054E103}</ProjectGuid>
+    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MonoTouch.Dialog.VS2010</RootNamespace>
+    <AssemblyName>MonoTouch.Dialog.VS2010</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="DialogViewController.cs" />
+    <Compile Include="Elements.cs" />
+    <Compile Include="Reflect.cs" />
+    <Compile Include="Elements\ActivityElement.cs" />
+    <Compile Include="Elements\ElementBadge.cs" />
+    <Compile Include="Elements\MessageElement.cs" />
+    <Compile Include="Elements\OwnerDrawnElement.cs" />
+    <Compile Include="OldElements\LoadMoreElement.cs" />
+    <Compile Include="Utilities\Controls.cs" />
+    <Compile Include="Utilities\GlassButton.cs" />
+    <Compile Include="Utilities\Graphics.cs" />
+    <Compile Include="Utilities\ImageLoader.cs" />
+    <Compile Include="Utilities\LRUCache.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\arrow.png" />
+  </ItemGroup>
+</Project>
