@@ -1289,15 +1289,56 @@ namespace MonoTouch.Dialog
 					entry.KeyboardType = value;
 			}
 		}
+		
+		/// <summary>
+		/// The type of Return Key that is displayed on the
+		/// keyboard, you can change this to use this for
+		/// Done, Return, Save, etc. keys on the keyboard
+		/// </summary>
+		public UIReturnKeyType? ReturnKeyType {
+			get {
+				return returnKeyType;
+			}
+			set {
+				returnKeyType = value;
+				if (entry != null && returnKeyType.HasValue)
+					entry.ReturnKeyType = returnKeyType.Value;
+			}
+		}
+		
+		public UITextAutocapitalizationType AutocapitalizationType {
+			get {
+				return autocapitalizationType;	
+			}
+			set { 
+				autocapitalizationType = value;
+				if (entry != null)
+					entry.AutocapitalizationType = value;
+			}
+		}
+		
+		public UITextAutocorrectionType AutocorrectionType { 
+			get { 
+				return autocorrectionType;
+			}
+			set { 
+				autocorrectionType = value;
+				if (entry != null)
+					this.autocorrectionType = value;
+			}
+		}
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
+		UIReturnKeyType? returnKeyType = null;
+		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.AllCharacters;
+		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
 		public event EventHandler Changed;
-		
+		public event Func<bool> ShouldReturn;
 		/// <summary>
 		/// Constructs an EntryElement with the given caption, placeholder and initial value.
 		/// </summary>
@@ -1311,7 +1352,7 @@ namespace MonoTouch.Dialog
 		/// Initial value.
 		/// </param>
 		public EntryElement (string caption, string placeholder, string value) : base (caption)
-		{
+		{ 
 			Value = value;
 			this.placeholder = placeholder;
 		}
@@ -1412,6 +1453,10 @@ namespace MonoTouch.Dialog
 					FetchValue ();
 				};
 				entry.ShouldReturn += delegate {
+					
+					if (ShouldReturn != null)
+						return ShouldReturn();
+					
 					RootElement root = GetImmediateRootElement ();
 					EntryElement focus = null;
 					
@@ -1441,15 +1486,21 @@ namespace MonoTouch.Dialog
 				};
 				entry.Started += delegate {
 					EntryElement self = null;
-					var returnType = UIReturnKeyType.Default;
 					
-					foreach (var e in (Parent as Section).Elements){
-						if (e == this)
-							self = this;
-						else if (self != null && e is EntryElement)
-							returnType = UIReturnKeyType.Next;
+					if (!returnKeyType.HasValue)
+					{
+						var returnType = UIReturnKeyType.Default;
+						
+						foreach (var e in (Parent as Section).Elements){
+							if (e == this)
+								self = this;
+							else if (self != null && e is EntryElement)
+								returnType = UIReturnKeyType.Next;
+						}
+						entry.ReturnKeyType = returnType;
 					}
-					entry.ReturnKeyType = returnType;
+					else
+						entry.ReturnKeyType = returnKeyType.Value;
 				};
 			}
 			if (becomeResponder){
@@ -1457,6 +1508,9 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 			}
 			entry.KeyboardType = KeyboardType;
+			
+			entry.AutocapitalizationType = AutocapitalizationType;
+			entry.AutocorrectionType = AutocorrectionType;
 			
 			cell.TextLabel.Text = Caption;
 			cell.ContentView.AddSubview (entry);
