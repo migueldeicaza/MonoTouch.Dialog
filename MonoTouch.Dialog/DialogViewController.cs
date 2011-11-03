@@ -17,6 +17,10 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
+	/// <summary>
+	///   The DialogViewController is the main entry point to use MonoTouch.Dialog,
+	///   it provides a simplified API to the UITableViewController.
+	/// </summary>
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
