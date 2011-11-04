@@ -865,6 +865,55 @@ This works for most elements, but not for the StringElement and StyledStringElem
 as those use their own set of keys for various rendering scenarios.   You would have
 to replicate the code in those classes.
 
+Extending the Reflection API for your own custom Elements
+---------------------------------------------------------
+
+To use custom Elements with the Reflection API you will need to create a custom 
+data type to hold values and a subclass of BindingContext. In your custom 
+BindingContext class you will need to override these two methods:
+
+		public virtual Element BuildElementForType (Type mType, string Caption, object Value)
+		public virtual object FetchElementValue (Element element)
+
+Here is a very simple example:
+
+	    class MyCustomDataType
+	    {
+	        public int CustomData;
+	    }
+
+	    class BindingContextEx : BindingContext
+	    {
+	        public BindingContextEx (object callbacks, object o, string title) : base(callbacks, o, title) { }
+
+	        public override Element BuildElementForType(Type mType, string Caption, object Value)
+	        {
+	            if (mType == typeof(MyCustomDataType))
+	            {
+	                return new MyCustomElement(Caption, (MyCustomDataType)Value);
+	            }
+
+	            return base.BuildElementForType(mType, Caption, Value);
+	        }
+
+	        public override object FetchElementValue(Element element)
+	        {
+	            if (element.GetType() == typeof(MyCustomElement))
+	            {
+	                return ((MyCustomElement)element).Value;
+	            }
+
+	            return base.FetchElementValue(element);
+	        }
+	    }
+
+This would allow you to use custom views that bind to custom data types using 
+the reflection API. Your custom Element would handle the mechanics of building 
+the table cell that used those custom views and binding to your data types.
+	
+Once this is done you can add your custom data types as members of the object 
+being edited.
+
 Customizing the DialogViewController
 ====================================
 
