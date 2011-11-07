@@ -592,6 +592,9 @@ namespace MonoTouch.Dialog
 			if (root == null)
 				return;
 			
+			if(root.Caption != null) 
+				NavigationItem.Title = root.Caption;
+			
 			root.Prepare ();
 			if (tableView != null){
 				UpdateSource ();
