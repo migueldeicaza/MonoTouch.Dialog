@@ -4,9 +4,11 @@
 <dict>
 	<key>MinimumOSVersion</key>
 	<string>5.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainWindow</string>
 	<key>UIDeviceFamily</key>
 	<array>
-		<string>1</string>
+		<integer>1</integer>
 	</array>
 </dict>
 </plist>
