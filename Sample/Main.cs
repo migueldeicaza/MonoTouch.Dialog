@@ -50,7 +50,8 @@ namespace Sample
 					new StringElement ("Index sample", DemoIndex),
 				},
 				new Section ("Auto-mapped", footer){
-					new StringElement ("Reflection API", DemoReflectionApi)
+					new StringElement ("Reflection API", DemoReflectionApi),
+					new StringElement ("Reflection Extension API", DemoReflectionExtensionApi),
 				},
 			};
 

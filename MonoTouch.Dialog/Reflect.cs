@@ -450,13 +450,18 @@ namespace MonoTouch.Dialog
 						
 						SetValue (mi, obj, fi.GetValue (null));
 					}
-				} else SetValue (mi, obj, FetchElementValue (element));
+				} else {
+					object Value;
+					if(FetchElementValue(element, out Value))
+						SetValue (mi, obj, Value);
+				}
 			}
 		}
 
-		public virtual object FetchElementValue (Element element)
+		public virtual bool FetchElementValue (Element element, out object Value)
 		{
-			return null;
+			Value = null;
+			return false;
 		}
 	}
 }

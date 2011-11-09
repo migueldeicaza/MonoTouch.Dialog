@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -89,9 +89,10 @@
     <Compile Include="DemoContainerStyle.cs" />
     <Compile Include="DemoIndex.cs" />
     <Compile Include="DemoEditingAdvanced.cs" />
+    <Compile Include="DemoReflectionExtensionApi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <InterfaceDefinition Include="MainWindow.xib" xmlns="" />
+    <InterfaceDefinition Include="MainWindow.xib" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog.csproj">
