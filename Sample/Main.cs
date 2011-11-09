@@ -30,7 +30,6 @@ namespace Sample
 			Console.WriteLine (Last);
 			
 			var p = Path.GetFullPath ("background.png");
-			window.AddSubview (navigation.View);
 
 			var menu = new RootElement ("Demos"){
 				new Section ("Element API"){
@@ -55,12 +54,18 @@ namespace Sample
 				},
 			};
 
+			//
+			// Create our UI and add it to the current toplevel navigation controller
+			// this will allow us to have nice navigation animations.
+			//
 			var dv = new DialogViewController (menu) {
 				Autorotate = true
 			};
 			navigation.PushViewController (dv, true);				
 			
+			// Activate our window, and set our toplevel controller
 			window.MakeKeyAndVisible ();
+			window.RootViewController = navigation;
 			
 			return true;
 		}
