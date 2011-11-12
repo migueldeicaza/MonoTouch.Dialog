@@ -1512,6 +1512,8 @@ namespace MonoTouch.Dialog
 					}
 					else
 						entry.ReturnKeyType = returnKeyType.Value;
+						
+					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
 			}
 			if (becomeResponder){
