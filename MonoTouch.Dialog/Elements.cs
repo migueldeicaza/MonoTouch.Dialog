@@ -1559,6 +1559,12 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
+			BecomeFirstResponder(true);
+			tableView.DeselectRow (indexPath, true);
+		}
+		
 		public override bool Matches (string text)
 		{
 			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
