@@ -2280,6 +2280,8 @@ namespace MonoTouch.Dialog
 		// display
 		public bool NeedColorUpdate;
 		
+		public event NSAction Tapped;
+		
 		/// <summary>
 		///  Initializes a RootSection with a caption
 		/// </summary>
@@ -2691,6 +2693,9 @@ namespace MonoTouch.Dialog
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
+			if (Tapped != null)
+				Tapped ();
+			
 			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
 			PrepareDialogViewController (newDvc);
