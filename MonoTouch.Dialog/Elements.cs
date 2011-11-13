@@ -1341,7 +1341,7 @@ namespace MonoTouch.Dialog
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
-		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.AllCharacters;
+		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.None;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		bool isPassword, becomeResponder;
 		UITextField entry;
