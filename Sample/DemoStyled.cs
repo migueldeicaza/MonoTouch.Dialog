@@ -34,6 +34,11 @@ namespace Sample
 				BackgroundColor = UIColor.Red,
 				DetailColor = UIColor.Green,
 			};
+			var sse = new StyledStringElement ("DetailDisclosureIndicator") { Accessory = UITableViewCellAccessory.DetailDisclosureButton };
+			sse.AccessoryTapped += delegate {
+				var alert = new UIAlertView ("Accessory", "Accessory clicked!", null, "Ok");
+				alert.Show ();
+			};
 			var root = new RootElement("Styled Elements") {
 				new Section ("Image icon"){
 					imageIcon
@@ -56,7 +61,7 @@ namespace Sample
 				new Section ("Accessories"){
 					new StyledStringElement ("DisclosureIndicator") { Accessory = UITableViewCellAccessory.DisclosureIndicator },
 					new StyledStringElement ("Checkmark") { Accessory = UITableViewCellAccessory.Checkmark },
-					new StyledStringElement ("DetailDisclosureIndicator") { Accessory = UITableViewCellAccessory.DetailDisclosureButton },
+					sse
 				}
 			};
 			
