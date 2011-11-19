@@ -372,7 +372,7 @@ namespace MonoTouch.Dialog
 							break;
 						}
 					}
-				} else if ((element = BuildElementForType (mType, caption, GetValue (mi, o), attrs)) == null) {
+				} else if ((element = BuildElementForType (mType, caption, GetValue (mi, o), attrs, callbacks)) == null) {
 					var nested = GetValue (mi, o);
 					if (nested != null){
 						var newRoot = new RootElement (caption);
@@ -389,7 +389,7 @@ namespace MonoTouch.Dialog
 			root.Add (section);
 		}
 
-		public virtual Element BuildElementForType(Type mType, string Caption, object Value, object[] attrs)
+		public virtual Element BuildElementForType(Type mType, string Caption, object Value, object[] attrs, object callbacks)
 		{
 			return null;
 		}
