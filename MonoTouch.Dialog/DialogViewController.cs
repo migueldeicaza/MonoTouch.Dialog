@@ -300,6 +300,14 @@ namespace MonoTouch.Dialog
 				Root = container.root;
 			}
 			
+			public override void AccessoryButtonTapped (UITableView tableView, NSIndexPath indexPath)
+			{
+				var section = Root.Sections [indexPath.Section];
+				var element = (section.Elements [indexPath.Row] as StyledStringElement);
+				if (element != null)
+					element.AccessoryTap ();
+			}
+			
 			public override int RowsInSection (UITableView tableview, int section)
 			{
 				var s = Root.Sections [section];
