@@ -628,6 +628,7 @@ namespace MonoTouch.Dialog
 		static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
+		public bool AutoDeselectRow = true;
 		
 		public StringElement (string caption) : base (caption) {}
 		
@@ -670,7 +671,9 @@ namespace MonoTouch.Dialog
 		{
 			if (Tapped != null)
 				Tapped ();
-			tableView.DeselectRow (indexPath, true);
+			
+			if (AutoDeselectRow)
+				tableView.DeselectRow (indexPath, true);
 		}
 		
 		public override bool Matches (string text)
