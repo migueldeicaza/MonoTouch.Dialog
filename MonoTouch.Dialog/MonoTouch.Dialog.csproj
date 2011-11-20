@@ -97,6 +97,7 @@
     <Compile Include="Elements\ElementBadge.cs" />
     <Compile Include="Utilities\Controls.cs" />
     <Compile Include="Utilities\GlassButton.cs" />
+    <Compile Include="Utilities\LocalizationExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />

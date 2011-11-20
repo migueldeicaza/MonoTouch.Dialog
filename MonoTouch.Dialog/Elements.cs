@@ -245,7 +245,7 @@ namespace MonoTouch.Dialog
 		
 		public override string Summary ()
 		{
-			return val ? "On" : "Off";
+			return val ? "On".GetText () : "Off".GetText ();
 		}		
 	}
 	
@@ -609,7 +609,9 @@ namespace MonoTouch.Dialog
 				NetworkActivity = false;
 				vc.NavigationItem.RightBarButtonItem = null;
 				if (web != null)
-					web.LoadHtmlString (String.Format ("<html><center><font size=+5 color='red'>An error occurred:<br>{0}</font></center></html>", args.Error.LocalizedDescription), null);
+					web.LoadHtmlString (
+						String.Format ("<html><center><font size=+5 color='red'>{0}:<br>{1}</font></center></html>",
+						"An error occurred:".GetText (), args.Error.LocalizedDescription), null);
 			};
 			vc.NavigationItem.Title = Caption;
 			vc.View.AddSubview (web);
@@ -628,6 +630,8 @@ namespace MonoTouch.Dialog
 		static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
 		public string Value;
+		public bool AutoDeselectRow = true;
+		public UITableViewCellSelectionStyle SelectionStyle = UITableViewCellSelectionStyle.Blue;
 		
 		public StringElement (string caption) : base (caption) {}
 		
@@ -648,7 +652,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (Value == null ? skey : skeyvalue);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1, skey);
-				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
+				cell.SelectionStyle = (Tapped != null) ? SelectionStyle : UITableViewCellSelectionStyle.None;
 			}
 			cell.Accessory = UITableViewCellAccessory.None;
 			cell.TextLabel.Text = Caption;
@@ -670,7 +674,9 @@ namespace MonoTouch.Dialog
 		{
 			if (Tapped != null)
 				Tapped ();
-			tableView.DeselectRow (indexPath, true);
+			
+			if (AutoDeselectRow)
+				tableView.DeselectRow (indexPath, true);
 		}
 		
 		public override bool Matches (string text)
@@ -788,7 +794,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
 				cell = new UITableViewCell (style, key);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.SelectionStyle = SelectionStyle;
 			}
 			PrepareCell (cell);
 			return cell;
@@ -938,7 +944,7 @@ namespace MonoTouch.Dialog
 			var cell = tv.DequeueReusableCell (CellKey);
 			if (cell == null){
 				cell = new UITableViewCell (Value == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Subtitle, CellKey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.SelectionStyle = SelectionStyle;
 			}
 			
 			cell.Accessory = Accessory;
