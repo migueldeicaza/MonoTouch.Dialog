@@ -30,7 +30,6 @@ namespace Sample
 			Console.WriteLine (Last);
 			
 			var p = Path.GetFullPath ("background.png");
-			window.AddSubview (navigation.View);
 
 			var menu = new RootElement ("Demos"){
 				new Section ("Element API"){
@@ -55,12 +54,22 @@ namespace Sample
 				},
 			};
 
+			//
+			// Create our UI and add it to the current toplevel navigation controller
+			// this will allow us to have nice navigation animations.
+			//
 			var dv = new DialogViewController (menu) {
 				Autorotate = true
 			};
 			navigation.PushViewController (dv, true);				
 			
 			window.MakeKeyAndVisible ();
+			
+			// On iOS5 we use the new window.RootViewController, on older versions, we add the subview
+			if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
+				window.RootViewController = navigation;	
+			else
+				window.AddSubview (navigation.View);			
 			
 			return true;
 		}
