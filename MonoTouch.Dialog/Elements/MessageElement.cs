@@ -72,7 +72,7 @@ namespace MonoTouch.Dialog {
 			if (DateTime.Now.Day == Date.Day)
 				label = Date.ToShortTimeString ();
 			else if (diff <= TimeSpan.FromHours (24))
-				label = "Yesterday";
+				label = "Yesterday".GetText ();
 			else if (diff < TimeSpan.FromDays (6))
 				label = Date.ToString ("dddd");
 			else
