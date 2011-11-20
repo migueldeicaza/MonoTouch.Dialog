@@ -278,6 +278,7 @@ namespace MonoTouch.Dialog
 				searchBar.ShowsCancelButton = false;
 				container.FinishSearch ();
 				searchBar.ResignFirstResponder ();
+				searchBar.Text = String.Empty;
 			}
 			
 			public override void SearchButtonClicked (UISearchBar searchBar)
