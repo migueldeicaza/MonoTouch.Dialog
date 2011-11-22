@@ -2608,7 +2608,11 @@ namespace MonoTouch.Dialog
 				
 				cell = new UITableViewCell (style, rkey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
-			} 
+			}
+
+			// The check is needed because the cell might have been recycled.
+			if (cell.DetailTextLabel != null)
+				cell.DetailTextLabel.Text = "";
 		
 			cell.TextLabel.Text = Caption;
 			var radio = group as RadioGroup;
