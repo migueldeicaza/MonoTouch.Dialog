@@ -76,13 +76,13 @@ namespace Sample
 	{
 		public BindingContextEx(object callbacks, object o, string title) : base(callbacks, o, title) { }
 
-		public override Element BuildElementForType(Type mType, string Caption, object Value)
+		public override Element BuildElementForType(Type mType, string Caption, object Value, object[] attrs, object callbacks)
 		{
 			if (mType == typeof(CustomDataType)) {
 				return new CustomElement(Caption, (CustomDataType)Value);
 			}
 
-			return base.BuildElementForType(mType, Caption, Value);
+			return base.BuildElementForType(mType, Caption, Value, attrs, callbacks);
 		}
 
 		public override bool FetchElementValue(Element element, out object Value)
