@@ -699,6 +699,7 @@ namespace MonoTouch.Dialog
 		}
 		
 		protected UITableViewCellStyle style;
+		public NSAction AccessoryTapped;
 		public UIFont Font;
 		public UIFont SubtitleFont;
 		public UIColor TextColor;
@@ -867,6 +868,13 @@ namespace MonoTouch.Dialog
 				return;
 			root.TableView.ReloadRows (new NSIndexPath [] { IndexPath }, UITableViewRowAnimation.None);
 		}	
+		
+		internal void AccessoryTap ()
+		{
+			NSAction tapped = AccessoryTapped;
+			if (tapped != null)
+				tapped ();
+		}
 	}
 	
 	public class StyledMultilineElement : StyledStringElement, IElementSizing {
@@ -888,7 +896,7 @@ namespace MonoTouch.Dialog
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
 			float height = tableView.StringSize (Caption, captionFont, maxSize, LineBreakMode).Height;
 			
-			if (this.style == UITableViewCellStyle.Subtitle){
+			if ((this.style == UITableViewCellStyle.Subtitle) && !String.IsNullOrEmpty (Value)) {
 				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
 				height += tableView.StringSize (Value, subtitleFont, maxSize, LineBreakMode).Height;
 			}
