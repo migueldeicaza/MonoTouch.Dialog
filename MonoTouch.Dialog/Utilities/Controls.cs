@@ -119,15 +119,15 @@ namespace MonoTouch.Dialog
 			if (this.status == status)
 				return;
 			
-			string s = "Release to refresh";
+			string s = "Release to refresh".GetText ();
 	
 			switch (status){
 			case RefreshViewStatus.Loading:
-				s = "Loading..."; 
+				s = "Loading...".GetText (); 
 				break;
 				
 			case RefreshViewStatus.PullToReload:
-				s = "Pull down to refresh...";
+				s = "Pull down to refresh...".GetText ();
 				break;
 			}
 			statusLabel.Text = s;
@@ -169,9 +169,9 @@ namespace MonoTouch.Dialog
 				
 				lastUpdateTime = value;
 				if (value == DateTime.MinValue){
-					lastUpdateLabel.Text = "Last Updated: never";
+					lastUpdateLabel.Text = "Last Updated: never".GetText ();
 				} else 
-					lastUpdateLabel.Text = String.Format ("Last Updated: {0:g}", value);
+					lastUpdateLabel.Text = String.Format ("Last Updated: {0:g}".GetText (), value);
 			}
 		}
 		
@@ -185,7 +185,7 @@ namespace MonoTouch.Dialog
 				activity.StopAnimating ();
 				arrowView.Hidden = false;
 			}
-		}	
+		}
 	}
 	
 	public class SearchChangedEventArgs : EventArgs {
