@@ -1351,7 +1351,7 @@ namespace MonoTouch.Dialog
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
-		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.AllCharacters;
+		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.None;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		bool isPassword, becomeResponder;
 		UITextField entry;
@@ -1522,6 +1522,8 @@ namespace MonoTouch.Dialog
 					}
 					else
 						entry.ReturnKeyType = returnKeyType.Value;
+						
+					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
 			}
 			if (becomeResponder){
@@ -1565,6 +1567,12 @@ namespace MonoTouch.Dialog
 					entry = null;
 				}
 			}
+		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
+			BecomeFirstResponder(true);
+			tableView.DeselectRow (indexPath, true);
 		}
 		
 		public override bool Matches (string text)
@@ -1818,6 +1826,7 @@ namespace MonoTouch.Dialog
 				if ((Flags & CellFlags.DisableSelection) != 0)
 					cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 				
+				cell.TextLabel.Text = Caption;
 				cell.ContentView.AddSubview (View);
 			} 
 			return cell;
@@ -2281,6 +2290,8 @@ namespace MonoTouch.Dialog
 		// display
 		public bool NeedColorUpdate;
 		
+		public event NSAction Tapped;
+		
 		/// <summary>
 		///  Initializes a RootSection with a caption
 		/// </summary>
@@ -2692,6 +2703,9 @@ namespace MonoTouch.Dialog
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
+			if (Tapped != null)
+				Tapped ();
+			
 			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
 			PrepareDialogViewController (newDvc);
