@@ -6,8 +6,9 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
-This [screenshot](http://tirania.org/images/MTDialogSample.png) was created with
-the following code:
+![screenshot](http://tirania.org/images/MTDialogSample.png "Sample") 
+
+This was created with the following code:
 
     return new RootElement ("Settings") {
         new Section (){
@@ -147,9 +148,6 @@ attributes:
             new DateElement ("Select Date", DateTime.Now),
             new TimeElement ("Select Time", DateTime.Now),
           },
-
-Also see this [screenshot](http://tirania.org/tmp/a.png) was created
-with [this code](http://gist.github.com/281469)
 
 To create nested UIs that provide automatic navigation, you would just
 create an instance of that class.  
@@ -796,7 +794,7 @@ message-like information, that includes a sender, a subject, a time, a
 greyed out snippet and a couple of status features like read/unread or
 the message count:
 
-(http://tirania.org/s/a8f54e89.png)
+![MessageElement](http://tirania.org/s/a8f54e89.png)
 
 The contents are controlled by a few properties:
 
