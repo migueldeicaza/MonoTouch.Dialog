@@ -6,6 +6,36 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
+This [screenshot](http://tirania.org/images/MTDialogSample.png) was created with
+the following code:
+
+    return new RootElement ("Settings") {
+        new Section (){
+            new BooleanElement ("Airplane Mode", false),
+            new RootElement ("Notifications", 0, 0) {
+                new Section (null, 
+    		    	 "Turn off Notifications to disable Sounds\n" +
+                         "Alerts and Home Screen Badges for the\napplications below."){
+                    new BooleanElement ("Notifications", false)
+                }
+            }},
+        new Section (){
+            CreateSoundSection (),
+            new RootElement ("Brightness"){
+                new Section (){
+                    new FloatElement (null, null, 0.5f),
+                    new BooleanElement ("Auto-brightness", false),
+                }
+            },
+            new RootElement ("Wallpaper"){ MakeWallPaper (); }
+        },
+        new Section () {
+            new EntryElement ("Login", "Your login name", "miguel"),
+            new EntryElement ("Password", "Your password", "password", true),
+            new DateElement ("Select Date", DateTime.Now),
+        },
+
+
 In addition to being a simple way to create dialogs, it also has been
 growing to contains a number of utility functions that are useful for
 iPhone development.
@@ -42,12 +72,6 @@ some advanced used cases of MonoTouch.Dialog.
 
 Miguel (miguel@gnome.org)
 
-Screenshot
-==========
-
-This [screenshot](http://tirania.org/s/ac8f1451.png) was created with 
-[this code](http://gist.github.com/281469)
-
 Using MonoTouch.Dialog
 ======================
 
@@ -80,7 +104,7 @@ account page is as trivial as:
 
         [Section ("Travel options")]
         public SeatPreference preference;
-  }
+    }
 
     void Setup ()
     {
@@ -629,7 +653,7 @@ Standard Elements
 -----------------
 
 MonoTouch.Dialog comes with various standard elements that you can
-use:
+use, the basics include:
 
   * BooleanElement
   * CheckboxElement
@@ -652,6 +676,21 @@ use:
   * TimeElement (to edit just times)
   * BadgeElement 
     To render images (57x57) or calendar entries next to the text.
+
+The more sophisticated elements include:
+
+  * MessageElement
+    To show Mail-like information showing a sender, a date, a
+    summary and a message extract with optional message counts
+    and read/unread indicators.
+
+  * OwnerDrawnElement
+    Allows developers to easily create elements that are drawn
+    on demand.
+
+  * UIViewElement
+    Can we used to host a standard UIView as an element, in this
+    case no cell reuse will take place.
 
 Values
 ------
@@ -737,6 +776,7 @@ This element shows a UIActivity indicator in the view, use this while your
 application is loading data and you want to provide the user with some
 visual feedback that your application is busy.
 
+
 LoadMoreElement
 ---------------
 
@@ -747,6 +787,33 @@ and the loading caption is displayed when a user taps the cell,
 and then the NSAction passed into the constructor is executed.
 Once your code in the NSAction is finished, the UIActivity indicator
 stops animating and the normal caption is displayed again.
+
+MessageElement
+--------------
+
+The message element can be used to render rows that render
+message-like information, that includes a sender, a subject, a time, a
+greyed out snippet and a couple of status features like read/unread or
+the message count:
+
+(http://tirania.org/s/a8f54e89.png)
+
+The contents are controlled by a few properties:
+
+   string Sender, Body, Subject;
+   DateTime Date;
+   bool NewFlag;
+   int MessageCount;
+
+You create them like this:
+
+   var msg = new MessageElement () {
+       Sender = "Miguel de Icaza",
+       Subject = "iPhone count",
+       Body = "We should discuss how many iPhones to get next week, should we go for a six-pack or six units?",
+       NewFlag = true,
+   }
+   msg.Tapped += delegate { ShowEmail (); }
 
 OwnerDrawnElement
 -----------------
