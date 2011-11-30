@@ -551,6 +551,25 @@ can contain any kind of Element (including other RootElements).
 RootElements inside a Section when tapped have the effect of activating
 a nested UI on a new DialogViewController. 
 
+Another advantage of the C# 3.0 syntax is that it can be integrated
+with LINQ, you can use integrated queries to generate the user
+interface based on your data.  The following example is taken from the
+MIX Conference:
+
+	 RootElement MakeDay (DateTime day){
+	 	return new RootElement ("Sessions for " + day) {
+	 	    from s in AppDelegate.ConferenceData.Sessions
+	 		where s.Start.Day == day
+	 		orderby s.Start ascending
+	 		group s by s.Start.ToString() into g
+	 		select new Section (MakeCaption ("", Convert.ToDateTime(g.Key))) 
+	 			from hs in g
+	 			   select (Element) new SessionElement (hs)
+	 	};
+	}
+
+This generates the user interface for the sessions on a given day
+
 The hierarchy of Elements looks like this:
 
         Element
@@ -562,6 +581,7 @@ The hierarchy of Elements looks like this:
            FloatElement
            HtmlElement
            ImageElement
+	   MessageElement
            MultilineElement
            RootElement (container for Sections)
            Section (only valid container for Elements)
