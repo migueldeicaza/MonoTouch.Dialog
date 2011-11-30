@@ -1351,7 +1351,7 @@ namespace MonoTouch.Dialog
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
-		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.AllCharacters;
+		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		bool isPassword, becomeResponder;
 		UITextField entry;
@@ -1508,8 +1508,7 @@ namespace MonoTouch.Dialog
 				entry.Started += delegate {
 					EntryElement self = null;
 					
-					if (!returnKeyType.HasValue)
-					{
+					if (!returnKeyType.HasValue) {
 						var returnType = UIReturnKeyType.Default;
 						
 						foreach (var e in (Parent as Section).Elements){
@@ -1519,9 +1518,10 @@ namespace MonoTouch.Dialog
 								returnType = UIReturnKeyType.Next;
 						}
 						entry.ReturnKeyType = returnType;
-					}
-					else
+					} else
 						entry.ReturnKeyType = returnKeyType.Value;
+
+					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
 			}
 			if (becomeResponder){
@@ -1565,6 +1565,12 @@ namespace MonoTouch.Dialog
 					entry = null;
 				}
 			}
+		}
+
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
+		{
+			BecomeFirstResponder(true);
+			tableView.DeselectRow (indexPath, true);
 		}
 		
 		public override bool Matches (string text)
