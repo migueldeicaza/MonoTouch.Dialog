@@ -1823,7 +1823,9 @@ namespace MonoTouch.Dialog
 				}
 				if ((Flags & CellFlags.DisableSelection) != 0)
 					cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-				
+
+				if (Caption != null)
+					cell.TextLabel.Text = Caption;
 				cell.ContentView.AddSubview (View);
 			} 
 			return cell;
