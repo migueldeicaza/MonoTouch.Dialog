@@ -62,6 +62,7 @@ This was created with the following code:
             new EntryElement ("Password", "Your password", "password", true),
             new DateElement ("Select Date", DateTime.Now),
         },
+    }
 
 
 In addition to being a simple way to create dialogs, it also has been
