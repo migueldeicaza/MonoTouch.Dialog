@@ -144,7 +144,7 @@ account page is as trivial as:
 
 Which produces this UI:
 
-![Rendering of AccountInfo](MonoTouch.Dialog/raw/master/sample.png)
+![Rendering of AccountInfo](http://github.com/migueldeicaza/MonoTouch.Dialog/raw/master/sample.png)
 
 This is what the Elements API usage looks like, it is a more flexible 
 API and the one I suggest you use for anything that requires
@@ -826,20 +826,20 @@ the message count:
 
 The contents are controlled by a few properties:
 
-   string Sender, Body, Subject;
-   DateTime Date;
-   bool NewFlag;
-   int MessageCount;
+	 string Sender, Body, Subject;
+	 DateTime Date;
+	 bool NewFlag;
+	 int MessageCount;
 
 You create them like this:
 
-   var msg = new MessageElement () {
-       Sender = "Miguel de Icaza",
-       Subject = "iPhone count",
-       Body = "We should discuss how many iPhones to get next week, should we go for a six-pack or six units?",
-       NewFlag = true,
-   }
-   msg.Tapped += delegate { ShowEmail (); }
+	 var msg = new MessageElement () {
+	     Sender = "Miguel de Icaza",
+	     Subject = "iPhone count",
+	     Body = "We should discuss how many iPhones to get next week, should we go for a six-pack or six units?",
+	     NewFlag = true,
+	 }
+	 msg.Tapped += delegate { ShowEmail (); }
 
 OwnerDrawnElement
 -----------------
@@ -856,32 +856,33 @@ implement two simple overrides.  You can see a better sample implementation
 in the Sample app in the DemoOwnerDrawnElement.cs file.
 
 Here's a very simple example of implementing the class:
-	public class SampleOwnerDrawnElement : OwnerDrawnElement
-	{
-		public SampleOwnerDrawnElement (string text) : base(UITableViewCellStyle.Default, "sampleOwnerDrawnElement")
-		{
-			this.Text = text;
-		}
-		
-		public string Text
-		{
-			get;set;	
-		}
-		
-		public override void Draw (RectangleF bounds, CGContext context, UIView view)
-		{
-			UIColor.White.SetFill();
-			context.FillRect(bounds);
-			
-			UIColor.Black.SetColor();	
-			view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
-		}
-		
-		public override float Height (RectangleF bounds)
-		{
-			return 44.0f;
-		}
-	}
+
+	 public class SampleOwnerDrawnElement : OwnerDrawnElement
+	 {
+	 	public SampleOwnerDrawnElement (string text) : base(UITableViewCellStyle.Default, "sampleOwnerDrawnElement")
+	 	{
+	 		this.Text = text;
+	 	}
+	 	
+	 	public string Text
+	 	{
+	 		get;set;	
+	 	}
+	 	
+	 	public override void Draw (RectangleF bounds, CGContext context, UIView view)
+	 	{
+	 		UIColor.White.SetFill();
+	 		context.FillRect(bounds);
+	 		
+	 		UIColor.Black.SetColor();	
+	 		view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
+	 	}
+	 	
+	 	public override float Height (RectangleF bounds)
+	 	{
+	 		return 44.0f;
+	 	}
+	 }
 
 Booleans
 --------
