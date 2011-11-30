@@ -21,7 +21,34 @@ This was created with the following code:
                 }
             }},
         new Section (){
-            CreateSoundSection (),
+	    new RootElement ("Sounds"){
+                new Section ("Silent") {
+                    new BooleanElement ("Vibrate", true),
+                },
+                new Section ("Ring") {
+                    new BooleanElement ("Vibrate", true),
+                    new FloatElement (null, null, 0.8f),
+                    new RootElement ("Ringtone", new RadioGroup (0)){
+                        new Section ("Custom"){
+                            new RadioElement ("Circus Music"),
+                            new RadioElement ("True Blood"),
+                        },
+                        new Section ("Standard"){
+			    from name in "Marimba,Alarm,Ascending,Bark".Split (',')
+				(Element) new RadioElement (n)
+                        }
+                    },
+                    new RootElement ("New Text Message", new RadioGroup (3)){
+                        new Section (){
+			    from name in "None,Tri-tone,Chime,Glass,Horn,Bell,Electronic".Split (',')
+				(Element) new RadioElement (n)
+                        }
+                    },
+                    new BooleanElement ("New Voice Mail", false),
+                    new BooleanElement ("New Mail", false),
+                    new BooleanElement ("Sent Mail", true),
+                }
+            },
             new RootElement ("Brightness"){
                 new Section (){
                     new FloatElement (null, null, 0.5f),
