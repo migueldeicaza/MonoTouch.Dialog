@@ -2660,7 +2660,7 @@ namespace MonoTouch.Dialog
 				cell.DetailTextLabel.Text = count.ToString ();
 			} else if (summarySection != -1 && summarySection < Sections.Count){
 					var s = Sections [summarySection];
-					if (summaryElement < s.Elements.Count)
+					if (summaryElement < s.Elements.Count && cell.DetailTextLabel != null)
 						cell.DetailTextLabel.Text = s.Elements [summaryElement].Summary ();
 			} 
 		le:
