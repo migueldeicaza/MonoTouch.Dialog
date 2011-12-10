@@ -2238,16 +2238,20 @@ namespace MonoTouch.Dialog
 	/// Captures the information about mutually exclusive elements in a RootElement
 	/// </summary>
 	public class RadioGroup : Group {
-		public int Selected;
+		int selected;
+		public virtual int Selected {
+			get { return selected; }
+			set { selected = value; }
+		}
 		
 		public RadioGroup (string key, int selected) : base (key)
 		{
-			Selected = selected;
+			this.selected = selected;
 		}
 		
 		public RadioGroup (int selected) : base (null)
 		{
-			Selected = selected;
+			this.selected = selected;
 		}
 	}
 	
