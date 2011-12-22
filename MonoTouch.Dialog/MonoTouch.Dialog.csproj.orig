@@ -11,12 +11,11 @@
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
 <<<<<<< HEAD
-    <ReleaseVersion>1.3</ReleaseVersion>
-=======
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
     <MtouchMinimumOS>3.0</MtouchMinimumOS>
     <AssemblyName>MonoTouch.Dialog</AssemblyName>
->>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
+    <ReleaseVersion>2.0</ReleaseVersion>
+=======
+>>>>>>> 27cce9e1e80978b202847d13a255b49d5b48abde
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,7 +55,6 @@
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
-<<<<<<< HEAD
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AdHoc|iPhone' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
@@ -83,8 +81,6 @@
     <OutputPath>bin\AppStore</OutputPath>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-=======
->>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
@@ -108,12 +104,12 @@
     <Compile Include="CalendarMonthView.cs" />
     <Compile Include="Utilities\GlassButton.cs" />
 <<<<<<< HEAD
-    <Compile Include="ElementsExtensions.cs" />
     <Compile Include="DialogViewControllerExtension.cs" />
-=======
     <Compile Include="CalendarMonthViewController.cs" />
     <Compile Include="RotatingViewController.cs" />
->>>>>>> 5e8e2401a0198f1667880dfe9e931803b2d1dd83
+=======
+    <Compile Include="Utilities\LocalizationExtensions.cs" />
+>>>>>>> 27cce9e1e80978b202847d13a255b49d5b48abde
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
