@@ -119,7 +119,7 @@ namespace MonoTouch.Dialog
 					//context.ScaleCTM (0.5f, -1);
 					context.TranslateCTM (0, 0);
 					context.DrawImage (new RectangleF (0, 0, 57, 57), template.CGImage);
-					context.SetRGBFillColor (1, 1, 1, 1);
+					context.SetFillColor (1, 1, 1, 1);
 					
 					context.SelectFont ("Helvetica", 10f, CGTextEncoding.MacRoman);
 					
@@ -139,7 +139,7 @@ namespace MonoTouch.Dialog
 					context.ShowText (bigText);
 					width = context.TextPosition.X - start;
 					
-					context.SetRGBFillColor (0, 0, 0, 1);
+					context.SetFillColor (0, 0, 0, 1);
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
 					context.ShowTextAtPoint ((57-width)/2, 9, bigText);
 					

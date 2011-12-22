@@ -291,7 +291,7 @@ namespace MonoTouch.Dialog
 					if (invoke != null)
 						((StringElement) element).Tapped += invoke;
 				} else if (mType == typeof (float)){
-					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
+					var floatElement = new FloatElement ((float) GetValue (mi, o));
 					floatElement.Caption = caption;
 					element = floatElement;
 					

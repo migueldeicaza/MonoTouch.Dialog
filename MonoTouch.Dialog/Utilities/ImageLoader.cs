@@ -153,7 +153,7 @@ namespace MonoTouch.Dialog.Utilities
 			return 'a' + v-10;
 		}
 
-		static string md5 (string input)
+		public static string md5 (string input)
 		{
 			var bytes = checksum.ComputeHash (Encoding.UTF8.GetBytes (input));
 			var ret = new char [32];

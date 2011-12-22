@@ -33,7 +33,7 @@ namespace Sample
 					CreateSoundSection (),
 					new RootElement ("Brightness"){
 						new Section (){
-							new FloatElement (null, null, 0.5f),
+							new FloatElement (0.5f),
 							new BooleanElement ("Auto-brightness", false),
 						}
 					},
@@ -76,7 +76,7 @@ namespace Sample
 				},
 				new Section ("Ring") {
 					new BooleanElement ("Vibrate", true),
-					new FloatElement (null, null, 0.8f),
+					new FloatElement (0.8f),
 					new RootElement ("Ringtone", new RadioGroup (0)){
 						new Section ("Custom"){
 							new RadioElement ("Circus Music"),
