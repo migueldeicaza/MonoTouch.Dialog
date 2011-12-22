@@ -15,8 +15,6 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
-using MonoTouch.CoreAnimation;
 
 namespace MonoTouch.Dialog
 {	
@@ -44,12 +42,12 @@ namespace MonoTouch.Dialog
 		UIImage image;
 		UIFont font;
 	
-		public BadgeElement (UIImage badgeImage, string cellText, string detail)
-			: this (badgeImage, cellText, detail,null)
+		public BadgeElement (UIImage badgeImage, string cellText)
+			: this (badgeImage, cellText, null)
 		{
 		}
 
-		public BadgeElement (UIImage badgeImage, string cellText, string detail, NSAction tapped) : base (cellText,detail)
+		public BadgeElement (UIImage badgeImage, string cellText, NSAction tapped) : base (cellText)
 		{
 			if (badgeImage == null)
 				throw new ArgumentNullException ("badgeImage");
@@ -72,12 +70,13 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (ckey);
 			if (cell == null){
-				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, ckey);				
-				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
+				cell = new UITableViewCell (UITableViewCellStyle.Default, ckey) {
+					SelectionStyle = UITableViewCellSelectionStyle.Blue
+				};
 			}
 			cell.Accessory = Accessory;
 			var tl = cell.TextLabel;
@@ -86,13 +85,9 @@ namespace MonoTouch.Dialog
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = Lines;
 			tl.ContentMode = ContentMode;
-			tl.BackgroundColor = UIColor.White;
-			if (Detail != null)
-			{
-				cell.DetailTextLabel.Text = Detail;
-				cell.DetailTextLabel.BackgroundColor = UIColor.White;
-			}
+			
 			cell.ImageView.Image = image;
+			
 			return cell;
 		}
 
@@ -104,7 +99,6 @@ namespace MonoTouch.Dialog
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			SizeF size = new SizeF (tableView.Bounds.Width - 40, float.MaxValue);
-			Caption = Caption ?? "";
 			float height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
 			
 			// Image is 57 pixels tall, add some padding
@@ -120,7 +114,6 @@ namespace MonoTouch.Dialog
 		
 		public static UIImage MakeCalendarBadge (UIImage template, string smallText, string bigText)
 		{
-			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
 				using (var context = new CGBitmapContext (IntPtr.Zero, 57, 57, 8, 57*4, cs, CGImageAlphaInfo.PremultipliedLast)){
 					//context.ScaleCTM (0.5f, -1);
@@ -156,6 +149,5 @@ namespace MonoTouch.Dialog
 				}
 			}
 		}
-		
 	}
 }

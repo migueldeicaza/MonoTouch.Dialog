@@ -41,7 +41,7 @@ namespace MonoTouch.Dialog
 			TextColor = textColor;
 		}
 		
-		public override UITableViewCell GetCell (DialogViewController dvc,UITableView tv)
+		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (key);
 			UIActivityIndicatorView activityIndicator;

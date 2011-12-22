@@ -195,45 +195,12 @@ namespace MonoTouch.Dialog
 			Root = new RootElement (title);
 			Populate (callbacks, o, Root);
 		}
-		bool isValidAttribute(object attribute)
-		{
-			if (attribute is  DateAttribute)
-				return true;			
-			if (attribute is  TimeAttribute)
-				return true;
-			if (attribute is  CheckboxAttribute)
-				return true;
-			if (attribute is  MultilineAttribute)
-				return true;
-			if (attribute is  HtmlAttribute)
-				return true;
-			if (attribute is  SkipAttribute)
-				return true;
-			if (attribute is  PasswordAttribute)
-				return true;
-			if (attribute is  AlignmentAttribute)
-				return true;
-			if (attribute is  RadioSelectionAttribute)
-				return true;
-			if (attribute is  OnTapAttribute)
-				return true;
-			if (attribute is  CaptionAttribute)
-				return true;
-			if (attribute is  SectionAttribute)
-				return true;
-			if (attribute is  RangeAttribute)
-				return true;
-			if (attribute is EntryAttribute)
-				return true;
-			else 
-			return false;
-			    
-		}
+		
 		void Populate (object callbacks, object o, RootElement root)
 		{
 			MemberInfo last_radio_index = null;
-			var members = o.GetType ().GetMembers();//.GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
-							       //BindingFlags.NonPublic | BindingFlags.Instance);
+			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
+							       BindingFlags.NonPublic | BindingFlags.Instance);
 
 			Section section = null;
 			
@@ -246,10 +213,7 @@ namespace MonoTouch.Dialog
 				string caption = null;
 				object [] attrs = mi.GetCustomAttributes (false);
 				bool skip = false;
-				bool validAttributes = false;
 				foreach (var attr in attrs){
-					if (isValidAttribute(attr))
-						validAttributes = true;
 					if (attr is SkipAttribute)
 						skip = true;
 					if (attr is CaptionAttribute)
@@ -261,8 +225,6 @@ namespace MonoTouch.Dialog
 						section = new Section (sa.Caption, sa.Footer);
 					}
 				}
-				if (!validAttributes)
-					continue;
 				if (skip)
 					continue;
 				

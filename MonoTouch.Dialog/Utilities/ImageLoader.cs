@@ -98,7 +98,7 @@ namespace MonoTouch.Dialog.Utilities
 		
 		static ImageLoader ()
 		{
-			PicDir = Path.Combine (BaseDir, "Library/Caches/Pictures/");
+			PicDir = Path.Combine (BaseDir, "Library/Caches/Pictures.MonoTouch.Dialog/");
 			
 			if (!Directory.Exists (PicDir))
 				Directory.CreateDirectory (PicDir);
@@ -106,17 +106,6 @@ namespace MonoTouch.Dialog.Utilities
 			pendingRequests = new Dictionary<Uri,List<IImageUpdated>> ();
 			queuedUpdates = new HashSet<Uri>();
 			requestQueue = new Stack<Uri> ();
-		}
-		public static void DeleteOldFiles(DateTime olderThenDate)
-		{
-		
-			string [] fileEntries = Directory.GetFiles(PicDir);
-			foreach(string fileName in fileEntries)
-			{
-				var lastUpdate = File.GetLastAccessTime(fileName);
-				if(lastUpdate <= olderThenDate)
-					File.Delete(fileName);
-			}
 		}
 		
 		/// <summary>
@@ -166,7 +155,6 @@ namespace MonoTouch.Dialog.Utilities
 
 		static string md5 (string input)
 		{
-			
 			var bytes = checksum.ComputeHash (Encoding.UTF8.GetBytes (input));
 			var ret = new char [32];
 			for (int i = 0; i < 16; i++){
@@ -174,11 +162,6 @@ namespace MonoTouch.Dialog.Utilities
 				ret [i*2+1] = (char)hex (bytes [i] & 0xf);
 			}
 			return new string (ret);
-			/*
-			var hash = input.Substring(input.LastIndexOf("/") + 1);
-			hash = hash.Substring(0, hash.IndexOf("."));
-			return hash;
-			*/
 		}
 		
 		/// <summary>
@@ -196,7 +179,7 @@ namespace MonoTouch.Dialog.Utilities
 		public static UIImage DefaultRequestImage (Uri uri, IImageUpdated notify)
 		{
 			if (DefaultLoader == null)
-				DefaultLoader = new ImageLoader (100, 4*1024*1024);
+				DefaultLoader = new ImageLoader (50, 4*1024*1024);
 			return DefaultLoader.RequestImage (uri, notify);
 		}
 		
@@ -238,8 +221,6 @@ namespace MonoTouch.Dialog.Utilities
 			} 
 			if (uri.IsFile)
 				return null;
-			if(uri.AbsoluteUri.Contains(picfile))
-				Console.WriteLine("WTF!!!!");
 			QueueRequest (uri, picfile, notify);
 			return null;
 		}
@@ -294,8 +275,6 @@ namespace MonoTouch.Dialog.Utilities
 				File.Move (tmpfile, target);
 				return true;
 			} catch (Exception e) {
-				//if(e.Message.Contains("ERROR_ALREADY_EXISTS"));
-				//	return true;
 				Console.WriteLine ("Problem with {0} {1}", uri, e);
 				return false;
 			}
@@ -326,7 +305,7 @@ namespace MonoTouch.Dialog.Utilities
 					Console.WriteLine ("Error fetching picture for {0} to {1}", uri, target);
 				
 				// Cluster all updates together
-				bool doInvoke = true;
+				bool doInvoke = false;
 				
 				lock (requestQueue){
 					if (downloaded){

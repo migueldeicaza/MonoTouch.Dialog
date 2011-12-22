@@ -151,7 +151,7 @@ namespace MonoTouch.Dialog {
 			Tapped += tapped;
 		}
 		
-		public override UITableViewCell GetCell (DialogViewController dvc ,UITableView tv)
+		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (mKey) as MessageCell;
 			if (cell == null)

@@ -23,12 +23,12 @@ namespace Sample
 				badgeImage = UIImage.FromFile ("jakub-calendar.png");
 			
 			var badgeSection = new Section ("Basic Badge Properties"){
-				new BadgeElement (badgeImage, "New Movie Day","") {
+				new BadgeElement (badgeImage, "New Movie Day") {
 					Font = UIFont.FromName ("Helvetica", 36f)
 				},
-				new BadgeElement (badgeImage, "Valentine's Day",""),
+				new BadgeElement (badgeImage, "Valentine's Day"),
 				
-				new BadgeElement (badgeImage, longString,"") {
+				new BadgeElement (badgeImage, longString) {
 					Lines = 3,
 					Font = UIFont.FromName ("Helvetica", 12f)
 				}
@@ -47,7 +47,7 @@ namespace Sample
 			};
 			var calendarSection = new Section ("Date sample");
 			foreach (string [] date in dates){
-				calendarSection.Add (new BadgeElement (BadgeElement.MakeCalendarBadge (badgeImage, date [0], date [1]), date [2],""){
+				calendarSection.Add (new BadgeElement (BadgeElement.MakeCalendarBadge (badgeImage, date [0], date [1]), date [2]){
 					Font = font
 				});
 			}
