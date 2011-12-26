@@ -338,6 +338,7 @@ namespace MonoTouch.Dialog
 					TextAlignment = UITextAlignment.Left,
 					Text = parent.Caption,
 					Font = font,
+					BackgroundColor = UIColor.Clear
 				};
 				button = UIButton.FromType (UIButtonType.Custom);
 				button.TouchDown += delegate {
