@@ -50,6 +50,9 @@ namespace MonoTouch.Dialog
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class SkipAttribute : Attribute {}
 	
+	[AttributeUsage (AttributeTargets.Class | AttributeTargets.Struct, Inherited=false)]
+	public class SkipNonPublicAttribute : Attribute {}
+	
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
 	public class PasswordAttribute : EntryAttribute {
 		public PasswordAttribute (string placeholder) : base (placeholder) {}
@@ -199,8 +202,11 @@ namespace MonoTouch.Dialog
 		void Populate (object callbacks, object o, RootElement root)
 		{
 			MemberInfo last_radio_index = null;
-			var members = o.GetType ().GetMembers (BindingFlags.DeclaredOnly | BindingFlags.Public |
-							       BindingFlags.NonPublic | BindingFlags.Instance);
+			
+			BindingFlags flags = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance;
+			if (Attribute.GetCustomAttribute(o.GetType (), typeof(SkipNonPublicAttribute)) == null)
+				flags |= BindingFlags.NonPublic;
+			var members = o.GetType ().GetMembers (flags);
 
 			Section section = null;
 			
