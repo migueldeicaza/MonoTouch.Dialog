@@ -214,9 +214,9 @@ namespace MonoTouch.Dialog
 				object [] attrs = mi.GetCustomAttributes (false);
 				bool skip = false;
 				foreach (var attr in attrs){
-					if (attr is SkipAttribute)
+					if (attr is SkipAttribute || attr is System.Runtime.CompilerServices.CompilerGeneratedAttribute)
 						skip = true;
-					if (attr is CaptionAttribute)
+					else if (attr is CaptionAttribute)
 						caption = ((CaptionAttribute) attr).Caption;
 					else if (attr is SectionAttribute){
 						if (section != null)
