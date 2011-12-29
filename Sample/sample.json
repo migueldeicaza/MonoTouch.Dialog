@@ -1,0 +1,85 @@
+{
+  "title": "Json Sample",
+  "sections": [ 
+      {
+          "header": "Booleans",
+          "footer": "Slider or image-based",
+          "elements": [
+              { 
+                  "type" : "boolean",
+                  "caption" : "Demo of a Boolean",
+                  "value"   : true
+              }, {
+                  "type": "boolean",
+                  "caption" : "Boolean using images",
+                  "value"   : false,
+                  "on"      : "favorite.png",
+                  "off"     : "~/favorited.png"
+              }
+          ]
+      }, {
+      	"header": "Entries",
+  		"elements" : [
+			{
+				"type": "entry",
+				"caption": "Username",
+				"value": "",
+				"placeholder": "Your account username"
+			}, {
+				"type": "password",
+				"caption": "Password",
+				"value": "",
+				"placeholder": "You password"
+			}, {
+				"type": "entry",
+				"caption": "Zip Code",
+				"value": "01010",
+				"placeholder": "your zip code",
+				"keyboard": "numbers"
+			}, {
+				"type": "entry",
+				"return-key": "route",
+				"caption": "Entry with 'route'",
+				"placeholder": "captialization all + no corrections",
+				"capitalization": "all",
+				"autocorrect": "no"
+			}
+  		]
+      }, {
+      	"header": "Strings",
+      	"elements": [
+      		{
+      			"type": "string",
+      			"caption": "Plain label"
+      		}, {
+      			"type": "string",
+      			"caption": "Plain label with ",
+      			"value": "Value"
+      		}, {
+      			"type": "string",
+      			"caption": "Styled label",
+      			"style": "subtitle",
+      			"value": "This is a subtitle"
+      		}, {
+      			"type": "string",
+      			"caption": "Styled label",
+      			"style": "value2",
+      			"value": "Like the addressbook"
+      		}, {
+      			"type": "string",
+      			"caption": "On Tap Calls Method",
+      			"ontap": "Sample.AppDelegate.JsonCallback"
+      		}, {
+      			"type": "string",
+      			"caption": "the background color is set",
+      			"background": "#f0f",
+      		}, {
+      			"type": "string",
+      			"caption": "Background color set from a URI",
+      			"background": "http://www.google.com/images/logos/ps_logo2.png",
+      		}, {
+      		}
+      	]
+      }
+  ]
+}

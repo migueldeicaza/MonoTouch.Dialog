@@ -69,6 +69,7 @@
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.xib.designer.cs">
@@ -89,6 +90,7 @@
     <Compile Include="DemoContainerStyle.cs" />
     <Compile Include="DemoIndex.cs" />
     <Compile Include="DemoEditingAdvanced.cs" />
+    <Compile Include="Json.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" xmlns="" />
@@ -107,6 +109,7 @@
     <Content Include="favorite.png" />
     <Content Include="favorited.png" />
     <Content Include="background.png" />
+    <Content Include="sample.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

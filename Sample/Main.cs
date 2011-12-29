@@ -30,8 +30,11 @@ namespace Sample
 			Console.WriteLine (Last);
 			
 			var p = Path.GetFullPath ("background.png");
-
+			
 			var menu = new RootElement ("Demos"){
+				new Section ("Json") {
+					JsonDialog.FromFile ("sample.json")
+				},
 				new Section ("Element API"){
 					new StringElement ("iPhone Settings Sample", DemoElementApi),
 					new StringElement ("Dynamically load data", DemoDynamic),
@@ -66,7 +69,7 @@ namespace Sample
 			window.MakeKeyAndVisible ();
 			
 			// On iOS5 we use the new window.RootViewController, on older versions, we add the subview
-                        if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
+            if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
 				window.RootViewController = navigation;	
 			else
 				window.AddSubview (navigation.View);
@@ -74,6 +77,11 @@ namespace Sample
 			return true;
 		}
 
+		static void JsonCallback (object data)
+		{
+			Console.WriteLine ("Invoked");
+		}
+		
 		// This method is required in iPhoneOS 3.0
 		public override void OnActivated (UIApplication application)
 		{
