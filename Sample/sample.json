@@ -53,11 +53,11 @@
       			"caption": "Plain label"
       		}, {
       			"type": "string",
-      			"caption": "Plain label with ",
+      			"caption": "Plain label with value: ",
       			"value": "Value"
       		}, {
       			"type": "string",
-      			"caption": "Styled label",
+      			"caption": "Styled label with subtitles",
       			"style": "subtitle",
       			"value": "This is a subtitle"
       		}, {
@@ -67,19 +67,50 @@
       			"value": "Like the addressbook"
       		}, {
       			"type": "string",
-      			"caption": "On Tap Calls Method",
+      			"caption": "Tapping on this cell invokes a C# method",
       			"ontap": "Sample.AppDelegate.JsonCallback"
       		}, {
       			"type": "string",
       			"caption": "the background color is set",
-      			"background": "#f0f",
+      			"background": "#f0f"
       		}, {
       			"type": "string",
       			"caption": "Background color set from a URI",
-      			"background": "http://www.google.com/images/logos/ps_logo2.png",
+      			"background": "http://www.google.com/images/logos/ps_logo2.png"
       		}, {
+      			"type": "string",
+      			"caption": "To render multi-line strings, set both the 'lines' value to a positive value and the 'line-break' mode to 'word-wrap' for example",
+      			"lines": "5",
+      			"linebreak": "word-wrap"
+      		}, { 
+      			"type": "string",
+      			"caption": "Show a checkmark",
+      			"accessory": "checkmark"
+      		}, { 
+      			"type": "string",
+      			"caption": "Show a detail disclosure",
+      			"accessory": "detail-disclosure"
+      		}, { 
+      			"type": "string",
+      			"caption": "Show a disclosure indicator",
+      			"accessory": "disclosure-indicator"
+      		}, {
+      			"type": "string",
+      			"caption": "Using a custom font: Chalkduster 20",
+      			"font": "Chalkduster-20",
+      			"linebreak": "word-wrap",
+      			"lines": "0"
+      		}, {
+      			"type": "string",
+      			"style": "subtitle",
+      			"caption": "Styled main and subtitle font",
+      			"font": "Chalkduster-12",
+      			"textcolor": "#d88",
+      			"value": "Subtitle with font Gurmunkhi MN",
+      			"subtitlefont": "Gurmukhi MN-12",
+      			"subtitlecolor": "#8d8"
       		}
-      	]
+      	 ]
       }
   ]
 }

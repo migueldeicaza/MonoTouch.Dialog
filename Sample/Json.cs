@@ -341,7 +341,7 @@ namespace MonoTouch.Dialog {
 			UITableViewCellAccessory? accessory;
 			UILineBreakMode? linebreakmode;
 			UITextAlignment? alignment;
-			UIColor textcolor = null;
+			UIColor textcolor = null, subtitlecolor = null;
 			UIFont font = null;
 			UIFont subtitlefont = null;
 			UITableViewCellStyle style = UITableViewCellStyle.Value1;
@@ -395,18 +395,29 @@ namespace MonoTouch.Dialog {
 				case "font":
 					font = ToFont (kvalue);
 					break;
+				case "subtitle":
+					value = kvalue;
+					style = UITableViewCellStyle.Subtitle;
+					break;
 				case "subtitlefont":
 					subtitlefont = ToFont (kvalue);
 					break;
 				case "alignment":
 					alignment = ToAlignment (kvalue);
 					break;
-					
+				case "subtitlecolor":
+					subtitlecolor = ParseColor (kvalue);
+					break;
+				case "type":
+					break;
+				default:
+					Console.WriteLine ("Unknown attribute: '{0}'", kv.Key);
+					break;
 				}
 			}
 			if (caption == null)
 				caption = "";
-			if (font != null || style != UITableViewCellStyle.Value1 || subtitlefont != null || linebreakmode.HasValue || textcolor != null || accessory.HasValue || onaccessorytap != null || background != null){
+			if (font != null || style != UITableViewCellStyle.Value1 || subtitlefont != null || linebreakmode.HasValue || textcolor != null || accessory.HasValue || onaccessorytap != null || background != null || subtitlecolor != null){
 				StyledStringElement styled;
 				
 				if (lines.HasValue){
@@ -419,9 +430,14 @@ namespace MonoTouch.Dialog {
 					styled.Tapped += ontap;
 				if (onaccessorytap != null)
 					styled.AccessoryTapped += onaccessorytap;
-				styled.Font = font;
-				styled.SubtitleFont = subtitlefont;
-				styled.TextColor = textcolor;
+				if (font != null)
+					styled.Font = font;
+				if (subtitlefont != null)
+					styled.SubtitleFont = subtitlefont;
+				if (subtitlecolor != null)
+					styled.DetailColor = subtitlecolor;
+				if (textcolor != null)
+					styled.TextColor = textcolor;
 				if (accessory.HasValue)
 					styled.Accessory = accessory.Value;
 				if (linebreakmode.HasValue)

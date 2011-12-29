@@ -828,13 +828,14 @@ namespace MonoTouch.Dialog
 				imgView.Image = img;
 
 				if (cell.DetailTextLabel != null)
-					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Gray;
 			}
 				
 			if (cell.DetailTextLabel != null){
 				cell.DetailTextLabel.Lines = Lines;
 				cell.DetailTextLabel.LineBreakMode = LineBreakMode;
 				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				cell.DetailTextLabel.TextColor = (extraInfo == null || extraInfo.DetailColor == null) ? UIColor.Gray : extraInfo.DetailColor;
 			}
 		}	
 	
