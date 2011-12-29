@@ -107,8 +107,8 @@
       			"font": "Chalkduster-12",
       			"textcolor": "#d88",
       			"value": "Subtitle with font Gurmunkhi MN",
-      			"subtitlefont": "Gurmukhi MN-12",
-      			"subtitlecolor": "#8d8"
+      			"detailfont": "Gurmukhi MN-12",
+      			"detailcolor": "#8d8"
       		}
       	 ]
       }

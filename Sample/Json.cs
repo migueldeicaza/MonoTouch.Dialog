@@ -341,9 +341,9 @@ namespace MonoTouch.Dialog {
 			UITableViewCellAccessory? accessory;
 			UILineBreakMode? linebreakmode;
 			UITextAlignment? alignment;
-			UIColor textcolor = null, subtitlecolor = null;
+			UIColor textcolor = null, detailcolor = null;
 			UIFont font = null;
-			UIFont subtitlefont = null;
+			UIFont detailfont = null;
 			UITableViewCellStyle style = UITableViewCellStyle.Value1;
 
 			foreach (var kv in json){
@@ -399,14 +399,14 @@ namespace MonoTouch.Dialog {
 					value = kvalue;
 					style = UITableViewCellStyle.Subtitle;
 					break;
-				case "subtitlefont":
-					subtitlefont = ToFont (kvalue);
+				case "detailfont":
+					detailfont = ToFont (kvalue);
 					break;
 				case "alignment":
 					alignment = ToAlignment (kvalue);
 					break;
-				case "subtitlecolor":
-					subtitlecolor = ParseColor (kvalue);
+				case "detailcolor":
+					detailcolor = ParseColor (kvalue);
 					break;
 				case "type":
 					break;
@@ -417,7 +417,7 @@ namespace MonoTouch.Dialog {
 			}
 			if (caption == null)
 				caption = "";
-			if (font != null || style != UITableViewCellStyle.Value1 || subtitlefont != null || linebreakmode.HasValue || textcolor != null || accessory.HasValue || onaccessorytap != null || background != null || subtitlecolor != null){
+			if (font != null || style != UITableViewCellStyle.Value1 || detailfont != null || linebreakmode.HasValue || textcolor != null || accessory.HasValue || onaccessorytap != null || background != null || detailcolor != null){
 				StyledStringElement styled;
 				
 				if (lines.HasValue){
@@ -432,10 +432,10 @@ namespace MonoTouch.Dialog {
 					styled.AccessoryTapped += onaccessorytap;
 				if (font != null)
 					styled.Font = font;
-				if (subtitlefont != null)
-					styled.SubtitleFont = subtitlefont;
-				if (subtitlecolor != null)
-					styled.DetailColor = subtitlecolor;
+				if (detailfont != null)
+					styled.SubtitleFont = detailfont;
+				if (detailcolor != null)
+					styled.DetailColor = detailcolor;
 				if (textcolor != null)
 					styled.TextColor = textcolor;
 				if (accessory.HasValue)
