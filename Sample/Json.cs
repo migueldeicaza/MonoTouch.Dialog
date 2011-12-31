@@ -10,7 +10,7 @@ namespace MonoTouch.Dialog {
 		public static RootElement FromFile (string file, object arg)
 		{
 			using (var reader = File.OpenRead (file))
-				return FromJson (JsonObject.Load (reader) as JsonObject, arg);
+					return FromJson (JsonObject.Load (reader) as JsonObject, arg);
 		}
 		
 		public static RootElement FromFile (string file)
@@ -52,8 +52,24 @@ namespace MonoTouch.Dialog {
 		{
 			if (json == null)
 				return null;
-
-			var root = new RootElement (GetString (json, "title") ?? "");
+			
+			var title = GetString (json, "title") ?? "";
+			
+			var group = GetString (json, "group");
+			var radioSelected = GetString (json, "radioselected");
+			RootElement root;
+			if (group == null){
+				if (radioSelected == null)
+					root = new RootElement (title);
+				else 
+					root = new RootElement (title, new RadioGroup (int.Parse (radioSelected)));
+			} else {
+				if (radioSelected == null)
+					root = new RootElement (title, new Group (group));
+				else
+					root = new RootElement (title, new RadioGroup (group, int.Parse (radioSelected)));
+			}
+			
 			LoadSections (root, GetArray (json, "sections"), data);
 			return root;
 		}
@@ -102,6 +118,7 @@ namespace MonoTouch.Dialog {
 		{
 			var caption = GetString (json, "caption");
 			bool bvalue = GetBoolean (json, "value");
+			var group = GetString (json, "group");
 			var onImagePath = ExpandPath (GetString (json, "on"));
 			var offImagePath = ExpandPath (GetString (json, "off"));
 
@@ -111,7 +128,7 @@ namespace MonoTouch.Dialog {
 				
 				return new BooleanImageElement (caption, bvalue, onImage, offImage);
 			} else 
-				return new BooleanElement (caption, bvalue);
+				return new BooleanElement (caption, bvalue, group);
 		}
 		
 		static UIKeyboardType ToKeyboardType (string kbdType)
@@ -465,6 +482,26 @@ namespace MonoTouch.Dialog {
 			}
 		}
 		
+		static Element LoadRadio (JsonObject json, object data)
+		{
+			var caption = GetString (json, "caption");
+			var group = GetString (json, "group");
+			
+			if (group != null)
+				return new RadioElement (caption, group);
+			else
+				return new RadioElement (caption);
+		}
+		
+		static Element LoadCheckbox (JsonObject json, object data)
+		{
+			var caption = GetString (json, "caption");
+			var group = GetString (json, "group");
+			var value = GetBoolean (json, "value");
+			
+			return new CheckboxElement (caption, value, group);
+		}
+		
 		static void LoadSectionElements (Section section, JsonArray array, object data)
 		{
 			if (array == null)
@@ -490,6 +527,18 @@ namespace MonoTouch.Dialog {
 						
 					case "string":
 						element = LoadString (json, data);
+						break;
+						
+					case "root":
+						element = FromJson (json, data);
+						break;
+						
+					case "radio":
+						element = LoadRadio (json, data);
+						break;
+						
+					case "checkbox":
+						element = LoadCheckbox (json, data);
 						break;
 						
 					default:

@@ -24,7 +24,25 @@ Sample:
                         "value"   : false,
                         "on"      : "favorite.png",
                         "off"     : "~/favorited.png"
-                    }
+                    }, {
+  	  	      "type": "root",
+  	  	      "title": "Tap for nested controller",
+  	  	      "sections": [ {
+  	  	     	 "header": "Nested view!",
+  	  	     	 "elements": [
+  	  	     	   {
+  	  	     	     "type": "boolean",
+  	  	     	     "caption": "Just a boolean",
+  	  	     	     "value": false
+  	  	     	   },
+  	  	     	   {
+  	  	     	     "type": "string",
+  	  	     	     "caption": "Welcome to the nested controller"
+  	  	     	   }
+  	  	     	 ]
+  	  	       }
+  	  	     ]
+  	  	   }
                 ]
             }, {
             	  "header": "Entries",
@@ -41,17 +59,39 @@ Sample:
       }
      
 
-RootElement Syntax
-------------------
+Root Element Syntax
+-------------------
 
 The Root element contains the following values:
 
   * title
   * sections (optional)
 
+The root element can appear inside a section as an element to create a
+nested controller.   In that case, the extra property "type" must be
+set to "root".
+
+### group ###
+
+If set, this sets the groupname for the root element.   Group names
+are used to pick a summary that is displayed as the value of the root
+element from one of the nested elements in the element.
+
+This is either the value of a checkbox or the value of a radio
+button. 
+
+### radioselected ###
+
+Identifies the radio item that is selected in nested elements
+
 ### title ###
 
 If present, it will be the title used for the RootElement
+
+### type ###
+
+Must be set to "root" when this appears in a section (this is used to
+nest controllers).
 
 ### sections ###
 
@@ -180,7 +220,7 @@ properties.  The rendering style is determined by the "style" property.
 
 ### color and detailcolor ###
 
-
+The color to be used for the main text or the detailed text.
 
 ### detailfont and font ###
 
@@ -298,8 +338,16 @@ For example:
                   "off"     : "~/favorited.png"
               }
 
-If the "on" and "off" settings are missing, MonoTouch.Dialog will use
-the UIKit UISwitch control.
+### type ###
+
+Type can be set to either "boolean" or "checkbox".  If set to boolean
+it will use a UISlider or images (if both "on" and "off" are set).  If
+set to checkbox, it will use a checkbox.
+
+The "group" property can be used to tag a boolean element as belonging
+to a particular group.  This is useful if the containing root also has
+a "group" property as the root will summarize the results with a count
+of all the booleans (or checkboxes) that belong to the same group.
 
 Entry Elements
 --------------
@@ -400,4 +448,13 @@ The possible values are:
 ### value ###
 
 The initial value for the entry
+
+Radio Elements
+--------------
+
+Radio elements have type "radio".   The item that is selected is
+picked by the radioselected property on its containing root element.
+
+Additionally, if a value is set for the "group" property, this radio
+button belongs to that group.
 

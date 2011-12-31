@@ -1,6 +1,124 @@
 {
   "title": "Json Sample",
   "sections": [ 
+  	  { 
+  	  	"header": "Nested Elements",
+  	  	"elements": [
+  	  	  {
+  	  	    "type": "root",
+  	  	    "title": "home",
+  	  	  	"sections": [
+  	  	       {
+  	  	     	 "header": "Nested view!",
+  	  	     	 "elements": [
+  	  	     	   {
+  	  	     	     "type": "boolean",
+  	  	     	     "caption": "Just a boolean",
+  	  	     	     "value": false
+  	  	     	   },
+  	  	     	   {
+  	  	     	     "type": "string",
+  	  	     	     "caption": "Welcome to the nested controller"
+  	  	     	   }
+  	  	     	 ]
+  	  	       }
+  	  	     ]
+  	  	  }, {
+  	  	  	"type": "root",
+  	  	  	"title": "Favorite Fruit",
+  	  	  	"radioselected": "2",
+  	  	  	"sections": [
+  	  	  	   {
+  	  	  	     "header": "Select your favorite",
+  	  	  	     "elements": [
+  	  	  	        {
+  	  	  	          "type": "radio",
+  	  	  	          "caption": "Apple"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "radio",
+  	  	  	          "caption": "Banana"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "radio",
+  	  	  	          "caption": "Coconut"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "radio",
+  	  	  	          "caption": "Watermelon"
+  	  	  	        }
+  	  	  	     ]
+  	  	  	   }, {
+  	  	  	      "header": "Multiple radios"
+  	  	  	      
+  	  	  	   }
+  	  	  	]
+  	  	  }, {
+  	  	  	"type": "root",
+  	  	  	"title": "Summary counts",
+  	  	  	"group": "counter",
+  	  	  	"sections": [
+  	  	  	   {
+  	  	  	      "header": "Using checkboxes",
+  	  	  	      "elements": [
+  	  	  	        {
+  	  	  	          "type": "checkbox",
+  	  	  	          "caption": "English",
+  	  	  	          "value": true,
+  	  	  	          "group": "counter"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "checkbox",
+  	  	  	          "caption": "French",
+  	  	  	          "value": false,
+  	  	  	          "group": "counter"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "checkbox",
+  	  	  	          "caption": "Spanish",
+  	  	  	          "value": true,
+  	  	  	          "group": "counter"
+  	  	  	        }
+  	  	  	      ]
+  	  	  	   },
+  	  	  	   {
+  	  	  	      "header": "Using booleans",
+  	  	  	      "elements": [
+  	  	  	        {
+  	  	  	          "type": "bool",
+  	  	  	          "caption": "Portuguese",
+  	  	  	          "value": true,
+  	  	  	          "group": "counter"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "bool",
+  	  	  	          "caption": "German",
+  	  	  	          "value": false,
+  	  	  	          "group": "counter"
+  	  	  	        }
+  	  	  	      ]
+  	  	  	   },
+  	  	  	   {
+  	  	  	      "header": "Mixing them",
+  	  	  	      "elements": [
+  	  	  	        {
+  	  	  	          "type": "checkbox",
+  	  	  	          "caption": "Italian",
+  	  	  	          "value": false,
+  	  	  	          "group": "counter"
+  	  	  	        },
+  	  	  	        {
+  	  	  	          "type": "bool",
+  	  	  	          "caption": "Dutch",
+  	  	  	          "value": false,
+  	  	  	          "group": "counter"
+  	  	  	        }
+  	  	  	      ]
+  	  	  	   }
+  	  	  	]
+  	  	  }
+  	  	]
+  	  },
       {
           "header": "Booleans",
           "footer": "Slider or image-based",
