@@ -17,6 +17,10 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
+	/// <summary>
+	///   The DialogViewController is the main entry point to use MonoTouch.Dialog,
+	///   it provides a simplified API to the UITableViewController.
+	/// </summary>
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
@@ -63,7 +67,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		// If the value is 1, we are enabled, used in the source for quick computation
+		// If the value is true, we are enabled, used in the source for quick computation
 		bool enableSearch;
 		public bool EnableSearch {
 			get {
@@ -156,6 +160,14 @@ namespace MonoTouch.Dialog
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
 			base.DidRotate (fromInterfaceOrientation);
+			
+			//Fixes the RefreshView's size if it is shown during rotation
+			if (refreshView != null) {
+				var bounds = View.Bounds;
+				
+				refreshView.Frame = new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height);
+			}
+			
 			ReloadData ();
 		}
 		
@@ -288,6 +300,14 @@ namespace MonoTouch.Dialog
 				Root = container.root;
 			}
 			
+			public override void AccessoryButtonTapped (UITableView tableView, NSIndexPath indexPath)
+			{
+				var section = Root.Sections [indexPath.Section];
+				var element = (section.Elements [indexPath.Row] as StyledStringElement);
+				if (element != null)
+					element.AccessoryTap ();
+			}
+			
 			public override int RowsInSection (UITableView tableview, int section)
 			{
 				var s = Root.Sections [section];
@@ -330,7 +350,12 @@ namespace MonoTouch.Dialog
 				}
 			}
 			
-			public override void RowSelected (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override void RowDeselected (UITableView tableView, NSIndexPath indexPath)
+			{
+				Container.Deselected (indexPath);
+			}
+			
+			public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 			{
 				Container.Selected (indexPath);
 			}			
@@ -473,6 +498,14 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public virtual void Deselected (NSIndexPath indexPath)
+		{
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
+			
+			element.Deselected (this, tableView, indexPath);
+		}
+		
 		public virtual void Selected (NSIndexPath indexPath)
 		{
 			var section = root.Sections [indexPath.Section];
@@ -491,6 +524,9 @@ namespace MonoTouch.Dialog
 			tableView = MakeTableView (UIScreen.MainScreen.Bounds, Style);
 			tableView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin;
 			tableView.AutosizesSubviews = true;
+			
+			if (root != null)
+				root.Prepare ();
 			
 			UpdateSource ();
 			View = tableView;
@@ -564,6 +600,9 @@ namespace MonoTouch.Dialog
 			if (root == null)
 				return;
 			
+			if(root.Caption != null) 
+				NavigationItem.Title = root.Caption;
+			
 			root.Prepare ();
 			if (tableView != null){
 				UpdateSource ();
@@ -580,22 +619,16 @@ namespace MonoTouch.Dialog
 			if (ViewDissapearing != null)
 				ViewDissapearing (this, EventArgs.Empty);
 		}
-
-		void PrepareRoot (RootElement root)
-		{
-			this.root = root;
-			if (root != null)
-				root.Prepare ();
-		}
 		
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
 		{
-			PrepareRoot (root);
+			this.root = root;
 		}
 		
 		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
-			PrepareRoot (root);
+			Style = style;
+			this.root = root;
 		}
 		
 		/// <summary>
@@ -612,14 +645,14 @@ namespace MonoTouch.Dialog
 		public DialogViewController (RootElement root, bool pushing) : base (UITableViewStyle.Grouped)
 		{
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 
 		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
 		{
+			Style = style;
 			this.pushing = pushing;
-			PrepareRoot (root);
+			this.root = root;
 		}
 	}
-	
 }

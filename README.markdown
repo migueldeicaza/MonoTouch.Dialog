@@ -6,6 +6,65 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
+![screenshot](http://tirania.org/images/MTDialogSample.png "Sample") 
+
+This was created with the following code:
+
+    return new RootElement ("Settings") {
+        new Section (){
+            new BooleanElement ("Airplane Mode", false),
+            new RootElement ("Notifications", 0, 0) {
+                new Section (null, 
+    		    	 "Turn off Notifications to disable Sounds\n" +
+                         "Alerts and Home Screen Badges for the\napplications below."){
+                    new BooleanElement ("Notifications", false)
+                }
+            }},
+        new Section (){
+	    new RootElement ("Sounds"){
+                new Section ("Silent") {
+                    new BooleanElement ("Vibrate", true),
+                },
+                new Section ("Ring") {
+                    new BooleanElement ("Vibrate", true),
+                    new FloatElement (null, null, 0.8f),
+                    new RootElement ("Ringtone", new RadioGroup (0)){
+                        new Section ("Custom"){
+                            new RadioElement ("Circus Music"),
+                            new RadioElement ("True Blood"),
+                        },
+                        new Section ("Standard"){
+			    from name in "Marimba,Alarm,Ascending,Bark".Split (',')
+				(Element) new RadioElement (n)
+                        }
+                    },
+                    new RootElement ("New Text Message", new RadioGroup (3)){
+                        new Section (){
+			    from name in "None,Tri-tone,Chime,Glass,Horn,Bell,Electronic".Split (',')
+				(Element) new RadioElement (n)
+                        }
+                    },
+                    new BooleanElement ("New Voice Mail", false),
+                    new BooleanElement ("New Mail", false),
+                    new BooleanElement ("Sent Mail", true),
+                }
+            },
+            new RootElement ("Brightness"){
+                new Section (){
+                    new FloatElement (null, null, 0.5f),
+                    new BooleanElement ("Auto-brightness", false),
+                }
+            },
+            new RootElement ("Wallpaper"){ MakeWallPaper (); }
+        },
+        new Section () {
+            new EntryElement ("Login", "Your login name", "miguel"),
+            new EntryElement ("Password", "Your password", "password", true),
+            new DateElement ("Select Date", DateTime.Now),
+        },
+    }
+
+
 In addition to being a simple way to create dialogs, it also has been
 growing to contains a number of utility functions that are useful for
 iPhone development.
@@ -42,12 +101,6 @@ some advanced used cases of MonoTouch.Dialog.
 
 Miguel (miguel@gnome.org)
 
-Screenshot
-==========
-
-This [screenshot](http://tirania.org/tmp/a.png) was created with 
-[this code](http://gist.github.com/281469)
-
 Using MonoTouch.Dialog
 ======================
 
@@ -80,7 +133,7 @@ account page is as trivial as:
 
         [Section ("Travel options")]
         public SeatPreference preference;
-  }
+    }
 
     void Setup ()
     {
@@ -91,10 +144,38 @@ account page is as trivial as:
 
 Which produces this UI:
 
-![Rendering of AccountInfo](MonoTouch.Dialog/raw/master/sample.png)
+![Rendering of AccountInfo](http://github.com/migueldeicaza/MonoTouch.Dialog/raw/master/sample.png)
 
-Also see this [screenshot](http://tirania.org/tmp/a.png) was created
-with [this code](http://gist.github.com/281469)
+This is what the Elements API usage looks like, it is a more flexible 
+API and the one I suggest you use for anything that requires
+customizations and goes beyond the basics of the Reflection-based
+attributes:
+
+        var root = new RootElement ("Settings") {
+          new Section (){
+            new BooleanElement ("Airplane Mode", false),
+            new RootElement ("Notifications", 0, 0) {
+              new Section (null, 
+                  "Turn off Notifications to disable Sounds\n" +
+                  "Alerts and Home Screen Badges for the."){
+                new BooleanElement ("Notifications", false)
+              }
+            }},
+          new Section (){
+            new RootElement ("Brightness"){
+              new Section (){
+                new FloatElement (null, null, 0.5f),
+                new BooleanElement ("Auto-brightness", false),
+		new UILabel ("I am a simple UILabel!"),
+              }
+            },
+          },
+          new Section () {
+            new EntryElement ("Login", "enter", "miguel"),
+            new EntryElement ("Password", "enter", "password", true),
+            new DateElement ("Select Date", DateTime.Now),
+            new TimeElement ("Select Time", DateTime.Now),
+          },
 
 To create nested UIs that provide automatic navigation, you would just
 create an instance of that class.  
@@ -423,8 +504,8 @@ favorite handler, and at that point you can also call
 context.Dispose() to assist the GC in releasing any large resources it
 might have held.
 
-The Low-Level Elements API
-==========================
+The Elements API
+================
 
 All that the Reflection API does is create a set of nodes from the
 Elements API.   
@@ -447,7 +528,7 @@ C# 3.0 initializers:
               new Section (){
                 new FloatElement (null, null, 0.5f),
                 new BooleanElement ("Auto-brightness", false),
-		new UILabel ("I am a simple UILabel!"),
+				new UILabel ("I am a simple UILabel!"),
               }
             },
           },
@@ -470,6 +551,25 @@ can contain any kind of Element (including other RootElements).
 RootElements inside a Section when tapped have the effect of activating
 a nested UI on a new DialogViewController. 
 
+Another advantage of the C# 3.0 syntax is that it can be integrated
+with LINQ, you can use integrated queries to generate the user
+interface based on your data.  The following example is taken from the
+MIX Conference:
+
+	 RootElement MakeDay (DateTime day){
+	 	return new RootElement ("Sessions for " + day) {
+	 	    from s in AppDelegate.ConferenceData.Sessions
+	 		where s.Start.Day == day
+	 		orderby s.Start ascending
+	 		group s by s.Start.ToString() into g
+	 		select new Section (MakeCaption ("", Convert.ToDateTime(g.Key))) 
+	 			from hs in g
+	 			   select (Element) new SessionElement (hs)
+	 	};
+	}
+
+This generates the user interface for the sessions on a given day
+
 The hierarchy of Elements looks like this:
 
         Element
@@ -481,6 +581,7 @@ The hierarchy of Elements looks like this:
            FloatElement
            HtmlElement
            ImageElement
+	   MessageElement
            MultilineElement
            RootElement (container for Sections)
            Section (only valid container for Elements)
@@ -598,7 +699,7 @@ Standard Elements
 -----------------
 
 MonoTouch.Dialog comes with various standard elements that you can
-use:
+use, the basics include:
 
   * BooleanElement
   * CheckboxElement
@@ -621,6 +722,21 @@ use:
   * TimeElement (to edit just times)
   * BadgeElement 
     To render images (57x57) or calendar entries next to the text.
+
+The more sophisticated elements include:
+
+  * MessageElement
+    To show Mail-like information showing a sender, a date, a
+    summary and a message extract with optional message counts
+    and read/unread indicators.
+
+  * OwnerDrawnElement
+    Allows developers to easily create elements that are drawn
+    on demand.
+
+  * UIViewElement
+    Can we used to host a standard UIView as an element, in this
+    case no cell reuse will take place.
 
 Values
 ------
@@ -706,6 +822,7 @@ This element shows a UIActivity indicator in the view, use this while your
 application is loading data and you want to provide the user with some
 visual feedback that your application is busy.
 
+
 LoadMoreElement
 ---------------
 
@@ -716,6 +833,33 @@ and the loading caption is displayed when a user taps the cell,
 and then the NSAction passed into the constructor is executed.
 Once your code in the NSAction is finished, the UIActivity indicator
 stops animating and the normal caption is displayed again.
+
+MessageElement
+--------------
+
+The message element can be used to render rows that render
+message-like information, that includes a sender, a subject, a time, a
+greyed out snippet and a couple of status features like read/unread or
+the message count:
+
+![MessageElement](http://tirania.org/s/a8f54e89.png)
+
+The contents are controlled by a few properties:
+
+	 string Sender, Body, Subject;
+	 DateTime Date;
+	 bool NewFlag;
+	 int MessageCount;
+
+You create them like this:
+
+	 var msg = new MessageElement () {
+	     Sender = "Miguel de Icaza",
+	     Subject = "iPhone count",
+	     Body = "We should discuss how many iPhones to get next week, should we go for a six-pack or six units?",
+	     NewFlag = true,
+	 }
+	 msg.Tapped += delegate { ShowEmail (); }
 
 OwnerDrawnElement
 -----------------
@@ -732,32 +876,33 @@ implement two simple overrides.  You can see a better sample implementation
 in the Sample app in the DemoOwnerDrawnElement.cs file.
 
 Here's a very simple example of implementing the class:
-	public class SampleOwnerDrawnElement : OwnerDrawnElement
-	{
-		public SampleOwnerDrawnElement (string text) : base(UITableViewCellStyle.Default, "sampleOwnerDrawnElement")
-		{
-			this.Text = text;
-		}
-		
-		public string Text
-		{
-			get;set;	
-		}
-		
-		public override void Draw (RectangleF bounds, CGContext context, UIView view)
-		{
-			UIColor.White.SetFill();
-			context.FillRect(bounds);
-			
-			UIColor.Black.SetColor();	
-			view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
-		}
-		
-		public override float Height (RectangleF bounds)
-		{
-			return 44.0f;
-		}
-	}
+
+	 public class SampleOwnerDrawnElement : OwnerDrawnElement
+	 {
+	 	public SampleOwnerDrawnElement (string text) : base(UITableViewCellStyle.Default, "sampleOwnerDrawnElement")
+	 	{
+	 		this.Text = text;
+	 	}
+	 	
+	 	public string Text
+	 	{
+	 		get;set;	
+	 	}
+	 	
+	 	public override void Draw (RectangleF bounds, CGContext context, UIView view)
+	 	{
+	 		UIColor.White.SetFill();
+	 		context.FillRect(bounds);
+	 		
+	 		UIColor.Black.SetColor();	
+	 		view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
+	 	}
+	 	
+	 	public override float Height (RectangleF bounds)
+	 	{
+	 		return 44.0f;
+	 	}
+	 }
 
 Booleans
 --------
@@ -815,8 +960,24 @@ methods:
 If your element can have a variable size, you need to implement the
 IElementSizing interface, which contains one method:
 
-	// Returns the height for the cell at indexPath.Section, indexPath.Row
+    	// Returns the height for the cell at indexPath.Section, indexPath.Row
         float GetHeight (UITableView tableView, NSIndexPath indexPath);
+
+If you are planning on implemeneting your GetCell method by calling
+"base.GetCell(tv)" and customizing the returned cell, you need to also
+override the CellKey property to return a key that will be unique to
+your Element, like this:
+
+	    static NSString MyKey = new NSString ("MyKey");
+	    protected override NSString CellKey {
+	        get {
+	            return MyKey;
+	        }
+	    }
+
+This works for most elements, but not for the StringElement and StyledStringElement
+as those use their own set of keys for various rendering scenarios.   You would have
+to replicate the code in those classes.
 
 Customizing the DialogViewController
 ====================================

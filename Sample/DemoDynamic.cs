@@ -13,6 +13,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
+using MonoTouch.Foundation;
 
 namespace Sample
 {
@@ -33,6 +34,7 @@ namespace Sample
 			
 			[Section ("Tap to fetch the timeline")]
 			[OnTap ("FetchTweets")]
+			[Preserve]
 			public string Login;
 		}
 		
