@@ -225,7 +225,7 @@ namespace MonoTouch.Dialog
 
 	public abstract class BoolElement : Element {
 		bool val;
-		public bool Value {
+		public virtual bool Value {
 			get {
 				return val;
 			}
@@ -301,6 +301,17 @@ namespace MonoTouch.Dialog
 					sw.Dispose ();
 					sw = null;
 				}
+			}
+		}
+		
+		public override bool Value {
+			get {
+				return base.Value;
+			}
+			set {
+				 base.Value = value;
+				if (sw != null)
+					sw.On = value;
 			}
 		}
 	}
