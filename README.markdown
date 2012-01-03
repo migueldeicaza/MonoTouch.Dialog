@@ -407,6 +407,10 @@ These are the current widgets supported by the Reflection API:
           [Caption ("Seat Preference")]
           SeatPreference seat;
 
+  Additionally, the [Caption] attribtue can be applied to the
+  individual elements of an enumeration value to customize how they
+  are rendered.
+  
 ### Images ###
 
   Variables with type UIImage will render the image as a 
