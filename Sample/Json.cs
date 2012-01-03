@@ -1,3 +1,17 @@
+// 
+// Json.cs: MonoTouch.Dialog support for creating UIs from Json description files
+// 
+// Author:
+//   Miguel de Icaza
+//
+// See the JSON.md file for documentation
+//
+// TODO: ImageElements
+// TODO: Json to load entire view controllers
+// TODO: Date and Time elements
+// TODO: Web element
+// TODO: JsonContext loader (to allow ui.GetElement ("keyboard") to fetch elements)
+//
 using System;
 using System.IO;
 using System.Json;
