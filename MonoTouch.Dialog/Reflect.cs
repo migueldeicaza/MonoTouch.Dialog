@@ -343,7 +343,8 @@ namespace MonoTouch.Dialog
 						if (v == evalue)
 							selected = idx;
 						
-						csection.Add (new RadioElement (MakeCaption (fi.Name)));
+						CaptionAttribute ca = Attribute.GetCustomAttribute(fi, typeof(CaptionAttribute)) as CaptionAttribute;
+						csection.Add (new RadioElement (ca != null ? ca.Caption : MakeCaption (fi.Name)));
 						idx++;
 					}
 					
