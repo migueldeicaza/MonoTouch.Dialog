@@ -839,7 +839,10 @@ namespace MonoTouch.Dialog
 				imgView.Image = img;
 
 				if (cell.DetailTextLabel != null)
+				{
 					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+					cell.DetailTextLabel.BackgroundColor = UIColor.Clear;
+				}
 			}
 				
 			if (cell.DetailTextLabel != null){
@@ -853,6 +856,9 @@ namespace MonoTouch.Dialog
 		{
 			cell.BackgroundColor = UIColor.White;
 			cell.TextLabel.BackgroundColor = UIColor.Clear;
+			
+			if (cell.DetailTextLabel != null)
+				cell.DetailTextLabel.BackgroundColor = UIColor.Clear;
 		}
 
 		void IColorizeBackground.WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

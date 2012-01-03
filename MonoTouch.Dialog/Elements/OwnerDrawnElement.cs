@@ -45,7 +45,7 @@ namespace MonoTouch.Dialog
 			
 			cell.Update();
 			return cell;
-		}	
+		}
 		
 		public abstract void Draw(RectangleF bounds, CGContext context, UIView view);
 		
@@ -58,6 +58,14 @@ namespace MonoTouch.Dialog
 			public OwnerDrawnCell(OwnerDrawnElement element, UITableViewCellStyle style, string cellReuseIdentifier) : base(style, cellReuseIdentifier)
 			{
 				Element = element;
+
+				// This trick is necessary to keep the background clear, otherwise
+				// it gets painted as black
+				//
+				BackgroundView = new UIView (RectangleF.Empty) { 
+					BackgroundColor = UIColor.Clear 
+				};
+				SelectionStyle = UITableViewCellSelectionStyle.None;
 			}
 			
 			public OwnerDrawnElement Element
@@ -101,6 +109,7 @@ namespace MonoTouch.Dialog
 			public OwnerDrawnCellView(OwnerDrawnElement element)
 			{
 				this.element = element;
+				BackgroundColor = UIColor.Clear;
 			}
 			
 			
