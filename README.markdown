@@ -411,7 +411,7 @@ These are the current widgets supported by the Reflection API:
   Additionally, the [Caption] attribtue can be applied to the
   individual elements of an enumeration value to customize how they
   are rendered.
-  
+
 ### Images ###
 
   Variables with type UIImage will render the image as a
@@ -542,7 +542,7 @@ C# 3.0 initializers:
             new EntryElement ("Password", "enter", "password", true),
             new DateElement ("Select Date", DateTime.Now),
             new TimeElement ("Select Time", DateTime.Now),
-	    new CounterElement ("Select Value", 123.45),
+            new CounterElement ("Select Value", 123.45),
           },
 
 You will need a RootElement to get things rolling.   The nested
