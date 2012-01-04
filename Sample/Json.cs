@@ -8,8 +8,6 @@
 //
 // TODO: ImageElements
 // TODO: Json to load entire view controllers
-// TODO: Date and Time elements
-// TODO: Web element
 // TODO: JsonContext loader (to allow ui.GetElement ("keyboard") to fetch elements)
 //
 using System;
@@ -516,6 +514,35 @@ namespace MonoTouch.Dialog {
 			return new CheckboxElement (caption, value, group);
 		}
 		
+		static Element LoadDateTime (JsonObject json, string type)
+		{
+			var caption = GetString (json, "caption");
+			var date = GetString (json, "value");
+			DateTime datetime;
+			
+			if (!DateTime.TryParse (date, out datetime))
+				return null;
+
+			switch (type){
+			case "date":
+				return new DateElement (caption, datetime);
+			case "time":
+				return new TimeElement (caption, datetime);
+			case "datetime":
+				return new DateTimeElement (caption, datetime);
+			default:
+				return null;
+			}
+		}
+		
+		static Element LoadHtmlElement (JsonObject json)
+		{
+			var caption = GetString (json, "caption");
+			var url = GetString (json, "url");
+			
+			return new HtmlElement (caption, url);
+		}
+		
 		static void LoadSectionElements (Section section, JsonArray array, object data)
 		{
 			if (array == null)
@@ -553,6 +580,16 @@ namespace MonoTouch.Dialog {
 						
 					case "checkbox":
 						element = LoadCheckbox (json, data);
+						break;
+						
+					case "datetime":
+					case "date":
+					case "time":
+						element = LoadDateTime (json, type);
+						break;
+						
+					case "html":
+						element = LoadHtmlElement (json);
 						break;
 						
 					default:

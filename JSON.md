@@ -458,3 +458,45 @@ picked by the radioselected property on its containing root element.
 Additionally, if a value is set for the "group" property, this radio
 button belongs to that group.
 
+Date and Time Elements
+----------------------
+
+The element types "datetime", "date" and "time" are used to render
+dates with times, dates or times.  These elements take as parameters a
+caption and a value.  The value can be written in any format supported
+by the .NET DateTime.Parse function.
+
+Example:
+
+      	"header": "Dates and Times",
+      	"elements": [
+       		{
+       			"type": "datetime",
+       			"caption": "Date and Time",
+       			"value": "Sat, 01 Nov 2008 19:35:00 GMT"
+       		}, {
+       			"type": "date",
+       			"caption": "Date",
+       			"value": "10/10"
+       		}, {
+       			"type": "time",
+       			"caption": "Time",
+       			"value": "11:23"
+			}       		
+      	]
+
+Html/Web Element
+================
+
+You can create a cell that when tapped will embed a UIWebView that
+renders the contents of a specified URL, either local or remote using
+the "html" type.
+
+The only two properties for this element are "caption" and "url":
+
+	{
+		"type": "html",
+		"caption": "Miguel's blog",
+		"url": "http://tirania.org/blog" 
+	}
+

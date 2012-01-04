@@ -229,6 +229,32 @@
       			"detailcolor": "#8d8"
       		}
       	 ]
+      }, {
+      	"header": "Dates and Times",
+      	"elements": [
+       		{
+       			"type": "datetime",
+       			"caption": "Date and Time",
+       			"value": "Sat, 01 Nov 2008 19:35:00 GMT"
+       		}, {
+       			"type": "date",
+       			"caption": "Date",
+       			"value": "10/10"
+       		}, {
+       			"type": "time",
+       			"caption": "Time",
+       			"value": "11:23"
+			}       		
+      	]
+      }, {
+      	"header": "Web View",
+      	"elements": [
+      		{
+      			"type": "html",
+      			"caption": "Miguel's blog",
+      			"url": "http://tirania.org/blog" 
+      		}
+      	]
       }
   ]
 }
