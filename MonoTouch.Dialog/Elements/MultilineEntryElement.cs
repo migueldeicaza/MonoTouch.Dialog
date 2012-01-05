@@ -79,13 +79,34 @@ namespace MonoTouch.Dialog
 					this.autocorrectionType = value;
 			}
 		}
+		
+		private float height = 112;
+		public float Height {
+			get {
+				return height;
+			}
+			set {
+				height = value;
+			}
+		}
+		
+		private UIFont inputFont = UIFont.SystemFontOfSize(17);
+		public UIFont Font {
+			get {
+				return inputFont;
+			}
+			set {
+				inputFont = value;
+				if (entry != null)
+					entry.Font = value;
+			}
+		}
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		bool becomeResponder;
 		UITextView entry;
-		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
 		public event EventHandler Changed;
@@ -102,10 +123,9 @@ namespace MonoTouch.Dialog
 		/// <param name="value">
 		/// Initial value.
 		/// </param>
-		public MultilineEntryElement (string caption, string placeholder, string value) : base (caption)
+		public MultilineEntryElement (string caption, string value) : base (caption)
 		{ 
 			Value = value;
-			this.placeholder = placeholder;
 		}
 
 		public override string Summary ()
@@ -172,7 +192,8 @@ namespace MonoTouch.Dialog
 				float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
 				float width = cell.ContentView.Bounds.Width - size.Width;
 				
-				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height + (112 - 44)));
+				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height + (height - 44)));
+				entry.Font = inputFont;
 				
 				entry.Changed += delegate {
 					FetchValue ();
@@ -305,7 +326,7 @@ namespace MonoTouch.Dialog
 		#region IElementSizing implementation
 		public float GetHeight (MonoTouch.UIKit.UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 		{
-			return 112;
+			return height;
 		}
 		#endregion
 	}
