@@ -33,7 +33,9 @@ namespace Sample
 			
 			var menu = new RootElement ("Demos"){
 				new Section ("Json") {
-					JsonDialog.FromFile ("sample.json")
+					JsonDialog.FromFile ("sample.json"),
+					// Notice what happens when I close the paranthesis at the end, in the next line:
+					new JsonElement ("Load from URL", "file://" + Path.GetFullPath ("sample.json"))
 				},
 				new Section ("Element API"){
 					new StringElement ("iPhone Settings Sample", DemoElementApi),
