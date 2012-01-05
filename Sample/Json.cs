@@ -71,18 +71,29 @@ namespace MonoTouch.Dialog {
 			var title = GetString (json, "title") ?? "";
 			
 			var group = GetString (json, "group");
+			var url = GetString (json, "url");
 			var radioSelected = GetString (json, "radioselected");
 			RootElement root;
 			if (group == null){
 				if (radioSelected == null)
-					root = new RootElement (title);
+					root = url == null ? new RootElement (title) : new JsonElement (title, url);
 				else 
-					root = new RootElement (title, new RadioGroup (int.Parse (radioSelected)));
+					root = url == null 
+						? new RootElement (title, new RadioGroup (int.Parse (radioSelected))) 
+						: new JsonElement (title, new RadioGroup (int.Parse (radioSelected)), url);						
 			} else {
 				if (radioSelected == null)
-					root = new RootElement (title, new Group (group));
-				else
-					root = new RootElement (title, new RadioGroup (group, int.Parse (radioSelected)));
+					root = url == null 
+						? new RootElement (title, new Group (group))
+						: new JsonElement (title, new Group (group), url);
+				else {
+					// It does not seem that we group elements together, notice when I add
+					// the return, and then change my mind, I have to undo *twice* instead of once.
+					
+					root = url == null 
+						? new RootElement (title, new RadioGroup (group, int.Parse (radioSelected)))
+						: new JsonElement (title, new RadioGroup (group, int.Parse (radioSelected)), url);
+				}
 			}
 			
 			LoadSections (root, GetArray (json, "sections"), data);

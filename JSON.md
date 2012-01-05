@@ -71,6 +71,15 @@ The root element can appear inside a section as an element to create a
 nested controller.   In that case, the extra property "type" must be
 set to "root".
 
+### url ###
+
+If the "url" property is set, if the user taps on this RootElement,
+the code will request a file from the specified url and will make the
+contents the new information displayed.
+
+You can use this to create extend the user interface from the server
+based on what the user taps.
+
 ### group ###
 
 If set, this sets the groupname for the root element.   Group names
