@@ -98,6 +98,7 @@
     <Compile Include="Utilities\Controls.cs" />
     <Compile Include="Utilities\GlassButton.cs" />
     <Compile Include="Utilities\LocalizationExtensions.cs" />
+    <Compile Include="Elements\MultilineEntryElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
