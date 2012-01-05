@@ -1676,31 +1676,69 @@ namespace MonoTouch.Dialog
 		static RectangleF PickerFrameWithSize (SizeF size)
 		{                                                                                                                                    
 			var screenRect = UIScreen.MainScreen.ApplicationFrame;
-			float fY = 0, fX = 0;
+			float fY = 0, width = 0;
 			
-			switch (UIApplication.SharedApplication.StatusBarOrientation){
+			switch (UIApplication.SharedApplication.StatusBarOrientation) {
 			case UIInterfaceOrientation.LandscapeLeft:
 			case UIInterfaceOrientation.LandscapeRight:
-				fX = (screenRect.Height - size.Width) /2;
-				fY = (screenRect.Width - size.Height) / 2 -17;
+				width = screenRect.Height;
+				fY = (screenRect.Width - size.Height) / 2 + 10;
 				break;
 				
 			case UIInterfaceOrientation.Portrait:
 			case UIInterfaceOrientation.PortraitUpsideDown:
-				fX = (screenRect.Width - size.Width) / 2;
+				width = screenRect.Width;
 				fY = (screenRect.Height - size.Height) / 2 - 25;
 				break;
 			}
 			
-			return new RectangleF (fX, fY, size.Width, size.Height);
-		}                                                                                                                                    
+			return new RectangleF (0, fY, width, size.Height);
+		}    
+		
+		static RectangleF ButtonSize ()
+		{
+			var screenRect = UIScreen.MainScreen.ApplicationFrame;
+			switch (UIApplication.SharedApplication.StatusBarOrientation) {
+			case UIInterfaceOrientation.LandscapeLeft:
+			case UIInterfaceOrientation.LandscapeRight:
+				return new RectangleF (5, 5, screenRect.Height - 10, 40);
+				break;
+				
+			case UIInterfaceOrientation.Portrait:
+			case UIInterfaceOrientation.PortraitUpsideDown:
+				return new RectangleF (5, 5, screenRect.Width - 10, 40);
+				break;
+			}
+			return RectangleF.Empty;
+		}
 
 		class MyViewController : UIViewController {
 			DateTimeElement container;
+			UIButton button;
 			
 			public MyViewController (DateTimeElement container)
 			{
 				this.container = container;
+			}
+			
+			public override void ViewWillAppear (bool animated)
+			{
+				base.ViewWillAppear (animated);
+				var parent = ParentViewController;
+				var nav = parent as UINavigationController;
+				if (nav == null) {
+					// As there is no navigation-controller we cannot get back from this view.
+					button = new GlassButton (ButtonSize ()) {
+						Font = UIFont.BoldSystemFontOfSize (22),
+						NormalColor = new UIColor (0.05f, 0.55f, 0.02f, 1),
+						//HighlightedColor = UIColor.Red
+					};
+					button.SetTitle ("Ok", UIControlState.Normal);
+					button.TouchUpInside += delegate {
+						DismissModalViewControllerAnimated (true);
+					};
+					View.AddSubview (button);
+				}
 			}
 			
 			public override void ViewWillDisappear (bool animated)
@@ -1713,6 +1751,10 @@ namespace MonoTouch.Dialog
 			{
 				base.DidRotate (fromInterfaceOrientation);
 				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (SizeF.Empty));
+				if (button != null) {
+					button.Frame = ButtonSize ();
+					button.SetNeedsDisplay ();
+				}
 			}
 			
 			public bool Autorotate { get; set; }
