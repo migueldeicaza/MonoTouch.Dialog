@@ -3,6 +3,7 @@
   "sections": [ 
   	  { 
   	  	"header": "Nested Elements",
+  	  	"id": "section-1",
   	  	"elements": [
   	  	  {
   	  	    "type": "root",
@@ -14,6 +15,7 @@
   	  	     	   {
   	  	     	     "type": "boolean",
   	  	     	     "caption": "Just a boolean",
+  	  	     	     "id": "first-boolean",
   	  	     	     "value": false
   	  	     	   },
   	  	     	   {

@@ -26,6 +26,7 @@ namespace Sample
 		// This method is invoked when the application has loaded its UI and its ready to run
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
+			JsonElement sampleJson;
 			var Last = new DateTime (2010, 10, 7);
 			Console.WriteLine (Last);
 			
@@ -33,7 +34,7 @@ namespace Sample
 			
 			var menu = new RootElement ("Demos"){
 				new Section ("Json") {
-					JsonElement.FromFile ("sample.json"),
+					(sampleJson = JsonElement.FromFile ("sample.json")),
 					// Notice what happens when I close the paranthesis at the end, in the next line:
 					new JsonElement ("Load from URL", "file://" + Path.GetFullPath ("sample.json"))
 				},
@@ -58,7 +59,15 @@ namespace Sample
 					new StringElement ("Reflection API", DemoReflectionApi)
 				},
 			};
-
+			
+			//
+			// Lookup elements by ID:
+			//
+			var jsonSection = sampleJson ["section-1"] as Section;
+			Console.WriteLine ("The section has {0} elements", jsonSection.Count);
+			var booleanElement = sampleJson ["first-boolean"] as BooleanElement;
+			Console.WriteLine ("The state of the first-boolean value is {0}", booleanElement.Value);
+			
 			//
 			// Create our UI and add it to the current toplevel navigation controller
 			// this will allow us to have nice navigation animations.

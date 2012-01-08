@@ -1,6 +1,25 @@
 Json and MonoTouch.Dialog
 =========================
 
+You can create RootElement hierarchies using the JsonElement class in
+MonoTouch dialog.    This can be useful to create interfaces driven by
+data generated on a server.
+
+The JsonElement is a RootElement that can be instantiated in two
+forms.  One version creates a RootElement that will load the contents
+on demand, these are created by using the JsonElement constructors,
+which take an extra argument at the end, the url to load the contents
+from:
+
+    var je = new JsonElement ("Dynamic Data", "http://tirania.org/tmp/demo.json");
+
+The other form creates the data from a local file or an existing
+System.Json.JsonObject that you have already parsed:
+
+    var je = JsonElement.FromFile ("json.sample");
+
+    using (var reader = File.OpenRead ("json.sample"))
+        return JsonElement.FromJson (JsonObject.Load (reader) as JsonObject, arg);
 
 Json Syntax
 ===========
@@ -13,6 +32,7 @@ Sample:
             {
                 "header": "Booleans",
                 "footer": "Slider or image-based",
+		"id": "first-section"
                 "elements": [
                     { 
                         "type" : "boolean",
@@ -33,6 +53,7 @@ Sample:
   	  	     	   {
   	  	     	     "type": "boolean",
   	  	     	     "caption": "Just a boolean",
+			     "id": "the-boolean",
   	  	     	     "value": false
   	  	     	   },
   	  	     	   {
@@ -58,6 +79,14 @@ Sample:
         ]
       }
      
+Every element in the tree can contain the property "id".  It is
+possible at runtime to reference individual sections or elements using
+the JsonElement indexer.   Like this:
+
+     var jsonElement = JsonElement.FromFile ("demo.json");
+     var firstSection = jsonElement ["first-section"] as Section;
+     var theBoolean = jsonElement ["the-boolean"] as BooleanElement
+
 
 Root Element Syntax
 -------------------

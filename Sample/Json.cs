@@ -7,9 +7,9 @@
 // See the JSON.md file for documentation
 //
 // TODO: Json to load entire view controllers
-// TODO: JsonContext loader (to allow ui.GetElement ("keyboard") to fetch elements)
 //
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Json;
@@ -21,6 +21,8 @@ using MonoTouch.UIKit;
 namespace MonoTouch.Dialog {
 	
 	public class JsonElement : RootElement {
+		JsonElement jsonParent;
+		Dictionary<string,Element> map;
 		const int CSIZE = 16;
 		const int SPINNER_TAG = 1000;
 		public string Url;
@@ -82,7 +84,6 @@ namespace MonoTouch.Dialog {
 			var wc = new WebClient ();
 			
 			wc.DownloadStringCompleted += delegate  (object sender, DownloadStringCompletedEventArgs e){
-				System.Threading.Thread.Sleep (3000);
 				dvc.BeginInvokeOnMainThread (delegate {
 					loading = false;
 					spinner.StopAnimating ();
@@ -127,8 +128,6 @@ namespace MonoTouch.Dialog {
 				
 		public static JsonElement FromFile (string file, object arg)
 		{
-			// Command-D to go to definition does not work
-			
 			using (var reader = File.OpenRead (file))
 					return FromJson (JsonObject.Load (reader) as JsonObject, arg);
 		}
@@ -140,10 +139,15 @@ namespace MonoTouch.Dialog {
 		
 		public static JsonElement FromJson (JsonObject json)
 		{
-			return FromJson (json, null);
+			return FromJson (null, json, null);
 		}
 				
 		public static JsonElement FromJson (JsonObject json, object data)
+		{
+			return FromJson (null, json, data);
+		}
+		
+		public static JsonElement FromJson (JsonElement parent, JsonObject json, object data)
 		{
 			if (json == null)
 				return null;
@@ -169,9 +173,36 @@ namespace MonoTouch.Dialog {
 					root = new JsonElement (title, new RadioGroup (group, int.Parse (radioSelected)), url);
 				}
 			}
-			
-			LoadSections (root, GetArray (json, "sections"), data);
+			root.jsonParent = parent;
+			root.LoadSections (GetArray (json, "sections"), data);
 			return root;
+		}
+		
+		void AddMapping (string id, Element element)
+		{
+			if (jsonParent != null){
+				jsonParent.AddMapping (id, element);
+				return;
+			}
+			if (map == null)
+				map = new Dictionary<string, Element> ();
+			map.Add (id, element);
+		}
+		
+		//
+		// Retrieves the element name "key"
+		//
+		public Element this [string key] {
+			get {
+				if (jsonParent != null)
+					return jsonParent [key];
+				if (map == null)
+					return null;
+				Element res;
+				if (map.TryGetValue (key, out res))
+					return res;
+				return null;
+			}
 		}
 		
 		static void Error (string msg)
@@ -209,7 +240,7 @@ namespace MonoTouch.Dialog {
 			}
 		}
 		
-		static void LoadSections (RootElement target, JsonArray array, object data)
+		void LoadSections (JsonArray array, object data)
 		{
 			if (array == null)
 				return;
@@ -218,11 +249,14 @@ namespace MonoTouch.Dialog {
 				var jsonSection = array [i];
 				var header = GetString (jsonSection, "header");
 				var footer = GetString (jsonSection, "footer");
+				var id = GetString (jsonSection, "id");
 				
 				var section = new Section (header, footer);
 				if (jsonSection.ContainsKey ("elements"))
 					LoadSectionElements (section, jsonSection ["elements"] as JsonArray, data);
-				target.Add (section);
+				Add (section);
+				if (id != null)
+					AddMapping (id, section);
 			}
 		}
 		
@@ -656,7 +690,7 @@ namespace MonoTouch.Dialog {
 			return new HtmlElement (caption, url);
 		}
 		
-		static void LoadSectionElements (Section section, JsonArray array, object data)
+		void LoadSectionElements (Section section, JsonArray array, object data)
 		{
 			if (array == null)
 				return;
@@ -684,7 +718,7 @@ namespace MonoTouch.Dialog {
 						break;
 						
 					case "root":
-						element = FromJson (json, data);
+						element = FromJson (this, json, data);
 						break;
 						
 					case "radio":
@@ -708,6 +742,12 @@ namespace MonoTouch.Dialog {
 					default:
 						Error ("json element at {0} contain an unknown type `{1}', json {2}", i, type, json);
 						break;
+					}
+					
+					if (element != null){
+						var id = GetString (json, "id");
+						if (id != null)
+							AddMapping (id, element);
 					}
 				} catch (Exception e) {
 					Console.WriteLine ("Error processing Json {0}, exception {1}", array, e);
