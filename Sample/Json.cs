@@ -26,21 +26,6 @@ namespace MonoTouch.Dialog {
 		public string Url;
 		bool loading;
 		
-		public JsonElement (string caption, string url) : base (caption)
-		{
-			Url = url;
-		}
-
-		public JsonElement (string caption, int section, int element, string url) : base (caption, section, element)
-		{
-			Url = url;
-		}
-		
-		public JsonElement (string caption, Group group, string url) : base (caption, group)
-		{
-			Url = url;
-		}
-				
 		UIActivityIndicatorView StartSpinner (UITableViewCell cell)
 		{
 			var cvb = cell.ContentView.Bounds;
@@ -106,7 +91,7 @@ namespace MonoTouch.Dialog {
 						try {
 							var obj = JsonValue.Load (new StringReader (e.Result)) as JsonObject;
 							if (obj != null){
-								var root = JsonDialog.FromJson (obj);
+								var root = JsonElement.FromJson (obj);
 								var newDvc = new DialogViewController (root, true) {
 									Autorotate = true
 								};
@@ -122,13 +107,25 @@ namespace MonoTouch.Dialog {
 					alert.Show ();
 				});
 			};
-			var u = new Uri (Url);
 			wc.DownloadStringAsync (new Uri (Url));
 		}
-	}	
-	
-	public class JsonDialog {
-		public static RootElement FromFile (string file, object arg)
+
+		public JsonElement (string caption, string url) : base (caption)
+		{
+			Url = url;
+		}
+
+		public JsonElement (string caption, int section, int element, string url) : base (caption, section, element)
+		{
+			Url = url;
+		}
+		
+		public JsonElement (string caption, Group group, string url) : base (caption, group)
+		{
+			Url = url;
+		}
+				
+		public static JsonElement FromFile (string file, object arg)
 		{
 			// Command-D to go to definition does not work
 			
@@ -136,17 +133,17 @@ namespace MonoTouch.Dialog {
 					return FromJson (JsonObject.Load (reader) as JsonObject, arg);
 		}
 		
-		public static RootElement FromFile (string file)
+		public static JsonElement FromFile (string file)
 		{
 			return FromFile (file, null);
 		}
 		
-		public static RootElement FromJson (JsonObject json)
+		public static JsonElement FromJson (JsonObject json)
 		{
 			return FromJson (json, null);
 		}
 				
-		public static RootElement FromJson (JsonObject json, object data)
+		public static JsonElement FromJson (JsonObject json, object data)
 		{
 			if (json == null)
 				return null;
@@ -156,26 +153,20 @@ namespace MonoTouch.Dialog {
 			var group = GetString (json, "group");
 			var url = GetString (json, "url");
 			var radioSelected = GetString (json, "radioselected");
-			RootElement root;
+			JsonElement root;
 			if (group == null){
 				if (radioSelected == null)
-					root = url == null ? new RootElement (title) : new JsonElement (title, url);
+					root = new JsonElement (title, url);
 				else 
-					root = url == null 
-						? new RootElement (title, new RadioGroup (int.Parse (radioSelected))) 
-						: new JsonElement (title, new RadioGroup (int.Parse (radioSelected)), url);						
+					root = new JsonElement (title, new RadioGroup (int.Parse (radioSelected)), url);
 			} else {
 				if (radioSelected == null)
-					root = url == null 
-						? new RootElement (title, new Group (group))
-						: new JsonElement (title, new Group (group), url);
+					root = new JsonElement (title, new Group (group), url);
 				else {
 					// It does not seem that we group elements together, notice when I add
 					// the return, and then change my mind, I have to undo *twice* instead of once.
 					
-					root = url == null 
-						? new RootElement (title, new RadioGroup (group, int.Parse (radioSelected)))
-						: new JsonElement (title, new RadioGroup (group, int.Parse (radioSelected)), url);
+					root = new JsonElement (title, new RadioGroup (group, int.Parse (radioSelected)), url);
 				}
 			}
 			
