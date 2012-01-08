@@ -33,11 +33,6 @@ namespace Sample
 			var p = Path.GetFullPath ("background.png");
 			
 			var menu = new RootElement ("Demos"){
-				new Section ("Json") {
-					(sampleJson = JsonElement.FromFile ("sample.json")),
-					// Notice what happens when I close the paranthesis at the end, in the next line:
-					new JsonElement ("Load from URL", "file://" + Path.GetFullPath ("sample.json"))
-				},
 				new Section ("Element API"){
 					new StringElement ("iPhone Settings Sample", DemoElementApi),
 					new StringElement ("Dynamically load data", DemoDynamic),
@@ -54,6 +49,11 @@ namespace Sample
 					new StringElement ("Headers and Footers", DemoHeadersFooters),
 					new StringElement ("Root Style", DemoContainerStyle),
 					new StringElement ("Index sample", DemoIndex),
+				},
+				new Section ("Json") {
+					(sampleJson = JsonElement.FromFile ("sample.json")),
+					// Notice what happens when I close the paranthesis at the end, in the next line:
+					new JsonElement ("Load from URL", "file://" + Path.GetFullPath ("sample.json"))
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)
