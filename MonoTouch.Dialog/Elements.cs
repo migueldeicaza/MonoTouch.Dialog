@@ -2294,7 +2294,8 @@ namespace MonoTouch.Dialog
 	///    C# 4.0 syntax to initialize a RootElement in one pass.
 	/// </remarks>
 	public class RootElement : Element, IEnumerable, IEnumerable<Section> {
-		static NSString rkey = new NSString ("RootElement");
+		static NSString rkey1 = new NSString ("RootElement1");
+		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
 		internal Group group;
 		public bool UnevenRows;
@@ -2637,11 +2638,12 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (rkey);
+			NSString key = summarySection == -1 ? rkey1 : rkey2;
+			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
 				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
 				
-				cell = new UITableViewCell (style, rkey);
+				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			} 
 		
