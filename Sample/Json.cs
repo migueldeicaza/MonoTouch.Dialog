@@ -19,6 +19,114 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog {
+	
+	public class JsonElement : RootElement {
+		const int CSIZE = 16;
+		const int SPINNER_TAG = 1000;
+		public string Url;
+		bool loading;
+		
+		public JsonElement (string caption, string url) : base (caption)
+		{
+			Url = url;
+		}
+
+		public JsonElement (string caption, int section, int element, string url) : base (caption, section, element)
+		{
+			Url = url;
+		}
+		
+		public JsonElement (string caption, Group group, string url) : base (caption, group)
+		{
+			Url = url;
+		}
+				
+		UIActivityIndicatorView StartSpinner (UITableViewCell cell)
+		{
+			var cvb = cell.ContentView.Bounds;
+
+			var spinner = new UIActivityIndicatorView (new RectangleF (cvb.Width-CSIZE/2, (cvb.Height-CSIZE)/2, CSIZE, CSIZE)) {
+				Tag = SPINNER_TAG,
+				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
+			};
+			cell.ContentView.AddSubview (spinner);
+			spinner.StartAnimating ();
+			cell.Accessory = UITableViewCellAccessory.None;
+			
+			return spinner;
+		}
+
+		void RemoveSpinner (UITableViewCell cell, UIActivityIndicatorView spinner)
+		{
+			spinner.StopAnimating ();
+			spinner.RemoveFromSuperview ();
+			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+		}
+
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = base.GetCell (tv);
+			if (Url == null)
+				return cell;
+			
+			var spinner = cell.ViewWithTag (SPINNER_TAG) as UIActivityIndicatorView;
+			if (loading){
+				if (spinner == null)
+					StartSpinner (cell);
+				else 
+					if (spinner != null)
+						RemoveSpinner (cell, spinner);
+			}
+			return cell;
+		}
+		
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			if (Url == null){
+				base.Selected (dvc, tableView, path);
+				return;
+			}
+			
+			tableView.DeselectRow (path, false);
+			if (loading)
+				return;
+			var cell = GetActiveCell ();
+			var spinner = StartSpinner (cell);
+			loading = true;
+			
+			var wc = new WebClient ();
+			
+			wc.DownloadStringCompleted += delegate  (object sender, DownloadStringCompletedEventArgs e){
+				System.Threading.Thread.Sleep (3000);
+				dvc.BeginInvokeOnMainThread (delegate {
+					loading = false;
+					spinner.StopAnimating ();
+					spinner.RemoveFromSuperview ();
+					if (e.Result != null){
+						try {
+							var obj = JsonValue.Load (new StringReader (e.Result)) as JsonObject;
+							if (obj != null){
+								var root = JsonDialog.FromJson (obj);
+								var newDvc = new DialogViewController (root, true) {
+									Autorotate = true
+								};
+								PrepareDialogViewController (newDvc);
+								dvc.ActivateController (newDvc);
+								return;
+							}
+						} catch (Exception ee){
+							Console.WriteLine (ee);
+						}
+					}
+					var alert = new UIAlertView ("Error", "Unable to download data", null, "Ok");
+					alert.Show ();
+				});
+			};
+			var u = new Uri (Url);
+			wc.DownloadStringAsync (new Uri (Url));
+		}
+	}	
+	
 	public class JsonDialog {
 		public static RootElement FromFile (string file, object arg)
 		{
@@ -31,31 +139,6 @@ namespace MonoTouch.Dialog {
 		public static RootElement FromFile (string file)
 		{
 			return FromFile (file, null);
-		}
-		
-		static string GetString (JsonValue obj, string key)
-		{
-			if (obj.ContainsKey (key))
-				if (obj [key].JsonType == JsonType.String)
-					return (string) obj [key];
-			return null;
-		}
-
-		static JsonArray GetArray (JsonObject obj, string key)
-		{
-			if (obj.ContainsKey (key))
-				if (obj [key].JsonType == JsonType.Array)
-					return (JsonArray) obj [key];
-			return null;
-		}
-		
-		static bool GetBoolean (JsonObject obj, string key)
-		{
-			try {
-				return (bool) obj [key];
-			} catch {
-				return false;
-			}
 		}
 		
 		public static RootElement FromJson (JsonObject json)
@@ -108,6 +191,31 @@ namespace MonoTouch.Dialog {
 		static void Error (string fmt, params object [] args)
 		{
 			Error (String.Format (fmt, args));
+		}
+		
+		static string GetString (JsonValue obj, string key)
+		{
+			if (obj.ContainsKey (key))
+				if (obj [key].JsonType == JsonType.String)
+					return (string) obj [key];
+			return null;
+		}
+
+		static JsonArray GetArray (JsonObject obj, string key)
+		{
+			if (obj.ContainsKey (key))
+				if (obj [key].JsonType == JsonType.Array)
+					return (JsonArray) obj [key];
+			return null;
+		}
+		
+		static bool GetBoolean (JsonObject obj, string key)
+		{
+			try {
+				return (bool) obj [key];
+			} catch {
+				return false;
+			}
 		}
 		
 		static void LoadSections (RootElement target, JsonArray array, object data)
@@ -616,107 +724,6 @@ namespace MonoTouch.Dialog {
 				if (element != null)
 					section.Add (element);
 			}
-		}
-	}
-	
-	public class JsonElement : RootElement {
-		const int CSIZE = 16;
-		const int SPINNER_TAG = 1000;
-		public string Url;
-		bool loading;
-		
-		public JsonElement (string caption, string url) : base (caption)
-		{
-			Url = url;
-		}
-
-		public JsonElement (string caption, int section, int element, string url) : base (caption, section, element)
-		{
-			Url = url;
-		}
-		
-		public JsonElement (string caption, Group group, string url) : base (caption, group)
-		{
-			Url = url;
-		}
-				
-		UIActivityIndicatorView StartSpinner (UITableViewCell cell)
-		{
-			var cvb = cell.ContentView.Bounds;
-
-			var spinner = new UIActivityIndicatorView (new RectangleF (cvb.Width-CSIZE/2, (cvb.Height-CSIZE)/2, CSIZE, CSIZE)) {
-				Tag = SPINNER_TAG,
-				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
-			};
-			cell.ContentView.AddSubview (spinner);
-			spinner.StartAnimating ();
-			cell.Accessory = UITableViewCellAccessory.None;
-			
-			return spinner;
-		}
-
-		void RemoveSpinner (UITableViewCell cell, UIActivityIndicatorView spinner)
-		{
-			spinner.StopAnimating ();
-			spinner.RemoveFromSuperview ();
-			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
-		}
-
-		public override UITableViewCell GetCell (UITableView tv)
-		{
-			var cell = base.GetCell (tv);
-			
-			var spinner = cell.ViewWithTag (SPINNER_TAG) as UIActivityIndicatorView;
-			if (loading){
-				if (spinner == null)
-					StartSpinner (cell);
-				else 
-					if (spinner != null)
-						RemoveSpinner (cell, spinner);
-			}
-			return cell;
-		}
-		
-		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
-		{
-			tableView.DeselectRow (path, false);
-			if (loading)
-				return;
-			var cell = GetActiveCell ();
-			var spinner = StartSpinner (cell);
-			loading = true;
-			
-			var wc = new WebClient ();
-			
-			wc.DownloadStringCompleted += delegate  (object sender, DownloadStringCompletedEventArgs e){
-				System.Threading.Thread.Sleep (3000);
-				dvc.BeginInvokeOnMainThread (delegate {
-					loading = false;
-					spinner.StopAnimating ();
-					spinner.RemoveFromSuperview ();
-					if (e.Result != null){
-						try {
-							var obj = JsonValue.Load (new StringReader (e.Result)) as JsonObject;
-							if (obj != null){
-								var root = JsonDialog.FromJson (obj);
-								var newDvc = new DialogViewController (root, true) {
-									Autorotate = true
-								};
-								PrepareDialogViewController (newDvc);
-								dvc.ActivateController (newDvc);
-								return;
-							}
-						} catch (Exception ee){
-							Console.WriteLine (ee);
-						}
-					}
-					var alert = new UIAlertView ("Error", "Unable to download data", null, "Ok");
-					alert.Show ();
-				});
-			};
-			var u = new Uri (Url);
-			Console.WriteLine (u);
-			wc.DownloadStringAsync (new Uri (Url));
 		}
 	}
 }
