@@ -110,7 +110,7 @@ Using MonoTouch.Dialog
 
 MonoTouch.Dialog core entry point is a UIViewController called the
 MonoTouch.Dialog.DialogViewController.  You initialize instances of
-this object from an object of type "RootElement".
+this object from an object of type "RootElement" or "JsonElement".
 
 RootElements can be created either manually with the "Elements" API by
 creating the various nodes necessary to render the information.  You
@@ -703,6 +703,9 @@ System.Json.JsonObject that you have already parsed:
     using (var reader = File.OpenRead ("json.sample"))
         return JsonElement.FromJson (JsonObject.Load (reader) as JsonObject, arg);
 
+See the section "Json Syntax" for the sample file format and the
+description of the Json objects.
+
 Sections
 --------
 
@@ -1111,9 +1114,6 @@ different cache size (for instance, if you are expecting the images to
 be too large that 50 images would be too much), you can just create
 instances of ImageLoader and pass the number of images you want to
 keep in the cache.
-
-Json
-----
 
 Json Syntax
 ===========
