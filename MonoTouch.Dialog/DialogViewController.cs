@@ -24,6 +24,7 @@ namespace MonoTouch.Dialog
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
+		public event Action<NSIndexPath> OnSelection;
 		UISearchBar searchBar;
 		UITableView tableView;
 		RefreshTableHeaderView refreshView;
@@ -357,6 +358,9 @@ namespace MonoTouch.Dialog
 			
 			public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 			{
+				var onSelection = Container.OnSelection;
+				if (onSelection != null)
+					onSelection (indexPath);
 				Container.Selected (indexPath);
 			}			
 			
