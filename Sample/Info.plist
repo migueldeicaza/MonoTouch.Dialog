@@ -6,7 +6,10 @@
 	<string>iiii</string>
 	<key>MinimumOSVersion</key>
 	<string>3.2</string>
-	<key>NSMainNibFile</key>
-	<string>MainWindow</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
 </dict>
 </plist>
