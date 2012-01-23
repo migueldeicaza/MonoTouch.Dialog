@@ -170,7 +170,9 @@ attributes:
               new Section (){
                 new FloatElement (null, null, 0.5f),
                 new BooleanElement ("Auto-brightness", false),
-		new UILabel ("I am a simple UILabel!"),
+		new UILabel (new RectangleF (10, 10, 100, 40) {
+		    Text = "I am a simple UILabel!"
+		}
               }
             },
           },
