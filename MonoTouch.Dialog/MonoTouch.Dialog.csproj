@@ -11,6 +11,7 @@
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
     <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <ReleaseVersion>0.7.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -100,6 +101,7 @@
     <Compile Include="Utilities\GlassButton.cs" />
     <Compile Include="Utilities\LocalizationExtensions.cs" />
     <Compile Include="Elements\Json.cs" />
+    <Compile Include="Elements\MultilineEntryElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
