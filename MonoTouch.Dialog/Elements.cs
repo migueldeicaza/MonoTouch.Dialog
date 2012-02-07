@@ -1022,7 +1022,7 @@ namespace MonoTouch.Dialog
 	
 	public class RadioElement : StringElement {
 		public string Group;
-		internal int RadioIdx;
+		internal protected int RadioIdx;
 		
 		public RadioElement (string caption, string group) : base (caption)
 		{
@@ -1032,17 +1032,23 @@ namespace MonoTouch.Dialog
 		public RadioElement (string caption) : base (caption)
 		{
 		}
-
-		public override UITableViewCell GetCell (UITableView tv)
+		
+		protected UITableViewCellAccessory GetAccessory ()
 		{
-			var cell = base.GetCell (tv);			
-			var root = (RootElement) Parent.Parent;
+			var root = (RootElement)Parent.Parent;
 			
 			if (!(root.group is RadioGroup))
 				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
 			
 			bool selected = RadioIdx == ((RadioGroup)(root.group)).Selected;
-			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			return selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+		}
+
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = base.GetCell (tv);			
+			
+			cell.Accessory = GetAccessory ();
 
 			return cell;
 		}

@@ -30,6 +30,19 @@ namespace MonoTouch.Dialog
 		}
 
 		protected string val;
+		
+		public bool Editable {
+			get {
+				return editable;
+			}
+			set {
+				editable = value;
+				if (entry != null)
+					entry.Editable = editable;
+			}
+		}
+		
+		protected bool editable;
 
 		/// <summary>
 		/// The key used for reusable UITableViewCells.
@@ -166,7 +179,8 @@ namespace MonoTouch.Dialog
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
 				Text = Value ?? "",
 				Tag = 1,
-				BackgroundColor = UIColor.Clear
+				BackgroundColor = UIColor.Clear,
+				Editable = editable
 			};
 		}
 		
