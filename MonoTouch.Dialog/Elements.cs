@@ -225,7 +225,7 @@ namespace MonoTouch.Dialog
 
 	public abstract class BoolElement : Element {
 		bool val;
-		public bool Value {
+		public virtual bool Value {
 			get {
 				return val;
 			}
@@ -301,6 +301,17 @@ namespace MonoTouch.Dialog
 					sw.Dispose ();
 					sw = null;
 				}
+			}
+		}
+		
+		public override bool Value {
+			get {
+				return base.Value;
+			}
+			set {
+				 base.Value = value;
+				if (sw != null)
+					sw.On = value;
 			}
 		}
 	}
@@ -828,13 +839,14 @@ namespace MonoTouch.Dialog
 				imgView.Image = img;
 
 				if (cell.DetailTextLabel != null)
-					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Black;
+					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Gray;
 			}
 				
 			if (cell.DetailTextLabel != null){
 				cell.DetailTextLabel.Lines = Lines;
 				cell.DetailTextLabel.LineBreakMode = LineBreakMode;
 				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				cell.DetailTextLabel.TextColor = (extraInfo == null || extraInfo.DetailColor == null) ? UIColor.Gray : extraInfo.DetailColor;
 			}
 		}	
 	
@@ -1655,7 +1667,7 @@ namespace MonoTouch.Dialog
 		{
 			var picker = new UIDatePicker (RectangleF.Empty){
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
-				Mode = UIDatePickerMode.Date,
+				Mode = UIDatePickerMode.DateAndTime,
 				Date = DateValue
 			};
 			return picker;
@@ -2282,7 +2294,8 @@ namespace MonoTouch.Dialog
 	///    C# 4.0 syntax to initialize a RootElement in one pass.
 	/// </remarks>
 	public class RootElement : Element, IEnumerable, IEnumerable<Section> {
-		static NSString rkey = new NSString ("RootElement");
+		static NSString rkey1 = new NSString ("RootElement1");
+		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
 		internal Group group;
 		public bool UnevenRows;
@@ -2625,11 +2638,12 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (rkey);
+			NSString key = summarySection == -1 ? rkey1 : rkey2;
+			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
 				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
 				
-				cell = new UITableViewCell (style, rkey);
+				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			} 
 		

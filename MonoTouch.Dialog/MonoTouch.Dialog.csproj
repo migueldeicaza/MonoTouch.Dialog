@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="monotouch" />
+    <Reference Include="System.Json" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -99,6 +100,7 @@
     <Compile Include="Utilities\GlassButton.cs" />
     <Compile Include="Elements\MapKitElement.cs" />
     <Compile Include="Utilities\LocalizationExtensions.cs" />
+    <Compile Include="Elements\Json.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />

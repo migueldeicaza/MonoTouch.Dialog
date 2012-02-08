@@ -15,8 +15,20 @@
     </Attribute>
   </Attributes>
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>On Reflection-based UIs, this attribute can be applied to a member to set the caption for the element.</summary>
+    <remarks>
+      <example>
+	<code lang="c#">
+	[Preserve (AllMembers=true)]
+	class Settings {
+	[Section ("Enumerations")]
+		
+		[Caption ("Favorite CLR type")]
+		public TypeCode FavoriteType;
+	}
+	</code>
+      </example>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -30,9 +42,9 @@
         <Parameter Name="caption" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="caption">Caption text to use</param>
+        <summary></summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Caption">
@@ -46,8 +58,8 @@
         <ReturnType>System.String</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Caption to display.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
   </Members>
