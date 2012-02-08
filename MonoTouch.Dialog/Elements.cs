@@ -602,10 +602,11 @@ namespace MonoTouch.Dialog
 			var vc = new WebViewController (this) {
 				Autorotate = dvc.Autorotate
 			};
-			web = new UIWebView (UIScreen.MainScreen.ApplicationFrame){
+
+			web = new UIWebView (UIScreen.MainScreen.Bounds) {
 				BackgroundColor = UIColor.White,
 				ScalesPageToFit = true,
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+				AutoresizingMask = UIViewAutoresizing.All
 			};
 			web.LoadStarted += delegate {
 				NetworkActivity = true;
@@ -626,6 +627,8 @@ namespace MonoTouch.Dialog
 						"An error occurred:".GetText (), args.Error.LocalizedDescription), null);
 			};
 			vc.NavigationItem.Title = Caption;
+			
+			vc.View.AutosizesSubviews = true;
 			vc.View.AddSubview (web);
 			
 			dvc.ActivateController (vc);
