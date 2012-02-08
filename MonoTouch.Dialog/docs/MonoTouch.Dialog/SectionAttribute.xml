@@ -15,8 +15,27 @@
     </Attribute>
   </Attributes>
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>On Reflection-based UIs, this attribute can be applied to a member to start a new section.</summary>
+    <remarks>
+	[Preserve (AllMembers=true)]
+	class Settings {
+
+	   [Section ("Account", "Your credentials")]
+		
+		[Entry ("Enter your login name")]
+		public string Login;
+		
+		[Password ("Enter your password")]
+		public string Password;
+
+
+	   [Section ("Image Selection")]
+		public UIImage Top;
+		public UIImage Middle;
+		public UIImage Bottom;
+		
+	}
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -43,9 +62,9 @@
         <Parameter Name="caption" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="caption">Caption for the section.</param>
+        <summary></summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -60,8 +79,8 @@
         <Parameter Name="footer" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <param name="footer">To be added.</param>
+        <param name="caption">Caption for the section.</param>
+        <param name="footer">Footer for the section.</param>
         <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>

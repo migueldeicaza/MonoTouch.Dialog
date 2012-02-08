@@ -10,8 +10,8 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>An element that can be used to show an activity indicator.</summary>
+    <remarks>This is a fixed size element that shows an activity indicator.   You can turn this on and off by setting the Animating property.</remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -23,8 +23,8 @@
       </AssemblyInfo>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Default constructor.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Animating">
@@ -38,9 +38,9 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <summary>Controls the animation for the activity indicator.</summary>
+        <value></value>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="MonoTouch.Dialog.IElementSizing.GetHeight">

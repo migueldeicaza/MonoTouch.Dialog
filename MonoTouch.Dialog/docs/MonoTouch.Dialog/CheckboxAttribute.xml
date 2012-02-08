@@ -15,8 +15,19 @@
     </Attribute>
   </Attributes>
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>On Reflection-based UIs, this attribute can be applied to boolean values to use a checkbox to render the boolean value.</summary>
+    <remarks>
+      <example>
+	<code lang="c#">
+	[Preserve (AllMembers=true)]
+	class Settings {
+	[Section ("Checkboxes")]
+		[Checkbox]
+		bool English = true;
+	}
+	</code>
+      </example>
+</remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -28,8 +39,8 @@
       </AssemblyInfo>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Default constructor</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
   </Members>

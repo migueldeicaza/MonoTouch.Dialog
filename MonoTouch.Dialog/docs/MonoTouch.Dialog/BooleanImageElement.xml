@@ -10,8 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>This class is used to render a string + a state in the form of an image.  </summary>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -28,10 +29,10 @@
         <Parameter Name="offImage" Type="MonoTouch.UIKit.UIImage" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <param name="value">To be added.</param>
-        <param name="onImage">To be added.</param>
-        <param name="offImage">To be added.</param>
+        <param name="caption">Caption to display</param>
+        <param name="value">Current value of this boolean element</param>
+        <param name="onImage">Image to use when the value is true</param>
+        <param name="offImage">Image to use when the value is false</param>
         <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>
@@ -67,9 +68,9 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <summary>Returns the image for the current state.</summary>
+        <returns></returns>
+        <remarks></remarks>
       </Docs>
     </Member>
   </Members>
