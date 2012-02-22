@@ -761,9 +761,9 @@
             </remarks>
       </Docs>
     </Member>
-    <Member MemberName="ViewDissapearing">
-      <MemberSignature Language="C#" Value="public event EventHandler ViewDissapearing;" />
-      <MemberSignature Language="ILAsm" Value=".event class System.EventHandler ViewDissapearing" />
+    <Member MemberName="ViewDisappearing">
+      <MemberSignature Language="C#" Value="public event EventHandler ViewDisappearing;" />
+      <MemberSignature Language="ILAsm" Value=".event class System.EventHandler ViewDisappearing" />
       <MemberType>Event</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
