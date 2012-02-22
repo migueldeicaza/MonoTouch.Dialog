@@ -615,13 +615,13 @@ namespace MonoTouch.Dialog
 			dirty = false;
 		}
 		
-		public event EventHandler ViewDisappearing;
+		public event EventHandler ViewDissapearing;
 		
 		public override void ViewWillDisappear (bool animated)
 		{
 			base.ViewWillDisappear (animated);
-			if (ViewDisappearing != null)
-				ViewDisappearing (this, EventArgs.Empty);
+			if (ViewDissapearing != null)
+				ViewDissapearing (this, EventArgs.Empty);
 		}
 		
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
