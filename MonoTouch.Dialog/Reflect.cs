@@ -13,9 +13,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using MonoTouch.UIKit;
+using System.Linq;
 using System.Drawing;
 using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
 {
@@ -351,6 +352,18 @@ namespace MonoTouch.Dialog
 					element = new RootElement (caption, new RadioGroup (null, selected)) { csection };
 				} else if (mType == typeof (UIImage)){
 					element = new ImageElement ((UIImage) GetValue (mi, o));
+				} else if (typeof (System.Collections.Generic.IEnumerable<string>).IsAssignableFrom(mType))
+				{
+					if (last_radio_index == null)
+						throw new Exception("IEnumerable found, but no previous int found");
+					
+					var datasource = (System.Collections.Generic.IEnumerable<string>)GetValue(mi, o);
+					var selected = (int) GetValue(last_radio_index, o);
+					if (selected >= datasource.Count() || selected < 0)
+						selected = 0;
+					element = new PickerElement(caption, datasource.ElementAt(selected),  datasource);
+					
+					last_radio_index = null;
 				} else if (typeof (System.Collections.IEnumerable).IsAssignableFrom (mType)){
 					var csection = new Section ();
 					int count = 0;

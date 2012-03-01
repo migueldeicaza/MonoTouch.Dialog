@@ -247,6 +247,11 @@ namespace MonoTouch.Dialog
 			ReloadData ();
 		}
 		
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+		}
+		
 		public virtual void SearchButtonClicked (string text)
 		{
 		}
