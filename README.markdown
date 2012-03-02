@@ -1128,7 +1128,7 @@ Sample:
             {
                 "header": "Booleans",
                 "footer": "Slider or image-based",
-		"id": "first-section"
+		"id": "first-section",
                 "elements": [
                     { 
                         "type" : "boolean",
@@ -1169,7 +1169,7 @@ Sample:
         		  "caption": "Username",
         		  "value": "",
         		  "placeholder": "Your account username"
-        	      },
+        	      }
         	  ]
             }
         ]
