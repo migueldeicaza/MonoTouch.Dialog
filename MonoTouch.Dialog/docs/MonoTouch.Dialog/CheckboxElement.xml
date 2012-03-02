@@ -10,8 +10,8 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>An element that can be used as a checkbox</summary>
+    <remarks></remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -25,9 +25,9 @@
         <Parameter Name="caption" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="caption">Text to use for the checkbox.</param>
+        <summary>Default constructor</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -42,10 +42,10 @@
         <Parameter Name="value" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <param name="value">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="caption">Text to use for the checkbox.</param>
+        <param name="value">Initial value for the checkbox.</param>
+        <summary>Constructor</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -61,11 +61,11 @@
         <Parameter Name="group" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <param name="value">To be added.</param>
+        <param name="caption">Text to use for the checkbox.</param>
+        <param name="value">Initial value for the checkbox.</param>
         <param name="group">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Constructor</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="GetCell">
@@ -82,8 +82,8 @@
         <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
       </Parameters>
       <Docs>
-        <param name="tv">To be added.</param>
-        <summary>To be added.</summary>
+        <param name="tv"></param>
+        <summary>Returns the cell that corresponds to this cell</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>
       </Docs>
@@ -137,8 +137,8 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>The current value of the checkbox.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
   </Members>

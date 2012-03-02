@@ -10,8 +10,8 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>An element that can be used to edit dates and times.</summary>
+    <remarks>This is the base class for both the DateElement and the TimeElement.</remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -26,10 +26,10 @@
         <Parameter Name="date" Type="System.DateTime" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <param name="date">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="caption">Caption for the element.</param>
+        <param name="date">The initial date and time.</param>
+        <summary>Constructs the DateElement.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="CreatePicker">
@@ -44,9 +44,9 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <summary>Creates the UIDatePicker, this method can be overwritten to customize the UIDatePicker used.</summary>
+        <returns></returns>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="datePicker">
@@ -60,8 +60,8 @@
         <ReturnType>MonoTouch.UIKit.UIDatePicker</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary></summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="DateValue">
@@ -75,8 +75,8 @@
         <ReturnType>System.DateTime</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>The current DateTime value in the editor.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -93,9 +93,9 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="disposing"></param>
+        <summary>Releases the resources associated with this DateTimeElement.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="fmt">
@@ -109,8 +109,8 @@
         <ReturnType>MonoTouch.Foundation.NSDateFormatter</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>An internal date formatter that has been preconfigured for short date time renderings.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="FormatDate">
@@ -127,10 +127,10 @@
         <Parameter Name="dt" Type="System.DateTime" />
       </Parameters>
       <Docs>
-        <param name="dt">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="dt">The date time to format.</param>
+        <summary>Formats the date, the return is used as the Value for the cell rendering.</summary>
+        <returns></returns>
+        <remarks>You can override this to alter the rendering of the date.</remarks>
       </Docs>
     </Member>
     <Member MemberName="GetCell">

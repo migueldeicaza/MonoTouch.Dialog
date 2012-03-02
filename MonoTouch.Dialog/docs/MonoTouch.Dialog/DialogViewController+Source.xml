@@ -10,8 +10,8 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>Default UITableViewSource used by MonoTouch.Dialog when all of the elements contained have a constant height.</summary>
+    <remarks>If you are subclassing MonoTouch.Dialog or extending it, you would likely create subclasses of this class.</remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
