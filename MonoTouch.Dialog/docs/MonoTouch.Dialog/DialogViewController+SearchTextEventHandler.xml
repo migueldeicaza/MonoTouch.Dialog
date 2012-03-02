@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public delegate void DialogViewController.SearchTextEventHandler(object sender, SearchChangedEventArgs args);" />
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi sealed DialogViewController/SearchTextEventHandler extends System.MulticastDelegate" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

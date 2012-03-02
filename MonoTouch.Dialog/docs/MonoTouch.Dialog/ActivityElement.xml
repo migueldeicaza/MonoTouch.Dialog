@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class ActivityElement : MonoTouch.Dialog.UIViewElement" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit ActivityElement extends MonoTouch.Dialog.UIViewElement implements class MonoTouch.Dialog.IElementSizing" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -24,7 +24,8 @@
       <Parameters />
       <Docs>
         <summary>Default constructor.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Animating">
@@ -39,8 +40,10 @@
       </ReturnValue>
       <Docs>
         <summary>Controls the animation for the activity indicator.</summary>
-        <value></value>
-        <remarks></remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="MonoTouch.Dialog.IElementSizing.GetHeight">

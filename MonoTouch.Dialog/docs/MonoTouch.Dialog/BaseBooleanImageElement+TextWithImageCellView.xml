@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class BaseBooleanImageElement.TextWithImageCellView : MonoTouch.UIKit.UITableViewCell" />
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi beforefieldinit BaseBooleanImageElement/TextWithImageCellView extends MonoTouch.UIKit.UITableViewCell" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

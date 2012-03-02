@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public enum UIViewElement.CellFlags" />
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi sealed UIViewElement/CellFlags extends System.Enum" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

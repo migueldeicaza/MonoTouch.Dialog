@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class CheckboxAttribute : Attribute" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit CheckboxAttribute extends System.Attribute" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -18,7 +18,7 @@
     <summary>On Reflection-based UIs, this attribute can be applied to boolean values to use a checkbox to render the boolean value.</summary>
     <remarks>
       <example>
-	<code lang="c#">
+        <code lang="c#">
 	[Preserve (AllMembers=true)]
 	class Settings {
 	[Section ("Checkboxes")]
@@ -27,7 +27,7 @@
 	}
 	</code>
       </example>
-</remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -40,7 +40,8 @@
       <Parameters />
       <Docs>
         <summary>Default constructor</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

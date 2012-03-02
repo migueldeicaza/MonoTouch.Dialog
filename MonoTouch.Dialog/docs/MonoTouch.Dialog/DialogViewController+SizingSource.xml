@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class DialogViewController.SizingSource : MonoTouch.Dialog.DialogViewController.Source" />
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi beforefieldinit DialogViewController/SizingSource extends MonoTouch.Dialog.DialogViewController/Source" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -14,7 +14,7 @@
     <remarks>
       <para>If you are subclassing MonoTouch.Dialog or extending it, you would likely create subclasses of this class.</para>
       <para>This source probes the element to see if it implements the IElementSizing interface.   If it does, it invokes the method to determine the height of the row, otherwise it returns the default value</para>
-    </remarks>remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">

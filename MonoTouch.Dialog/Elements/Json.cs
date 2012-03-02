@@ -129,7 +129,7 @@ namespace MonoTouch.Dialog {
 		public static JsonElement FromFile (string file, object arg)
 		{
 			using (var reader = File.OpenRead (file))
-					return FromJson (JsonObject.Load (reader) as JsonObject, arg);
+				return FromJson (JsonObject.Load (reader) as JsonObject, arg);
 		}
 		
 		public static JsonElement FromFile (string file)

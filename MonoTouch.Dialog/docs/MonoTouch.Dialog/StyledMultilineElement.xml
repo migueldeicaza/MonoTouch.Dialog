@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class StyledMultilineElement : MonoTouch.Dialog.StyledStringElement, MonoTouch.Dialog.IElementSizing" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit StyledMultilineElement extends MonoTouch.Dialog.StyledStringElement implements class MonoTouch.Dialog.IElementSizing" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

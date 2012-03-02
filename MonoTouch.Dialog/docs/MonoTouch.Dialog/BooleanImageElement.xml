@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class BooleanImageElement : MonoTouch.Dialog.BaseBooleanImageElement" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit BooleanImageElement extends MonoTouch.Dialog.BaseBooleanImageElement" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -69,8 +69,10 @@
       <Parameters />
       <Docs>
         <summary>Returns the image for the current state.</summary>
-        <returns></returns>
-        <remarks></remarks>
+        <returns>
+        </returns>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

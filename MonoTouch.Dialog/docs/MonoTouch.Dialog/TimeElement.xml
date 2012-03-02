@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class TimeElement : MonoTouch.Dialog.DateTimeElement" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit TimeElement extends MonoTouch.Dialog.DateTimeElement" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -11,7 +11,8 @@
   <Interfaces />
   <Docs>
     <summary>An element that can be used to edit times</summary>
-    <remarks></remarks>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -45,8 +46,10 @@
       <Parameters />
       <Docs>
         <summary>Creates the UIDatePicker, this method can be overwritten to customize the UIDatePicker used.</summary>
-        <returns></returns>
-        <remarks></remarks>
+        <returns>
+        </returns>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="FormatDate">
@@ -65,7 +68,8 @@
       <Docs>
         <param name="dt">The date time to format.</param>
         <summary>Formats the date, the return is used as the Value for the cell rendering.</summary>
-        <returns></returns>
+        <returns>
+        </returns>
         <remarks>You can override this to alter the rendering of the date.</remarks>
       </Docs>
     </Member>
