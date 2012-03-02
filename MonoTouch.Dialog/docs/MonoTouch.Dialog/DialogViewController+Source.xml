@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class DialogViewController.Source : MonoTouch.UIKit.UITableViewSource" />
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi beforefieldinit DialogViewController/Source extends MonoTouch.UIKit.UITableViewSource" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

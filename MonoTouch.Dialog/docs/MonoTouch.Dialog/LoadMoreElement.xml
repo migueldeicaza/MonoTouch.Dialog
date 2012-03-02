@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class LoadMoreElement : MonoTouch.Dialog.Element, MonoTouch.Dialog.IElementSizing" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit LoadMoreElement extends MonoTouch.Dialog.Element implements class MonoTouch.Dialog.IElementSizing" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -174,7 +174,8 @@
             customize the style or contents of the cell you must also override the CellKey
             property in your derived class.
             </summary>
-        <returns></returns>
+        <returns>
+        </returns>
         <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
@@ -275,7 +276,8 @@
         <summary>
             Invoked when the given element has been selected by the user.
             </summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Tapped">

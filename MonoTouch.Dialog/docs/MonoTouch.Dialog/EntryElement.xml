@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class EntryElement : MonoTouch.Dialog.Element" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit EntryElement extends MonoTouch.Dialog.Element" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
@@ -91,8 +91,10 @@
       </ReturnValue>
       <Docs>
         <summary>Configuration to set the entry's auto capitalization mode.</summary>
-        <value></value>
-        <remarks></remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="AutocorrectionType">
@@ -107,8 +109,10 @@
       </ReturnValue>
       <Docs>
         <summary>Configuration to set the entry's auto correction type.</summary>
-        <value></value>
-        <remarks></remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="BecomeFirstResponder">
@@ -131,7 +135,8 @@
         <summary>
             Makes this cell the first responder (get the focus)
             </summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CellKey">
@@ -151,8 +156,7 @@
         <value>Unique NSString value, typically the underlying value is allocated as a static variable.</value>
         <remarks>
             This method should return the key passed to UITableView.DequeueReusableCell.
-            If your code overrides the <see
-        cref="MonoTouch.Dialog.Element.GetCell(MonoTouch.UIKit.UITableView"/> method to change the cell, you must also
+            If your code overrides the <see cref="MonoTouch.Dialog.Element.GetCell(MonoTouch.UIKit.UITableView" /> method to change the cell, you must also
             override this method and return a unique key for it.
             This works in most subclasses with a couple of exceptions: StringElement and
             various derived classes do not use this setting as they need a wider range
@@ -173,7 +177,8 @@
       </ReturnValue>
       <Docs>
         <summary>Event raised when the contents of the Entry have changed.n</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CreateTextField">
@@ -192,7 +197,8 @@
       <Docs>
         <param name="frame">Bounds for the entry to create</param>
         <summary>Creates the UITextField used for data entry.</summary>
-        <returns></returns>
+        <returns>
+        </returns>
         <remarks>You can use this method in a subclass to customize the entry.</remarks>
       </Docs>
     </Member>
@@ -224,6 +230,22 @@
       </AssemblyInfo>
       <ReturnValue>
         <ReturnType>MonoTouch.Foundation.NSString</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="EntryStarted">
+      <MemberSignature Language="C#" Value="public EventHandler EntryStarted { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class System.EventHandler EntryStarted" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.EventHandler</ReturnType>
       </ReturnValue>
       <Docs>
         <summary>To be added.</summary>
@@ -267,9 +289,10 @@
             customize the style or contents of the cell you must also override the CellKey
             property in your derived class.
             </summary>
-        <returns></returns>
+        <returns>
+        </returns>
         <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
-`      </Docs>
+      </Docs>
     </Member>
     <Member MemberName="KeyboardType">
       <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UIKeyboardType KeyboardType { get; set; }" />
@@ -287,8 +310,10 @@
             this to use this for numeric input, email addressed,
             urls, phones.
             </summary>
-        <value></value>
-        <remarks></remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Matches">
@@ -306,12 +331,12 @@
       </Parameters>
       <Docs>
         <param name="text">Text that the user is looking for</param>
+        <param name="text">To be added.</param>
         <summary>
             Method invoked to determine if the cell matches the given text, never invoked with a null value or an empty string.
             </summary>
         <returns>True if the element contains the text, false otherwise.</returns>
         <remarks>This method should return true if the user would find the text represented by this cell.  This could perform a search on the visible elements of the cell, or some components of the cell that are not visible.</remarks>
-        <param name="text">To be added.</param>
       </Docs>
     </Member>
     <Member MemberName="ResignFirstResponder">
@@ -371,13 +396,15 @@
         <param name="tableView">
             The <see cref="T:MonoTouch.UIKit.UITableView" /> that contains the element.
             </param>
+        <param name="indexPath">To be added.</param>
         <param name="path">
             The <see cref="T:MonoTouch.Foundation.NSIndexPath" /> that contains the Section and Row for the element.
             </param>
         <summary>
             Invoked when the given element has been selected by the user.
             </summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="ShouldReturn">

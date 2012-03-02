@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class DialogViewController.SizingSource : MonoTouch.Dialog.DialogViewController.Source" />
   <TypeSignature Language="ILAsm" Value=".class nested public auto ansi beforefieldinit DialogViewController/SizingSource extends MonoTouch.Dialog.DialogViewController/Source" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

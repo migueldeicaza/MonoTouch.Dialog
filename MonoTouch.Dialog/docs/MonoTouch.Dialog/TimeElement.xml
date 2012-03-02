@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class TimeElement : MonoTouch.Dialog.DateTimeElement" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit TimeElement extends MonoTouch.Dialog.DateTimeElement" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

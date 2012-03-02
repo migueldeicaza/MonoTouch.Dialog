@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public interface IElementSizing" />
   <TypeSignature Language="ILAsm" Value=".class public interface auto ansi abstract IElementSizing" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Interfaces />

@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class ActivityElement : MonoTouch.Dialog.UIViewElement" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit ActivityElement extends MonoTouch.Dialog.UIViewElement implements class MonoTouch.Dialog.IElementSizing" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

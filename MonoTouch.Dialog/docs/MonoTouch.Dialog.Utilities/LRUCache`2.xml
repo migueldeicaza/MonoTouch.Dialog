@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class LRUCache&lt;TKey,TValue&gt; where TValue : class, IDisposable" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit LRUCache`2&lt;TKey, class (class System.IDisposable) TValue&gt; extends System.Object" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <TypeParameters>

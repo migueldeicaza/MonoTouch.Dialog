@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public enum RefreshViewStatus" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi sealed RefreshViewStatus extends System.Enum" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>

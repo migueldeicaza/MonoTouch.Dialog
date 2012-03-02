@@ -2,7 +2,7 @@
   <TypeSignature Language="C#" Value="public class ImageLoader" />
   <TypeSignature Language="ILAsm" Value=".class public auto ansi ImageLoader extends System.Object" />
   <AssemblyInfo>
-    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
   </AssemblyInfo>
   <Base>
