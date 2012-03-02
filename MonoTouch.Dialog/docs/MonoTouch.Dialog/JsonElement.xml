@@ -153,7 +153,7 @@ See the README.markdown included with MonoTouch.Dialog for details on the markup
       <Docs>
         <param name="file">Path to the file containing the Json Data.</param>
         <summary>Creates a RootElement with its nested content from the contents of the Json file at the specified path.</summary>
-        <remarks>
+        <remarks></remarks>
         <returns>An instance of the JsonElement or null if the file does not exist, or the contents of the Json file can not be parsed.</returns>
       </Docs>
     </Member>
