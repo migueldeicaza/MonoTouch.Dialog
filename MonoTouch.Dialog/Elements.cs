@@ -1605,7 +1605,7 @@ namespace MonoTouch.Dialog
 		/// <param name="animated">
 		/// Whether scrolling to the location of this cell should be animated
 		/// </param>
-		public void BecomeFirstResponder (bool animated)
+		public virtual void BecomeFirstResponder (bool animated)
 		{
 			becomeResponder = true;
 			var tv = GetContainerTableView ();
@@ -1618,7 +1618,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		public void ResignFirstResponder (bool animated)
+		public virtual void ResignFirstResponder (bool animated)
 		{
 			becomeResponder = false;
 			var tv = GetContainerTableView ();
