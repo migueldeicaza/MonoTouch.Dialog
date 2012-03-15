@@ -2,23 +2,59 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
 {
-	public class PickerElement : StyledStringElement
+	internal class PickerElement : Element
 	{
 		private bool becomeResponder;
-		private UILabel replacementLabel;
+		private UIPickerLabel replacementLabel;
 		private IEnumerable<String> datasource;
+		private string val;
 		
 		private static readonly UIFont defaultFont = UIFont.FromName("Helvetica", 16);
+		private static readonly UIColor defaultColor = UIColor.FromRGB(56, 84, 135);
 		private static readonly NSString cellkey = new NSString("PickerCell");
 		
-		public PickerElement(string caption, string value, IEnumerable<string> datasource) : base(caption, value)
+		public PickerElement(string caption, string value, IEnumerable<string> datasource, MemberInfo mi) : base(caption)
 		{
+			Value = value;
 			this.datasource = datasource;
+			this.mi = mi;
+		}
+		
+		public MemberInfo mi;
+		
+		/// <summary>
+		///   The value of the EntryElement
+		/// </summary>
+		public string Value 
+		{ 
+			get {
+				return val;
+			}
+			set {
+				val = value;
+				if (replacementLabel != null)
+				{	
+					replacementLabel.Text = value;
+					UpdatePickerSelectedIndex();
+				}
+			}
+		}
+		
+		public int FetchSelectedIndex()
+		{
+			int selectedIdx = datasource.Select((a, i) => (a.Equals(Value)) ? i : -1).Max();
+			return selectedIdx;
+		}
+		
+		public override string Summary()
+		{
+			return Value;
 		}
 		
 		protected override NSString CellKey
@@ -29,20 +65,18 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		protected virtual UILabel CreateReplacementLabel(RectangleF frame)
+		protected virtual UIPickerLabel CreateReplacementLabel(RectangleF frame)
 		{
-			int selectedIdx = datasource.Select((a, i) => (a.Equals(Value)) ? i : -1).Max();
-			
-			var label = new UIPickerLabel(frame, CreatePicker(), selectedIdx)
+			var label = new UIPickerLabel(frame, CreatePicker())
 			       	{
 						BackgroundColor = UIColor.Clear,
 			       		AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
 			       		Text = Value ?? String.Empty,
 			       		Tag = 1,
-						Font = SubtitleFont ?? defaultFont,
+						Font =  defaultFont,
 						AdjustsFontSizeToFitWidth = true,
 						TextAlignment = UITextAlignment.Right,
-						TextColor = DetailColor ?? UIColor.FromRGB(56, 84, 135),
+						TextColor = defaultColor,
 			       	};
 			
 			return label;
@@ -59,8 +93,6 @@ namespace MonoTouch.Dialog
 			else
 				RemoveTag(cell, 1);
 			
-			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
-			
 			if (replacementLabel == null)
 			{
 				SizeF size = this.ComputeEntryPosition(tv, cell);
@@ -68,6 +100,7 @@ namespace MonoTouch.Dialog
 				float width = cell.ContentView.Bounds.Width - size.Width;
 				
 				replacementLabel = CreateReplacementLabel(new RectangleF(size.Width + 5, yOffset, width - 10, size.Height));
+				UpdatePickerSelectedIndex();
 			}
 			
 			if (becomeResponder)
@@ -76,6 +109,7 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 			}
 			
+			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			cell.TextLabel.Text = Caption;
 			cell.ContentView.AddSubview(replacementLabel);
 			
@@ -109,6 +143,11 @@ namespace MonoTouch.Dialog
 			return picker;
 		}
 		
+		private void UpdatePickerSelectedIndex(){
+			int selectedIdx = datasource.Select((a, i) => (a.Equals(Value)) ? i : -1).Max();
+			replacementLabel.SetPickerIndex(selectedIdx);
+		}
+		
 		private SizeF ComputeEntryPosition(UITableView tv, UITableViewCell cell)
 		{
 			var s = this.Parent as Section;
@@ -140,7 +179,7 @@ namespace MonoTouch.Dialog
 			replacementLabel.Text = Value = newValue;
 		}
 		
-		private class PickerModel: UIPickerViewModel 
+		public class PickerModel: UIPickerViewModel 
 		{
 			IEnumerable<string> datasource;
 			Action<string> callback;
@@ -172,15 +211,14 @@ namespace MonoTouch.Dialog
             }
 		}
 		
-		private class UIPickerLabel: UILabel 
+		public class UIPickerLabel: UILabel 
 		{
 			UIPickerView inputView;
-			int selectedIdx;
 			UIToolbar inputAccessoryView;
+			int selectedIdx;
 			
-			public UIPickerLabel (RectangleF frame, UIPickerView picker, int selectedIdx): base(frame)
+			public UIPickerLabel (RectangleF frame, UIPickerView picker): base(frame)
 			{
-				this.selectedIdx = selectedIdx;
 				this.inputView = picker;
 				UserInteractionEnabled = true;
 				
@@ -192,7 +230,11 @@ namespace MonoTouch.Dialog
 					})
 				};
 			}
-
+			
+			public void SetPickerIndex(int selectedIdx){
+				this.selectedIdx = selectedIdx;
+			}
+			
 			public override void TouchesEnded (NSSet touches, UIEvent evt)
 			{
 				inputView.Select(selectedIdx, 0, false);

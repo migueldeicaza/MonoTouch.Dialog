@@ -359,9 +359,11 @@ namespace MonoTouch.Dialog
 					
 					var datasource = (System.Collections.Generic.IEnumerable<string>)GetValue(mi, o);
 					var selected = (int) GetValue(last_radio_index, o);
+					
 					if (selected >= datasource.Count() || selected < 0)
 						selected = 0;
-					element = new PickerElement(caption, datasource.ElementAt(selected),  datasource);
+					
+					element = new PickerElement(caption, datasource.ElementAt(selected), datasource, last_radio_index);
 					
 					last_radio_index = null;
 				} else if (typeof (System.Collections.IEnumerable).IsAssignableFrom (mType)){
@@ -446,6 +448,9 @@ namespace MonoTouch.Dialog
 					var entry = (EntryElement) element;
 					entry.FetchValue ();
 					SetValue (mi, obj, entry.Value);
+				} else if (element is PickerElement){
+					var entry = (PickerElement) element;
+					SetValue (entry.mi, obj, entry.FetchSelectedIndex());
 				} else if (element is ImageElement)
 					SetValue (mi, obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
