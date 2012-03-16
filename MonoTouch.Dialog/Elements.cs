@@ -1525,6 +1525,10 @@ namespace MonoTouch.Dialog
 				entry.Started += delegate {
 					EntryElement self = null;
 					
+					if (EntryStarted != null) {
+						EntryStarted(this, null);
+					}
+					
 					if (!returnKeyType.HasValue) {
 						var returnType = UIReturnKeyType.Default;
 						
@@ -1537,12 +1541,8 @@ namespace MonoTouch.Dialog
 						entry.ReturnKeyType = returnType;
 					} else
 						entry.ReturnKeyType = returnKeyType.Value;
-
-					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 					
-					if (EntryStarted != null) {
-						EntryStarted(this, null);
-					}
+					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
 			}
 			if (becomeResponder){
