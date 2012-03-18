@@ -1377,6 +1377,7 @@ namespace MonoTouch.Dialog
 		public event EventHandler Changed;
 		public event Func<bool> ShouldReturn;
 		public EventHandler EntryStarted {get;set;}
+		public EventHandler EntryEnded {get;set;}
 		/// <summary>
 		/// Constructs an EntryElement with the given caption, placeholder and initial value.
 		/// </summary>
@@ -1487,8 +1488,11 @@ namespace MonoTouch.Dialog
 				entry.ValueChanged += delegate {
 					FetchValue ();
 				};
-				entry.Ended += delegate {
+				entry.Ended += delegate {					
 					FetchValue ();
+					if (EntryEnded != null) {
+						EntryEnded(this, null);
+					}
 				};
 				entry.ShouldReturn += delegate {
 					
