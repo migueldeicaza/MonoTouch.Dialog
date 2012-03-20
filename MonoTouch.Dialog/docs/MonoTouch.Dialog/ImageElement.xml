@@ -10,8 +10,8 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>Element to pick images from the local photo library.</summary>
+    <remarks></remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -25,9 +25,9 @@
         <Parameter Name="image" Type="MonoTouch.UIKit.UIImage" />
       </Parameters>
       <Docs>
-        <param name="image">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="image">Image that represents the current selection.</param>
+        <summary>Creates an instance of the image selector element.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="CellKey">
@@ -143,8 +143,8 @@
         <ReturnType>MonoTouch.UIKit.UIImage</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>The current UIImage selected</summary>
+        <remarks>If the user picked a new image, this property will have the user's new selection.</remarks>
       </Docs>
     </Member>
   </Members>
