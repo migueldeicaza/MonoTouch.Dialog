@@ -342,9 +342,9 @@ namespace MonoTouch.Dialog
 			const int ImageSpace = 32;
 			const int Padding = 8;
 	
-			public TextWithImageCellView (BaseBooleanImageElement parent) : base (UITableViewCellStyle.Value1, parent.CellKey)
+			public TextWithImageCellView (BaseBooleanImageElement parent_) : base (UITableViewCellStyle.Value1, parent_.CellKey)
 			{
-				this.parent = parent;
+				parent = parent_;
 				label = new UILabel () {
 					TextAlignment = UITextAlignment.Left,
 					Text = parent.Caption,
