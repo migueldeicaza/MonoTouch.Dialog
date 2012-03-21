@@ -1364,11 +1364,23 @@ namespace MonoTouch.Dialog
 					this.autocorrectionType = value;
 			}
 		}
+		
+		public UITextFieldViewMode ClearButtonMode { 
+			get { 
+				return clearButtonMode;
+			}
+			set { 
+				clearButtonMode = value;
+				if (entry != null)
+					entry.ClearButtonMode = value;
+			}
+		}
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
+		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
 		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
@@ -1457,7 +1469,8 @@ namespace MonoTouch.Dialog
 				Placeholder = placeholder ?? "",
 				SecureTextEntry = isPassword,
 				Text = Value ?? "",
-				Tag = 1
+				Tag = 1,
+				ClearButtonMode = ClearButtonMode
 			};
 		}
 		
