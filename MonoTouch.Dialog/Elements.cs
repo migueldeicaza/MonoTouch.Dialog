@@ -1487,6 +1487,9 @@ namespace MonoTouch.Dialog
 				entry.ValueChanged += delegate {
 					FetchValue ();
 				};
+				entry.EditingChanged += delegate {
+					FetchValue ();
+				};
 				entry.Ended += delegate {
 					FetchValue ();
 				};
