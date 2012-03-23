@@ -10,7 +10,9 @@
 // MIT X11 license
 //
 using System;
+using System.Reflection;
 using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
 using System.Drawing;
 using System.Collections.Generic;
 using MonoTouch.Foundation;
@@ -90,18 +92,59 @@ namespace MonoTouch.Dialog
 		public bool AutoHideSearch { get; set; }
 		
 		public string SearchPlaceholder { get; set; }
+		
+		// If set, we automatically hide the keyboard after the user scrolls the table.
+		// Also hides the keybaord when the keyboard's "search" button is tapped.
+		public bool AutoHideSearchKeyboard { get; set; }		
+		
+		/// <summary>
+		/// Hides the search keyboard.
+		/// </summary>
+		public void HideSearchKeyboard ()
+		{
+			searchBar.ResignFirstResponder ();
 			
+			if (!String.IsNullOrEmpty(searchBar.Text))
+				EnableSearchCancelButton ();
+		}
+		
+		public void EnableSearchCancelButton ()
+		{
+			foreach (UIView subview in searchBar.Subviews) {
+				if (subview is UIButton) {
+					((UIButton)subview).Enabled = true;
+					return;
+				}
+			}
+		}
+		
 		/// <summary>
 		/// Invoke this method to trigger a data refresh.   
 		/// </summary>
 		/// <remarks>
-		/// This will invoke the RerfeshRequested event handler, the code attached to it
+		/// This will invoke the RefreshRequested event handler, the code attached to it
 		/// should start the background operation to fetch the data and when it completes
 		/// it should call ReloadComplete to restore the control state.
 		/// </remarks>
 		public void TriggerRefresh ()
 		{
 			TriggerRefresh (false);
+		}
+		
+		/// <summary>
+		/// Invoke this method to trigger a data refresh that shows the pull-to-refresh
+		/// status display.
+		/// </summary>
+		/// <remarks>
+		/// This will invoke the RefreshRequested event handler, the code attached to it
+		/// should start the background operation to fetch the data and when it completes
+		/// it should call ReloadComplete to restore the control state.
+		/// </remarks>
+		public void TriggerRefreshSimulatePulldown()
+		{
+			ConfigureTableView ();
+			
+			TriggerRefresh (true);
 		}
 		
 		void TriggerRefresh (bool showStatus)
@@ -233,7 +276,8 @@ namespace MonoTouch.Dialog
 						if (newSection == null){
 							newSection = new Section (section.Header, section.Footer){
 								FooterView = section.FooterView,
-								HeaderView = section.HeaderView
+								HeaderView = section.HeaderView,
+								Caption = section.Caption
 							};
 							newSections.Add (newSection);
 						}
@@ -267,8 +311,10 @@ namespace MonoTouch.Dialog
 			
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
-				searchBar.ShowsCancelButton = false;
-				container.FinishSearch ();
+				if (String.IsNullOrEmpty(searchBar.Text)) {
+					searchBar.ShowsCancelButton = false;
+					container.FinishSearch ();
+				}
 			}
 			
 			public override void TextChanged (UISearchBar searchBar, string searchText)
@@ -278,7 +324,14 @@ namespace MonoTouch.Dialog
 			
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
+				searchBar.Text = "";
 				searchBar.ShowsCancelButton = false;
+				
+				if (container.AutoHideSearch && container.EnableSearch) {
+					if (container.TableView.ContentOffset.Y < 44)
+						container.TableView.ContentOffset = new PointF (0, 44);
+				}
+				
 				container.FinishSearch ();
 				searchBar.ResignFirstResponder ();
 			}
@@ -286,9 +339,15 @@ namespace MonoTouch.Dialog
 			public override void SearchButtonClicked (UISearchBar searchBar)
 			{
 				container.SearchButtonClicked (searchBar.Text);
+				
+				if (container.AutoHideSearchKeyboard)
+					searchBar.ResignFirstResponder ();
+				
+				if (!String.IsNullOrEmpty(searchBar.Text))
+					container.EnableSearchCancelButton ();
 			}
 		}
-		
+				
 		public class Source : UITableViewSource {
 			const float yboundary = 65;
 			protected DialogViewController Container;
@@ -395,6 +454,10 @@ namespace MonoTouch.Dialog
 			#region Pull to Refresh support
 			public override void Scrolled (UIScrollView scrollView)
 			{
+				if (Container.EnableSearch && Container.AutoHideSearchKeyboard){
+					Container.HideSearchKeyboard ();
+				}				
+				
 				if (!checkForRefresh)
 					return;
 				if (Container.reloading)
@@ -489,17 +552,95 @@ namespace MonoTouch.Dialog
 
 		void SetupSearch ()
 		{
-			if (enableSearch){
+			if (enableSearch) {
+				// Wrap search bar in UIView to allow searchbar resizing (to make space for an index)
+				var searchBarWrapper = new SearchBarBackgroundView(new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+					AutosizesSubviews = true
+				};
+				
 				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
 				};
+				
+				// Determine if index titles will be displayed and adjust search width appropriately
+				SetSearchSize ();
+				
+				// Make the search bar background transparent (wrapper UIView has the gradient background)
+				searchBar.BackgroundColor = UIColor.Clear;
+				searchBar.Subviews[0].RemoveFromSuperview();
+				
 				if (SearchPlaceholder != null)
 					searchBar.Placeholder = this.SearchPlaceholder;
-				tableView.TableHeaderView = searchBar;					
+				
+				searchBarWrapper.AddSubview (searchBar);
+				tableView.TableHeaderView = searchBarWrapper;
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
 			}
+		}
+		
+		public class SearchBarBackgroundView : UIView {
+		
+			static CGGradient gradient;
+			
+			public SearchBarBackgroundView (RectangleF frame) : base (frame)
+			{
+				using (var colorspace = CGColorSpace.CreateDeviceRGB ()){
+					gradient = new CGGradient (
+						colorspace, 
+						new float [] { 
+							.839f, .866f, .886f, 1.0f,
+							.776f, .811f, .831f, 1.0f,
+							.701f, .745f, .772f, 1.0f },
+						new float [] { 0f, 0.5f, 1.0f });
+				}
+			}
+			
+			public override void Draw (RectangleF rect)
+			{
+				var ctx = UIGraphics.GetCurrentContext ();
+				ctx.DrawLinearGradient (gradient, new PointF (0, 0), new PointF (0, rect.Height), 0);
+			}
+		}
+		
+		bool UsingIndexedTitles ()
+		{
+			// Determine if index titles have been provided. This is done by:
+			// 	- checking if the SectionIndexTitles() method is overridden in the tableView's source 
+			//	  instance using reflection (if not there will be no titles)
+			//  - calling the inherited implementation's SectionIndexTitles() method to determine if 
+			//	  any indexes titles are returned
+			
+			// This method of determining if indexed titles are displayed is likely not optimal as it depends 
+			// on an implementation detail; the base SectionIndexTitles() method to be implementated
+			// in UITableViewSource.
+			
+			MethodInfo m = tableView.Source.GetType().GetMethod("SectionIndexTitles", BindingFlags.Instance | BindingFlags.Public);
+			
+			if (!m.DeclaringType.Name.Equals(typeof(UITableViewSource).Name)) {
+				if (tableView.Source.SectionIndexTitles(tableView).Length > 0) {
+					return true;
+				}
+			}
+						
+			return false;
+		}
+		
+		void SetSearchSize ()
+		{
+			const int padRight = 29;
+				
+			if (searchBar == null)
+				return;
+			
+			// Determine if index titles will be displayed and adjust search width appropriately
+			float searchWidth = tableView.Bounds.Width;
+			if (UsingIndexedTitles ())
+				searchWidth = searchWidth - padRight;
+			
+			searchBar.Frame = new RectangleF (0, 0, searchWidth, 44);
+			searchBar.SetNeedsLayout ();
 		}
 		
 		public virtual void Deselected (NSIndexPath indexPath)
@@ -514,7 +655,10 @@ namespace MonoTouch.Dialog
 		{
 			var section = root.Sections [indexPath.Section];
 			var element = section.Elements [indexPath.Row];
-
+			
+			if (EnableSearch && AutoHideSearchKeyboard)
+				HideSearchKeyboard ();
+			
 			element.Selected (this, tableView, indexPath);
 		}
 		
@@ -597,6 +741,9 @@ namespace MonoTouch.Dialog
 			
 			TableSource = CreateSizingSource (root.UnevenRows);
 			tableView.Source = TableSource;
+			
+			if (enableSearch)
+				SetSearchSize ();
 		}
 
 		public void ReloadData ()
