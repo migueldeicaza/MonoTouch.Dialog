@@ -906,17 +906,30 @@ namespace MonoTouch.Dialog
 
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF maxSize = new SizeF (tableView.Bounds.Width-40, float.MaxValue);
+			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
+			SizeF maxSize = new SizeF (tableView.Bounds.Width - margin, float.MaxValue);
 			
 			if (this.Accessory != UITableViewCellAccessory.None)
 				maxSize.Width -= 20;
 			
+			string c = Caption;
+			string v = Value;
+			// ensure the (multi-line) Value will be rendered inside the cell when no Caption is present
+			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (v))
+				c = " ";
+
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
-			float height = tableView.StringSize (Caption, captionFont, maxSize, LineBreakMode).Height;
+			float height = tableView.StringSize (c, captionFont, maxSize, LineBreakMode).Height;
 			
-			if ((this.style == UITableViewCellStyle.Subtitle) && !String.IsNullOrEmpty (Value)) {
+			if (!String.IsNullOrEmpty (v)) {
 				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
-				height += tableView.StringSize (Value, subtitleFont, maxSize, LineBreakMode).Height;
+				if (this.style == UITableViewCellStyle.Subtitle) {
+					height += tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
+				} else {
+					float vheight = tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
+					if (vheight > height)
+						height = vheight;
+				}
 			}
 			
 			return height + 10;
@@ -1017,9 +1030,14 @@ namespace MonoTouch.Dialog
 		
 		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF size = new SizeF (280, float.MaxValue);
-			using (var font = UIFont.FromName ("Helvetica", 17f))
-				return tableView.StringSize (Caption, font, size, UILineBreakMode.WordWrap).Height + 10;
+			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
+			SizeF size = new SizeF (tableView.Bounds.Width - margin, float.MaxValue);
+			UIFont font = UIFont.BoldSystemFontOfSize (17);
+			string c = Caption;
+			// ensure the (single-line) Value will be rendered inside the cell
+			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (Value))
+				c = " ";
+			return tableView.StringSize (c, font, size, UILineBreakMode.WordWrap).Height + 10;
 		}
 	}
 	
