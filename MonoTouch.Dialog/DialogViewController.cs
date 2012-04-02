@@ -13,6 +13,7 @@ using System;
 using System.Reflection;
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
+using MonoTouch.CoreAnimation;
 using System.Drawing;
 using System.Collections.Generic;
 using MonoTouch.Foundation;
@@ -553,54 +554,38 @@ namespace MonoTouch.Dialog
 		void SetupSearch ()
 		{
 			if (enableSearch) {
-				// Wrap search bar in UIView to allow searchbar resizing (to make space for an index)
-				var searchBarWrapper = new SearchBarBackgroundView(new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
-					AutosizesSubviews = true
+				// Wrap search bar in UIView to allow resizing (to make space for the index)
+				var searchBarWrapper = new UIView(new RectangleF (0, 0, tableView.Bounds.Width, 44));
+				var gradient = new CAGradientLayer() {
+					Frame = searchBarWrapper.Bounds,
+					Colors = new CGColor[] {
+						UIColor.FromRGB(214, 221, 226).CGColor, 
+						UIColor.FromRGB(198, 207, 212).CGColor, 
+						UIColor.FromRGB(179, 190, 197).CGColor}
 				};
-				
-				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
-					Delegate = new SearchDelegate (this)
-				};
+				searchBarWrapper.Layer.InsertSublayer(gradient, 0);
 				
 				// Determine if index titles will be displayed and adjust search width appropriately
-				SetSearchSize ();
+				float searchWidth = tableView.Bounds.Width;
+				if (UsingIndexedTitles ())
+					searchWidth -= 29;
+				
+				searchBar = new UISearchBar (new RectangleF (0, 0, searchWidth, 44)) {
+					Delegate = new SearchDelegate (this)
+				};
 				
 				// Make the search bar background transparent (wrapper UIView has the gradient background)
 				searchBar.BackgroundColor = UIColor.Clear;
 				searchBar.Subviews[0].RemoveFromSuperview();
 				
+				searchBarWrapper.AddSubview (searchBar);
+				
 				if (SearchPlaceholder != null)
 					searchBar.Placeholder = this.SearchPlaceholder;
-				
-				searchBarWrapper.AddSubview (searchBar);
-				tableView.TableHeaderView = searchBarWrapper;
+				tableView.TableHeaderView = searchBarWrapper;					
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
-			}
-		}
-		
-		public class SearchBarBackgroundView : UIView {
-		
-			static CGGradient gradient;
-			
-			public SearchBarBackgroundView (RectangleF frame) : base (frame)
-			{
-				using (var colorspace = CGColorSpace.CreateDeviceRGB ()){
-					gradient = new CGGradient (
-						colorspace, 
-						new float [] { 
-							.839f, .866f, .886f, 1.0f,
-							.776f, .811f, .831f, 1.0f,
-							.701f, .745f, .772f, 1.0f },
-						new float [] { 0f, 0.5f, 1.0f });
-				}
-			}
-			
-			public override void Draw (RectangleF rect)
-			{
-				var ctx = UIGraphics.GetCurrentContext ();
-				ctx.DrawLinearGradient (gradient, new PointF (0, 0), new PointF (0, rect.Height), 0);
 			}
 		}
 		
@@ -627,22 +612,6 @@ namespace MonoTouch.Dialog
 			return false;
 		}
 		
-		void SetSearchSize ()
-		{
-			const int padRight = 29;
-				
-			if (searchBar == null)
-				return;
-			
-			// Determine if index titles will be displayed and adjust search width appropriately
-			float searchWidth = tableView.Bounds.Width;
-			if (UsingIndexedTitles ())
-				searchWidth = searchWidth - padRight;
-			
-			searchBar.Frame = new RectangleF (0, 0, searchWidth, 44);
-			searchBar.SetNeedsLayout ();
-		}
-		
 		public virtual void Deselected (NSIndexPath indexPath)
 		{
 			var section = root.Sections [indexPath.Section];
@@ -655,10 +624,7 @@ namespace MonoTouch.Dialog
 		{
 			var section = root.Sections [indexPath.Section];
 			var element = section.Elements [indexPath.Row];
-			
-			if (EnableSearch && AutoHideSearchKeyboard)
-				HideSearchKeyboard ();
-			
+
 			element.Selected (this, tableView, indexPath);
 		}
 		
@@ -741,9 +707,6 @@ namespace MonoTouch.Dialog
 			
 			TableSource = CreateSizingSource (root.UnevenRows);
 			tableView.Source = TableSource;
-			
-			if (enableSearch)
-				SetSearchSize ();
 		}
 
 		public void ReloadData ()
