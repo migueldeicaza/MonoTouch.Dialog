@@ -305,14 +305,14 @@ namespace MonoTouch.Dialog
 			
 			public override void OnEditingStarted (UISearchBar searchBar)
 			{
-				searchBar.SetShowsCancelButton(true, true);
+				searchBar.ShowsCancelButton = true;
 				container.StartSearch ();
 			}
 			
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
 				if (String.IsNullOrEmpty(searchBar.Text)) {
-					searchBar.SetShowsCancelButton(false, true);
+					searchBar.ShowsCancelButton = false;
 					container.FinishSearch ();
 				}
 			}
@@ -325,16 +325,11 @@ namespace MonoTouch.Dialog
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
 				searchBar.Text = "";
+				searchBar.ShowsCancelButton = false;
 				
 				if (container.AutoHideSearch && container.EnableSearch) {
-					
-					searchBar.SetShowsCancelButton(false, false);
-
 					if (container.TableView.ContentOffset.Y < 44)
 						container.TableView.ContentOffset = new PointF (0, 44);
-					
-				} else {
-					searchBar.SetShowsCancelButton(false, true);	
 				}
 				
 				container.FinishSearch ();
