@@ -621,14 +621,11 @@ namespace MonoTouch.Dialog
 			// on an implementation detail; the base SectionIndexTitles() method to be implementated
 			// in UITableViewSource.
 			
-			if(tableView.Source != null)
-			{
-				MethodInfo m = tableView.Source.GetType().GetMethod("SectionIndexTitles", BindingFlags.Instance | BindingFlags.Public);
+			MethodInfo m = tableView.Source.GetType().GetMethod("SectionIndexTitles", BindingFlags.Instance | BindingFlags.Public);
 			
-				if (!m.DeclaringType.Name.Equals(typeof(UITableViewSource).Name)) {
-					if (tableView.Source.SectionIndexTitles(tableView).Length > 0) {
-						return true;
-					}
+			if (!m.DeclaringType.Name.Equals(typeof(UITableViewSource).Name)) {
+				if (tableView.Source.SectionIndexTitles(tableView).Length > 0) {
+					return true;
 				}
 			}
 						
