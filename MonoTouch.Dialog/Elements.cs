@@ -493,6 +493,8 @@ namespace MonoTouch.Dialog
 				slider.ValueChanged += delegate {
 					Value = slider.Value;
 				};
+			} else {
+				slider.Value = Value;
 			}
 			
 			cell.ContentView.AddSubview (slider);
