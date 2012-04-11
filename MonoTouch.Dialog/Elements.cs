@@ -829,8 +829,7 @@ namespace MonoTouch.Dialog
 				cell.DetailTextLabel.Text = Value == null ? "" : Value;
 			
 			if (extraInfo == null){
-				cell.ContentView.BackgroundColor = null;
-				tl.BackgroundColor = null;
+				ClearBackground (cell);
 			} else {
 				var imgView = cell.ImageView;
 				UIImage img;
