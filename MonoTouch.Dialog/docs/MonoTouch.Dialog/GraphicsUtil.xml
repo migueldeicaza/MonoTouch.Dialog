@@ -10,8 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>Graphics utilities used by MonoTouch.Dialog elements</summary>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName="FillRoundedRect">
@@ -33,7 +34,7 @@
         <param name="ctx">To be added.</param>
         <param name="rect">To be added.</param>
         <param name="radius">To be added.</param>
-        <summary>To be added.</summary>
+        <summary>Renders a rounded rectangle with the specified radius on the given context.</summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -54,7 +55,7 @@
       <Docs>
         <param name="size">To be added.</param>
         <param name="radius">To be added.</param>
-        <summary>To be added.</summary>
+        <summary>Creates a rounded path for a square of the specified size with the specified radius.</summary>
         <returns>To be added.</returns>
         <remarks>To be added.</remarks>
       </Docs>

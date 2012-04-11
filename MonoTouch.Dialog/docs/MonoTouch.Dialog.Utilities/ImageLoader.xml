@@ -132,7 +132,8 @@
         <summary>
             Purges the contents of the DefaultLoader
             </summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="PurgeCache">
@@ -151,7 +152,8 @@
             Purges the cache of this instance of the ImageLoader, releasing
             all the memory used by the images in the caches.
             </summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="RequestImage">
@@ -181,7 +183,8 @@
         <returns>
             If the image has already been downloaded, or is in the cache, this will return the image as a UIImage.
             </returns>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

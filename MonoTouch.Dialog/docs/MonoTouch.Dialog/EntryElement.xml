@@ -79,6 +79,42 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="AutocapitalizationType">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UITextAutocapitalizationType AutocapitalizationType { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype MonoTouch.UIKit.UITextAutocapitalizationType AutocapitalizationType" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITextAutocapitalizationType</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Configuration to set the entry's auto capitalization mode.</summary>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AutocorrectionType">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UITextAutocorrectionType AutocorrectionType { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype MonoTouch.UIKit.UITextAutocorrectionType AutocorrectionType" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITextAutocorrectionType</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Configuration to set the entry's auto correction type.</summary>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
+      </Docs>
+    </Member>
     <Member MemberName="BecomeFirstResponder">
       <MemberSignature Language="C#" Value="public void BecomeFirstResponder (bool animated);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void BecomeFirstResponder(bool animated) cil managed" />
@@ -99,7 +135,8 @@
         <summary>
             Makes this cell the first responder (get the focus)
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CellKey">
@@ -113,9 +150,19 @@
         <ReturnType>MonoTouch.Foundation.NSString</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <summary>
+            Subclasses that override the GetCell method should override this method as well
+            </summary>
+        <value>Unique NSString value, typically the underlying value is allocated as a static variable.</value>
+        <remarks>
+            This method should return the key passed to UITableView.DequeueReusableCell.
+            If your code overrides the <see cref="MonoTouch.Dialog.Element.GetCell(MonoTouch.UIKit.UITableView" /> method to change the cell, you must also
+            override this method and return a unique key for it.
+            This works in most subclasses with a couple of exceptions: StringElement and
+            various derived classes do not use this setting as they need a wider range
+            of keys for different uses, so you need to look at the source code for those
+            if you are trying to override StringElement or StyledStringElement.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Changed">
@@ -129,8 +176,9 @@
         <ReturnType>System.EventHandler</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Event raised when the contents of the Entry have changed.n</summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CreateTextField">
@@ -147,10 +195,11 @@
         <Parameter Name="frame" Type="System.Drawing.RectangleF" />
       </Parameters>
       <Docs>
-        <param name="frame">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="frame">Bounds for the entry to create</param>
+        <summary>Creates the UITextField used for data entry.</summary>
+        <returns>
+        </returns>
+        <remarks>You can use this method in a subclass to customize the entry.</remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -169,6 +218,38 @@
       <Docs>
         <param name="disposing">To be added.</param>
         <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="EntryKey">
+      <MemberSignature Language="C#" Value="protected virtual MonoTouch.Foundation.NSString EntryKey { get; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class MonoTouch.Foundation.NSString EntryKey" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.Foundation.NSString</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="EntryStarted">
+      <MemberSignature Language="C#" Value="public EventHandler EntryStarted { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class System.EventHandler EntryStarted" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.EventHandler</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
@@ -202,10 +283,15 @@
         <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
       </Parameters>
       <Docs>
-        <param name="tv">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="tv">The containing table view.</param>
+        <summary>
+            Gets a UITableViewCell for this element.   Can be overridden, but if you
+            customize the style or contents of the cell you must also override the CellKey
+            property in your derived class.
+            </summary>
+        <returns>
+        </returns>
+        <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
     <Member MemberName="KeyboardType">
@@ -224,8 +310,10 @@
             this to use this for numeric input, email addressed,
             urls, phones.
             </summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Matches">
@@ -242,10 +330,13 @@
         <Parameter Name="text" Type="System.String" />
       </Parameters>
       <Docs>
+        <param name="text">Text that the user is looking for</param>
         <param name="text">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <summary>
+            Method invoked to determine if the cell matches the given text, never invoked with a null value or an empty string.
+            </summary>
+        <returns>True if the element contains the text, false otherwise.</returns>
+        <remarks>This method should return true if the user would find the text represented by this cell.  This could perform a search on the visible elements of the cell, or some components of the cell that are not visible.</remarks>
       </Docs>
     </Member>
     <Member MemberName="ResignFirstResponder">
@@ -267,6 +358,70 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="ReturnKeyType">
+      <MemberSignature Language="C#" Value="public Nullable&lt;MonoTouch.UIKit.UIReturnKeyType&gt; ReturnKeyType { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype System.Nullable`1&lt;valuetype MonoTouch.UIKit.UIReturnKeyType&gt; ReturnKeyType" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Nullable&lt;MonoTouch.UIKit.UIReturnKeyType&gt;</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <value>To be added.</value>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Selected">
+      <MemberSignature Language="C#" Value="public override void Selected (MonoTouch.Dialog.DialogViewController dvc, MonoTouch.UIKit.UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Selected(class MonoTouch.Dialog.DialogViewController dvc, class MonoTouch.UIKit.UITableView tableView, class MonoTouch.Foundation.NSIndexPath indexPath) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="dvc" Type="MonoTouch.Dialog.DialogViewController" />
+        <Parameter Name="tableView" Type="MonoTouch.UIKit.UITableView" />
+        <Parameter Name="indexPath" Type="MonoTouch.Foundation.NSIndexPath" />
+      </Parameters>
+      <Docs>
+        <param name="dvc">
+            The <see cref="T:MonoTouch.Dialog.DialogViewController" /> where the selection took place
+            </param>
+        <param name="tableView">
+            The <see cref="T:MonoTouch.UIKit.UITableView" /> that contains the element.
+            </param>
+        <param name="indexPath">To be added.</param>
+        <param name="path">
+            The <see cref="T:MonoTouch.Foundation.NSIndexPath" /> that contains the Section and Row for the element.
+            </param>
+        <summary>
+            Invoked when the given element has been selected by the user.
+            </summary>
+        <remarks>
+        </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ShouldReturn">
+      <MemberSignature Language="C#" Value="public event Func&lt;bool&gt; ShouldReturn;" />
+      <MemberSignature Language="ILAsm" Value=".event class System.Func`1&lt;bool&gt; ShouldReturn" />
+      <MemberType>Event</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Func&lt;System.Boolean&gt;</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Summary">
       <MemberSignature Language="C#" Value="public override string Summary ();" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance string Summary() cil managed" />
@@ -281,6 +436,21 @@
       <Docs>
         <summary>To be added.</summary>
         <returns>To be added.</returns>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="val">
+      <MemberSignature Language="C#" Value="protected string val;" />
+      <MemberSignature Language="ILAsm" Value=".field family string val" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.String</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>
     </Member>

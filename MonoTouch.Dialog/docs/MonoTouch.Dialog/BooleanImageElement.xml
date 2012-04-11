@@ -69,8 +69,10 @@
       <Parameters />
       <Docs>
         <summary>Returns the image for the current state.</summary>
-        <returns></returns>
-        <remarks></remarks>
+        <returns>
+        </returns>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

@@ -112,6 +112,21 @@
         <remarks>To be added.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="AccessoryTapped">
+      <MemberSignature Language="C#" Value="public event MonoTouch.Foundation.NSAction AccessoryTapped;" />
+      <MemberSignature Language="ILAsm" Value=".event class MonoTouch.Foundation.NSAction AccessoryTapped" />
+      <MemberType>Event</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.Foundation.NSAction</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>To be added.</summary>
+        <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="BackgroundColor">
       <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UIColor BackgroundColor { get; set; }" />
       <MemberSignature Language="ILAsm" Value=".property instance class MonoTouch.UIKit.UIColor BackgroundColor" />
@@ -189,10 +204,15 @@
         <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
       </Parameters>
       <Docs>
-        <param name="tv">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="tv">The containing table view.</param>
+        <summary>
+            Gets a UITableViewCell for this element.   Can be overridden, but if you
+            customize the style or contents of the cell you must also override the CellKey
+            property in your derived class.
+            </summary>
+        <returns>
+        </returns>
+        <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
     <Member MemberName="GetKey">

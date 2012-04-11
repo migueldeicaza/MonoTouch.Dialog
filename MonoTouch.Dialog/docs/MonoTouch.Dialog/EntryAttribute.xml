@@ -20,8 +20,8 @@
       <para>
 	You can specify the kind of UIKeyboardType for data entry by setting KeyboardType property.
       </para>
-	  <example>
-	    <code lang="c#">
+      <example>
+        <code lang="c#">
 class Login {
 	[Entry ("Enter your name")]
 	string Name; 
@@ -34,7 +34,7 @@ class Login {
 	string Pin;
 }
 	    </code>
-	  </example>
+      </example>
     </remarks>
   </Docs>
   <Members>
@@ -48,7 +48,8 @@ class Login {
       <Parameters />
       <Docs>
         <summary>Public constructor</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -65,8 +66,8 @@ class Login {
         <param name="placeholder">String to be displayed if the value of the string is null or empty.</param>
         <summary>Public constructor</summary>
         <remarks>
-	  <example>
-	    <code lang="c#">
+          <example>
+            <code lang="c#">
 class Login {
 	[Entry ("Enter your name")]
 	string Name; 
@@ -76,8 +77,8 @@ class Login {
 	string Password;
 }
 	    </code>
-	  </example>
-	</remarks>
+          </example>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="KeyboardType">
@@ -92,7 +93,8 @@ class Login {
       </ReturnValue>
       <Docs>
         <summary>Specifies the kind of keyboard type to use for the data entry</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Placeholder">

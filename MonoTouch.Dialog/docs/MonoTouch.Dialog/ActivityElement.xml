@@ -24,7 +24,8 @@
       <Parameters />
       <Docs>
         <summary>Default constructor.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Animating">
@@ -39,8 +40,10 @@
       </ReturnValue>
       <Docs>
         <summary>Controls the animation for the activity indicator.</summary>
-        <value></value>
-        <remarks></remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="MonoTouch.Dialog.IElementSizing.GetHeight">

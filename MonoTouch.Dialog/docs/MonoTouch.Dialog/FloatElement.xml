@@ -47,9 +47,19 @@
         <ReturnType>MonoTouch.Foundation.NSString</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <summary>
+            Subclasses that override the GetCell method should override this method as well
+            </summary>
+        <value>Unique NSString value, typically the underlying value is allocated as a static variable.</value>
+        <remarks>
+            This method should return the key passed to UITableView.DequeueReusableCell.
+            If your code overrides the <see cref="MonoTouch.Dialog.Element.GetCell(MonoTouch.UIKit.UITableView" /> method to change the cell, you must also
+            override this method and return a unique key for it.
+            This works in most subclasses with a couple of exceptions: StringElement and
+            various derived classes do not use this setting as they need a wider range
+            of keys for different uses, so you need to look at the source code for those
+            if you are trying to override StringElement or StyledStringElement.
+            </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -85,10 +95,15 @@
         <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
       </Parameters>
       <Docs>
-        <param name="tv">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="tv">The containing table view.</param>
+        <summary>
+            Gets a UITableViewCell for this element.   Can be overridden, but if you
+            customize the style or contents of the cell you must also override the CellKey
+            property in your derived class.
+            </summary>
+        <returns>
+        </returns>
+        <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
     <Member MemberName="MaxValue">

@@ -10,7 +10,7 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
+    <summary>Custom UITableViewCell to display text with an image (used by the BaseBooleanImageElement).</summary>
     <remarks>To be added.</remarks>
   </Docs>
   <Members>

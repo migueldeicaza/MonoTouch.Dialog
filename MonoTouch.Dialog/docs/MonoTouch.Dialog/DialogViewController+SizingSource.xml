@@ -10,8 +10,11 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>Default UITableViewSource used by MonoTouch.Dialog when  the elements contained are expected to have different heights.</summary>
+    <remarks>
+      <para>If you are subclassing MonoTouch.Dialog or extending it, you would likely create subclasses of this class.</para>
+      <para>This source probes the element to see if it implements the IElementSizing interface.   If it does, it invokes the method to determine the height of the row, otherwise it returns the default value</para>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">

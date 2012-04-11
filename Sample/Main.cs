@@ -12,13 +12,16 @@ namespace Sample
 	{
 		static void Main (string[] args)
 		{
-			UIApplication.Main (args);
+			UIApplication.Main (args, null, "AppDelegate");
 		}
 	}
 
 	// The name AppDelegate is referenced in the MainWindow.xib file.
+	[Register ("AppDelegate")]
 	public partial class AppDelegate : UIApplicationDelegate
 	{
+		UINavigationController navigation;
+		UIWindow window;
 		const string footer = 
 			"These show the two sets of APIs\n" +
 			"available in MonoTouch.Dialogs";
@@ -75,11 +78,12 @@ namespace Sample
 			var dv = new DialogViewController (menu) {
 				Autorotate = true
 			};
+			navigation = new UINavigationController ();
 			navigation.PushViewController (dv, true);				
 			
-			window.MakeKeyAndVisible ();
-			
 			// On iOS5 we use the new window.RootViewController, on older versions, we add the subview
+			window = new UIWindow (UIScreen.MainScreen.Bounds);
+			window.MakeKeyAndVisible ();
             if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
 				window.RootViewController = navigation;	
 			else

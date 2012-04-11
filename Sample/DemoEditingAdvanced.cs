@@ -41,6 +41,19 @@ namespace Sample
 				var element = section [indexPath.Row];
 				section.Remove (element);
 			}
+			
+			public override bool CanMoveRow (UITableView tableView, NSIndexPath indexPath)
+			{
+				 return true;
+			}
+			
+			public override void MoveRow (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
+			{
+				var section = Container.Root [sourceIndexPath.Section];
+				var source = section [sourceIndexPath.Row];
+				section.Remove (source);
+				section.Insert (destinationIndexPath.Row, source);
+			}
 		}
 		
 		public override Source CreateSizingSource (bool unevenRows)

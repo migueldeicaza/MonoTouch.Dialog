@@ -18,7 +18,7 @@
     <summary>On Reflection-based UIs, this attribute can be applied to a member to set the caption for the element.</summary>
     <remarks>
       <example>
-	<code lang="c#">
+        <code lang="c#">
 	[Preserve (AllMembers=true)]
 	class Settings {
 	[Section ("Enumerations")]
@@ -43,8 +43,10 @@
       </Parameters>
       <Docs>
         <param name="caption">Caption text to use</param>
-        <summary></summary>
-        <remarks></remarks>
+        <summary>
+        </summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Caption">
@@ -59,7 +61,8 @@
       </ReturnValue>
       <Docs>
         <summary>Caption to display.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

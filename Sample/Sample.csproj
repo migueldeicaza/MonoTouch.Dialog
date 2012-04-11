@@ -72,9 +72,6 @@
     <Reference Include="System.Json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindow.xib.designer.cs">
-      <DependentUpon>MainWindow.xib</DependentUpon>
-    </Compile>
     <Compile Include="Main.cs" />
     <Compile Include="DemoElementApi.cs" />
     <Compile Include="DemoReflectionApi.cs" />
@@ -90,9 +87,6 @@
     <Compile Include="DemoContainerStyle.cs" />
     <Compile Include="DemoIndex.cs" />
     <Compile Include="DemoEditingAdvanced.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <InterfaceDefinition Include="MainWindow.xib" xmlns="" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog.csproj">

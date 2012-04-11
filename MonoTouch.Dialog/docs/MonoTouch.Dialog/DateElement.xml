@@ -10,8 +10,9 @@
   </Base>
   <Interfaces />
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>An element that can be used to edit dates.</summary>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -26,10 +27,11 @@
         <Parameter Name="date" Type="System.DateTime" />
       </Parameters>
       <Docs>
-        <param name="caption">To be added.</param>
-        <param name="date">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="caption">Caption for the element.</param>
+        <param name="date">The initial date and time.</param>
+        <summary>Constructs the DateElement.</summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CreatePicker">
@@ -44,9 +46,11 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <summary>Creates the UIDatePicker, this method can be overwritten to customize the UIDatePicker used.</summary>
+        <returns>
+        </returns>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="FormatDate">
@@ -63,10 +67,11 @@
         <Parameter Name="dt" Type="System.DateTime" />
       </Parameters>
       <Docs>
-        <param name="dt">To be added.</param>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <param name="dt">The date time to format.</param>
+        <summary>Formats the date, the return is used as the Value for the cell rendering.</summary>
+        <returns>
+        </returns>
+        <remarks>You can override this to alter the rendering of the date.</remarks>
       </Docs>
     </Member>
   </Members>

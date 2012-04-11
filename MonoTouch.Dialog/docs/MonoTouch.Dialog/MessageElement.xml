@@ -17,7 +17,7 @@
     <summary>Element to display a mail message-like record with sender, subject, date, read/unread statuses.</summary>
     <remarks>
       <example>
-	<code lang="C#">
+        <code lang="C#">
 var messageSection = new Section ("Message Elements"){
 	new MessageElement (msgSelected) { 
 		Sender = "Miguel de Icaza (mdeicaza.home@emailserver.com)", 
@@ -57,11 +57,11 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
       <Docs>
         <summary>Default constructor</summary>
         <remarks>
-	  <para>
+          <para>
 	    You typically create an instance of this object and then set the individual properties.
 	  </para>
-	  <example>
-<code lang="c#">
+          <example>
+            <code lang="c#">
 	new MessageElement (msgSelected) { 
 		Sender = "Miguel de Icaza (mdeicaza.home@emailserver.com)", 
 		Subject = "Re: [Gtk-sharp-list] Glib Timeout and other ways to handle idle",
@@ -71,7 +71,7 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
 		MessageCount = 0
 	}
 </code>
-	  </example>
+          </example>
         </remarks>
       </Docs>
     </Member>
@@ -89,11 +89,11 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
         <param name="tapped">The method to invoke when the item is tapped on by the user.</param>
         <summary>Creates a new instance of the MessageElement.</summary>
         <remarks>
-	  <para>
+          <para>
 	    You typically create an instance of this object and then set the individual properties.
 	  </para>
-	  <example>
-<code lang="c#">
+          <example>
+            <code lang="c#">
 	new MessageElement (msgSelected) { 
 		Sender = "Miguel de Icaza (mdeicaza.home@emailserver.com)", 
 		Subject = "Re: [Gtk-sharp-list] Glib Timeout and other ways to handle idle",
@@ -103,8 +103,8 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
 		MessageCount = 0
 	}
 </code>
-	  </example>
-	</remarks>
+          </example>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Body">
@@ -119,7 +119,8 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
       </ReturnValue>
       <Docs>
         <summary>The text to show as the body of the element, it shows up grey.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Date">
@@ -134,7 +135,8 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
       </ReturnValue>
       <Docs>
         <summary>The date to display.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="GetCell">
@@ -151,10 +153,15 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
         <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
       </Parameters>
       <Docs>
-        <param name="tv"></param>
-        <summary></summary>
-        <returns></returns>
-        <remarks></remarks>
+        <param name="tv">The containing table view.</param>
+        <summary>
+            Gets a UITableViewCell for this element.   Can be overridden, but if you
+            customize the style or contents of the cell you must also override the CellKey
+            property in your derived class.
+            </summary>
+        <returns>
+        </returns>
+        <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
     <Member MemberName="GetHeight">
@@ -172,11 +179,16 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
         <Parameter Name="indexPath" Type="MonoTouch.Foundation.NSIndexPath" />
       </Parameters>
       <Docs>
-        <param name="tableView"></param>
-        <param name="indexPath"></param>
-        <summary></summary>
-        <returns></returns>
-        <remarks></remarks>
+        <param name="tableView">
+        </param>
+        <param name="indexPath">
+        </param>
+        <summary>
+        </summary>
+        <returns>
+        </returns>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="MessageCount">
@@ -206,7 +218,8 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
       </ReturnValue>
       <Docs>
         <summary>Whether this message should be displayed as a new item or not.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Selected">
@@ -225,11 +238,20 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
         <Parameter Name="path" Type="MonoTouch.Foundation.NSIndexPath" />
       </Parameters>
       <Docs>
-        <param name="dvc">To be added.</param>
-        <param name="tableView">To be added.</param>
-        <param name="path">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="dvc">
+            The <see cref="T:MonoTouch.Dialog.DialogViewController" /> where the selection took place
+            </param>
+        <param name="tableView">
+            The <see cref="T:MonoTouch.UIKit.UITableView" /> that contains the element.
+            </param>
+        <param name="path">
+            The <see cref="T:MonoTouch.Foundation.NSIndexPath" /> that contains the Section and Row for the element.
+            </param>
+        <summary>
+            Invoked when the given element has been selected by the user.
+            </summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Sender">
@@ -244,7 +266,8 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
       </ReturnValue>
       <Docs>
         <summary>Text to use for the sender.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Subject">
@@ -274,7 +297,8 @@ void msgSelected (DialogViewController dvc, UITableView tv, NSIndexPath path)
       </ReturnValue>
       <Docs>
         <summary>Event raised when the user taps on the cell.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

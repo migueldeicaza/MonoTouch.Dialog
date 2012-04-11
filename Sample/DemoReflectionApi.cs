@@ -97,7 +97,7 @@ namespace Sample
 			var dv = new DialogViewController (bc.Root, true);
 			
 			// When the view goes out of screen, we fetch the data.
-			dv.ViewDissapearing += delegate {
+			dv.ViewDisappearing += delegate {
 				// This reflects the data back to the object instance
 				bc.Fetch ();
 				

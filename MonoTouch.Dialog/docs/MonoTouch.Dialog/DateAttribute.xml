@@ -15,8 +15,8 @@
     </Attribute>
   </Attributes>
   <Docs>
-    <summary>To be added.</summary>
-    <remarks>To be added.</remarks>
+    <summary>Attribute applied to DateTime objects to instruct the rendering to be done using the Date selector.</summary>
+    <remarks>This is only used for the reflection binder of MonoTouch.Dialog</remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -28,8 +28,10 @@
       </AssemblyInfo>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>
+        </summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
   </Members>

@@ -71,10 +71,10 @@
         <summary>
             Subclasses that override the GetCell method should override this method as well
             </summary>
-        <value>To be added.</value>
+        <value>Unique NSString value, typically the underlying value is allocated as a static variable.</value>
         <remarks>
             This method should return the key passed to UITableView.DequeueReusableCell.
-            If your code overrides the GetCell method to change the cell, you must also
+            If your code overrides the <see cref="MonoTouch.Dialog.Element.GetCell(MonoTouch.UIKit.UITableView" /> method to change the cell, you must also
             override this method and return a unique key for it.
             This works in most subclasses with a couple of exceptions: StringElement and
             various derived classes do not use this setting as they need a wider range
@@ -182,14 +182,15 @@
         <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
       </Parameters>
       <Docs>
-        <param name="tv">To be added.</param>
+        <param name="tv">The containing table view.</param>
         <summary>
             Gets a UITableViewCell for this element.   Can be overridden, but if you
             customize the style or contents of the cell you must also override the CellKey
             property in your derived class.
             </summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <returns>
+        </returns>
+        <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
     <Member MemberName="GetContainerTableView">
@@ -264,12 +265,12 @@
         <Parameter Name="text" Type="System.String" />
       </Parameters>
       <Docs>
-        <param name="text">To be added.</param>
+        <param name="text">Text that the user is looking for</param>
         <summary>
             Method invoked to determine if the cell matches the given text, never invoked with a null value or an empty string.
             </summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <returns>True if the element contains the text, false otherwise.</returns>
+        <remarks>This method should return true if the user would find the text represented by this cell.  This could perform a search on the visible elements of the cell, or some components of the cell that are not visible.</remarks>
       </Docs>
     </Member>
     <Member MemberName="Parent">
@@ -342,7 +343,8 @@
         <summary>
             Invoked when the given element has been selected by the user.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Summary">

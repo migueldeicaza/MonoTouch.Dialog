@@ -15,9 +15,7 @@
   </Interfaces>
   <Docs>
     <summary>Helper class used to map Structures and Classes into user interface elements in MonoTouch.Dialog.</summary>
-
     <remarks>
-
       <para>
 	The Reflection-based dialog construction is used by creating an
 	object of class MonoTouch.Dialog.BindingContext, the method
@@ -25,30 +23,25 @@
 	resolve Tap targets, (2) The object that will be edited and (3)
 	a title for it.
       </para>
-
       <para>
 
 	The user interface is constructed based on the type of the
 	object being edited.  The type can contain objects of the
 	following types: string, bool, enumerations, floats, integers,
-	<see cref="T:System.DateTime"/>, <see
-	cref="T:MonoTouch.UIKit.UIImage"/> and those can be further
+	<see cref="T:System.DateTime" />, <see cref="T:MonoTouch.UIKit.UIImage" /> and those can be further
 	decorated with a handful of attributes that drive the UI
 	generation.  
       </para>
-
       <para>
 	A very simple dialog that contains a checkbox is shown here:
       </para>
-
       <example>
-	<code lang="c#">
+        <code lang="c#">
     class Settings {
         public bool AirplaneMode;
     }
 	</code>
       </example>
-
       <para>
 	The above will generate a page that contains a single item with the
 	caption "Airplane Mode" and a on/off switch.   The caption is computed
@@ -57,7 +50,6 @@
 	"AirplaneMode", "airplaneMode" and "airplane_mode" all produce the
 	same caption "Airplane Mode".
       </para>
-
       <para>
 
 	If you need to control the actual caption (for example to include
@@ -65,84 +57,72 @@
 	existing class) you just need to attach the [Caption] attribute to
 	your variable, like this:
       </para>
-
       <example>
-	<code lang="c#">
+        <code lang="c#">
         [Caption ("Your name is:")]
         string userName;
 	</code>
       </example>
-
       <para>
 	The dialog contents are rendered in the same order that the fields are
 	declared in the class.  You can use the [Section] attribute to
 	group information in sections that make sense.   You can use the
 	[Section] attribute in a few ways:
       </para>
-
       <example>
-	<code lang="c#">
+        <code lang="c#">
         [Section]
 	</code>
       </example>
-
       <para>
 	This Creates a new section, with no headers or footers.
       </para>
-
       <example>
-	<code lang="c#">
+        <code lang="c#">
 	        [Section (header)]
 	</code>
       </example>
-
       <para>
-	>> Creates a new section, with the specified header and no footer.
+	&gt;&gt; Creates a new section, with the specified header and no footer.
       </para>
-
       <example>
-	<code lang="c#">
+        <code lang="c#">
 	        [Section (header, footer)]
 	</code>
       </example>
-
       <para>
-	>> Creates a new section with the specified header and footer.
+	&gt;&gt; Creates a new section with the specified header and footer.
       </para>
-
       <para>
 	These are the current widgets supported by the Reflection API:
       </para>
       <h4>String constants and Buttons.</h4>
-	
       <para>
 	  Use the string type.   If the type has a value, in 
 	  addition to showing the caption, it will render its
 	  value on the right.
 	</para>
-	
-	<para>
+      <para>
 	  You can add the [OnTap] attribute to your string 
 	  to invoke a method on demand.
 	</para>
-	
-	<para>
+      <para>
 	  You can add the [Multiline] attribute to your string
 	  to make the cell render in multiple lines.   And you 
 	  can use the [Html] attribute on a string, in that
 	  case the value of the string should contain the url
 	  to load in the embedded UIWebView. 
 	</para>
-	<para>
+      <para>
 
 	  The [Aligntment] attribute takes a parameter a UITextAlingment
 	  that determines how the string should be rendered
 	</para>
-	<para>
+      <para>
 	  Examples:
 	</para>
       <example>
-	<code lang="c#">
+        <code lang="c#">
         public string Version = "1.2.3";
 
         [OnTap ("Login")]
@@ -160,25 +140,23 @@
         string centered;
 	</code>
       </example>
-
       <h4>Text Entry and Password Entries.</h4>
-	
-	<para>
+      <para>
 	  Use the string type for your field and annotate the 
 	  string with the [Entry] attribute.   If you provide
 	  an argument to the [Entry] attribute, it will be used
 	  as the greyed-out placeholder value for the UITextField.
 	</para>
-	<para>
+      <para>
 
 	  Use the [Password] attribute instead of [Entry] to 
 	  create a secure entry line.
 	</para>
-	<para>
+      <para>
 	  Examples:
 	</para>
-<example>
-	<code lang="c#">
+      <example>
+        <code lang="c#">
 	
         [Entry ("Your username")]
         public string Login;
@@ -190,73 +168,67 @@
         public string passwd;
 	</code>
       </example>
-
-	<para>
+      <para>
 	  You can also specify both the Placeholder and the keyboard type
 	  to use on the Entry using a few of the Entry attributes:
 	</para>
       <example>
-	<code lang="c#">
+        <code lang="c#">
 	[Entry (KeyboardType=UIKeyboardType.NumberPad,Placeholder="Your Zip code")]
 	public string ZipCode;
 	</code>
       </example>
-
-	<h4>On/off switches</h4>
-	
-	<para>
+      <h4>On/off switches</h4>
+      <para>
 	  Use a bool value to store an on/off setting, by default you
 	  will get an On/off switch, but you can change this behavior to
 	  just show a checkbox instead by using the [Checkbox] attribute:
 	</para>
-	<para>
+      <para>
 	  Examples:
 	</para>
       <example>
-	<code lang="c#">
+        <code lang="c#">
         bool OnOffSwitch;
 	
         [Checkbox]
         bool ReadyToRun;
 	</code>
       </example>
-
-	<h4>Float values</h4>
-	
-	<para>
+      <h4>Float values</h4>
+      <para>
 	  Using a float in your source will provide a slider on the 
 	  screen.   You can control the ranges of the values by
 	  using the [Range (low,high)] attribute.   Otherwise the
 	  default is to edit a value between 0 and 1.
 	</para>
-	<para>
+      <para>
 	  Examples:
 	</para>
       <example>
-	<code lang="c#">
+        <code lang="c#">
         float brightness;
 	
         [Range (0, 10), Caption ("Grade")]
         float studentGrade;
 	</code>
       </example>
-
-	<h4>Date Editing</h4>
-	<para>
+      <h4>Date Editing</h4>
+      <para>
 	
 	  Use a "DateTime" object in your class to present a date
 	  picker.
 	</para>
-	<para>
+      <para>
 	  By default this will provide a date and time editor, if you
 	  only want to edit the date, set the [Date] attribute, if you
 	  only want to edit the time, set the [Time] attribute:
 	</para>
-	<para>
+      <para>
 	  Examples:
 	</para>
-<example>
-	<code lang="c#">
+      <example>
+        <code lang="c#">
 	
         [Date]
         DateTime birthday;
@@ -268,7 +240,6 @@
         DateTime meetingTime;
 	</code>
       </example>
-
       <h4>Enumeration value</h4>
 	
 	  Monotouch.Dialogs will automatically turn an enumeration
@@ -277,59 +248,34 @@
 	
 	  Examples:
 	
-      <example>
-	<code lang="c#">
+      <example><code lang="c#">
           enum SeatPreference { Window, Aisle, MiddleSeat }
 	
           [Caption ("Seat Preference")]
           SeatPreference seat;
-	</code>
-      </example>
-
-      <h4>Images</h4>
-	
-      <para>
+	</code></example><h4>Images</h4><para>
 	  Variables with type UIImage will render the image as a 
 	  thumbnail and will invoke the image picker if tapped on.
-      </para>
-      <para>
+      </para><para>
 	  Examples:
-      </para>
-<example>
-	<code lang="c#">
+      </para><example><code lang="c#">
         UIImage ProfilePicture;
-	</code>
-      </example>
-
-      <h4>Ignoring Some Fields</h4>
-	
-      <para>
+	</code></example><h4>Ignoring Some Fields</h4><para>
 	  If you want to ignore a particular field just apply the [Skip]
 	  attribute to the field.   
-      </para>
-      <para>
+      </para><para>
 	  Examples:
-      </para><example>
-	<code lang="c#">
+      </para><example><code lang="c#">
         [Skip] Guid UniquId;
-	</code>
-      </example>
-
-      <h4>Nested Dialogs</h4>
-	
-      <para>
+	</code></example><h4>Nested Dialogs</h4><para>
 	  To create nested dialogs just use a nested class, the reflection
 	  binder will create the necessary navigation bits based on the
 	  container model.
-      </para>
-      <para>
+      </para><para>
 	  The value for a nested dialog must not be null.
-      </para>
-      <para>
+      </para><para>
 	  Examples:
-      </para>
-      <example>
-	<code lang="c#">
+      </para><example><code lang="c#">
 	class MainSettings {
 	    string Subject;
 	    string RoomName;
@@ -340,13 +286,9 @@
 	    [Time] DateTime Start;
 	    [Time] DateTime End;
 	}
-	</code>
-      </example>
-
-      <para>
+	</code></example><para>
 	To initialize:
-      </para><example>
-	<code lang="c#">
+      </para><example><code lang="c#">
 	
 	new MainSettings () {
 	    Subject = "Review designs",
@@ -356,45 +298,30 @@
 		End   = DateTime.Now
             }
         }
-	</code>
-      </example>
-
-      <h4>IEnumerable as a Radio Source</h4>
-	
-      <para>
+	</code></example><h4>IEnumerable as a Radio Source</h4><para>
 	You can use any type that implements IEnumerable, including
 	generics (which implement IEnumerable) as a source of values
 	for creating a one-of-many selector, similar to the radio-like
 	selection that you get from an enumeration.
-      </para>
-      <para>
+      </para><para>
 	To use this, you will need an int value that has the [RadioSelection]
 	attribute set to hold the value that will be selected on startup
 	and also to hold the new value when done.
-      </para>
-      <para>
+      </para><para>
 	For example:
-      </para><example>
-	<code lang="c#">
+      </para><example><code lang="c#">
         class MainSettings {
 	    [RadioSelection ("Themes")]
 	    public int CurrentTheme;
 	    public IList&lt;string&gt; Themes;
 	}
-	</code>
-      </example>
-
-      <para>
+	</code></example><para>
 	The value rendered is the value rendered by calling ToString() on the
 	value returned by IEnumerable.
-      </para>
-      <h3>Creating a Dialog From the Object</h3>
-      <para>
+      </para><h3>Creating a Dialog From the Object</h3><para>
 	Once you have created your class with the proper attributes, you
 	create a binding context, like this:
-      </para>
-      <example>
-	<code lang="c#">
+      </para><example><code lang="c#">
         BindingContext context;
 	
         public void Setup ()
@@ -408,19 +335,13 @@
 
             navigation.PushViewController (viewController, true);
         }
-	</code>
-      </example>
-
-      <para>
+	</code></example><para>
 	This will render the information.   To fetch the values back after
 	editing you need to call context.Fetch ().   You can do this from your
 	favorite handler, and at that point you can also call
 	context.Dispose() to assist the GC in releasing any large resources it
 	might have held.
-      </para>
-
-    </remarks>
-
+      </para></remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -441,21 +362,18 @@
         <param name="title">Title to be used for the resulting UI.</param>
         <summary>Creates a binding context with the specified parameters.   </summary>
         <remarks>
-
-	  <para>
+          <para>
 
 	    Once you have created an instance of this object, you can
 	    use the RootElement property of the object to pass it to
 	    the DialogViewController to create the UI.
 
 	  </para>
-
-
-	  <para>
+          <para>
 
 	    You can use the information on this binding context to retrieve the information after the user has edited the user interface by calling the method Fetch.
 	  </para>
-	</remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -470,8 +388,10 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary></summary>
-        <remarks></remarks>
+        <summary>
+        </summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -489,8 +409,10 @@
       </Parameters>
       <Docs>
         <param name="disposing">Whether the method is being called from a Dispose method or a finalizer</param>
-        <summary></summary>
-        <remarks></remarks>
+        <summary>
+        </summary>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Fetch">
@@ -506,7 +428,8 @@
       <Parameters />
       <Docs>
         <summary>Retrieves the data that was edited by the user and stores it back into the original object that was passed to the BindingContext.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Root">
