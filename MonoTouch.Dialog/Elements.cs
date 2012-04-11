@@ -1394,12 +1394,22 @@ namespace MonoTouch.Dialog
 					entry.ClearButtonMode = value;
 			}
 		}
+		
+		public UITableViewScrollPosition CellScrollPosition { 
+			get { 
+				return cellScrollPosition;
+			}
+			set { 
+				cellScrollPosition = value;
+			}
+		}
 
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
+		UITableViewScrollPosition cellScrollPosition = UITableViewScrollPosition.Middle;
 		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
@@ -1581,7 +1591,7 @@ namespace MonoTouch.Dialog
 					} else
 						entry.ReturnKeyType = returnKeyType.Value;
 					
-					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
+					tv.ScrollToRow (IndexPath, cellScrollPosition, true);
 				};
 			}
 			if (becomeResponder){
@@ -1650,7 +1660,7 @@ namespace MonoTouch.Dialog
 			var tv = GetContainerTableView ();
 			if (tv == null)
 				return;
-			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
+			tv.ScrollToRow (IndexPath, cellScrollPosition, animated);
 			if (entry != null){
 				entry.BecomeFirstResponder ();
 				becomeResponder = false;
