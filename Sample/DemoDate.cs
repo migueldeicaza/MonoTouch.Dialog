@@ -17,7 +17,7 @@ namespace Sample
 		
 		UIImage badgeImage;
 		
-		public void DemoDate ()	
+		public void DemoDate ()
 		{
 			if (badgeImage == null)
 				badgeImage = UIImage.FromFile ("jakub-calendar.png");
@@ -34,6 +34,19 @@ namespace Sample
 				}
 			};
 			
+			var numberBadgedSection = new Section ("RowBadgeElement") {
+				new RowBadgeElement ("Default", () => {}),
+				new RowBadgeElement ("Default with val", "10", () => {}),
+				new RowBadgeElement ("Default with text", "text", () => {}),
+				new RowBadgeElement ("Colored", "color", () => {}) {
+					Color = UIColor.FromRGBA (0.792f, 0.197f, 0.219f, 1f)
+				},
+				new RowBadgeElement ("With radius", "9f", () => {}) {
+					Radius = 9f,
+					Color = UIColor.FromRGBA (0.197f, 0.592f, 0.219f, 1f)
+				},
+			};
+			
 			//
 			// Use the MakeCalendarBadge API
 			//
@@ -46,7 +59,7 @@ namespace Sample
 				new string [] { "April", "1", "Pranks" },
 			};
 			var calendarSection = new Section ("Date sample");
-			foreach (string [] date in dates){
+			foreach (string [] date in dates) {
 				calendarSection.Add (new BadgeElement (BadgeElement.MakeCalendarBadge (badgeImage, date [0], date [1]), date [2]){
 					Font = font
 				});
@@ -92,6 +105,7 @@ namespace Sample
 				entrySection,
 				calendarSection,
 				badgeSection,
+				numberBadgedSection
 			};
 			var dvc = new DialogViewController (root, true);
 			dvc.Style = UITableViewStyle.Plain;
