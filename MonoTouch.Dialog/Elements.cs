@@ -2895,7 +2895,7 @@ namespace MonoTouch.Dialog
 			cell.Color = Color;
 			cell.Radius = Radius;
 			cell.HighlightColor = HighlightColor;
-			cell.Shadow = Shadow;
+			cell.ShowShadow = Shadow;
 			cell.SetNeedsLayout ();
 			
 			return cell;
