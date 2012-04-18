@@ -1396,6 +1396,18 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+		public UITextAlignment TextAlignment {
+			get {
+				return textalignment;
+			}
+			set{
+				textalignment = value;
+				if (entry != null) {
+					entry.TextAlignment = textalignment;
+				}
+			}
+		}
+		UITextAlignment textalignment = UITextAlignment.Left;
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
@@ -1490,6 +1502,7 @@ namespace MonoTouch.Dialog
 				SecureTextEntry = isPassword,
 				Text = Value ?? "",
 				Tag = 1,
+				TextAlignment = textalignment,
 				ClearButtonMode = ClearButtonMode
 			};
 		}
@@ -1515,6 +1528,10 @@ namespace MonoTouch.Dialog
 				SizeF size = ComputeEntryPosition (tv, cell);
 				float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
 				float width = cell.ContentView.Bounds.Width - size.Width;
+				if (textalignment == UITextAlignment.Right) {
+					// Add padding if right aligned
+					width -= 10;
+				}
 				
 				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
