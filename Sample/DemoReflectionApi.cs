@@ -26,6 +26,11 @@ namespace Sample
 		[Password ("Enter your password")]
 		public string Password;
 		
+	[Section ("Autocapitalize, autocorrect and clear button")]
+		
+		[Entry (Placeholder = "Enter your name", AutocorrectionType = UITextAutocorrectionType.Yes, AutocapitalizationType = UITextAutocapitalizationType.Words, ClearButtonMode = UITextFieldViewMode.WhileEditing)]
+		public string Name;
+		
 	[Section ("Time Editing")]
 		
 		public TimeSettings TimeSamples;
@@ -107,12 +112,13 @@ namespace Sample
 				    "AccountEnabled:  {0}\n" +
 				    "Login:           {1}\n" +
 				    "Password:        {2}\n" +
-				    "Appointment:     {3}\n" +
-				    "Birthday:        {4}\n" +
-				    "Alarm:           {5}\n" +
-				    "Favorite Type:   {6}\n" + 
-				    "IEnumerable idx: {7}", 
-				    settings.AccountEnabled, settings.Login, settings.Password, 
+					"Name:      	  {3}\n" +
+				    "Appointment:     {4}\n" +
+				    "Birthday:        {5}\n" +
+				    "Alarm:           {6}\n" +
+				    "Favorite Type:   {7}\n" + 
+				    "IEnumerable idx: {8}", 
+				    settings.AccountEnabled, settings.Login, settings.Password, settings.Name,
 				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, 
 				    settings.TimeSamples.Alarm, settings.FavoriteType,
 				    settings.selected);

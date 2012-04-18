@@ -30,6 +30,9 @@ namespace MonoTouch.Dialog
 
 		public string Placeholder;
 		public UIKeyboardType KeyboardType;
+		public UITextAutocorrectionType AutocorrectionType;
+		public UITextAutocapitalizationType AutocapitalizationType;
+		public UITextFieldViewMode ClearButtonMode;
 	}
 
 	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
@@ -275,7 +278,7 @@ namespace MonoTouch.Dialog
 					if (pa != null)
 						element = new EntryElement (caption, pa.Placeholder, value, true);
 					else if (ea != null)
-						element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = ea.KeyboardType };
+						element = new EntryElement (caption, ea.Placeholder, value) { KeyboardType = ea.KeyboardType, AutocapitalizationType = ea.AutocapitalizationType, AutocorrectionType = ea.AutocorrectionType, ClearButtonMode = ea.ClearButtonMode };
 					else if (multi)
 						element = new MultilineElement (caption, value);
 					else if (html != null)
