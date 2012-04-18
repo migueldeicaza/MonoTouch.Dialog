@@ -184,6 +184,26 @@
         <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
       </Docs>
     </Member>
+    <Member MemberName="GetDateWithKind">
+      <MemberSignature Language="C#" Value="protected DateTime GetDateWithKind (DateTime dt);" />
+      <MemberSignature Language="ILAsm" Value=".method familyhidebysig instance valuetype System.DateTime GetDateWithKind(valuetype System.DateTime dt) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.DateTime</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="dt" Type="System.DateTime" />
+      </Parameters>
+      <Docs>
+        <param name="dt">The datetime to format</param>
+        <summary>Returns either the provided date time if the DateTimeKind is specified, otherwise makes ita  DateTimeKind.Local</summary>
+        <returns></returns>
+        <remarks></remarks>
+      </Docs>
+    </Member>
     <Member MemberName="Selected">
       <MemberSignature Language="C#" Value="public override void Selected (MonoTouch.Dialog.DialogViewController dvc, MonoTouch.UIKit.UITableView tableView, MonoTouch.Foundation.NSIndexPath path);" />
       <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Selected(class MonoTouch.Dialog.DialogViewController dvc, class MonoTouch.UIKit.UITableView tableView, class MonoTouch.Foundation.NSIndexPath path) cil managed" />

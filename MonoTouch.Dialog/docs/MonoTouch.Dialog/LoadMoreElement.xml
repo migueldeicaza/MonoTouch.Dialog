@@ -15,7 +15,8 @@
   </Interfaces>
   <Docs>
     <summary>An element that amimates when tapped indicating that more data is being loaded.</summary>
-    <remarks></remarks>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">

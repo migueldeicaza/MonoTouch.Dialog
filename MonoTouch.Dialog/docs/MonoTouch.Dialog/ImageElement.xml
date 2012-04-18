@@ -11,7 +11,8 @@
   <Interfaces />
   <Docs>
     <summary>Element to pick images from the local photo library.</summary>
-    <remarks></remarks>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -27,7 +28,8 @@
       <Docs>
         <param name="image">Image that represents the current selection.</param>
         <summary>Creates an instance of the image selector element.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CellKey">

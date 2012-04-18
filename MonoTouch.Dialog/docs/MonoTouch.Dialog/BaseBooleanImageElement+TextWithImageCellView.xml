@@ -15,17 +15,17 @@
   </Docs>
   <Members>
     <Member MemberName=".ctor">
-      <MemberSignature Language="C#" Value="public TextWithImageCellView (MonoTouch.Dialog.BaseBooleanImageElement parent);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class MonoTouch.Dialog.BaseBooleanImageElement parent) cil managed" />
+      <MemberSignature Language="C#" Value="public TextWithImageCellView (MonoTouch.Dialog.BaseBooleanImageElement parent_);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(class MonoTouch.Dialog.BaseBooleanImageElement parent_) cil managed" />
       <MemberType>Constructor</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
       </AssemblyInfo>
       <Parameters>
-        <Parameter Name="parent" Type="MonoTouch.Dialog.BaseBooleanImageElement" />
+        <Parameter Name="parent_" Type="MonoTouch.Dialog.BaseBooleanImageElement" />
       </Parameters>
       <Docs>
-        <param name="parent">To be added.</param>
+        <param name="parent_">To be added.</param>
         <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>

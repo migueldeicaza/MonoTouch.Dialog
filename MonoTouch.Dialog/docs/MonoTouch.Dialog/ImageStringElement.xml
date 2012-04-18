@@ -11,7 +11,8 @@
   <Interfaces />
   <Docs>
     <summary>An element that displays an thumbnail image with a string, not stylable.</summary>
-    <remarks></remarks>
+    <remarks>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -29,7 +30,8 @@
         <param name="caption">The text to display</param>
         <param name="image">The image to show</param>
         <summary>Creates an instance of ImageStringElement.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -46,10 +48,11 @@
       </Parameters>
       <Docs>
         <param name="caption">The text to display</param>
-        <param name="image">The image to show</param>
         <param name="tapped">Code to invoke when the user taps on this cell</param>
+        <param name="image">The image to show</param>
         <summary>Creates an instance of ImageStringElement.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -69,7 +72,8 @@
         <param name="value">Subheading for the cell</param>
         <param name="image">The image to show</param>
         <summary>Creates an instance of ImageStringElement.</summary>
-        <remarks></remarks>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="Accessory">
@@ -84,8 +88,10 @@
       </ReturnValue>
       <Docs>
         <summary>Determines the accessory to use for the cell</summary>
-        <value></value>
-        <remarks></remarks>
+        <value>
+        </value>
+        <remarks>
+        </remarks>
       </Docs>
     </Member>
     <Member MemberName="CellKey">

@@ -1,0 +1,257 @@
+<Type Name="RowBadgeElement" FullName="MonoTouch.Dialog.RowBadgeElement">
+  <TypeSignature Language="C#" Value="public class RowBadgeElement : MonoTouch.Dialog.Element" />
+  <TypeSignature Language="ILAsm" Value=".class public auto ansi beforefieldinit RowBadgeElement extends MonoTouch.Dialog.SytledStringElement" />
+  <AssemblyInfo>
+    <AssemblyName>MonoTouch.Dialog-1</AssemblyName>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>MonoTouch.Dialog.Element</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>Element that renders a Styled String with a badge.</summary>
+    <remarks>
+      <para>
+	This element renders a caption with a value, you can control the renderin of the badge with the Shadow, Radius, HighlightColor and Color properties.
+      <img href="row-badge.png"/>
+    </remarks>
+  </Docs>
+  <Members>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public RowBadgeElement (string caption);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string caption) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="caption" Type="System.String" />
+      </Parameters>
+      <Docs>
+        <param name="caption">Text for the element</param>
+        <summary>Creates a new RowBadgeElement.</summary>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public RowBadgeElement (string caption, MonoTouch.Foundation.NSAction tapped);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string caption, class MonoTouch.Foundation.NSAction tapped) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="caption" Type="System.String" />
+        <Parameter Name="tapped" Type="MonoTouch.Foundation.NSAction" />
+      </Parameters>
+      <Docs>
+        <param name="caption">Text for the element.</param>
+        <param name="tapped">Action to invoke if tapped.</param>
+        <summary>Creates a new RowBadgeElement.</summary>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public RowBadgeElement (string caption, string badgeValue);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string caption, string badgeValue) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="caption" Type="System.String" />
+        <Parameter Name="badgeValue" Type="System.String" />
+      </Parameters>
+      <Docs>
+        <param name="caption">Text for the element.</param>
+        <param name="badgeValue">Value for the badge</param>
+        <summary>Creates a new RowBadgeElement.</summary>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public RowBadgeElement (string caption, string badgeValue, MonoTouch.Foundation.NSAction tapped);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig specialname rtspecialname instance void .ctor(string caption, string badgeValue, class MonoTouch.Foundation.NSAction tapped) cil managed" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters>
+        <Parameter Name="caption" Type="System.String" />
+        <Parameter Name="badgeValue" Type="System.String" />
+        <Parameter Name="tapped" Type="MonoTouch.Foundation.NSAction" />
+      </Parameters>
+      <Docs>
+        <param name="caption">Text for the element.</param>
+        <param name="badgeValue">Value for the badge</param>
+        <param name="tapped">Action to invoke if tapped.</param>
+        <summary>Creates a new RowBadgeElement.</summary>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Color">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UIColor Color { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class MonoTouch.UIKit.UIColor Color" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UIColor</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Color for the badge.</summary>
+        <value></value>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="GetCell">
+      <MemberSignature Language="C#" Value="public override MonoTouch.UIKit.UITableViewCell GetCell (MonoTouch.UIKit.UITableView tv);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance class MonoTouch.UIKit.UITableViewCell GetCell(class MonoTouch.UIKit.UITableView tv) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITableViewCell</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="tv" Type="MonoTouch.UIKit.UITableView" />
+      </Parameters>
+      <Docs>
+        <param name="tv">The containing table view.</param>
+        <summary>
+            Gets a UITableViewCell for this element.   Can be overridden, but if you
+            customize the style or contents of the cell you must also override the CellKey
+            property in your derived class.
+            </summary>
+        <returns>
+        </returns>
+        <remarks>This is part of the machinery required by UITableView.   This method is only ever used by developers creating new MonoTouch.Dialog Elements and is not intended to be used by consumers of the API.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="HighlightColor">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UIColor HighlightColor { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class MonoTouch.UIKit.UIColor HighlightColor" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UIColor</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Color to use when the row is highlighted.</summary>
+        <value></value>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Matches">
+      <MemberSignature Language="C#" Value="public override bool Matches (string text);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance bool Matches(string text) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Boolean</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="text" Type="System.String" />
+      </Parameters>
+      <Docs>
+        <param name="text">Text to match</param>
+        <summary>Returns true if the text matches the content of this element (the caption or the badge).</summary>
+        <returns></returns>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Radius">
+      <MemberSignature Language="C#" Value="public float Radius { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance float32 Radius" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Single</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Radius to use for the badge element.</summary>
+        <value></value>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Selected">
+      <MemberSignature Language="C#" Value="public override void Selected (MonoTouch.Dialog.DialogViewController dvc, MonoTouch.UIKit.UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance void Selected(class MonoTouch.Dialog.DialogViewController dvc, class MonoTouch.UIKit.UITableView tableView, class MonoTouch.Foundation.NSIndexPath indexPath) cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.Void</ReturnType>
+      </ReturnValue>
+      <Parameters>
+        <Parameter Name="dvc" Type="MonoTouch.Dialog.DialogViewController" />
+        <Parameter Name="tableView" Type="MonoTouch.UIKit.UITableView" />
+        <Parameter Name="indexPath" Type="MonoTouch.Foundation.NSIndexPath" />
+      </Parameters>
+      <Docs>
+        <param name="dvc">
+            The <see cref="T:MonoTouch.Dialog.DialogViewController" /> where the selection took place
+            </param>
+        <param name="tableView">
+            The <see cref="T:MonoTouch.UIKit.UITableView" /> that contains the element.
+            </param>
+        <param name="indexPath">To be added.</param>
+        <param name="path">
+            The <see cref="T:MonoTouch.Foundation.NSIndexPath" /> that contains the Section and Row for the element.
+            </param>
+        <summary>
+            Invoked when the given element has been selected by the user.
+            </summary>
+        <remarks>
+        </remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Summary">
+      <MemberSignature Language="C#" Value="public override string Summary ();" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig virtual instance string Summary() cil managed" />
+      <MemberType>Method</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.String</ReturnType>
+      </ReturnValue>
+      <Parameters />
+      <Docs>
+        <summary>
+            Returns a summary of the value represented by this object, suitable
+            for rendering as the result of a RootElement with child objects.
+            </summary>
+        <returns>
+            The return value must be a short description of the value.
+            </returns>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="Tapped">
+      <MemberSignature Language="C#" Value="public event MonoTouch.Foundation.NSAction Tapped;" />
+      <MemberSignature Language="ILAsm" Value=".event class MonoTouch.Foundation.NSAction Tapped" />
+      <MemberType>Event</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.Foundation.NSAction</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Method to invoke when the element is tapped.</summary>
+        <remarks></remarks>
+      </Docs>
+    </Member>
+  </Members>
+</Type>

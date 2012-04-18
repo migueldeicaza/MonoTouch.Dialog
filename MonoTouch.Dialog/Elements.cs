@@ -814,7 +814,7 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		void PrepareCell (UITableViewCell cell)
+		protected void PrepareCell (UITableViewCell cell)
 		{
 			cell.Accessory = Accessory;
 			var tl = cell.TextLabel;
@@ -2824,16 +2824,21 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Row badge element. Ported from https://github.com/tmdvs/TDBadgedCell
 	/// </summary>
-	public class RowBadgeElement : Element
+	public class RowBadgeElement : StyledStringElement
 	{
-		static NSString skey = new NSString ("BadgeElement");
+		static NSString [] skey = { new NSString ("rbe.1"), new NSString ("rbe.2"), new NSString ("rbe.3"), new NSString ("rbe.4") };
+
+		public static NSString GetKey (int style)
+		{
+			return skey [style];
+		}
 		
-		private string badgeValue;
+		string badgeValue;
 		
 		public UIColor Color { get; set; }
 		public UIColor HighlightColor { get; set; }
 		public float Radius { get; set; }
-		
+		public bool Shadow { get; set; }
 		
 		public RowBadgeElement (string caption) : base(caption)
 		{
@@ -2861,18 +2866,19 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			BadgeCell cell = (BadgeCell)tv.DequeueReusableCell (skey);
+			var key = GetKey ((int) style);
+			BadgeCell cell = (BadgeCell)tv.DequeueReusableCell (key);
 			if (cell == null) {
-				cell = new BadgeCell (skey);
+				cell = new BadgeCell (key);
 				cell.SelectionStyle = (Tapped != null) ? UITableViewCellSelectionStyle.Blue : UITableViewCellSelectionStyle.None;
 			}
-			cell.Accessory = UITableViewCellAccessory.None;
-			cell.TextLabel.Text = Caption;
-			cell.TextLabel.TextAlignment = UITextAlignment.Left;
+			PrepareCell (cell);
+
 			cell.BadgeText = badgeValue;
 			cell.Color = Color;
 			cell.Radius = Radius;
 			cell.HighlightColor = HighlightColor;
+			cell.Shadow = Shadow;
 			cell.SetNeedsLayout ();
 			
 			return cell;

@@ -81,6 +81,79 @@ class Login {
         </remarks>
       </Docs>
     </Member>
+    <Member MemberName="AutocapitalizationType">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UITextAutocapitalizationType AutocapitalizationType;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype MonoTouch.UIKit.UITextAutocapitalizationType AutocapitalizationType" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITextAutocapitalizationType</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Controls the autocapitalization kind for the entry.</summary>
+        <remarks>
+          <example>
+            <code lang="c#">
+class Login {
+	[Entry ("Company", AutocapitalizationType=UITextAutocapitalizationType.Words)]
+	string the_company_name; 
+}
+	    </code>
+          </example>
+
+</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="AutocorrectionType">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UITextAutocorrectionType AutocorrectionType;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype MonoTouch.UIKit.UITextAutocorrectionType AutocorrectionType" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITextAutocorrectionType</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Controls the autocorrection type for the entry.</summary>
+        <remarks>
+          <example>
+            <code lang="c#">
+class Login {
+	[Entry ("Company", AutocorrectionType = UITextAutocorrectionType.Yes)]
+	string the_company_name; 
+}
+</code>
+</example>
+</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="ClearButtonMode">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UITextFieldViewMode ClearButtonMode;" />
+      <MemberSignature Language="ILAsm" Value=".field public valuetype MonoTouch.UIKit.UITextFieldViewMode ClearButtonMode" />
+      <MemberType>Field</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITextFieldViewMode</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Controls whether the standard clear button widget appears on the entry.</summary>
+        <remarks>
+<example>
+<code lang="c#">
+class Login {
+	[Entry ("Url", ClearButtonMode = UITextFieldViewMode.WhileEditing)]
+	string url; 
+}
+</code>
+</example>
+</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="KeyboardType">
       <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UIKeyboardType KeyboardType;" />
       <MemberSignature Language="ILAsm" Value=".field public valuetype MonoTouch.UIKit.UIKeyboardType KeyboardType" />

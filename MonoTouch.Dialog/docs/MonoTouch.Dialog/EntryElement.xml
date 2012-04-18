@@ -116,8 +116,8 @@
       </Docs>
     </Member>
     <Member MemberName="BecomeFirstResponder">
-      <MemberSignature Language="C#" Value="public void BecomeFirstResponder (bool animated);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void BecomeFirstResponder(bool animated) cil managed" />
+      <MemberSignature Language="C#" Value="public virtual void BecomeFirstResponder (bool animated);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void BecomeFirstResponder(bool animated) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
@@ -181,6 +181,30 @@
         </remarks>
       </Docs>
     </Member>
+    <Member MemberName="ClearButtonMode">
+      <MemberSignature Language="C#" Value="public MonoTouch.UIKit.UITextFieldViewMode ClearButtonMode { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance valuetype MonoTouch.UIKit.UITextFieldViewMode ClearButtonMode" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>MonoTouch.UIKit.UITextFieldViewMode</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Controls whether the standard clear button widget appears on the entry.</summary>
+        <value></value>
+        <remarks>
+          <example>
+            <code lang="c#">
+var e = new EntryElement ("Name", "Your name", "miguel") {
+	ClearButtonMode = UITextFieldViewMode.WhileEditing
+};
+	    </code>
+	  </example>
+	</remarks>
+      </Docs>
+    </Member>
     <Member MemberName="CreateTextField">
       <MemberSignature Language="C#" Value="protected virtual MonoTouch.UIKit.UITextField CreateTextField (System.Drawing.RectangleF frame);" />
       <MemberSignature Language="ILAsm" Value=".method familyhidebysig newslot virtual instance class MonoTouch.UIKit.UITextField CreateTextField(valuetype System.Drawing.RectangleF frame) cil managed" />
@@ -219,6 +243,22 @@
         <param name="disposing">To be added.</param>
         <summary>To be added.</summary>
         <remarks>To be added.</remarks>
+      </Docs>
+    </Member>
+    <Member MemberName="EntryEnded">
+      <MemberSignature Language="C#" Value="public EventHandler EntryEnded { get; set; }" />
+      <MemberSignature Language="ILAsm" Value=".property instance class System.EventHandler EntryEnded" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue>
+        <ReturnType>System.EventHandler</ReturnType>
+      </ReturnValue>
+      <Docs>
+        <summary>Event raised when the underlying UITextField widget raises the Ended event.</summary>
+        <value></value>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="EntryKey">
@@ -340,8 +380,8 @@
       </Docs>
     </Member>
     <Member MemberName="ResignFirstResponder">
-      <MemberSignature Language="C#" Value="public void ResignFirstResponder (bool animated);" />
-      <MemberSignature Language="ILAsm" Value=".method public hidebysig instance void ResignFirstResponder(bool animated) cil managed" />
+      <MemberSignature Language="C#" Value="public virtual void ResignFirstResponder (bool animated);" />
+      <MemberSignature Language="ILAsm" Value=".method public hidebysig newslot virtual instance void ResignFirstResponder(bool animated) cil managed" />
       <MemberType>Method</MemberType>
       <AssemblyInfo>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>

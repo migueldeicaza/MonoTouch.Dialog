@@ -45,6 +45,11 @@ namespace Sample
 					Radius = 9f,
 					Color = UIColor.FromRGBA (0.197f, 0.592f, 0.219f, 1f)
 				},
+				new RowBadgeElement ("With radius", "9f", () => {}) {
+					BackgroundColor = UIColor.Red,
+					Radius = 9f,
+					Color = UIColor.FromRGBA (0.197f, 0.592f, 0.219f, 1f)
+				},
 			};
 			
 			//
