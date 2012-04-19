@@ -34,24 +34,6 @@ namespace Sample
 				}
 			};
 			
-			var numberBadgedSection = new Section ("RowBadgeElement") {
-				new RowBadgeElement ("Default", () => {}),
-				new RowBadgeElement ("Default with val", "10", () => {}),
-				new RowBadgeElement ("Default with text", "text", () => {}),
-				new RowBadgeElement ("Colored", "color", () => {}) {
-					Color = UIColor.FromRGBA (0.792f, 0.197f, 0.219f, 1f)
-				},
-				new RowBadgeElement ("With radius", "9f", () => {}) {
-					Radius = 9f,
-					Color = UIColor.FromRGBA (0.197f, 0.592f, 0.219f, 1f)
-				},
-				new RowBadgeElement ("With radius", "9f", () => {}) {
-					BackgroundColor = UIColor.Red,
-					Radius = 9f,
-					Color = UIColor.FromRGBA (0.197f, 0.592f, 0.219f, 1f)
-				},
-			};
-			
 			//
 			// Use the MakeCalendarBadge API
 			//
@@ -59,7 +41,7 @@ namespace Sample
 			var dates = new string [][] {
 				new string [] { "January", "1", "Hangover day" },
 				new string [] { "February", "14", "Valentine's Day" },
-				new string [] { "March", "3", "Third day of March" },
+ 				new string [] { "March", "3", "Third day of March" },
 				new string [] { "March", "31", "Prank Preparation day" },
 				new string [] { "April", "1", "Pranks" },
 			};
@@ -110,7 +92,6 @@ namespace Sample
 				entrySection,
 				calendarSection,
 				badgeSection,
-				numberBadgedSection
 			};
 			var dvc = new DialogViewController (root, true);
 			dvc.Style = UITableViewStyle.Plain;

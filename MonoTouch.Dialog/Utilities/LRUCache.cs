@@ -68,8 +68,6 @@ public class LRUCache<TKey, TValue> where TValue : class, IDisposable  {
 		revdict.Remove (last);
 		list.RemoveLast ();
 		last.Value.Dispose ();
-				
-			Console.WriteLine ("Evicted, got: {0} bytes and {1} slots", currentSize, list.Count);
 	}
 
 	public void Purge ()
@@ -131,7 +129,6 @@ public class LRUCache<TKey, TValue> where TValue : class, IDisposable  {
 			dict [key] = node;
 			revdict [node] = key;
 			currentSize += size;
-				Console.WriteLine ("new size: {0} with {1}", currentSize, list.Count);
 		}
 	}
 

@@ -105,6 +105,14 @@ some advanced used cases of MonoTouch.Dialog.
 
 Miguel (miguel@gnome.org)
 
+Additional Elements
+===================
+
+Additional user-contributed elements are now available in 
+
+http://github.com/xamarin/monotouch-element-pack
+
+
 Using MonoTouch.Dialog
 ======================
 
