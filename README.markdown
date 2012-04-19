@@ -6,7 +6,7 @@ table-based information without having to write dozens of delegates
 and controllers for the user interface.  Table support Pull-to-Refresh
 as well as built-in searching.
 
-![screenshot](http://tirania.org/images/MTDialogSample.png "Sample") 
+![screenshot](http://tirania.org/images/MTDialogSample.png "Sample")
 
 This was created with the following code:
 
@@ -14,7 +14,7 @@ This was created with the following code:
         new Section (){
             new BooleanElement ("Airplane Mode", false),
             new RootElement ("Notifications", 0, 0) {
-                new Section (null, 
+                new Section (null,
     		    	 "Turn off Notifications to disable Sounds\n" +
                          "Alerts and Home Screen Badges for the\napplications below."){
                     new BooleanElement ("Notifications", false)
@@ -70,13 +70,13 @@ generated on a server.  See the section below "Json" for more
 information.
 
 In addition to being a simple way to create dialogs, it also has been
-growing to contains a number of utility functions that are useful for
+growing to contain a number of utility functions that are useful for
 iPhone development.
 
 MonoTouch.Dialog is a retained system for implementing UITableViews
 as opposed to the on-demand nature of UITableView.
 
-Currently this supports creating Dialogs based on navigation controllers 
+Currently this supports creating Dialogs based on navigation controllers
 that support both basic and advanced cells.
 
 Some basic cells include:
@@ -89,6 +89,7 @@ Some basic cells include:
   * Jump to HTML page
   * Radio elements
   * Dates, Times and Dates+Times
+  * Numeric Value Entry
   * Pull-to-refresh functionality.
   * Activity indicators
 
@@ -124,7 +125,7 @@ RootElements can be created either manually with the "Elements" API by
 creating the various nodes necessary to render the information.  You
 would use this if you need control, if you want to extend the features
 supported by MonoTouch.Dialogs or if you want to dynamically generate
-the content for your dialog.   This is what is used for example in 
+the content for your dialog.   This is what is used for example in
 TweetStation for the main timeline views.
 
 Additionally, there is a trivial Reflection-based constructor that can
@@ -134,12 +135,12 @@ account page is as trivial as:
     class AccountInfo {
         [Section]
         public bool AirplaneMode;
-    
+
         [Section ("Data Entry", "Your credentials")]
-    
+
         [Entry ("Enter your login name")]
         public string Login;
-    
+
         [Caption ("Password"), Password ("Enter your password")]
         public string passwd;
 
@@ -150,7 +151,7 @@ account page is as trivial as:
     void Setup ()
     {
         account = new AccountInfo ();
-    
+
         var bc = new BindingContext (this, account, "Seat Selection");
     }
 
@@ -158,7 +159,7 @@ Which produces this UI:
 
 ![Rendering of AccountInfo](http://github.com/migueldeicaza/MonoTouch.Dialog/raw/master/sample.png)
 
-This is what the Elements API usage looks like, it is a more flexible 
+This is what the Elements API usage looks like, it is a more flexible
 API and the one I suggest you use for anything that requires
 customizations and goes beyond the basics of the Reflection-based
 attributes:
@@ -167,7 +168,7 @@ attributes:
           new Section (){
             new BooleanElement ("Airplane Mode", false),
             new RootElement ("Notifications", 0, 0) {
-              new Section (null, 
+              new Section (null,
                   "Turn off Notifications to disable Sounds\n" +
                   "Alerts and Home Screen Badges for the."){
                 new BooleanElement ("Notifications", false)
@@ -192,10 +193,10 @@ attributes:
           },
 
 To create nested UIs that provide automatic navigation, you would just
-create an instance of that class.  
+create an instance of that class.
 
 Autorotation is supported by default by setting the Autorotate property
-in the DialogViewController.   Setting this value will propagate to 
+in the DialogViewController.   Setting this value will propagate to
 the various components that are shiped with MonoTouch.Dialog like the
 WebView and the date and time pickers
 
@@ -246,7 +247,7 @@ Samples Included
 The sample program exercises various features of the API and should be
 a useful guide on how to implement certain features.  One of the demos
 uses the Elements API to replicate the "Settings" application on the
-iPhone.  
+iPhone.
 
 The High-Level Reflection API
 =============================
@@ -300,18 +301,18 @@ These are the current widgets supported by the Reflection API:
 
 ### String constants and Buttons. ###
 
-  Use the string type.   If the type has a value, in 
+  Use the string type.   If the type has a value, in
   addition to showing the caption, it will render its
   value on the right.
 
-  You can add the [OnTap] attribute to your string 
+  You can add the [OnTap] attribute to your string
   to invoke a method on demand.
 
   You can add the [Multiline] attribute to your string
-  to make the cell render in multiple lines.   And you 
+  to make the cell render in multiple lines.   And you
   can use the [Html] attribute on a string, in that
   case the value of the string should contain the url
-  to load in the embedded UIWebView. 
+  to load in the embedded UIWebView.
 
   The [Aligntment] attribute takes a parameter a UITextAlingment
   that determines how the string should be rendered
@@ -336,19 +337,19 @@ These are the current widgets supported by the Reflection API:
 
 ### Text Entry and Password Entries.###
 
-  Use the string type for your field and annotate the 
+  Use the string type for your field and annotate the
   string with the [Entry] attribute.   If you provide
   an argument to the [Entry] attribute, it will be used
   as the greyed-out placeholder value for the UITextField.
 
-  Use the [Password] attribute instead of [Entry] to 
+  Use the [Password] attribute instead of [Entry] to
   create a secure entry line.
- 
+
   Examples:
 
         [Entry ("Your username")]
         public string Login;
-  
+
         [Entry]
         public string StreetName;
 
@@ -376,7 +377,7 @@ These are the current widgets supported by the Reflection API:
 
 ### Float values ###
 
-  Using a float in your source will provide a slider on the 
+  Using a float in your source will provide a slider on the
   screen.   You can control the ranges of the values by
   using the [Range (low,high)] attribute.   Otherwise the
   default is to edit a value between 0 and 1.
@@ -424,10 +425,10 @@ These are the current widgets supported by the Reflection API:
   Additionally, the [Caption] attribute can be applied to the
   individual elements of an enumeration value to customize how they
   are rendered.
-  
+
 ### Images ###
 
-  Variables with type UIImage will render the image as a 
+  Variables with type UIImage will render the image as a
   thumbnail and will invoke the image picker if tapped on.
 
   Examples:
@@ -437,7 +438,7 @@ These are the current widgets supported by the Reflection API:
 ### Ignoring Some Fields ###
 
   If you want to ignore a particular field just apply the [Skip]
-  attribute to the field.   
+  attribute to the field.
 
   Examples:
         [Skip] Guid UniquId;
@@ -526,16 +527,16 @@ The Elements API
 ================
 
 All that the Reflection API does is create a set of nodes from the
-Elements API.   
+Elements API.
 
-First a sample of how you would create a UI taking advantage of 
+First a sample of how you would create a UI taking advantage of
 C# 3.0 initializers:
 
         var root = new RootElement ("Settings") {
           new Section (){
             new BooleanElement ("Airplane Mode", false),
             new RootElement ("Notifications", 0, 0) {
-              new Section (null, 
+              new Section (null,
                   "Turn off Notifications to disable Sounds\n" +
                   "Alerts and Home Screen Badges for the."){
                 new BooleanElement ("Notifications", false)
@@ -555,11 +556,12 @@ C# 3.0 initializers:
             new EntryElement ("Password", "enter", "password", true),
             new DateElement ("Select Date", DateTime.Now),
             new TimeElement ("Select Time", DateTime.Now),
+            new CounterElement ("Select Value", "123.45"),
           },
 
 You will need a RootElement to get things rolling.   The nested
 structure created by Sections() and Elements() are merely calls to
-either RootElement.Add () or Section.Add() that the C# compiler 
+either RootElement.Add () or Section.Add() that the C# compiler
 invokes for us.
 
 The basic principle is that the DialogViewController shows one
@@ -567,7 +569,7 @@ RootElement, and a RootElement is made up of Sections which in turn
 can contain any kind of Element (including other RootElements).
 
 RootElements inside a Section when tapped have the effect of activating
-a nested UI on a new DialogViewController. 
+a nested UI on a new DialogViewController.
 
 Another advantage of the C# 3.0 syntax is that it can be integrated
 with LINQ, you can use integrated queries to generate the user
@@ -580,7 +582,7 @@ MIX Conference:
 	 		where s.Start.Day == day
 	 		orderby s.Start ascending
 	 		group s by s.Start.ToString() into g
-	 		select new Section (MakeCaption ("", Convert.ToDateTime(g.Key))) 
+	 		select new Section (MakeCaption ("", Convert.ToDateTime(g.Key)))
 	 			from hs in g
 	 			   select (Element) new SessionElement (hs)
 	 	};
@@ -612,12 +614,12 @@ The hierarchy of Elements looks like this:
               RadioElement
               StyleStringElement
           UIViewElement
-        
+
 Additionally notice that when adding elements to a section, you
 can use either Elements or UIViews directly.   The UIViews are
 just wrapped in a special UIViewElement element.
 
-You can also create your own Elements by subclassing one of the 
+You can also create your own Elements by subclassing one of the
 above elements and overriding a handful of methods.
 
 RootElement
@@ -644,7 +646,7 @@ the Root element with the Group constructor, like this:
 
 The name of the group in RadioGroup is used to show the selected value
 in the containing page (if any) and the value, which is zero in this
-case, is the index of the first selected item. 
+case, is the index of the first selected item.
 
 Root elements can also be used inside Sections to trigger
 loading a new nested configuration page.   When used in this mode
@@ -669,7 +671,7 @@ and having a radio group with three values.
 
 In this particular sample, the radio group will select "Chocolate
 Cake" in the "Desert" section because we passed the value "2" to the
-RadioGroup.  This means pick the 3rd item on the list (zero-index). 
+RadioGroup.  This means pick the 3rd item on the list (zero-index).
 
 Sections are added by calling the Add method or using the C# 4
 initializer syntax.  The Insert methods are provided to insert
@@ -755,7 +757,7 @@ use, the basics include:
     To render strings with a read-only value.
     To be used as "buttons", pass a delegate for this.
   * StyledStringElement
-    Similar to StringElement but allows for the Font, TextColor, 
+    Similar to StringElement but allows for the Font, TextColor,
     images and accessories to be set on a per-cell basis.
   * MultilineElement
     Derives from StringElement, used to render multi-line cells.
@@ -764,7 +766,8 @@ use, the basics include:
   * DateTimeElement (to edit dates and times).
   * DateElement (to edit just dates)
   * TimeElement (to edit just times)
-  * BadgeElement 
+  * CounterElement (to edit numeric values, with or without decimals)
+  * BadgeElement
     To render images (57x57) or calendar entries next to the text.
 
 The more sophisticated elements include:
@@ -852,6 +855,32 @@ the keyboard type style desired for the data entry.  This can be used
 to configure the keyboard for numeric input, phone input, url input or
 email address input (The values of UIKeyboardType).
 
+CounterElement
+--------------
+
+The CounterElement is used to get user input for decimal values and is
+intialized with two string values: the caption for the entry and the
+current value. Both values are required. The initial numeric value may
+be the empty string.
+
+When the CounterElement is selected, the numeric value is displayed
+with a picker providing a wheel for each of the digit positions. An
+additional wheel is shown at the left, allowing the number to grow
+with one digit position. This leftmost wheel has a blank instead of
+a 0.
+
+So 12.50 will be shown with as a picker with 5 wheels having values
+blank, 1, 2, 5 and 0. When e.g. 6 is selected with the leftmost wheel,
+the value becomes 612.50 and subsequent selects will show a picker
+with 6 wheels having values blank, 6, 1, 2, 5 and 0. If now the 6 and
+1 are set to zero, the value becomes 2.50 and subsequent selects will
+show a picker with 4 wheels with values blank, 2, 5 and 0.
+
+The decimal wheels have a lightgrey background. Decimal wheels will
+only be present if the input value contains a decimal point (, or .)
+and the number of decimal wheels is fixed as indicated by the initial
+value.
+
 UIViewElement
 -------------
 
@@ -870,7 +899,7 @@ visual feedback that your application is busy.
 LoadMoreElement
 ---------------
 
-Use this element to allow users to load more items in your list. 
+Use this element to allow users to load more items in your list.
 You can customize the normal and loading captions, as well as the
 font and text color.  The UIActivity indicator starts animating,
 and the loading caption is displayed when a user taps the cell,
@@ -908,13 +937,13 @@ You create them like this:
 OwnerDrawnElement
 -----------------
 
-This element must be subclassed as it is an abstract class.  You 
+This element must be subclassed as it is an abstract class.  You
 should override the Height(RectangleF bounds) method in which you
-should return the height of the element, as well as 
+should return the height of the element, as well as
 Draw(RectangleF bounds, CGContext context, UIView view) in which
 you should do all your customized drawing within the given bounds,
 using the context and view parameters.
-This element does the heavy lifting of subclassing a UIView, and 
+This element does the heavy lifting of subclassing a UIView, and
 placing it in the Cell to be returned, leaving you only needing to
 implement two simple overrides.  You can see a better sample implementation
 in the Sample app in the DemoOwnerDrawnElement.cs file.
@@ -927,21 +956,21 @@ Here's a very simple example of implementing the class:
 	 	{
 	 		this.Text = text;
 	 	}
-	 	
+
 	 	public string Text
 	 	{
-	 		get;set;	
+	 		get;set;
 	 	}
-	 	
+
 	 	public override void Draw (RectangleF bounds, CGContext context, UIView view)
 	 	{
 	 		UIColor.White.SetFill();
 	 		context.FillRect(bounds);
-	 		
-	 		UIColor.Black.SetColor();	
+
+	 		UIColor.Black.SetColor();
 	 		view.DrawString(this.Text, new RectangleF(10, 15, bounds.Width - 20, bounds.Height - 30), UIFont.BoldSystemFontOfSize(14.0f), UILineBreakMode.TailTruncation);
 	 	}
-	 	
+
 	 	public override float Height (RectangleF bounds)
 	 	{
 	 		return 44.0f;
@@ -965,7 +994,7 @@ directly to the iPhone interaction model.
 If you want to do data validation, you should do this when the user
 triggers an action with the data entered.  For example a "Done" or
 "Next" buttons on the top toolbar, or some StringElement used as a
-button to go to the next stage.   
+button to go to the next stage.
 
 This is where you would perform basic input validation, and perhaps
 more complicated validation like checking for the validity of a
@@ -992,7 +1021,7 @@ methods:
         UITableViewCell GetCell (UITableView tv)
 
         // To retrieve a "summary" that can be used with
-        // a root element to render a summary one level up.  
+        // a root element to render a summary one level up.
         string Summary ()
 
         // To detect when the user has tapped on the cell
@@ -1045,20 +1074,20 @@ when you create the controller, like this:
 
 For more advanced customizations, like setting the default background
 for the DialogViewController, you would need to create a subclass of
-it and override the proper methods.   
+it and override the proper methods.
 
 This example shows how to use an image as the background for the
 DialogViewController:
 
     class SpiffyDialogViewController : DialogViewController {
         UIImage image;
-    
-        public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image) 
-            : base (root, pushing) 
+
+        public SpiffyDialogViewController (RootElement root, bool pushing, UIImage image)
+            : base (root, pushing)
         {
             this.image = image;
         }
-    
+
         public override LoadView ()
         {
             base.LoadView ();
