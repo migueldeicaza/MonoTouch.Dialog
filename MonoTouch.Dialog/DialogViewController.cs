@@ -485,15 +485,14 @@ namespace MonoTouch.Dialog
 
 		protected virtual UINavigationController FindNavigationController ()
 		{
-			if (NavigationController != null)
-				return NavigationController;
-			
 			UIViewController vc = ParentViewController;
 			while (vc != null) {
 				if (vc is UINavigationController)
 					return vc as UINavigationController;
 				vc = vc.ParentViewController;
 			}
+			if (NavigationController != null)
+				return NavigationController;
 
 			return null;
 		}
