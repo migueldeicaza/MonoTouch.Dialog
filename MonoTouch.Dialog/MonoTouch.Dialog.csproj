@@ -100,6 +100,7 @@
     <Compile Include="Utilities\GlassButton.cs" />
     <Compile Include="Utilities\LocalizationExtensions.cs" />
     <Compile Include="Elements\Json.cs" />
+    <Compile Include="LinkedProperty.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
