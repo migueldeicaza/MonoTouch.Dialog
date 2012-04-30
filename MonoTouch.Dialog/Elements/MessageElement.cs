@@ -126,17 +126,17 @@ namespace MonoTouch.Dialog
 		
 	public class MessageElement : Element, IElementSizing
 	{
-		static NSString mKey = new NSString ("MessageElement");
+		protected static NSString mKey = new NSString ("MessageElement");
 		
 		public string Sender, Body, Subject;
 		public DateTime Date;
 		public bool NewFlag;
 		public int MessageCount;
 
-		private MessageSummaryViewFactory m_ViewFactory;
+		protected MessageSummaryViewFactory m_ViewFactory;
 		
-		class MessageCell : UITableViewCell {
-			BaseMessageSummaryView view;
+		protected class MessageCell : UITableViewCell {
+			protected BaseMessageSummaryView view;
 			
 			public MessageCell () : base (UITableViewCellStyle.Default, mKey)
 			{
@@ -153,7 +153,7 @@ namespace MonoTouch.Dialog
 				Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			}
 			
-			public void Update (MessageElement me)
+			public virtual void Update (MessageElement me)
 			{
 				view.Update (me.Sender, me.Body, me.Subject, me.Date, me.NewFlag, me.MessageCount);
 			}
