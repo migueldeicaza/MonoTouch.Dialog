@@ -4,9 +4,21 @@ using MonoTouch.UIKit;
 using MonoTouch.Foundation;
 using MonoTouch.CoreGraphics;
 
-namespace MonoTouch.Dialog {
+namespace MonoTouch.Dialog
+{
+	/// <summary>
+	/// Interface for a view used to render a message cell
+	/// </summary>
+	public abstract class BaseMessageSummaryView : UIView
+	{
+		public abstract void Update (string sender, string body, string subject, DateTime date, bool newFlag, int messageCount);
+	}
 
-	public class MessageSummaryView : UIView {
+	public delegate BaseMessageSummaryView MessageSummaryViewFactory();
+
+
+	public class MessageSummaryView : BaseMessageSummaryView
+	{
 		static UIFont SenderFont = UIFont.BoldSystemFontOfSize (19);
 		static UIFont SubjectFont = UIFont.SystemFontOfSize (14);
 		static UIFont TextFont = UIFont.SystemFontOfSize (13);
@@ -22,7 +34,8 @@ namespace MonoTouch.Dialog {
 		
 		static MessageSummaryView ()
 		{
-			using (var colorspace = CGColorSpace.CreateDeviceRGB ()){
+			using (var colorspace = CGColorSpace.CreateDeviceRGB ())
+			{
 				gradient = new CGGradient (colorspace, new float [] { /* first */ .52f, .69f, .96f, 1, /* second */ .12f, .31f, .67f, 1 }, null); //new float [] { 0, 1 });
 			}
 		}
@@ -32,7 +45,7 @@ namespace MonoTouch.Dialog {
 			BackgroundColor = UIColor.White;
 		}
 		
-		public void Update (string sender, string body, string subject, DateTime date, bool newFlag, int messageCount)
+		public override void Update (string sender, string body, string subject, DateTime date, bool newFlag, int messageCount)
 		{
 			Sender = sender;
 			Body = body;
@@ -72,7 +85,7 @@ namespace MonoTouch.Dialog {
 			if (DateTime.Now.Day == Date.Day)
 				label = Date.ToShortTimeString ();
 			else if (diff <= TimeSpan.FromHours (24))
-				label = "Yesterday".GetText ();
+				label = "Yesterday";
 			else if (diff < TimeSpan.FromDays (6))
 				label = Date.ToString ("dddd");
 			else
@@ -111,20 +124,31 @@ namespace MonoTouch.Dialog {
 		}
 	}
 		
-	public class MessageElement : Element, IElementSizing {
+	public class MessageElement : Element, IElementSizing
+	{
 		static NSString mKey = new NSString ("MessageElement");
 		
 		public string Sender, Body, Subject;
 		public DateTime Date;
 		public bool NewFlag;
 		public int MessageCount;
+
+		private MessageSummaryViewFactory m_ViewFactory;
 		
 		class MessageCell : UITableViewCell {
-			MessageSummaryView view;
+			BaseMessageSummaryView view;
 			
 			public MessageCell () : base (UITableViewCellStyle.Default, mKey)
 			{
 				view = new MessageSummaryView ();
+				ContentView.Add (view);
+				Accessory = UITableViewCellAccessory.DisclosureIndicator;
+			}
+
+			public MessageCell (MessageSummaryViewFactory viewFactory)
+				 : base (UITableViewCellStyle.Default, mKey)
+			{
+				view = viewFactory();
 				ContentView.Add (view);
 				Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			}
@@ -150,12 +174,26 @@ namespace MonoTouch.Dialog {
 		{
 			Tapped += tapped;
 		}
-		
+		public MessageElement (MessageSummaryViewFactory viewFactory)
+			:base("")
+		{
+			m_ViewFactory = viewFactory;
+		}
+
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (mKey) as MessageCell;
 			if (cell == null)
-				cell = new MessageCell ();
+			{
+				if(m_ViewFactory != null)
+				{
+					cell = new MessageCell(m_ViewFactory);
+				}
+				else
+				{
+					cell = new MessageCell ();
+				}
+			}
 			cell.Update (this);
 			return cell;
 		}
