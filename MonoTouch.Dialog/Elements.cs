@@ -1503,9 +1503,14 @@ namespace MonoTouch.Dialog
 		/// <param name="isPassword">
 		/// True if this should be used to enter a password.
 		/// </param>
-		public EntryElement (string caption, string placeholder, string value, bool isPassword) : base (caption)
+		public EntryElement (string caption, string placeholder, string value, bool isPassword) : this (caption, placeholder, value.CreateUnlinked(), isPassword)
 		{
-			Value = value;
+		}
+
+		public EntryElement (string caption, string placeholder, PropertyStore<string> value, bool isPassword) : base (caption)
+		{
+			val = value;
+			Value = Value;
 			this.isPassword = isPassword;
 			this.placeholder = placeholder;
 		}
