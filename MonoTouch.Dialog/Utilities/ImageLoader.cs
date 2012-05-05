@@ -143,7 +143,7 @@ namespace MonoTouch.Dialog.Utilities
 		/// </summary>
 		public void PurgeCache ()
 		{
-			lock (purge)
+			lock (cache)
 				cache.Purge ();
 		}
 		
