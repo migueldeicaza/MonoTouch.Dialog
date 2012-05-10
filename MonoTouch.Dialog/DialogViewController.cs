@@ -25,7 +25,7 @@ namespace MonoTouch.Dialog
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		public event Action<NSIndexPath> OnSelection;
-		UISearchBar searchBar;
+		public UISearchBar searchBar;
 		UITableView tableView;
 		RefreshTableHeaderView refreshView;
 		RootElement root;

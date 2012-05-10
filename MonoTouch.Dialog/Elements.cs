@@ -225,22 +225,25 @@ namespace MonoTouch.Dialog
 	}
 
 	public abstract class BoolElement : Element {
-		bool val;
+		PropertyStore<bool> val;
 		public virtual bool Value {
 			get {
-				return val;
+				return val.Value;
 			}
 			set {
-				bool emit = val != value;
-				val = value;
+				bool emit = val.Value != value;
+				val.Value = value;
 				if (emit && ValueChanged != null)
 					ValueChanged (this, EventArgs.Empty);
 			}
 		}
 		public event EventHandler ValueChanged;
 		
-		public BoolElement (string caption, bool value) : base (caption)
+		public BoolElement (string caption, bool value) : this (caption, value.CreateUnlinked())
 		{
+		}
+		
+		public BoolElement(string caption, PropertyStore<bool> value) : base(caption) {
 			val = value;
 		}
 		
@@ -261,6 +264,12 @@ namespace MonoTouch.Dialog
 		{  }
 		
 		public BooleanElement (string caption, bool value, string key) : base (caption, value)
+		{  }
+		
+		public BooleanElement (string caption, PropertyStore<bool> value) : base (caption, value)
+		{  }
+		
+		public BooleanElement (string caption, PropertyStore<bool> value, string key) : base (caption, value)
 		{  }
 		
 		protected override NSString CellKey {
@@ -396,6 +405,11 @@ namespace MonoTouch.Dialog
 			: base (caption, value)
 		{
 		}
+
+		public BaseBooleanImageElement (string caption, PropertyStore<bool> value)
+			: base (caption, value)
+		{
+		}
 		
 		public event NSAction Tapped;
 		
@@ -425,6 +439,12 @@ namespace MonoTouch.Dialog
 			this.onImage = onImage;
 			this.offImage = offImage;
 		}
+
+		public BooleanImageElement (string caption, PropertyStore<bool> value, UIImage onImage, UIImage offImage) : base (caption, value)
+		{
+			this.onImage = onImage;
+			this.offImage = offImage;
+		}
 		
 		protected override UIImage GetImage ()
 		{
@@ -446,13 +466,17 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class FloatElement : Element {
 		public bool ShowCaption;
-		public float Value;
+		public PropertyStore<float> Value;
 		public float MinValue, MaxValue;
 		static NSString skey = new NSString ("FloatElement");
 		UIImage Left, Right;
 		UISlider slider;
 		
-		public FloatElement (UIImage left, UIImage right, float value) : base (null)
+		public FloatElement (UIImage left, UIImage right, float value) : this (left, right, value.CreateUnlinked())
+		{
+		}
+
+		public FloatElement (UIImage left, UIImage right, PropertyStore<float> value) : base (null)
 		{
 			Left = left;
 			Right = right;
@@ -492,7 +516,7 @@ namespace MonoTouch.Dialog
 					Tag = 1
 				};
 				slider.ValueChanged += delegate {
-					Value = slider.Value;
+					Value.Value = slider.Value;
 				};
 			} else {
 				slider.Value = Value;
@@ -522,18 +546,22 @@ namespace MonoTouch.Dialog
 	///  Used to display a cell that will launch a web browser when selected.
 	/// </summary>
 	public class HtmlElement : Element {
-		NSUrl nsUrl;
+		PropertyStore<string> _url;
+		
 		static NSString hkey = new NSString ("HtmlElement");
 		UIWebView web;
 		
-		public HtmlElement (string caption, string url) : base (caption)
+		public HtmlElement (string caption, string url) : this (caption, url.CreateUnlinked())
 		{
-			Url = url;
+		}
+
+		public HtmlElement (string caption, PropertyStore<string> url) : base (caption)
+		{
+			_url = url;
 		}
 		
-		public HtmlElement (string caption, NSUrl url) : base (caption)
+		public HtmlElement (string caption, NSUrl url) : this (caption, url.ToString().CreateUnlinked())
 		{
-			nsUrl = url;
 		}
 		
 		protected override NSString CellKey {
@@ -543,10 +571,10 @@ namespace MonoTouch.Dialog
 		}
 		public string Url {
 			get {
-				return nsUrl.ToString ();
+				return _url;
 			}
 			set {
-				nsUrl = new NSUrl (value);
+				_url.Value = value;
 			}
 		}
 		
@@ -635,7 +663,7 @@ namespace MonoTouch.Dialog
 			vc.View.AddSubview (web);
 			
 			dvc.ActivateController (vc);
-			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
+			web.LoadRequest (NSUrlRequest.FromUrl (new NSUrl(Url)));
 		}
 	}
 
@@ -647,11 +675,15 @@ namespace MonoTouch.Dialog
 		static NSString skey = new NSString ("StringElement");
 		static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
-		public string Value;
+		public PropertyStore<string> Value;
 		
 		public StringElement (string caption) : base (caption) {}
 		
-		public StringElement (string caption, string value) : base (caption)
+		public StringElement (string caption, string value) : this (caption, value.CreateUnlinked())
+		{
+		}
+
+		public StringElement (string caption, PropertyStore<string> value) : base (caption)
 		{
 			this.Value = value;
 		}
@@ -659,6 +691,7 @@ namespace MonoTouch.Dialog
 		public StringElement (string caption,  NSAction tapped) : base (caption)
 		{
 			Tapped += tapped;
+			this.Value = String.Empty.CreateUnlinked();
 		}
 		
 		public event NSAction Tapped;
@@ -695,7 +728,7 @@ namespace MonoTouch.Dialog
 		
 		public override bool Matches (string text)
 		{
-			return (Value != null ? Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
+			return (Value.Value != null ? Value.Value.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1: false) || base.Matches (text);
 		}
 	}
 	
@@ -713,7 +746,16 @@ namespace MonoTouch.Dialog
 		{
 			style = UITableViewCellStyle.Value1;	
 		}
+		public StyledStringElement (string caption, PropertyStore<string> value) : base (caption, value) 
+		{
+			style = UITableViewCellStyle.Value1;	
+		}
+
 		public StyledStringElement (string caption, string value, UITableViewCellStyle style) : base (caption, value) 
+		{ 
+			this.style = style;
+		}
+		public StyledStringElement (string caption, PropertyStore<string> value, UITableViewCellStyle style) : base (caption, value) 
 		{ 
 			this.style = style;
 		}
@@ -1074,9 +1116,13 @@ namespace MonoTouch.Dialog
 		{
 			RootElement root = (RootElement) Parent.Parent;
 			if (RadioIdx != root.RadioSelected){
-				var cell = tableView.CellAt (root.PathForRadio (root.RadioSelected));
-				if (cell != null)
-					cell.Accessory = UITableViewCellAccessory.None;
+				UITableViewCell cell;
+				var selectedIndex = root.PathForRadio (root.RadioSelected);
+				if (selectedIndex != null) {
+					cell = tableView.CellAt (selectedIndex);
+					if (cell != null)
+						cell.Accessory = UITableViewCellAccessory.None;
+				}
 				cell = tableView.CellAt (indexPath);
 				if (cell != null)
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
@@ -1314,12 +1360,12 @@ namespace MonoTouch.Dialog
 				return val;
 			}
 			set {
-				val = value;
-				if (entry != null)
-					entry.Text = value;
+				val.Value = value;
+				//if (entry != null)
+				//	entry.Text = value;
 			}
 		}
-		protected string val;
+		protected PropertyStore<string> val;
 
 		/// <summary>
 		/// The key used for reusable UITableViewCells.
@@ -1434,11 +1480,17 @@ namespace MonoTouch.Dialog
 		/// <param name="value">
 		/// Initial value.
 		/// </param>
-		public EntryElement (string caption, string placeholder, string value) : base (caption)
+		public EntryElement (string caption, string placeholder, string value) : this (caption, placeholder, value.CreateUnlinked())
 		{ 
-			Value = value;
+		}
+		
+		public EntryElement (string caption, string placeholder, PropertyStore<string> value) : base (caption)
+		{ 
+			val = value;
+			Value = Value;
 			this.placeholder = placeholder;
 		}
+
 		
 		/// <summary>
 		/// Constructs an EntryElement for password entry with the given caption, placeholder and initial value.
@@ -1455,9 +1507,14 @@ namespace MonoTouch.Dialog
 		/// <param name="isPassword">
 		/// True if this should be used to enter a password.
 		/// </param>
-		public EntryElement (string caption, string placeholder, string value, bool isPassword) : base (caption)
+		public EntryElement (string caption, string placeholder, string value, bool isPassword) : this (caption, placeholder, value.CreateUnlinked(), isPassword)
 		{
-			Value = value;
+		}
+
+		public EntryElement (string caption, string placeholder, PropertyStore<string> value, bool isPassword) : base (caption)
+		{
+			val = value;
+			Value = Value;
 			this.isPassword = isPassword;
 			this.placeholder = placeholder;
 		}
@@ -1688,7 +1745,7 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class DateTimeElement : StringElement {
-		public DateTime DateValue;
+		public PropertyStore<DateTime> DateValue;
 		public UIDatePicker datePicker;
 		public event Action<DateTimeElement> DateSelected;
 		
@@ -1696,15 +1753,19 @@ namespace MonoTouch.Dialog
 			DateStyle = NSDateFormatterStyle.Short
 		};
 		
-		public DateTimeElement (string caption, DateTime date) : base (caption)
+		public DateTimeElement (string caption, DateTime date) : this (caption, date.CreateUnlinked())
+		{
+		}	
+
+		public DateTimeElement (string caption, PropertyStore<DateTime> date) : base (caption)
 		{
 			DateValue = date;
-			Value = FormatDate (date);
+			Value = FormatDate (date).CreateUnlinked();
 		}	
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			Value = FormatDate (DateValue);
+			Value.Value = FormatDate (DateValue);
 			var cell = base.GetCell (tv);
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			return cell;
@@ -1744,7 +1805,7 @@ namespace MonoTouch.Dialog
 			var picker = new UIDatePicker (RectangleF.Empty){
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Mode = UIDatePickerMode.DateAndTime,
-				Date = DateValue
+				Date = DateValue.Value
 			};
 			return picker;
 		}
@@ -1782,7 +1843,7 @@ namespace MonoTouch.Dialog
 			public override void ViewWillDisappear (bool animated)
 			{
 				base.ViewWillDisappear (animated);
-				container.DateValue = container.datePicker.Date;
+				container.DateValue.Value = container.datePicker.Date;
 				if (container.DateSelected != null)
 					container.DateSelected (container);
 			}
@@ -1816,7 +1877,11 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class DateElement : DateTimeElement {
-		public DateElement (string caption, DateTime date) : base (caption, date)
+		public DateElement (string caption, DateTime date) : this (caption, date.CreateUnlinked())
+		{
+		}
+
+		public DateElement (string caption, PropertyStore<DateTime> date) : base (caption, date)
 		{
 			fmt.DateStyle = NSDateFormatterStyle.Medium;
 		}
@@ -1835,7 +1900,10 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class TimeElement : DateTimeElement {
-		public TimeElement (string caption, DateTime date) : base (caption, date)
+		public TimeElement (string caption, DateTime date) : this (caption, date.CreateUnlinked())
+		{
+		}
+		public TimeElement (string caption, PropertyStore<DateTime> date) : base (caption, date)
 		{
 		}
 		
