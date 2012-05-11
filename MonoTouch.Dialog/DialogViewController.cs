@@ -668,5 +668,9 @@ namespace MonoTouch.Dialog
 			this.pushing = pushing;
 			this.root = root;
 		}
+		public DialogViewController (IntPtr handle) : base(handle)
+		{
+			this.root = new RootElement ("");
+		}
 	}
 }
