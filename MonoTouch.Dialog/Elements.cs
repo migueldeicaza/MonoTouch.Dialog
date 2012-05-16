@@ -1315,6 +1315,15 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Value { 
 			get {
+				if (entry == null)
+					return val;
+				var newValue = entry.Text;
+				if (newValue == val)
+					return val;
+				val = newValue;
+
+				if (Changed != null)
+					Changed (this EventArgs.Empty);
 				return val;
 			}
 			set {
@@ -1540,9 +1549,6 @@ namespace MonoTouch.Dialog
 				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
 				entry.ValueChanged += delegate {
-					FetchValue ();
-				};
-				entry.EditingChanged += delegate {
 					FetchValue ();
 				};
 				entry.Ended += delegate {					
