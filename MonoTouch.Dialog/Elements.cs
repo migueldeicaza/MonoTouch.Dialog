@@ -1323,7 +1323,7 @@ namespace MonoTouch.Dialog
 				val = newValue;
 
 				if (Changed != null)
-					Changed (this EventArgs.Empty);
+					Changed (this, EventArgs.Empty);
 				return val;
 			}
 			set {
