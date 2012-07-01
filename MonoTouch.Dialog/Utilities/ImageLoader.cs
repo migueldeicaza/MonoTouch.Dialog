@@ -143,7 +143,8 @@ namespace MonoTouch.Dialog.Utilities
 		/// </summary>
 		public void PurgeCache ()
 		{
-			cache.Purge ();
+			lock (cache)
+				cache.Purge ();
 		}
 		
 		static int hex (int v)

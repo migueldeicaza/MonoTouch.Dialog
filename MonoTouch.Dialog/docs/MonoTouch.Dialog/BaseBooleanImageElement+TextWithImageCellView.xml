@@ -25,7 +25,7 @@
         <Parameter Name="parent_" Type="MonoTouch.Dialog.BaseBooleanImageElement" />
       </Parameters>
       <Docs>
-        <param name="parent_">To be added.</param>
+        <param name="parent_">The parent BaseBooleanImageElement object</param>
         <summary>To be added.</summary>
         <remarks>To be added.</remarks>
       </Docs>

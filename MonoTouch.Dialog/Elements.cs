@@ -834,14 +834,16 @@ namespace MonoTouch.Dialog
 			} else {
 				var imgView = cell.ImageView;
 				UIImage img;
-				
-				if (extraInfo.Uri != null)
-					img = ImageLoader.DefaultRequestImage (extraInfo.Uri, this);
-				else if (extraInfo.Image != null)
-					img = extraInfo.Image;
-				else 
-					img = null;
-				imgView.Image = img;
+
+				if (imgView != null) {
+					if (extraInfo.Uri != null)
+						img = ImageLoader.DefaultRequestImage (extraInfo.Uri, this);
+					else if (extraInfo.Image != null)
+						img = extraInfo.Image;
+					else 
+						img = null;
+					imgView.Image = img;
+				}
 
 				if (cell.DetailTextLabel != null)
 					cell.DetailTextLabel.TextColor = extraInfo.DetailColor ?? UIColor.Gray;
@@ -1074,9 +1076,13 @@ namespace MonoTouch.Dialog
 		{
 			RootElement root = (RootElement) Parent.Parent;
 			if (RadioIdx != root.RadioSelected){
-				var cell = tableView.CellAt (root.PathForRadio (root.RadioSelected));
-				if (cell != null)
-					cell.Accessory = UITableViewCellAccessory.None;
+				UITableViewCell cell;
+				var selectedIndex = root.PathForRadio (root.RadioSelected);
+				if (selectedIndex != null) {
+					cell = tableView.CellAt (selectedIndex);
+					if (cell != null)
+						cell.Accessory = UITableViewCellAccessory.None;
+				}				
 				cell = tableView.CellAt (indexPath);
 				if (cell != null)
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
@@ -1311,6 +1317,15 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Value { 
 			get {
+				if (entry == null)
+					return val;
+				var newValue = entry.Text;
+				if (newValue == val)
+					return val;
+				val = newValue;
+
+				if (Changed != null)
+					Changed (this, EventArgs.Empty);
 				return val;
 			}
 			set {
@@ -1536,9 +1551,6 @@ namespace MonoTouch.Dialog
 				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
 				entry.ValueChanged += delegate {
-					FetchValue ();
-				};
-				entry.EditingChanged += delegate {
 					FetchValue ();
 				};
 				entry.Ended += delegate {					
