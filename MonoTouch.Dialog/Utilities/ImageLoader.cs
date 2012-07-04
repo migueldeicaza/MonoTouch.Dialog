@@ -257,24 +257,12 @@ namespace MonoTouch.Dialog.Utilities
 		
 		static bool Download (Uri uri, string target)
 		{
-			var buffer = new byte [4*1024];
-			
 			try {
-				var tmpfile = target + ".tmp";
-				using (var file = new FileStream (tmpfile, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-	                	var req = WebRequest.Create (uri) as HttpWebRequest;
-					
-	                using (var resp = req.GetResponse()) {
-						using (var s = resp.GetResponseStream()) {
-							int n;
-							while ((n = s.Read (buffer, 0, buffer.Length)) > 0){
-								file.Write (buffer, 0, n);
-	                        }
-						}
-	                }
-				}
-				File.Move (tmpfile, target);
-				return true;
+				NSUrlResponse response;
+				NSError error;
+				var req = new NSUrlRequest (new NSUrl (uri.ToString ()), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
+				var data = NSUrlConnection.SendSynchronousRequest (req, out response, out error);
+				return data.Save (target, true, out error);
 			} catch (Exception e) {
 				Console.WriteLine ("Problem with {0} {1}", uri, e);
 				return false;

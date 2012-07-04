@@ -66,7 +66,38 @@ namespace MonoTouch.Dialog {
 			}
 			return cell;
 		}
-		
+
+		class ConnectionDelegate : NSUrlConnectionDelegate {
+			Action<Stream,NSError> callback;
+			NSMutableData buffer;
+
+			public ConnectionDelegate (Action<Stream,NSError> callback) 
+			{
+				this.callback = callback;
+				buffer = new NSMutableData ();
+			}
+
+			public override void ReceivedResponse(NSUrlConnection connection, NSUrlResponse response)
+			{
+				buffer.SetLength (0);
+			}
+
+			public override void FailedWithError(NSUrlConnection connection, NSError error)
+			{
+				callback (null, error);
+			}
+
+			public override void ReceivedData(NSUrlConnection connection, NSData data)
+			{
+				buffer.AppendData (data);
+			}
+
+			public override void FinishedLoading(NSUrlConnection connection)
+			{
+				callback (buffer.AsStream (), null);
+			}
+		}
+
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			if (Url == null){
@@ -80,35 +111,31 @@ namespace MonoTouch.Dialog {
 			var cell = GetActiveCell ();
 			var spinner = StartSpinner (cell);
 			loading = true;
-			
-			var wc = new WebClient ();
-			
-			wc.DownloadStringCompleted += delegate  (object sender, DownloadStringCompletedEventArgs e){
-				dvc.BeginInvokeOnMainThread (delegate {
-					loading = false;
-					spinner.StopAnimating ();
-					spinner.RemoveFromSuperview ();
-					if (e.Result != null){
-						try {
-							var obj = JsonValue.Load (new StringReader (e.Result)) as JsonObject;
-							if (obj != null){
-								var root = JsonElement.FromJson (obj);
-								var newDvc = new DialogViewController (root, true) {
-									Autorotate = true
-								};
-								PrepareDialogViewController (newDvc);
-								dvc.ActivateController (newDvc);
-								return;
-							}
-						} catch (Exception ee){
-							Console.WriteLine (ee);
+
+			var request = new NSUrlRequest (new NSUrl (Url), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 60);
+			var connection = new NSUrlConnection (request, new ConnectionDelegate ((data,error) => {
+				loading = false;
+				spinner.StopAnimating ();
+				spinner.RemoveFromSuperview ();
+				if (error == null){
+					try {
+						var obj = JsonValue.Load (new StreamReader (data)) as JsonObject;
+						if (obj != null){
+							var root = JsonElement.FromJson (obj);
+							var newDvc = new DialogViewController (root, true) {
+								Autorotate = true
+							};
+							PrepareDialogViewController (newDvc);
+							dvc.ActivateController (newDvc);
+							return;
 						}
+					} catch (Exception ee){
+						Console.WriteLine (ee);
 					}
-					var alert = new UIAlertView ("Error", "Unable to download data", null, "Ok");
-					alert.Show ();
-				});
-			};
-			wc.DownloadStringAsync (new Uri (Url));
+				}
+				var alert = new UIAlertView ("Error", "Unable to download data", null, "Ok");
+				alert.Show ();
+			}));
 		}
 
 		public JsonElement (string caption, string url) : base (caption)
