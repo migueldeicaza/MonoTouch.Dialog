@@ -540,10 +540,10 @@ namespace MonoTouch.Dialog {
 			string background = null;
 			NSAction ontap = null;
 			NSAction onaccessorytap = null;
-			int? lines;
-			UITableViewCellAccessory? accessory;
-			UILineBreakMode? linebreakmode;
-			UITextAlignment? alignment;
+            int? lines = null;
+            UITableViewCellAccessory? accessory = null;
+            UILineBreakMode? linebreakmode = null;
+            UITextAlignment? alignment = null;
 			UIColor textcolor = null, detailcolor = null;
 			UIFont font = null;
 			UIFont detailfont = null;
@@ -627,7 +627,8 @@ namespace MonoTouch.Dialog {
 			}
 			if (caption == null)
 				caption = "";
-			if (font != null || style != UITableViewCellStyle.Value1 || detailfont != null || linebreakmode.HasValue || textcolor != null || accessory.HasValue || onaccessorytap != null || background != null || detailcolor != null){
+            if (font != null || style != UITableViewCellStyle.Value1 || detailfont != null || linebreakmode.HasValue || textcolor != null || accessory.HasValue || onaccessorytap != null || background != null || detailcolor != null)
+            {
 				StyledStringElement styled;
 				
 				if (lines.HasValue){
