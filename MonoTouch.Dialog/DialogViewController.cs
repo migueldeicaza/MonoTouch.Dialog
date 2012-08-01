@@ -487,15 +487,33 @@ namespace MonoTouch.Dialog
 				DismissModalViewControllerAnimated (animated);
 		}
 
+		public UISearchBar ExternalSearchBar 
+		{
+			get {
+				return _externalSearchBar;
+			}
+			set {
+				if (searchBar != null)
+					throw new ArgumentException("Internal searchBar already in use, assign before accessing tableView for first time.");
+				else if (_externalSearchBar != null)
+					throw new ArgumentException("External searchBar already in use, can only be assigned 1 time per intance");
+
+				_externalSearchBar = value;
+			}
+		}
+		private UISearchBar _externalSearchBar;
+
 		void SetupSearch ()
 		{
 			if (enableSearch){
-				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
-					Delegate = new SearchDelegate (this)
-				};
+				searchBar = _externalSearchBar != null 
+					? _externalSearchBar : new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44));
+				searchBar.Delegate = new SearchDelegate(this);
 				if (SearchPlaceholder != null)
 					searchBar.Placeholder = this.SearchPlaceholder;
-				tableView.TableHeaderView = searchBar;					
+
+				if (_externalSearchBar == null)
+					tableView.TableHeaderView = searchBar;					
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;

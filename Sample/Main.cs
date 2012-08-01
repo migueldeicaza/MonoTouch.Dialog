@@ -61,6 +61,9 @@ namespace Sample
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)
 				},
+				new Section  ("Search") {
+					new StringElement("External Search Bar", DemoExternalSearchBar)
+				}
 			};
 			
 			//
