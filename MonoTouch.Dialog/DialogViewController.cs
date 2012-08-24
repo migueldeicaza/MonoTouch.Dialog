@@ -583,6 +583,17 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+		public bool Pushing {
+			get {
+				return pushing;
+			}
+			set {
+				pushing = value;
+				if (NavigationItem != null)
+					NavigationItem.HidesBackButton = !pushing;
+			}
+		}
+		
 		public virtual Source CreateSizingSource (bool unevenRows)
 		{
 			return unevenRows ? new SizingSource (this) : new Source (this);
