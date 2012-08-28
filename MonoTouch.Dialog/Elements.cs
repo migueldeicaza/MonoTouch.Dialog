@@ -580,18 +580,6 @@ namespace MonoTouch.Dialog
 				this.container = container;
 			}
 			
-			public override void ViewWillDisappear (bool animated)
-			{
-				base.ViewWillDisappear (animated);
-				NetworkActivity = false;
-				if (container.web == null)
-					return;
-
-				container.web.StopLoading ();
-				container.web.Dispose ();
-				container.web = null;
-			}
-
 			public bool Autorotate { get; set; }
 			
 			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
@@ -602,6 +590,7 @@ namespace MonoTouch.Dialog
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
+			int i = 0;
 			var vc = new WebViewController (this) {
 				Autorotate = dvc.Autorotate
 			};
@@ -612,14 +601,22 @@ namespace MonoTouch.Dialog
 				AutoresizingMask = UIViewAutoresizing.All
 			};
 			web.LoadStarted += delegate {
+				// this is called several times and only one UIActivityIndicatorView is needed
+				if (i++ == 0) {
+					var indicator = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.White);
+					vc.NavigationItem.RightBarButtonItem = new UIBarButtonItem (indicator);
+					indicator.StartAnimating ();
+				}
 				NetworkActivity = true;
-				var indicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.White);
-				vc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(indicator);
-				indicator.StartAnimating();
 			};
 			web.LoadFinished += delegate {
+				if (--i == 0) {
+					// we stopped loading, remove indicator and dispose of UIWebView
+					vc.NavigationItem.RightBarButtonItem = null;
+					web.StopLoading ();
+					web.Dispose ();
+				}
 				NetworkActivity = false;
-				vc.NavigationItem.RightBarButtonItem = null;
 			};
 			web.LoadError += (webview, args) => {
 				NetworkActivity = false;
