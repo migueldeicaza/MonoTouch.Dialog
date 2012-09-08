@@ -211,8 +211,7 @@ namespace MonoTouch.Dialog.Utilities
 					if (!pendingRequests [uri].Contains(notify))
 						pendingRequests [uri].Add (notify);
 					return null;
-				}
-				
+				}				
 			}
 
 			string picfile = uri.IsFile ? uri.LocalPath : PicDir + md5 (uri.AbsoluteUri);
