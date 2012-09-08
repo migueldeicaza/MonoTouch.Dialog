@@ -208,7 +208,8 @@ namespace MonoTouch.Dialog.Utilities
 
 			lock (requestQueue){
 				if (pendingRequests.ContainsKey (uri)) {
-					pendingRequests [uri].Add (notify);
+					if (!pendingRequests [uri].Contains(notify))
+						pendingRequests [uri].Add (notify);
 					return null;
 				}
 				
