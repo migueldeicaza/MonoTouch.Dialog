@@ -264,7 +264,7 @@ namespace MonoTouch.Dialog.Utilities
 			try {
 				NSUrlResponse response;
 				NSError error;
-				var req = new NSUrlRequest (new NSUrl (uri.ToString ()), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
+				var req = new NSUrlRequest (new NSUrl (uri.AbsoluteUri.ToString ()), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
 				var data = NSUrlConnection.SendSynchronousRequest (req, out response, out error);
 				return data.Save (target, true, out error);
 			} catch (Exception e) {
