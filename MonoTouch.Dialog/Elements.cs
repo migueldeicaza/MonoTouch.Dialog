@@ -1547,7 +1547,7 @@ namespace MonoTouch.Dialog
 				
 				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
-				entry.ValueChanged += delegate {
+				entry.EditingChanged += delegate {
 					FetchValue ();
 				};
 				entry.Ended += delegate {					
