@@ -56,6 +56,7 @@ namespace MonoTouch.Dialog
 				};
 				caption = new UILabel () {
 					AdjustsFontSizeToFitWidth = false,
+					AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 					Tag = 2
 				};
 				cell.ContentView.AddSubview (caption);
