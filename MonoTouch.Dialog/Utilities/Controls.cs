@@ -55,7 +55,13 @@ namespace MonoTouch.Dialog
 		protected UIActivityIndicatorView Activity;
 		protected UILabel LastUpdateLabel, StatusLabel;
 		protected UIImageView ArrowView;		
-			
+		readonly string dateTimeFormat;
+
+		public RefreshTableHeaderView (RectangleF rect, string dateTimeFormat) : this(rect)
+		{
+			this.dateTimeFormat = dateTimeFormat;
+		}
+
 		public RefreshTableHeaderView (RectangleF rect) : base (rect)
 		{
 			this.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
@@ -176,7 +182,11 @@ namespace MonoTouch.Dialog
 				if (value == DateTime.MinValue){
 					LastUpdateLabel.Text = "Last Updated: never".GetText ();
 				} else 
-					LastUpdateLabel.Text = String.Format ("Last Updated: {0:g}".GetText (), value);
+					if (!string.IsNullOrWhiteSpace(dateTimeFormat)) {
+						LastUpdateLabel.Text = String.Format ("Last Updated: {0}".GetText (), value.ToString(dateTimeFormat));
+					} else {
+						LastUpdateLabel.Text = String.Format ("Last Updated: {0:g}".GetText (), value);
+					}
 			}
 		}
 		

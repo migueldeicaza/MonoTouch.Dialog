@@ -20,6 +20,7 @@ namespace Sample
 			};
 
 			var dvc = new DialogViewController (root, true);
+			dvc.SetRefreshViewDateTimeFormat("HH:mm");
 			
 			//
 			// After the DialogViewController is created, but before it is displayed
