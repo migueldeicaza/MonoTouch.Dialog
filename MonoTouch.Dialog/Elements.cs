@@ -1509,7 +1509,7 @@ namespace MonoTouch.Dialog
 		protected virtual UITextField CreateTextField (RectangleF frame)
 		{
 			return new UITextField (frame) {
-				AutoresizingMask = UIViewAutoresizing.None,
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
 				Placeholder = placeholder ?? "",
 				SecureTextEntry = isPassword,
 				Text = Value ?? "",
@@ -1545,7 +1545,7 @@ namespace MonoTouch.Dialog
 					width -= 10;
 				}
 				
-				entry = CreateTextField (new RectangleF (cell.ContentView.Bounds.Width, yOffset, width, size.Height));
+				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
 				
 				entry.ValueChanged += delegate {
 					FetchValue ();
