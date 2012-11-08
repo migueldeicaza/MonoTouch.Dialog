@@ -34,14 +34,14 @@ This was created with the following code:
                             new RadioElement ("True Blood"),
                         },
                         new Section ("Standard"){
-			    from name in "Marimba,Alarm,Ascending,Bark".Split (',')
-				(Element) new RadioElement (n)
+                            from name in "Marimba,Alarm,Ascending,Bark".Split (',')
+                                 select (Element) new RadioElement (name)
                         }
                     },
                     new RootElement ("New Text Message", new RadioGroup (3)){
                         new Section (){
-			    from name in "None,Tri-tone,Chime,Glass,Horn,Bell,Electronic".Split (',')
-				(Element) new RadioElement (n)
+                            from name in "None,Tri-tone,Chime,Glass,Horn,Bell,Electronic".Split (',')
+                                select (Element) new RadioElement (name)
                         }
                     },
                     new BooleanElement ("New Voice Mail", false),
