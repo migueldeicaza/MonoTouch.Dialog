@@ -15,26 +15,54 @@
   </Interfaces>
   <Docs>
     <summary>
-            RootElements are responsible for showing a full configuration page.
-            </summary>
+      RootElements are responsible for showing a full configuration page.
+    </summary>
     <remarks>
-            At least one RootElement is required to start the MonoTouch.Dialogs
-            process.
-            RootElements can also be used inside Sections to trigger
-            loading a new nested configuration page.   When used in this mode
-            the caption provided is used while rendered inside a section and
-            is also used as the Title for the subpage.
-            If a RootElement is initialized with a section/element value then
-            this value is used to locate a child Element that will provide
-            a summary of the configuration which is rendered on the right-side
-            of the display.
-            RootElements are also used to coordinate radio elements.  The
-            RadioElement members can span multiple Sections (for example to
-            implement something similar to the ring tone selector and separate
-            custom ring tones from system ringtones).
-            Sections are added by calling the Add method which supports the
-            C# 4.0 syntax to initialize a RootElement in one pass.
-            </remarks>
+      <para>
+	At least one RootElement is required to start the
+	MonoTouch.Dialogs process.  RootElements contain in turn a
+	collection of <see cref="T:MonoTouch.Dialog.Section"/> objects
+	which in turn contain the various specialized Element
+	instances including other RootElements -- to create nested user
+	interfaces. 
+      </para>
+      <para>
+	RootElements can also be used inside Sections to trigger
+	loading a new nested configuration page.   When used in this mode
+	the caption provided is used while rendered inside a section and
+	is also used as the Title for the subpage.
+      </para>
+      <para>
+	If a RootElement is initialized with a section/element value then
+	this value is used to locate a child Element that will provide
+	a summary of the configuration which is rendered on the right-side
+	of the display.
+      </para>
+      <para>
+	RootElements are also used to coordinate radio elements.  The
+	RadioElement members can span multiple Sections (for example to
+	implement something similar to the ring tone selector and separate
+	custom ring tones from system ringtones).
+      </para>
+      <para>
+	Sections are added by calling the Add method which supports the
+	C# 4.0 syntax to initialize a RootElement in one pass, for example:
+      </para>
+<example>
+<code lang="c#">
+return new RootElement ("Settings") {
+  new Section ("Basic Settings"){
+    new BooleanElement ("Airplane Mode", false),
+    new BooleanElement ("Happy", true),
+  },
+  new Section ("Advanced Settings"){
+    new BooleanElement ("Attend seminars", true)
+    new BooleanElement ("Enjoy coffee", true)
+  }
+}
+</code>
+</example>
+    </remarks>
   </Docs>
   <Members>
     <Member MemberName=".ctor">
@@ -54,7 +82,7 @@
         <summary>
             Initializes a RootSection with a caption
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -70,7 +98,7 @@
       </Parameters>
       <Docs>
         <param name="caption">
-            The caption to ender
+            The caption to render
             </param>
         <param name="group">
             The group that contains the checkbox or radio information.  This is used to display
@@ -79,7 +107,7 @@
         <summary>
             Initializes a RootElement that renders the summary based on the radio settings of the contained elements.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -97,13 +125,46 @@
         <param name="caption">
             The caption to render.
             </param>
-        <param name="createOnSelected">To be added.</param>
+        <param name="createOnSelected">Delegate returning a UIViewController.</param>
         <summary>
             Initializes a RootSection with a caption and a callback that will
             create the nested UIViewController that is activated when the user
             taps on the element.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+	  <para>
+	    You can use this constructor to customize the nested
+	    UIViewController that will be displayed when the element
+	    is tapped on.  For example, you could use this to either
+	    present something different than a DialogViewController,
+	    or to customize the contents of it.
+	  </para>
+
+<example>
+<code lang="c#">
+//
+// This ensures that the child DialogViewController uses the "Plain" style
+//
+void Setup (DialogViewController dvc)
+{
+    dvc.Root = new RootElement ("Settings", (root) => {
+	return new DialogViewController (UITableViewStyle.Plain, this, true);
+    });
+}
+
+// 
+// This example shows how to use an arbitrary UIViewController
+//
+void Setup (DialogViewController dvc)
+{
+    dvc.Root = new RootElement ("Settings", (root) => {
+        return new PickFriendViewController ();
+    });
+}
+</code>
+</example>
+
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName=".ctor">
@@ -120,18 +181,18 @@
       </Parameters>
       <Docs>
         <param name="caption">
-            The caption to render cref="System.String"/&gt;
-            </param>
-        <param name="section">
-            The section that contains the element with the summary.
-            </param>
-        <param name="element">
-            The element index inside the section that contains the summary for this RootSection.
-            </param>
-        <summary>
-            Initializes a RootElement with a caption with a summary fetched from the specified section and leement
-            </summary>
-        <remarks>To be added.</remarks>
+	  The caption to render cref="System.String"/&gt;
+	</param>
+	<param name="section">
+	  The section that contains the element with the summary.
+	</param>
+	<param name="element">
+	  The element index inside the section that contains the summary for this RootSection.
+	</param>
+	<summary>
+	  Initializes a RootElement with a caption with a summary fetched from the specified section and element
+	</summary>
+	<remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Add">
@@ -149,12 +210,12 @@
       </Parameters>
       <Docs>
         <param name="section">
-            The section to add, if the root is visible, the section is inserted with no animation
-            </param>
-        <summary>
-            Adds a new section to this RootElement
-            </summary>
-        <remarks>To be added.</remarks>
+	  The section to add, if the root is visible, the section is inserted with no animation
+	</param>
+	<summary>
+	  Adds a new section to this RootElement
+	</summary>
+	<remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Add">
@@ -171,9 +232,9 @@
         <Parameter Name="sections" Type="System.Collections.Generic.IEnumerable&lt;MonoTouch.Dialog.Section&gt;" />
       </Parameters>
       <Docs>
-        <param name="sections">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="sections">The sections to add, as an IEnumerable.</param>
+        <summary>Adds all of the sections in the IEnumerable to this root element.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Clear">
@@ -188,8 +249,10 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Removes all the sections from this RootElement.</summary>
+        <remarks>
+	  All of the sections are removed, and the contents of the UITableView are reloaded.
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName="Count">
@@ -203,9 +266,9 @@
         <ReturnType>System.Int32</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <summary>Number of sections in this RootElement.</summary>
+        <value></value>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="createOnSelected">
@@ -219,8 +282,21 @@
         <ReturnType>System.Func&lt;MonoTouch.Dialog.RootElement,MonoTouch.UIKit.UIViewController&gt;</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Delegate invoked when the RootElement is tapped.</summary>
+        <remarks>
+	  <para>
+	    If this value is not null, the delegate is invoked when the
+	    RootElement is tapped on.  The return value should be a
+	    UIViewController that will be displayed in response to the
+	    tap.  If the value is null, the code returns new
+	    DialogViewController initialized like this: 
+	  </para>
+<example>
+<code lang="c#">
+  new DialogViewController (this, true) { Autorotate = true; }.
+</code>
+</example>
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName="Dispose">
@@ -237,9 +313,9 @@
         <Parameter Name="disposing" Type="System.Boolean" />
       </Parameters>
       <Docs>
-        <param name="disposing">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="disposing">Whether Dispose is being called from the method (true) or false if it is being invoked by the C# finalizer.</param>
+        <summary>Releases the resources held by this RootElement and its children.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="GetCell">
@@ -284,7 +360,7 @@
       <Docs>
         <param name="idx">
             The index where the section is added <see cref="T:System.Int32" /></param>
-        <param name="section">To be added.</param>
+        <param name="section">Section to add at the given position.</param>
         <summary>
             Inserts a new section into the RootElement
             </summary>
@@ -347,10 +423,10 @@
         <Parameter Name="idx" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="idx">To be added.</param>
-        <summary>To be added.</summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+        <param name="idx">Index to retrieve</param>
+        <summary>Returns the section at the specified index.</summary>
+        <value></value>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="MakeViewController">
@@ -365,11 +441,33 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>
-            Creates the UIViewController that will be pushed by this RootElement
-            </summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+	<summary>
+	  Creates the UIViewController that will be pushed by this RootElement
+	</summary>
+	<returns>The new view controller.</returns>
+        <remarks>
+	  <para>
+	    This method is provided to allow subclasses of RootElement
+	    to customize the UIViewController to display when this
+	    element is selected.   
+	  </para>
+	  <para>
+	    This is the default implementation for this method:
+	  </para>
+	  <example>
+<code lang="c#">
+protected virtual UIViewController MakeViewController ()
+{
+  if (createOnSelected != null)
+    return createOnSelected (this);
+  
+  return new DialogViewController (this, true) {
+    Autorotate = true
+  };
+}
+</code>
+	  </example>
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName="NeedColorUpdate">
@@ -383,8 +481,9 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Set to direct the DialogViewController to call the
+	    WillDisplay method on cells that implement IColorizeBackground.</summary>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Prepare">
@@ -417,12 +516,12 @@
         <Parameter Name="dvc" Type="MonoTouch.UIKit.UIViewController" />
       </Parameters>
       <Docs>
-        <param name="dvc">To be added.</param>
+        <param name="dvc">The view controller.</param>
         <summary>
             This method does nothing by default, but gives a chance to subclasses to
             customize the UIViewController before it is presented
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="RadioSelected">
@@ -438,9 +537,9 @@
       <Docs>
         <summary>
             The currently selected Radio item in the whole Root.
-            </summary>
-        <value>To be added.</value>
-        <remarks>To be added.</remarks>
+	  </summary>
+        <value></value>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Reload">
@@ -458,10 +557,14 @@
         <Parameter Name="animation" Type="MonoTouch.UIKit.UITableViewRowAnimation" />
       </Parameters>
       <Docs>
-        <param name="element">To be added.</param>
-        <param name="animation">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="element">Element to refresh.</param>
+        <param name="animation">Animation to use for the changes done to an element after the data is reloaded.</param>
+        <summary>Notifies the UITableView that the contents of the specified Element have been updated and that they should be reloaded.</summary>
+        <remarks>
+	  <para>
+	    You should call this if you have made changes to the Element and want their contents to be refreshed.
+	  </para>
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName="Reload">
@@ -479,10 +582,10 @@
         <Parameter Name="animation" Type="MonoTouch.UIKit.UITableViewRowAnimation" />
       </Parameters>
       <Docs>
-        <param name="section">To be added.</param>
-        <param name="animation">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="section">Section to reload</param>
+        <param name="animation">Animation to use for the changes done to the section after the data is reloaded.</param>
+        <summary>Notifies the UITableView that the contents of the Section have been updated and that they should be reloaded.</summary>
+        <remarks>You should call this if you have made changes to cells in the Section and want their contents to be refreshed.</remarks>
       </Docs>
     </Member>
     <Member MemberName="Remove">
@@ -499,9 +602,16 @@
         <Parameter Name="s" Type="MonoTouch.Dialog.Section" />
       </Parameters>
       <Docs>
-        <param name="s">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="s">Section to remove</param>
+        <summary>Removes the specified section from this RootElement using the default animation.</summary>
+        <remarks>
+	  <para>
+	    If the Section is currently visible on the screen, the specified animation will be used to remove it.
+	  </para>
+	  <para>
+	    The default animation is Fade, but it could change in the future.
+	  </para>
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName="Remove">
@@ -519,10 +629,10 @@
         <Parameter Name="anim" Type="MonoTouch.UIKit.UITableViewRowAnimation" />
       </Parameters>
       <Docs>
-        <param name="s">To be added.</param>
-        <param name="anim">To be added.</param>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <param name="s">Section to remove</param>
+        <param name="anim">Animation to use for removing the section from the UITableView.</param>
+        <summary>Removes the specified section from this RootElement.</summary>
+        <remarks>If the Section is currently visible on the screen, the specified animation will be used to remove it.</remarks>
       </Docs>
     </Member>
     <Member MemberName="RemoveAt">
@@ -539,11 +649,13 @@
         <Parameter Name="idx" Type="System.Int32" />
       </Parameters>
       <Docs>
-        <param name="idx">To be added.</param>
+        <param name="idx">Index of the section to remove.</param>
         <summary>
-            Removes a section at a specified location
+            Removes a section at a specified location using the default animation.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks>
+	  The default animation is Fade, but it could change in the future.
+	</remarks>
       </Docs>
     </Member>
     <Member MemberName="RemoveAt">
@@ -566,9 +678,9 @@
         <param name="anim">
             A <see cref="T:MonoTouch.UIKit.UITableViewRowAnimation" /></param>
         <summary>
-            Removes a section at a specified location using the specified animation
+            Removes a section at a specified location using the specified animation.
             </summary>
-        <remarks>To be added.</remarks>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="Selected">
@@ -615,9 +727,9 @@
       </ReturnValue>
       <Parameters />
       <Docs>
-        <summary>To be added.</summary>
-        <returns>To be added.</returns>
-        <remarks>To be added.</remarks>
+        <summary>Enumerator that returns all the sections in this RootElement.</summary>
+        <returns></returns>
+        <remarks>This is the strongly typed version of the enumerator.</remarks>
       </Docs>
     </Member>
     <Member MemberName="System.Collections.IEnumerable.GetEnumerator">
@@ -637,7 +749,7 @@
             </summary>
         <returns>
             A <see cref="T:System.Collections.IEnumerator" /></returns>
-        <remarks>To be added.</remarks>
+        <remarks></remarks>
       </Docs>
     </Member>
     <Member MemberName="TableView">
@@ -651,8 +763,8 @@
         <ReturnType>MonoTouch.UIKit.UITableView</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>The UITableView that is rendering the current RootElement.</summary>
+        <remarks>If the value is null, it means that the RootElement has not been displayed yet.</remarks>
       </Docs>
     </Member>
     <Member MemberName="UnevenRows">
@@ -666,8 +778,21 @@
         <ReturnType>System.Boolean</ReturnType>
       </ReturnValue>
       <Docs>
-        <summary>To be added.</summary>
-        <remarks>To be added.</remarks>
+        <summary>Reports whether the rows have all the same size or not.</summary>
+        <remarks>
+	  <para>
+	    The value of this property is computed during the DialogViewController's Prepare() method, which is in turn called when the View is about to appear.
+	  </para>
+	  <para>
+
+	    The value is set to true if any of the elements that are
+	    being displayed implement the IElementSizing interface.
+	    The computed value is used by the DialogViewController to
+	    determine which one of its sources it will use to render
+	    the data.
+
+	  </para>
+	</remarks>
       </Docs>
     </Member>
   </Members>
