@@ -176,7 +176,7 @@ namespace MonoTouch.Dialog
 				if (value == DateTime.MinValue){
 					LastUpdateLabel.Text = "Last Updated: never".GetText ();
 				} else 
-					LastUpdateLabel.Text = String.Format ("Last Updated: {0:g}".GetText (), value);
+					LastUpdateLabel.Text = String.Format ("Last Updated: {0:d} {1}".GetText (), value, value.ToString("h:mm tt"));
 			}
 		}
 		
