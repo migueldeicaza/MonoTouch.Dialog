@@ -916,7 +916,7 @@ namespace MonoTouch.Dialog
 			string c = Caption;
 			string v = Value;
 			// ensure the (multi-line) Value will be rendered inside the cell when no Caption is present
-			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (v))
+			if (String.IsNullOrEmpty (c) && String.IsNullOrEmpty (v))
 				c = " ";
 
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
