@@ -52,7 +52,12 @@ namespace Sample
 					new TimeElement ("Select Time", DateTime.Now),
 				},
 				new Section () {
-					CreateGeneralSection (),		
+					CreateGeneralSection (),
+					new RootElement ("RootElement", "Explicit Summary") {
+						new Section ("About this test"){
+							new MultilineElement ("A root element with an explicit summary")
+						}
+					}
 					//new RootElement ("Mail, Contacts, Calendars"),
 					//new RootElement ("Phone"),
 					//new RootElement ("Safari"),
