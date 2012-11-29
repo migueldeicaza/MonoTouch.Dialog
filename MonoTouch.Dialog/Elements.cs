@@ -1705,6 +1705,7 @@ namespace MonoTouch.Dialog
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
 		public event Action<DateTimeElement> DateSelected;
+		public UIColor BackgroundColor = UIColor.Black;
 		
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
@@ -1822,7 +1823,7 @@ namespace MonoTouch.Dialog
 			};
 			datePicker = CreatePicker ();
 			                            
-			vc.View.BackgroundColor = UIColor.Black;
+			vc.View.BackgroundColor = BackgroundColor;
 			vc.View.AddSubview (datePicker);
 			dvc.ActivateController (vc);
 
