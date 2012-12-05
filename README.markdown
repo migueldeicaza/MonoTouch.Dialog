@@ -496,6 +496,97 @@ For example:
 The value rendered is the value rendered by calling ToString() on the
 value returned by IEnumerable.
 
+### Using Customized Elements in the Reflection API ###
+
+You can create your own custom Element implementations for use in
+the Elements API by extending the Element class or one of its 
+sub classes. That implementation can be used in the Elements API; however,
+it will not automatically be available in the Reflection api.
+
+To make your custom element available for the Reflection api, you
+will have to create a subclass of CustomElementAttribute.
+
+For example, say you have created a DateTimeElement that has additional
+properties:
+
+	class MyDateTimeElement : DateTimeElement {
+		
+		public bool IsOptional { get; private set; }
+		
+		public MyDateTimeElement(string caption, DateTime date, bool isOptional)
+			: base(caption, date)
+		{
+			IsOptional = isOptional;
+			// ... your implementation
+		}
+		
+		// ... your implementation
+	}
+	
+You can then create a CustomElementAttribute as follows:
+
+	class MyDateTimeAttribute : CustomElementAttribute {
+	
+		public bool IsOptional = false;
+		
+		public override Element CreateElement (
+			string caption, 
+			MemberInfo forMember, Type memberType, object memberValue, 
+			object[] attributes)
+		{
+			if (memberValue is DateTime) {
+				return new MyDateTimeElement(caption, (DateTime) memberValue, IsOptional); 
+			}
+			return null;
+		}
+		
+		public override object GetValue (Element element, Type resultType)
+		{
+			return ((MyDateTimeElement) element).DateValue;
+		}
+	}
+	
+The MyDateTimeAttribute can be used in a definition for the Reflection Api:
+
+	class MyReflectionApiScreen {
+	
+		[Entry]
+		public string YourNote;
+		
+		[MyDateTime(IsOptional = true)]
+		[Caption("Date / Time")]
+		public DateTime OptionalDateTime;
+	}
+
+You can also define CustomElementAttribute subclasses for existing elements 
+that you want to have instantiated in a specific way. For example, the
+BooleanImageElement has no corresponding attribute in the Reflection API.
+You can still use it by defining your own attribute:
+
+	public class MyBooleanAttribute : CustomElementAttribute {
+	
+		public override Element CreateElement (
+			string caption, 
+			MemberInfo forMember, Type memberType, object memberValue, 
+			object[] attributes)
+		{
+			// check whether memberType / memberValue is suitable?
+			bool value == ...;
+			UIImage onImage = ...;
+			UIImage offImage = ...;
+			return new BooleanImageElement(caption, value,  onImage, offImage);
+		}
+		
+		public override object GetValue (Element element, Type resultType)
+		{
+			// check wether resultType is suitable?
+			// ...
+			return ((BooleanImageElement) element).Value;
+		}
+	}
+
+A practical example is in the Sample application, under Reflection API -> Custom Element Attribute.
+
 Creating a Dialog From the Object
 ---------------------------------
 

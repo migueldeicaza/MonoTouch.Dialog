@@ -61,6 +61,33 @@ namespace Sample
 		[RadioSelection ("ListOfString")] 
 		public int selected = 1;
 		public IList<string> ListOfString;
+
+	[Section ("Custom Element Attribute")]
+		[MyFavorite]
+		[Caption("I like ice cream")]
+		public bool LikeIceCream = true;
+
+		[MyFavorite]
+		[Caption("I like veggies")]
+		public bool LikeVegetables = false;
+	}
+
+	public class MyFavoriteAttribute : CustomElementAttribute {
+
+		#region implemented abstract members of CustomElementAttribute		
+		public override Element CreateElement (string caption, System.Reflection.MemberInfo forMember, Type memberType, object memberValue, object[] attributes)
+		{
+			bool value = (bool) Convert.ChangeType(memberValue, typeof(bool));
+			UIImage favorite = UIImage.FromFile ("favorite.png");
+			UIImage favorited = UIImage.FromFile ("favorited.png");
+			return new BooleanImageElement(caption, value, favorited, favorite);
+		}		
+
+		public override object GetValue (Element element, Type resultType)
+		{
+			return Convert.ChangeType(((BooleanImageElement) element).Value, resultType);
+		}		
+		#endregion
 	}
 
 	public class TimeSettings {
@@ -109,19 +136,22 @@ namespace Sample
 				// Manly way of dumping the data.
 				Console.WriteLine ("Current status:");
 				Console.WriteLine (
-				    "AccountEnabled:  {0}\n" +
-				    "Login:           {1}\n" +
-				    "Password:        {2}\n" +
-					"Name:      	  {3}\n" +
-				    "Appointment:     {4}\n" +
-				    "Birthday:        {5}\n" +
-				    "Alarm:           {6}\n" +
-				    "Favorite Type:   {7}\n" + 
-				    "IEnumerable idx: {8}", 
+				    "AccountEnabled:   {0}\n" +
+				    "Login:            {1}\n" +
+				    "Password:         {2}\n" +
+					"Name:      	   {3}\n" +
+				    "Appointment:      {4}\n" +
+				    "Birthday:         {5}\n" +
+				    "Alarm:            {6}\n" +
+				    "Favorite Type:    {7}\n" + 
+				    "IEnumerable idx:  {8}\n" +
+					"I like ice cream: {9}\n" +
+					"I like veggies:   {10}\n",
 				    settings.AccountEnabled, settings.Login, settings.Password, settings.Name,
 				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, 
 				    settings.TimeSamples.Alarm, settings.FavoriteType,
-				    settings.selected);
+				    settings.selected, 
+					settings.LikeIceCream, settings.LikeVegetables);
 			};
 			navigation.PushViewController (dv, true);	
 		}

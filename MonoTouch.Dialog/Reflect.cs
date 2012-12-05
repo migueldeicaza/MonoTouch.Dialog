@@ -3,6 +3,9 @@
 //
 // Author:
 //   Miguel de Icaza (miguel@gnome.org)
+//   
+// Changes:
+//   2012-12-05, Added CustomElementAttribute and integrations (Reinder Kamphorst, reinder@toubab.nl)
 //
 // Copyright 2010, Novell, Inc.
 //
@@ -119,18 +122,78 @@ namespace MonoTouch.Dialog
 		public bool ShowCaption;
 	}
 
+	/// <summary>
+	/// Make your own custom element attributes for the reflection api
+	/// by deriving from this class. 
+	/// </summary>
+	/// <remarks>
+	/// For example, if you implement this class as e.g. MyElementAttribute,
+	/// specifying how to create an instance of MyElement (CreateElement) and 
+	/// specifying how to fetch its value (GetValue), you will be able to
+	/// decorate class fields / properties with [MyElement] and have them rendered
+	/// through the MonoTouch.Dialog reflection api.
+	/// </remarks>
+	public abstract class CustomElementAttribute : Attribute {
+		/// <summary>
+		/// Creates a new element of the type this CustomElementAttribute is made for
+		/// </summary>
+		/// <returns>
+		/// A newly instantiated element that is initialized with given memberValue.
+		/// </returns>
+		/// <param name='caption>
+		/// Caption to display on the created element.
+		/// </param>			
+		/// <param name='forMember'>
+		/// MemberInfo instance reflecting the member to create the element for.
+		/// </param>
+		/// <param name='memberType'>
+		/// Type of the reflected member. 
+		/// </param>
+		/// <param name='memberValue'>
+		/// Value to initialize the new element with. The type of memberValue will be memberType.
+		/// </param>
+		/// <param name='attributes'>
+		/// All the <seealso cref="Attribute"/>s that were defined on this member. 
+		/// With these, you can define custon behavior for your element for other attributes,
+		/// e.g. <seealso cref="OnTapAttribute"/>.
+		/// </param>
+		public abstract Element CreateElement(string caption, MemberInfo forMember, Type memberType, object memberValue, object[] attributes);
+
+		/// <summary>
+		/// Fetch the value of an element that was returned by <see cref="CreateElement"/>.
+		/// </summary>
+		/// <returns>
+		/// The value that is held by given element. 
+		/// </returns>
+		/// <param name='element'>
+		/// Element to fetch the value for. This element was previously created with <see cref="CreateElement"/>.
+		/// </param>
+		/// <param name='resultType'>
+		/// Type of the object to return. Even tough the return type of this method is <see cref="object"/>, 
+		/// it is the responsibility of this method to make sure the return value can be
+		/// directly cast to the specified resultType (i.e., it should not need extra conversion through,
+		/// for example, the <see cref="Convert"/> class).
+		/// </param>
+		public abstract object GetValue(Element element, Type resultType);
+	}
+	
 	public class BindingContext : IDisposable {
 		public RootElement Root;
 		Dictionary<Element,MemberAndInstance> mappings;
-			
+
 		class MemberAndInstance {
-			public MemberAndInstance (MemberInfo mi, object o)
+			public MemberAndInstance (MemberInfo mi, object o, CustomElementAttribute customInfo, Type memberType)
 			{
 				Member = mi;
 				Obj = o;
+				CustomInfo = customInfo;
+				MemberType = memberType;
 			}
+
 			public MemberInfo Member;
 			public object Obj;
+			public CustomElementAttribute CustomInfo;
+			public Type MemberType;
 		}
 		
 		static object GetValue (MemberInfo mi, object o)
@@ -194,7 +257,7 @@ namespace MonoTouch.Dialog
 				throw new ArgumentNullException ("o");
 			
 			mappings = new Dictionary<Element,MemberAndInstance> ();
-			
+
 			Root = new RootElement (title);
 			Populate (callbacks, o, Root);
 		}
@@ -213,20 +276,25 @@ namespace MonoTouch.Dialog
 				if (mType == null)
 					continue;
 
+				CustomElementAttribute customElementAttr = null;
 				string caption = null;
 				object [] attrs = mi.GetCustomAttributes (false);
 				bool skip = false;
 				foreach (var attr in attrs){
-					if (attr is SkipAttribute || attr is System.Runtime.CompilerServices.CompilerGeneratedAttribute)
+					if (attr is SkipAttribute || attr is System.Runtime.CompilerServices.CompilerGeneratedAttribute) {
 						skip = true;
-					else if (attr is CaptionAttribute)
+						break;
+					} else if (attr is CaptionAttribute) {
 						caption = ((CaptionAttribute) attr).Caption;
-					else if (attr is SectionAttribute){
+					} else if (attr is SectionAttribute) {
 						if (section != null)
 							root.Add (section);
 						var sa = attr as SectionAttribute;
 						section = new Section (sa.Caption, sa.Footer);
+					} else if (attr is CustomElementAttribute){
+						customElementAttr = attr as CustomElementAttribute;
 					}
+
 				}
 				if (skip)
 					continue;
@@ -238,7 +306,9 @@ namespace MonoTouch.Dialog
 					section = new Section ();
 				
 				Element element = null;
-				if (mType == typeof (string)){
+				if (customElementAttr != null) {
+					element = customElementAttr.CreateElement(caption, mi, mType, GetValue(mi, o), attrs);
+				} else if (mType == typeof (string)){
 					PasswordAttribute pa = null;
 					AlignmentAttribute align = null;
 					EntryAttribute ea = null;
@@ -388,7 +458,7 @@ namespace MonoTouch.Dialog
 				if (element == null)
 					continue;
 				section.Add (element);
-				mappings [element] = new MemberAndInstance (mi, o);
+				mappings [element] = new MemberAndInstance (mi, o, customElementAttr, mType);
 			}
 			root.Add (section);
 		}
@@ -420,11 +490,15 @@ namespace MonoTouch.Dialog
 		public void Fetch ()
 		{
 			foreach (var dk in mappings){
+				CustomElementAttribute customInfo = dk.Value.CustomInfo;
+				Type memberType = dk.Value.MemberType;
 				Element element = dk.Key;
 				MemberInfo mi = dk.Value.Member;
 				object obj = dk.Value.Obj;
-				
-				if (element is DateTimeElement)
+
+				if (customInfo != null) 
+					SetValue (mi, obj, customInfo.GetValue(element, memberType)); 
+				else if (element is DateTimeElement)
 					SetValue (mi, obj, ((DateTimeElement) element).DateValue);
 				else if (element is FloatElement)
 					SetValue (mi, obj, ((FloatElement) element).Value);
