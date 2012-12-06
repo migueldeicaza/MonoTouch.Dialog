@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using MonoTouch.Dialog;
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
+using System.Linq;
 
 namespace Sample
 {
@@ -70,6 +71,63 @@ namespace Sample
 		[MyFavorite]
 		[Caption("I like veggies")]
 		public bool LikeVegetables = false;
+
+	[Section ("Index Tags: Animals")]
+
+		[Checkbox]
+		[IndexTags("animals,dogs,small")]
+		public bool Chihuahua = false;
+
+		[Checkbox]
+		[IndexTags("animals,cats,small")]
+		public bool Persian = false;
+
+		[Checkbox]
+		[IndexTags("animals,dogs,big")]
+		public bool GermanShepherd = false;
+
+		[Checkbox]
+		[IndexTags("animals,cats,big")]
+		public bool MaineCoon = false;
+
+		[Section("")]
+		[Caption("Kinds")]
+		[IndexTags("kinds")]
+		[Entry]
+		public string Kinds = "";
+
+		[Caption("Sizes")]
+		[IndexTags("sizes")]
+		[Entry]
+		public string Sizes = "";
+
+	}
+
+	public class Callbacks {
+		private BindingContext _context;
+
+		public void Initalize (BindingContext context)
+		{
+			_context = context;
+			foreach (Element el in _context.GetElementsForTag("animals")) {
+				var chkEl = el as CheckboxElement;
+				if (chkEl != null)
+					chkEl.Tapped += UpdateCatsAndDogs;
+			}
+		}
+
+		public void UpdateCatsAndDogs() {
+			int dogs = _context.GetElementsForTag("dogs").Where(el => ((CheckboxElement) el).Value).Count();
+			int cats = _context.GetElementsForTag("cats").Where(el => ((CheckboxElement) el).Value).Count();
+			int small = _context.GetElementsForTag("small").Where(el => ((CheckboxElement) el).Value).Count();
+			int big = _context.GetElementsForTag("big").Where(el => ((CheckboxElement) el).Value).Count();
+
+			var kindsEl = _context.GetElementsForTag("kinds").FirstOrDefault() as EntryElement;
+			var sizesEl = _context.GetElementsForTag("sizes").FirstOrDefault() as EntryElement;
+
+			kindsEl.Value = string.Format("{0} dogs, {1} cats", dogs, cats);
+			sizesEl.Value = string.Format("{0} small, {1} big", small, big);
+		}
 	}
 
 	public class MyFavoriteAttribute : CustomElementAttribute {
@@ -99,6 +157,8 @@ namespace Sample
 		[Time]
 		public DateTime Alarm;
 	}
+
+	
 	
 	public partial class AppDelegate 
 	{
@@ -124,8 +184,11 @@ namespace Sample
 					ListOfString = new List<string> () { "One", "Two", "Three" }
 				};
 			}
-			var bc = new BindingContext (null, settings, "Settings");
-			
+
+			var cb = new Callbacks();
+			var bc = new BindingContext (cb, settings, "Settings");
+			cb.Initalize(bc);
+
 			var dv = new DialogViewController (bc.Root, true);
 			
 			// When the view goes out of screen, we fetch the data.
@@ -146,12 +209,15 @@ namespace Sample
 				    "Favorite Type:    {7}\n" + 
 				    "IEnumerable idx:  {8}\n" +
 					"I like ice cream: {9}\n" +
-					"I like veggies:   {10}\n",
+					"I like veggies:   {10}\n" +
+					"Animal kinds:     {11}\n" +
+					"Animal sizes:     {12}",
 				    settings.AccountEnabled, settings.Login, settings.Password, settings.Name,
 				    settings.TimeSamples.Appointment, settings.TimeSamples.Birthday, 
 				    settings.TimeSamples.Alarm, settings.FavoriteType,
 				    settings.selected, 
-					settings.LikeIceCream, settings.LikeVegetables);
+					settings.LikeIceCream, settings.LikeVegetables,
+					settings.Kinds, settings.Sizes);
 			};
 			navigation.PushViewController (dv, true);	
 		}

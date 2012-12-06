@@ -6,6 +6,7 @@
 //   
 // Changes:
 //   2012-12-05, Added CustomElementAttribute and integrations (Reinder Kamphorst, reinder@toubab.nl)
+//   2012-12-06, Added IndexTagsAttribute and integrations (Reinder Kamphorst, reinder@toubab.nl)
 //
 // Copyright 2010, Novell, Inc.
 //
@@ -19,6 +20,7 @@ using System.Text;
 using MonoTouch.UIKit;
 using System.Drawing;
 using MonoTouch.Foundation;
+using System.Linq;
 
 namespace MonoTouch.Dialog
 {
@@ -123,6 +125,43 @@ namespace MonoTouch.Dialog
 	}
 
 	/// <summary>
+	/// Index tags attribute. Use this attribute to insert the generated 
+	/// element into the <seealso cref="BindingContext"/> element index
+	/// with given tag. 
+	/// </summary>
+	/// <remarks>
+	/// <para>Usage:</para>
+	/// 
+	/// <para>In the reflection API, put the following attribute on a field 
+	/// or property member:</para>
+	/// 
+	/// <code>[IndexTags("tag1,tag2")]</code>
+	/// 
+	/// <para>This inserts the generated element into the element index under 
+	/// tags "tag1" and "tag2". If ctx is the binding context, a list 
+	/// of elements for one particular tag ("tag1") can be fetched as 
+	/// follows:</para>
+	/// 
+	/// <code>List<Element> elementsForTag1 = ctx.GetElementsForTag("tag1");</code>
+	/// 
+	/// </remarks>			
+	[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property, Inherited=false)]
+	public class IndexTagsAttribute : Attribute {
+
+		public IndexTagsAttribute(string tags) {
+			CsvTags = tags;
+		}
+
+		public string CsvTags;
+
+		public string[] TagList {
+			get {
+				return CsvTags.Split(',').Select(str => str.Trim().ToLowerInvariant()).ToArray();
+			}
+		}
+	}
+	
+	/// <summary>
 	/// Make your own custom element attributes for the reflection api
 	/// by deriving from this class. 
 	/// </summary>
@@ -176,10 +215,11 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public abstract object GetValue(Element element, Type resultType);
 	}
-	
+
 	public class BindingContext : IDisposable {
 		public RootElement Root;
 		Dictionary<Element,MemberAndInstance> mappings;
+		Dictionary<string, List<Element>> index;
 
 		class MemberAndInstance {
 			public MemberAndInstance (MemberInfo mi, object o, CustomElementAttribute customInfo, Type memberType)
@@ -257,6 +297,7 @@ namespace MonoTouch.Dialog
 				throw new ArgumentNullException ("o");
 			
 			mappings = new Dictionary<Element,MemberAndInstance> ();
+			index = new Dictionary<string, List<Element>>();
 
 			Root = new RootElement (title);
 			Populate (callbacks, o, Root);
@@ -270,16 +311,18 @@ namespace MonoTouch.Dialog
 
 			Section section = null;
 			
-			foreach (var mi in members){
+			foreach (var mi in members) {
 				Type mType = GetTypeForMember (mi);
 
 				if (mType == null)
 					continue;
 
 				CustomElementAttribute customElementAttr = null;
+				string[] indexTags = new string[0];
 				string caption = null;
 				object [] attrs = mi.GetCustomAttributes (false);
 				bool skip = false;
+
 				foreach (var attr in attrs){
 					if (attr is SkipAttribute || attr is System.Runtime.CompilerServices.CompilerGeneratedAttribute) {
 						skip = true;
@@ -291,10 +334,11 @@ namespace MonoTouch.Dialog
 							root.Add (section);
 						var sa = attr as SectionAttribute;
 						section = new Section (sa.Caption, sa.Footer);
-					} else if (attr is CustomElementAttribute){
+					} else if (attr is IndexTagsAttribute) {
+						indexTags = ((IndexTagsAttribute) attr).TagList;
+					} else if (attr is CustomElementAttribute) {
 						customElementAttr = attr as CustomElementAttribute;
-					}
-
+					} 
 				}
 				if (skip)
 					continue;
@@ -459,6 +503,12 @@ namespace MonoTouch.Dialog
 					continue;
 				section.Add (element);
 				mappings [element] = new MemberAndInstance (mi, o, customElementAttr, mType);
+
+				foreach (var tag in indexTags) {
+					if (!index.ContainsKey(tag))
+						index[tag] = new List<Element>();
+					index[tag].Add(element);
+				}
 			}
 			root.Add (section);
 		}
@@ -525,6 +575,11 @@ namespace MonoTouch.Dialog
 					}
 				}
 			}
+		}
+
+		public List<Element> GetElementsForTag(string tag) {
+			tag = tag.ToLowerInvariant();
+			return index.ContainsKey(tag) ? new List<Element>(index[tag]) : new List<Element>();
 		}
 	}
 }
