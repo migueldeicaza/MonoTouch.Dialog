@@ -1518,12 +1518,13 @@ namespace MonoTouch.Dialog
 				ClearButtonMode = ClearButtonMode
 			};
 		}
-		
-		static NSString cellkey = new NSString ("EntryElement");
+
+		static readonly NSString passwordKey = new NSString ("EntryElement+Password");
+		static readonly NSString cellkey = new NSString ("EntryElement");
 		
 		protected override NSString CellKey {
 			get {
-				return cellkey;
+				return isPassword ? passwordKey : cellkey;
 			}
 		}
 		
