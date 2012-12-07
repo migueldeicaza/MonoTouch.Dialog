@@ -1,3 +1,4 @@
+
 //
 // Elements.cs: defines the various components of our view
 //
@@ -916,7 +917,7 @@ namespace MonoTouch.Dialog
 			string c = Caption;
 			string v = Value;
 			// ensure the (multi-line) Value will be rendered inside the cell when no Caption is present
-			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (v))
+			if (String.IsNullOrEmpty (c) && String.IsNullOrEmpty (v))
 				c = " ";
 
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
@@ -1705,6 +1706,7 @@ namespace MonoTouch.Dialog
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
 		public event Action<DateTimeElement> DateSelected;
+		public UIColor BackgroundColor = UIColor.Black;
 		
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
@@ -1821,11 +1823,12 @@ namespace MonoTouch.Dialog
 				Autorotate = dvc.Autorotate
 			};
 			datePicker = CreatePicker ();
-			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 			                            
-			vc.View.BackgroundColor = UIColor.Black;
+			vc.View.BackgroundColor = BackgroundColor;
 			vc.View.AddSubview (datePicker);
 			dvc.ActivateController (vc);
+
+			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 		}
 	}
 	
