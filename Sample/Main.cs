@@ -52,6 +52,7 @@ namespace Sample
 					new StringElement ("Headers and Footers", DemoHeadersFooters),
 					new StringElement ("Root Style", DemoContainerStyle),
 					new StringElement ("Index sample", DemoIndex),
+					new StringElement ("Colored list", DemoColoredList),
 				},
 				new Section ("Json") {
 					(sampleJson = JsonElement.FromFile ("sample.json")),
