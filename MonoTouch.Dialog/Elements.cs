@@ -153,6 +153,8 @@ namespace MonoTouch.Dialog
 		public RootElement GetImmediateRootElement ()
 		{
 				var section = Parent as Section;
+                if (section == null)
+                    section = this as Section;
 				if (section == null)
 					return null;
 				return section.Parent as RootElement;
