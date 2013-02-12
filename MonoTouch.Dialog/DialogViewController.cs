@@ -214,7 +214,7 @@ namespace MonoTouch.Dialog
 				SearchTextChanged (this, new SearchChangedEventArgs (text));
 		}
 		                                     
-		public void PerformFilter (string text)
+		public virtual void PerformFilter (string text)
 		{
 			if (originalSections == null)
 				return;
