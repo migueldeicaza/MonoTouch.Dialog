@@ -2532,16 +2532,38 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		internal int IndexOf (Section target)
-		{
-			int idx = 0;
-			foreach (Section s in Sections){
-				if (s == target)
-					return idx;
-				idx++;
-			}
-			return -1;
-		}
+		/// <summary>
+        ///Searches for the specified section and returns the zero-based index of the first occurrance.
+        /// </summary>
+        /// <returns>The index of the section, or -1.</returns>
+        /// <param name="section">The section to find.</param>
+        public int IndexOf (Section section)
+        {
+            return Sections.IndexOf (target);
+        }
+        
+        /// <summary>
+        ///Searches for the specified section and returns the zero-based index of the first occurrance.
+        /// </summary>
+        /// <returns>The index of the section, or -1.</returns>
+        /// <param name="section">The section to find.</param>
+        /// <param name="idx">The zero-based starting index of the search.</para>
+        public int IndexOf (Section section, int idx)
+        {
+            return Sections.IndexOf (section, idx);
+        }
+        
+        /// <summary>
+        ///Searches for the specified section and returns the zero-based index of the first occurrance.
+        /// </summary>
+        /// <returns>The index of the section, or -1.</returns>
+        /// <param name="section">The section to find.</param>
+        /// <param name="idx">The zero-based starting index of the search.</para>
+        /// <param name="count">The number of elements to search.</para>
+        public int IndexOf (Section section, int idx, int count)
+        {
+            return Sections.IndexOf (section, idx, count);
+        }
 			
 		public void Prepare ()
 		{
@@ -2644,8 +2666,8 @@ namespace MonoTouch.Dialog
 		/// <param name="idx">
 		/// The index where the section is added <see cref="System.Int32"/>
 		/// </param>
-		/// <param name="newSections">
-		/// A <see cref="Section[]"/> list of sections to insert
+		/// <param name="section">
+		/// The section to insert
 		/// </param>
 		/// <remarks>
 		///    This inserts the specified list of sections (a params argument) into the
