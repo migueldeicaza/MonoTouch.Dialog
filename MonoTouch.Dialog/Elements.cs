@@ -2511,7 +2511,7 @@ namespace MonoTouch.Dialog
         /// <param name="section">The section to find.</param>
         public int IndexOf (Section section)
         {
-            return Sections.IndexOf (target);
+            return Sections.IndexOf (section);
         }
         
         /// <summary>
