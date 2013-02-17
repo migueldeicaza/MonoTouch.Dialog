@@ -45,6 +45,9 @@ namespace Sample
 						}
 					}
 				},
+				new Section(){
+					new TwinButtonElemet("Call", "Text")
+				},
 				new Section () {
 					new EntryElement ("Login", "Your login name", "miguel"),
 					new EntryElement ("Password", "Your password", "password", true),
