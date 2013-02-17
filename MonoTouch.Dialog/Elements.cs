@@ -1,3 +1,4 @@
+
 //
 // Elements.cs: defines the various components of our view
 //
@@ -152,6 +153,8 @@ namespace MonoTouch.Dialog
 		public RootElement GetImmediateRootElement ()
 		{
 				var section = Parent as Section;
+                if (section == null)
+                    section = this as Section;
 				if (section == null)
 					return null;
 				return section.Parent as RootElement;
@@ -449,13 +452,13 @@ namespace MonoTouch.Dialog
 		public float Value;
 		public float MinValue, MaxValue;
 		static NSString skey = new NSString ("FloatElement");
-		UIImage Left, Right;
+		//UIImage Left, Right;
 		UISlider slider;
 		
 		public FloatElement (UIImage left, UIImage right, float value) : base (null)
 		{
-			Left = left;
-			Right = right;
+			//Left = left;
+			//Right = right;
 			MinValue = 0;
 			MaxValue = 1;
 			Value = value;
@@ -916,7 +919,7 @@ namespace MonoTouch.Dialog
 			string c = Caption;
 			string v = Value;
 			// ensure the (multi-line) Value will be rendered inside the cell when no Caption is present
-			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (v))
+			if (String.IsNullOrEmpty (c))
 				c = " ";
 
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
@@ -1147,7 +1150,7 @@ namespace MonoTouch.Dialog
 		{
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
 				using (var bit = new CGBitmapContext (IntPtr.Zero, dimx, dimy, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
-					bit.SetRGBStrokeColor (1, 0, 0, 0.5f);
+					bit.SetStrokeColor (1, 0, 0, 0.5f);
 					bit.FillRect (new RectangleF (0, 0, dimx, dimy));
 					
 					return UIImage.FromImage (bit.ToImage ());
@@ -1287,8 +1290,8 @@ namespace MonoTouch.Dialog
 				if (cell == null)
 					useRect = rect;
 				else
-					rect = cell.Frame;
-				popover.PresentFromRect (rect, dvc.View, UIPopoverArrowDirection.Any, true);
+					useRect = cell.Frame;
+				popover.PresentFromRect (useRect, dvc.View, UIPopoverArrowDirection.Any, true);
 				break;
 				
 			default:
@@ -1518,12 +1521,13 @@ namespace MonoTouch.Dialog
 				ClearButtonMode = ClearButtonMode
 			};
 		}
-		
-		static NSString cellkey = new NSString ("EntryElement");
+
+		static readonly NSString passwordKey = new NSString ("EntryElement+Password");
+		static readonly NSString cellkey = new NSString ("EntryElement");
 		
 		protected override NSString CellKey {
 			get {
-				return cellkey;
+				return isPassword ? passwordKey : cellkey;
 			}
 		}
 		
@@ -1533,6 +1537,10 @@ namespace MonoTouch.Dialog
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+
+				var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
+				cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+
 			} else 
 				RemoveTag (cell, 1);
 			
@@ -1700,6 +1708,7 @@ namespace MonoTouch.Dialog
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
 		public event Action<DateTimeElement> DateSelected;
+		public UIColor BackgroundColor = UIColor.Black;
 		
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
@@ -1816,11 +1825,12 @@ namespace MonoTouch.Dialog
 				Autorotate = dvc.Autorotate
 			};
 			datePicker = CreatePicker ();
-			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 			                            
-			vc.View.BackgroundColor = UIColor.Black;
+			vc.View.BackgroundColor = BackgroundColor;
 			vc.View.AddSubview (datePicker);
 			dvc.ActivateController (vc);
+
+			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 		}
 	}
 	

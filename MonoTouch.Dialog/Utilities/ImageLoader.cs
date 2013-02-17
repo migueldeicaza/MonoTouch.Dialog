@@ -207,13 +207,16 @@ namespace MonoTouch.Dialog.Utilities
 			}
 
 			lock (requestQueue){
-				if (pendingRequests.ContainsKey (uri))
+				if (pendingRequests.ContainsKey (uri)) {
+					if (!pendingRequests [uri].Contains(notify))
+						pendingRequests [uri].Add (notify);
 					return null;
+				}				
 			}
 
 			string picfile = uri.IsFile ? uri.LocalPath : PicDir + md5 (uri.AbsoluteUri);
 			if (File.Exists (picfile)){
-				ret = UIImage.FromFileUncached (picfile);
+				ret = UIImage.FromFile (picfile);
 				if (ret != null){
 					lock (cache)
 						cache [uri] = ret;
@@ -222,11 +225,11 @@ namespace MonoTouch.Dialog.Utilities
 			} 
 			if (uri.IsFile)
 				return null;
-			QueueRequest (uri, picfile, notify);
+			QueueRequest (uri, notify);
 			return null;
 		}
 		
-		static void QueueRequest (Uri uri, string target, IImageUpdated notify)
+		static void QueueRequest (Uri uri, IImageUpdated notify)
 		{
 			if (notify == null)
 				throw new ArgumentNullException ("notify");
@@ -246,7 +249,7 @@ namespace MonoTouch.Dialog.Utilities
 				else {
 					ThreadPool.QueueUserWorkItem (delegate { 
 							try {
-								StartPicDownload (uri, target); 
+								StartPicDownload (uri); 
 							} catch (Exception e){
 								Console.WriteLine (e);
 							}
@@ -255,12 +258,14 @@ namespace MonoTouch.Dialog.Utilities
 			}
 		}
 		
-		static bool Download (Uri uri, string target)
+		static bool Download (Uri uri)
 		{
 			try {
 				NSUrlResponse response;
 				NSError error;
-				var req = new NSUrlRequest (new NSUrl (uri.ToString ()), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
+				
+				var target =  PicDir + md5 (uri.AbsoluteUri);
+				var req = new NSUrlRequest (new NSUrl (uri.AbsoluteUri.ToString ()), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
 				var data = NSUrlConnection.SendSynchronousRequest (req, out response, out error);
 				return data.Save (target, true, out error);
 			} catch (Exception e) {
@@ -271,11 +276,11 @@ namespace MonoTouch.Dialog.Utilities
 		
 		static long picDownloaders;
 		
-		static void StartPicDownload (Uri uri, string target)
+		static void StartPicDownload (Uri uri)
 		{
 			Interlocked.Increment (ref picDownloaders);
 			try {
-				_StartPicDownload (uri, target);
+				_StartPicDownload (uri);
 			} catch (Exception e){
 				Console.Error.WriteLine ("CRITICAL: should have never happened {0}", e);
 			}
@@ -283,15 +288,15 @@ namespace MonoTouch.Dialog.Utilities
 			Interlocked.Decrement (ref picDownloaders);
 		}
 		
-		static void _StartPicDownload (Uri uri, string target)
+		static void _StartPicDownload (Uri uri)
 		{
 			do {
 				bool downloaded = false;
 				
 				//System.Threading.Thread.Sleep (5000);
-				downloaded = Download (uri, target);
-				if (!downloaded)
-					Console.WriteLine ("Error fetching picture for {0} to {1}", uri, target);
+				downloaded = Download (uri);
+				//if (!downloaded)
+				//	Console.WriteLine ("Error fetching picture for {0} to {1}", uri, target);
 				
 				// Cluster all updates together
 				bool doInvoke = false;
