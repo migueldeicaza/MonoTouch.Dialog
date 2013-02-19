@@ -199,6 +199,12 @@ namespace MonoTouch.Dialog
 				return;
 			
 			Root.Sections = new List<Section> (originalSections);
+
+			// restore element's parents
+			foreach (var section in Root.Sections)
+				foreach (var element in section.Elements)
+					element.Parent = section;
+
 			originalSections = null;
 			originalElements = null;
 			searchBar.ResignFirstResponder ();
@@ -243,7 +249,11 @@ namespace MonoTouch.Dialog
 			}
 			
 			Root.Sections = newSections;
-			
+
+			// apply parent to new sections
+			foreach (var section in newSections)
+				section.Parent = Root;
+
 			ReloadData ();
 		}
 		
