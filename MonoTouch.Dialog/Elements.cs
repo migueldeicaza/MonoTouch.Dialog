@@ -1725,6 +1725,7 @@ namespace MonoTouch.Dialog
 			Value = FormatDate (DateValue);
 			var cell = base.GetCell (tv);
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+            cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			return cell;
 		}
  
