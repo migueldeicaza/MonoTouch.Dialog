@@ -1530,44 +1530,43 @@ namespace MonoTouch.Dialog
 				return isPassword ? passwordKey : cellkey;
 			}
 		}
-		
+
+		UITableViewCell cell;
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (CellKey);
-			if (cell == null){
+			if (cell == null) {
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
-				var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
-				cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+			} 
+			cell.TextLabel.Text = Caption;
 
-			} else 
-				RemoveTag (cell, 1);
-			
-			if (entry == null){
-				SizeF size = ComputeEntryPosition (tv, cell);
-				float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
-				float width = cell.ContentView.Bounds.Width - size.Width;
-				if (textalignment == UITextAlignment.Right) {
-					// Add padding if right aligned
-					width -= 10;
-				}
-				
-				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
-				
+			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
+			cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+			SizeF size = ComputeEntryPosition (tv, cell);
+			float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
+			float width = cell.ContentView.Bounds.Width - size.Width;
+			if (textalignment == UITextAlignment.Right) {
+				// Add padding if right aligned
+				width -= 10;
+			}
+			var entryFrame = new RectangleF (size.Width, yOffset, width, size.Height);
+
+			if (entry == null) {
+				entry = CreateTextField (entryFrame);
 				entry.ValueChanged += delegate {
 					FetchValue ();
 				};
 				entry.Ended += delegate {					
 					FetchValue ();
 					if (EntryEnded != null) {
-						EntryEnded(this, null);
+						EntryEnded (this, null);
 					}
 				};
 				entry.ShouldReturn += delegate {
 					
 					if (ShouldReturn != null)
-						return ShouldReturn();
+						return ShouldReturn ();
 					
 					RootElement root = GetImmediateRootElement ();
 					EntryElement focus = null;
@@ -1600,13 +1599,13 @@ namespace MonoTouch.Dialog
 					EntryElement self = null;
 					
 					if (EntryStarted != null) {
-						EntryStarted(this, null);
+						EntryStarted (this, null);
 					}
 					
 					if (!returnKeyType.HasValue) {
 						var returnType = UIReturnKeyType.Default;
 						
-						foreach (var e in (Parent as Section).Elements){
+						foreach (var e in (Parent as Section).Elements) {
 							if (e == this)
 								self = this;
 							else if (self != null && e is EntryElement)
@@ -1618,7 +1617,10 @@ namespace MonoTouch.Dialog
 					
 					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
-			}
+				cell.ContentView.AddSubview (entry);
+			} else
+				entry.Frame = entryFrame;
+
 			if (becomeResponder){
 				entry.BecomeFirstResponder ();
 				becomeResponder = false;
@@ -1627,9 +1629,7 @@ namespace MonoTouch.Dialog
 			
 			entry.AutocapitalizationType = AutocapitalizationType;
 			entry.AutocorrectionType = AutocorrectionType;
-			
-			cell.TextLabel.Text = Caption;
-			cell.ContentView.AddSubview (entry);
+
 			return cell;
 		}
 		
