@@ -5,46 +5,75 @@ using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
 {
+	/// <summary>
+	/// Twin button identifier enum
+	/// </summary>
+	public enum TwinButton
+	{
+		Left,
+		Right
+	}
+
+	/// <summary>
+	/// Twin button elemet.
+	/// </summary>
 	public class TwinButtonElemet : Element
 	{
-		Tuple<string, string> _captions;
-		const string _elementKey = "TwinElementKey";
+		const string ElementKey = "TwinElementKey";
+		UIButton rightButton;
+		UIButton leftButton;
+		Action<TwinButton> tapped;
+		string leftButtonTitle;
+		string rightButtonTitle;
 
-		public TwinButtonElemet (string leftButton, string rightButton):base("Twin Elements")
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MonoTouch.Dialog.TwinButtonElemet"/> class.
+		/// </summary>
+		/// <param name="leftButtonTitle">Left button title.</param>
+		/// <param name="rightButtonTitle">Right button title.</param>
+		/// <param name="tapped">Twin button tapped handler </param>
+		public TwinButtonElemet (string leftButtonTitle, string rightButtonTitle, Action<TwinButton> tapped):base("Twin Button Element")
 		{
-			_captions = new Tuple<string, string>(leftButton, rightButton);
-
+			this.leftButtonTitle = leftButtonTitle;
+			this.rightButtonTitle = rightButtonTitle;
+			this.tapped = tapped;
 		}
 
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (_elementKey);
+			var cell = tv.DequeueReusableCell (ElementKey);
 			if (cell == null) {
-				cell = new UITableViewCell (UITableViewCellStyle.Default, _elementKey);
+
+				cell = new UITableViewCell (UITableViewCellStyle.Default, ElementKey);
 
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-				cell.BackgroundView = new UIView(RectangleF.Empty);
-
-				 float buttonHeight = cell.ContentView.Bounds.Height;
+				cell.BackgroundView = new UIView (RectangleF.Empty);
+			
+				float buttonHeight = cell.ContentView.Bounds.Height;
 				const float buttonWidth = 155;
+			
+				leftButton = new UIButton (UIButtonType.RoundedRect);
+				leftButton.Frame = new RectangleF (0, 0, buttonWidth, buttonHeight);
+				leftButton.AutoresizingMask = UIViewAutoresizing.All;
+				leftButton.SetTitle (leftButtonTitle, UIControlState.Normal);
+				leftButton.TouchUpInside += delegate {
+					tapped (TwinButton.Left);
+				};
+			
+				rightButton = new UIButton (UIButtonType.RoundedRect);
+				rightButton.Frame = new RectangleF (165, 0, buttonWidth, buttonHeight);
+				rightButton.AutoresizingMask = UIViewAutoresizing.All;
+				rightButton.SetTitle (rightButtonTitle, UIControlState.Normal);
+				rightButton.TouchUpInside += delegate {
+					tapped (TwinButton.Right);
+				};
 
-				UIButton btn = new UIButton (UIButtonType.RoundedRect);
-				btn.Frame = new RectangleF(0,0,buttonWidth, buttonHeight);
-				btn.AutoresizingMask = UIViewAutoresizing.All;
-				btn.SetTitle (_captions.Item1, UIControlState.Normal);
-
-				UIButton btn1 = new UIButton (UIButtonType.RoundedRect);
-				btn1.Frame = new RectangleF (165, 0, buttonWidth, buttonHeight);
-				btn1.AutoresizingMask = UIViewAutoresizing.All;
-				btn1.SetTitle (_captions.Item2, UIControlState.Normal);
-				cell.ContentView.AddSubviews (new []{btn, btn1});
+				cell.ContentView.AddSubviews (new []{leftButton, rightButton});
 			}
 
 			return cell;
 		}
 
 	}
-
-
 }
 

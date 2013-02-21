@@ -8,7 +8,7 @@ using MonoTouch.UIKit;
 
 namespace Sample
 {
-	public partial class AppDelegate 
+	public partial class AppDelegate
 	{		
 		public void DemoElementApi ()
 		{
@@ -46,7 +46,9 @@ namespace Sample
 					}
 				},
 				new Section(){
-					new TwinButtonElemet("Call", "Text")
+					new TwinButtonElemet("Call", "Text", a=> {
+						Console.WriteLine(a);
+					})
 				},
 				new Section () {
 					new EntryElement ("Login", "Your login name", "miguel"),
