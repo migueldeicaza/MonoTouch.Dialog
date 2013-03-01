@@ -2246,9 +2246,22 @@ namespace MonoTouch.Dialog
             RemoveRange (Elements.IndexOf (e), 1);
 		}
 		
-		public void Remove (int idx)
+        public void Remove (Element e, UITableViewRowAnimation anim)
+        {
+            if (e == null)
+                return;
+            
+            RemoveRange (Elements.IndexOf (e), 1, anim);
+        }
+        
+        public void Remove (int idx)
+        {
+            RemoveRange (idx, 1);
+        }
+
+        public void Remove (int idx, UITableViewRowAnimation anim)
 		{
-			RemoveRange (idx, 1);
+            RemoveRange (idx, 1, anim);
 		}
 		
 		/// <summary>
