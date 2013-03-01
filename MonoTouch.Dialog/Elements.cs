@@ -2214,13 +2214,8 @@ namespace MonoTouch.Dialog
 		{
 			if (e == null)
 				return;
-			for (int i = Elements.Count; i > 0;){
-				i--;
-				if (Elements [i] == e){
-					RemoveRange (i, 1);
-					return;
-				}
-			}
+
+            RemoveRange (Elements.IndexOf (e), 1);
 		}
 		
 		public void Remove (int idx)
