@@ -45,11 +45,6 @@ namespace Sample
 						}
 					}
 				},
-				new Section(){
-					new TwinButtonElemet("Call", "Text", a=> {
-						Console.WriteLine(a);
-					})
-				},
 				new Section () {
 					new EntryElement ("Login", "Your login name", "miguel"),
 					new EntryElement ("Password", "Your password", "password", true),

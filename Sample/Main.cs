@@ -46,6 +46,7 @@ namespace Sample
 					new StringElement ("Row Editing Support", DemoEditing),
 					new StringElement ("Advanced Editing Support", DemoAdvancedEditing),
 					new StringElement ("Owner Drawn Element", DemoOwnerDrawnElement),
+					new StringElement("Twin Button Element", DemoTwinButton)
 				},
 				new Section ("Container features"){
 					new StringElement ("Pull to Refresh", DemoRefresh),
