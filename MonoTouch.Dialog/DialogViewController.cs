@@ -25,7 +25,7 @@ namespace MonoTouch.Dialog
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		public event Action<NSIndexPath> OnSelection;
-		protected UISearchBar searchBar;
+		protected UISearchBar SearchBar;
 		UITableView tableView;
 		RefreshTableHeaderView refreshView;
 		RootElement root;
@@ -183,7 +183,7 @@ namespace MonoTouch.Dialog
 			if (originalSections != null)
 				return;
 			
-			searchBar.BecomeFirstResponder ();
+			SearchBar.BecomeFirstResponder ();
 			originalSections = Root.Sections.ToArray ();
 			originalElements = new Element [originalSections.Length][];
 			for (int i = 0; i < originalSections.Length; i++)
@@ -201,7 +201,7 @@ namespace MonoTouch.Dialog
 			Root.Sections = new List<Section> (originalSections);
 			originalSections = null;
 			originalElements = null;
-			searchBar.ResignFirstResponder ();
+			SearchBar.ResignFirstResponder ();
 			ReloadData ();
 		}
 		
@@ -279,7 +279,7 @@ namespace MonoTouch.Dialog
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
 				searchBar.ShowsCancelButton = false;
-				container.searchBar.Text = "";
+				container.SearchBar.Text = "";
 				container.FinishSearch ();
 				searchBar.ResignFirstResponder ();
 			}
@@ -491,12 +491,12 @@ namespace MonoTouch.Dialog
 		void SetupSearch ()
 		{
 			if (enableSearch){
-				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+				SearchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
-					searchBar.Placeholder = this.SearchPlaceholder;
-				tableView.TableHeaderView = searchBar;					
+					SearchBar.Placeholder = this.SearchPlaceholder;
+				tableView.TableHeaderView = SearchBar;					
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
