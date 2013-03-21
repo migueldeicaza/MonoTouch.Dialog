@@ -704,7 +704,7 @@ namespace MonoTouch.Dialog
 	///   options and can render images or background images either from UIImage parameters 
 	///   or by downloading them from the net.
 	/// </summary>
-	public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
+    public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground, ITappableAccessory {
 		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
 		
 		public StyledStringElement (string caption) : base (caption) {}
@@ -891,7 +891,7 @@ namespace MonoTouch.Dialog
 			root.TableView.ReloadRows (new NSIndexPath [] { IndexPath }, UITableViewRowAnimation.None);
 		}	
 		
-		internal void AccessoryTap ()
+		public void AccessoryTap ()
 		{
 			NSAction tapped = AccessoryTapped;
 			if (tapped != null)
@@ -1008,6 +1008,15 @@ namespace MonoTouch.Dialog
 	public interface IColorizeBackground {
 		void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath);
 	}
+
+    /// <summary>
+    /// This interface is implemented by Elements that will have a tappable accessory
+    /// </summary>
+    public interface ITappableAccessory {
+        event NSAction AccessoryTapped;
+        
+        void AccessoryTap ();
+    }
 	
 	public class MultilineElement : StringElement, IElementSizing {
 		public MultilineElement (string caption) : base (caption)
