@@ -305,7 +305,7 @@ namespace MonoTouch.Dialog
 			public override void AccessoryButtonTapped (UITableView tableView, NSIndexPath indexPath)
 			{
 				var section = Root.Sections [indexPath.Section];
-				var element = (section.Elements [indexPath.Row] as StyledStringElement);
+                var element = (section.Elements [indexPath.Row] as ITappableAccessory);
 				if (element != null)
 					element.AccessoryTap ();
 			}
