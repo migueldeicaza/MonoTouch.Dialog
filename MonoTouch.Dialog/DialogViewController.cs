@@ -488,7 +488,7 @@ namespace MonoTouch.Dialog
 				DismissModalViewControllerAnimated (animated);
 		}
 
-		void SetupSearch ()
+		protected virtual void SetupSearch ()
 		{
 			if (enableSearch){
 				SearchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
