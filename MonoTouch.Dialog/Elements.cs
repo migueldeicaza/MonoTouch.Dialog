@@ -2003,7 +2003,8 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public Section (string caption) : base (caption)
 		{
-		}
+            Header = caption;
+        }
 		
 		/// <summary>
 		/// Constructs a Section with a header and a footer
@@ -2015,7 +2016,8 @@ namespace MonoTouch.Dialog
 		/// The footer to display.
 		/// </param>
 		public Section (string caption, string footer) : base (caption)
-		{
+        {
+            Header = caption;
 			Footer = footer;
 		}
 
