@@ -1437,7 +1437,8 @@ namespace MonoTouch.Dialog
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
-		bool isPassword, becomeResponder;
+        protected bool IsPassword;
+		bool becomeResponder;
 		UITextField entry;
 		string placeholder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
@@ -1482,7 +1483,7 @@ namespace MonoTouch.Dialog
 		public EntryElement (string caption, string placeholder, string value, bool isPassword) : base (caption)
 		{
 			Value = value;
-			this.isPassword = isPassword;
+            IsPassword = isPassword;
 			this.placeholder = placeholder;
 		}
 
@@ -1523,7 +1524,7 @@ namespace MonoTouch.Dialog
 			return new UITextField (frame) {
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
 				Placeholder = placeholder ?? "",
-				SecureTextEntry = isPassword,
+                SecureTextEntry = IsPassword,
 				Text = Value ?? "",
 				Tag = 1,
 				TextAlignment = textalignment,
@@ -1536,7 +1537,7 @@ namespace MonoTouch.Dialog
 		
 		protected override NSString CellKey {
 			get {
-				return isPassword ? passwordKey : cellkey;
+                return IsPassword ? passwordKey : cellkey;
 			}
 		}
 
