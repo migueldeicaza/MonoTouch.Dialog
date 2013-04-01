@@ -1326,9 +1326,9 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Value { 
 			get {
-				if (entry == null)
+				if (Entry == null)
 					return val;
-				var newValue = entry.Text;
+				var newValue = Entry.Text;
 				if (newValue == val)
 					return val;
 				val = newValue;
@@ -1339,8 +1339,8 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				val = value;
-				if (entry != null)
-					entry.Text = value;
+				if (Entry != null)
+					Entry.Text = value;
 			}
 		}
 		protected string val;
@@ -1366,8 +1366,8 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				keyboardType = value;
-				if (entry != null)
-					entry.KeyboardType = value;
+				if (Entry != null)
+					Entry.KeyboardType = value;
 			}
 		}
 		
@@ -1382,8 +1382,8 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				returnKeyType = value;
-				if (entry != null && returnKeyType.HasValue)
-					entry.ReturnKeyType = returnKeyType.Value;
+				if (Entry != null && returnKeyType.HasValue)
+					Entry.ReturnKeyType = returnKeyType.Value;
 			}
 		}
 		
@@ -1393,8 +1393,8 @@ namespace MonoTouch.Dialog
 			}
 			set { 
 				autocapitalizationType = value;
-				if (entry != null)
-					entry.AutocapitalizationType = value;
+				if (Entry != null)
+					Entry.AutocapitalizationType = value;
 			}
 		}
 		
@@ -1404,7 +1404,7 @@ namespace MonoTouch.Dialog
 			}
 			set { 
 				autocorrectionType = value;
-				if (entry != null)
+				if (Entry != null)
 					this.autocorrectionType = value;
 			}
 		}
@@ -1415,8 +1415,8 @@ namespace MonoTouch.Dialog
 			}
 			set { 
 				clearButtonMode = value;
-				if (entry != null)
-					entry.ClearButtonMode = value;
+				if (Entry != null)
+					Entry.ClearButtonMode = value;
 			}
 		}
 
@@ -1426,8 +1426,8 @@ namespace MonoTouch.Dialog
 			}
 			set{
 				textalignment = value;
-				if (entry != null) {
-					entry.TextAlignment = textalignment;
+				if (Entry != null) {
+					Entry.TextAlignment = textalignment;
 				}
 			}
 		}
@@ -1437,9 +1437,8 @@ namespace MonoTouch.Dialog
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
-        protected bool IsPassword;
-		bool becomeResponder;
-		UITextField entry;
+        protected bool IsPassword, BecomeResponder;
+		protected UITextField Entry;
 		protected string PlaceHolder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
@@ -1495,7 +1494,7 @@ namespace MonoTouch.Dialog
 		// 
 		// Computes the X position for the entry by aligning all the entries in the Section
 		//
-		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
+		protected SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
 			Section s = Parent as Section;
 			if (s.EntryAlignment.Width != 0)
@@ -1541,39 +1540,39 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		UITableViewCell cell;
+		UITableViewCell _cell;
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			if (cell == null) {
-				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+			if (_cell == null) {
+				_cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
+				_cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 
 			} 
-			cell.TextLabel.Text = Caption;
+			_cell.TextLabel.Text = Caption;
 
 			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
-			cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
-			SizeF size = ComputeEntryPosition (tv, cell);
-			float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
-			float width = cell.ContentView.Bounds.Width - size.Width;
+			_cell.Frame = new RectangleF(_cell.Frame.X, _cell.Frame.Y, tv.Frame.Width-offset, _cell.Frame.Height);
+			SizeF size = ComputeEntryPosition (tv, _cell);
+			float yOffset = (_cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
+			float width = _cell.ContentView.Bounds.Width - size.Width;
 			if (textalignment == UITextAlignment.Right) {
 				// Add padding if right aligned
 				width -= 10;
 			}
 			var entryFrame = new RectangleF (size.Width, yOffset, width, size.Height);
 
-			if (entry == null) {
-				entry = CreateTextField (entryFrame);
-				entry.ValueChanged += delegate {
+			if (Entry == null) {
+				Entry = CreateTextField (entryFrame);
+				Entry.ValueChanged += delegate {
 					FetchValue ();
 				};
-				entry.Ended += delegate {					
+				Entry.Ended += delegate {					
 					FetchValue ();
 					if (EntryEnded != null) {
 						EntryEnded (this, null);
 					}
 				};
-				entry.ShouldReturn += delegate {
+				Entry.ShouldReturn += delegate {
 					
 					if (ShouldReturn != null)
 						return ShouldReturn ();
@@ -1605,7 +1604,7 @@ namespace MonoTouch.Dialog
 					
 					return true;
 				};
-				entry.Started += delegate {
+				Entry.Started += delegate {
 					EntryElement self = null;
 					
 					if (EntryStarted != null) {
@@ -1621,38 +1620,38 @@ namespace MonoTouch.Dialog
 							else if (self != null && e is EntryElement)
 								returnType = UIReturnKeyType.Next;
 						}
-						entry.ReturnKeyType = returnType;
+						Entry.ReturnKeyType = returnType;
 					} else
-						entry.ReturnKeyType = returnKeyType.Value;
+						Entry.ReturnKeyType = returnKeyType.Value;
 					
 					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
-				cell.ContentView.AddSubview (entry);
+				_cell.ContentView.AddSubview (Entry);
 			} else
-				entry.Frame = entryFrame;
+				Entry.Frame = entryFrame;
 
-			if (becomeResponder){
-				entry.BecomeFirstResponder ();
-				becomeResponder = false;
+			if (BecomeResponder){
+				Entry.BecomeFirstResponder ();
+				BecomeResponder = false;
 			}
-			entry.KeyboardType = KeyboardType;
+			Entry.KeyboardType = KeyboardType;
 			
-			entry.AutocapitalizationType = AutocapitalizationType;
-			entry.AutocorrectionType = AutocorrectionType;
+			Entry.AutocapitalizationType = AutocapitalizationType;
+			Entry.AutocorrectionType = AutocorrectionType;
 
-			return cell;
+			return _cell;
 		}
 		
 		/// <summary>
 		///  Copies the value from the UITextField in the EntryElement to the
-		//   Value property and raises the Changed event if necessary.
+		///   Value property and raises the Changed event if necessary.
 		/// </summary>
 		public void FetchValue ()
 		{
-			if (entry == null)
+			if (Entry == null)
 				return;
 
-			var newValue = entry.Text;
+			var newValue = Entry.Text;
 			if (newValue == Value)
 				return;
 			
@@ -1665,9 +1664,9 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				if (entry != null){
-					entry.Dispose ();
-					entry = null;
+				if (Entry != null){
+					Entry.Dispose ();
+					Entry = null;
 				}
 			}
 		}
@@ -1691,26 +1690,26 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public virtual void BecomeFirstResponder (bool animated)
 		{
-			becomeResponder = true;
+			BecomeResponder = true;
 			var tv = GetContainerTableView ();
 			if (tv == null)
 				return;
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
-			if (entry != null){
-				entry.BecomeFirstResponder ();
-				becomeResponder = false;
+			if (Entry != null){
+				Entry.BecomeFirstResponder ();
+				BecomeResponder = false;
 			}
 		}
 
 		public virtual void ResignFirstResponder (bool animated)
 		{
-			becomeResponder = false;
+			BecomeResponder = false;
 			var tv = GetContainerTableView ();
 			if (tv == null)
 				return;
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
-			if (entry != null)
-				entry.ResignFirstResponder ();
+			if (Entry != null)
+				Entry.ResignFirstResponder ();
 		}
 	}
 	
