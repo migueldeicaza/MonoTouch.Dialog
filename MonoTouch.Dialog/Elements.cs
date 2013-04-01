@@ -1440,7 +1440,7 @@ namespace MonoTouch.Dialog
         protected bool IsPassword;
 		bool becomeResponder;
 		UITextField entry;
-		string placeholder;
+		protected string PlaceHolder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
 		public event EventHandler Changed;
@@ -1462,7 +1462,7 @@ namespace MonoTouch.Dialog
 		public EntryElement (string caption, string placeholder, string value) : base (caption)
 		{ 
 			Value = value;
-			this.placeholder = placeholder;
+			PlaceHolder = placeholder;
 		}
 		
 		/// <summary>
@@ -1484,7 +1484,7 @@ namespace MonoTouch.Dialog
 		{
 			Value = value;
             IsPassword = isPassword;
-			this.placeholder = placeholder;
+			PlaceHolder = placeholder;
 		}
 
 		public override string Summary ()
@@ -1523,7 +1523,7 @@ namespace MonoTouch.Dialog
 		{
 			return new UITextField (frame) {
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
-				Placeholder = placeholder ?? "",
+				Placeholder = PlaceHolder ?? "",
                 SecureTextEntry = IsPassword,
 				Text = Value ?? "",
 				Tag = 1,
