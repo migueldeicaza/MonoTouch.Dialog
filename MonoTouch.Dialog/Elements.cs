@@ -1431,7 +1431,6 @@ namespace MonoTouch.Dialog
 		bool isPassword, becomeResponder;
 		UITextField entry;
 		string placeholder;
-		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
 		public event EventHandler Changed;
 		public event Func<bool> ShouldReturn;
@@ -1493,6 +1492,7 @@ namespace MonoTouch.Dialog
 			
 			// If all EntryElements have a null Caption, align UITextField with the Caption
 			// offset of normal cells (at 10px).
+			UIFont font = UIFont.BoldSystemFontOfSize (17);
 			SizeF max = new SizeF (-15, tv.StringSize ("M", font).Height);
 			foreach (var e in s.Elements){
 				var ee = e as EntryElement;
