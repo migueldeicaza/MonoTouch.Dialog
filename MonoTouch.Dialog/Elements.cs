@@ -1537,6 +1537,7 @@ namespace MonoTouch.Dialog
 			if (cell == null) {
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				cell.TextLabel.Font = font;
 
 			} 
 			cell.TextLabel.Text = Caption;
