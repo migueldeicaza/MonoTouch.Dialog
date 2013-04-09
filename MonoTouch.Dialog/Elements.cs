@@ -1017,6 +1017,10 @@ namespace MonoTouch.Dialog
         
         void AccessoryTap ();
     }
+
+    public interface IRadioElement {
+        int RadioIdx { get; set; }
+    }
 	
 	public class MultilineElement : StringElement, IElementSizing {
 		public MultilineElement (string caption) : base (caption)
@@ -1054,9 +1058,9 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class RadioElement : StringElement {
+	public class RadioElement : StringElement, IRadioElement {
 		public string Group;
-		internal int RadioIdx;
+		public int RadioIdx { get; set; }
 		
 		public RadioElement (string caption, string group) : base (caption)
 		{
@@ -1072,10 +1076,10 @@ namespace MonoTouch.Dialog
 			var cell = base.GetCell (tv);			
 			var root = (RootElement) Parent.Parent;
 			
-			if (!(root.group is RadioGroup))
+			if (!(root.Group is RadioGroup))
 				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
 			
-			bool selected = RadioIdx == ((RadioGroup)(root.group)).Selected;
+			bool selected = RadioIdx == ((RadioGroup)(root.Group)).Selected;
 			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
 
 			return cell;
@@ -2414,7 +2418,7 @@ namespace MonoTouch.Dialog
 		static NSString rkey1 = new NSString ("RootElement1");
 		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
-		internal Group group;
+		public Group Group { get; internal set; }
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
@@ -2481,14 +2485,14 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public RootElement (string caption, Group group) : base (caption)
 		{
-			this.group = group;
+			this.Group = group;
 		}
 		
 		internal List<Section> Sections = new List<Section> ();
 
-		internal NSIndexPath PathForRadio (int idx)
+		public NSIndexPath PathForRadio (int idx)
 		{
-			RadioGroup radio = group as RadioGroup;
+			RadioGroup radio = Group as RadioGroup;
 			if (radio == null)
 				return null;
 			
@@ -2497,7 +2501,7 @@ namespace MonoTouch.Dialog
 				uint row = 0;
 				
 				foreach (Element e in s.Elements){
-					if (!(e is RadioElement))
+					if (!(e is IRadioElement))
 						continue;
 					
 					if (current == idx){
@@ -2561,7 +2565,7 @@ namespace MonoTouch.Dialog
 			int current = 0;
 			foreach (Section s in Sections){				
 				foreach (Element e in s.Elements){
-					var re = e as RadioElement;
+					var re = e as IRadioElement;
 					if (re != null)
 						re.RadioIdx = current++;
 					if (UnevenRows == false && e is IElementSizing)
@@ -2763,13 +2767,13 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public int RadioSelected {
 			get {
-				var radio = group as RadioGroup;
+				var radio = Group as RadioGroup;
 				if (radio != null)
 					return radio.Selected;
 				return -1;
 			}
 			set {
-				var radio = group as RadioGroup;
+				var radio = Group as RadioGroup;
 				if (radio != null)
 					radio.Selected = value;
 			}
@@ -2787,14 +2791,14 @@ namespace MonoTouch.Dialog
 			} 
 		
 			cell.TextLabel.Text = Caption;
-			var radio = group as RadioGroup;
+			var radio = Group as RadioGroup;
 			if (radio != null){
 				int selected = radio.Selected;
 				int current = 0;
 				
 				foreach (var s in Sections){
 					foreach (var e in s.Elements){
-						if (!(e is RadioElement))
+						if (!(e is IRadioElement))
 							continue;
 						
 						if (current == selected){
@@ -2804,7 +2808,7 @@ namespace MonoTouch.Dialog
 						current++;
 					}
 				}
-			} else if (group != null){
+			} else if (Group != null){
 				int count = 0;
 				
 				foreach (var s in Sections){
