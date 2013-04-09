@@ -2087,7 +2087,18 @@ namespace MonoTouch.Dialog
 			if (Parent != null)
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
-		
+
+		/// <summary>
+		/// Adds a new child RootElement to the Section. This only exists to fix a compiler breakage when the mono 3.0 mcs is used.
+		/// </summary>
+		/// <param name="element">
+		/// An element to add to the section.
+		/// </param>
+		public void Add (RootElement element)
+		{
+			Add ((Element)element);
+		}
+
 		/// <summary>
 		///    Add version that can be used with LINQ
 		/// </summary>
