@@ -30,7 +30,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
-	public class Element : IDisposable {
+	public class Element : NSObject, IDisposable {
 		/// <summary>
 		///  Handle to the container object.
 		/// </summary>
