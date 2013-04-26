@@ -2201,6 +2201,23 @@ namespace MonoTouch.Dialog
 			return count;
 		}
 		
+		/// <summary>
+		/// Inserts a single RootElement into the Section using the specified animation
+		/// </summary>
+		/// <param name="idx">
+		/// The index where the elements are inserted
+		/// </param>
+		/// <param name="anim">
+		/// The animation to use
+		/// </param>
+		/// <param name="newElements">
+		/// A series of elements.
+		/// </param>
+		public void Insert (int idx, UITableViewRowAnimation anim, RootElement newElement)
+		{
+			Insert (idx, anim, (Element) newElement);
+		}
+
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
 		{
 			var root = Parent as RootElement;
