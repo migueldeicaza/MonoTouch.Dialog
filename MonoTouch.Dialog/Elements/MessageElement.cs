@@ -68,8 +68,9 @@ namespace MonoTouch.Dialog {
 			
 			UIColor.FromRGB (36, 112, 216).SetColor ();
 			var diff = DateTime.Now - Date;
+			var now = DateTime.Now;
 			string label;
-			if (DateTime.Now.Day == Date.Day)
+			if (now.Day == Date.Day && now.Month == Date.Month && now.Year == Date.Year)
 				label = Date.ToShortTimeString ();
 			else if (diff <= TimeSpan.FromHours (24))
 				label = "Yesterday".GetText ();
