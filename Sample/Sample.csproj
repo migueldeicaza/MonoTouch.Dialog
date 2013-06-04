@@ -91,6 +91,7 @@
     <Compile Include="DemoContainerStyle.cs" />
     <Compile Include="DemoIndex.cs" />
     <Compile Include="DemoEditingAdvanced.cs" />
+    <Compile Include="DemoInsets.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog.csproj">

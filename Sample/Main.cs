@@ -5,6 +5,7 @@ using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.Dialog;
 using System.IO;
+using System.Drawing;
 
 namespace Sample
 {
@@ -34,7 +35,7 @@ namespace Sample
 			Console.WriteLine (Last);
 			
 			var p = Path.GetFullPath ("background.png");
-			
+
 			var menu = new RootElement ("Demos"){
 				new Section ("Element API"){
 					new StringElement ("iPhone Settings Sample", DemoElementApi),
@@ -46,6 +47,7 @@ namespace Sample
 					new StringElement ("Row Editing Support", DemoEditing),
 					new StringElement ("Advanced Editing Support", DemoAdvancedEditing),
 					new StringElement ("Owner Drawn Element", DemoOwnerDrawnElement),
+					new StringElement ("UIViewElement insets", DemoInsets),
 				},
 				new Section ("Container features"){
 					new StringElement ("Pull to Refresh", DemoRefresh),
