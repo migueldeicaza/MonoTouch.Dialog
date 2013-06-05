@@ -1899,6 +1899,7 @@ namespace MonoTouch.Dialog
 		protected UIView View;
 		public CellFlags Flags;
 		
+        [Flags]
 		public enum CellFlags {
 			Transparent = 1,
 			DisableSelection = 2
