@@ -47,9 +47,13 @@ namespace Sample
 				},
 				new Section () {
 					new EntryElement ("Login", "Your login name", "miguel"),
-					new EntryElement ("Password", "Your password", "password", true),
+					new EntryElement ("Password", "Your password", "password", true)
+				},
+				new Section () {
 					new DateElement ("Select Date", DateTime.Now),
 					new TimeElement ("Select Time", DateTime.Now),
+					new DateElement ("Date (Optional)", null, false),
+					new TimeElement ("Time (Optional)", null, false),
 				},
 				new Section () {
 					CreateGeneralSection (),		

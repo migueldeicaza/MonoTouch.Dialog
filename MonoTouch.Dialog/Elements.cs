@@ -1701,30 +1701,39 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class DateTimeElement : StringElement {
-		public DateTime DateValue;
+			
+		public DateTime? DateValue;
 		public UIDatePicker datePicker;
-		public event Action<DateTimeElement> DateSelected;
+		public Action<DateTimeElement> DateSelected;
+		
+		public bool IsRequired = false;
+		public bool IsClearing = false;
+		public bool IsCancelling = false;
 		
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
 		};
 		
-		public DateTimeElement (string caption, DateTime date) : base (caption)
-		{
+		public DateTimeElement(string caption) : this(caption, null) { }
+
+		public DateTimeElement(string caption, DateTime? date) : this(caption, date, true) { }
+		
+		public DateTimeElement (string caption, DateTime? date, bool isRequired) 
+			: base(caption) {
+
+			this.IsRequired = isRequired;
 			DateValue = date;
 			Value = FormatDate (date);
-		}	
-		
-		public override UITableViewCell GetCell (UITableView tv)
-		{
-			Value = FormatDate (DateValue);
+		}
+
+		public override UITableViewCell GetCell (UITableView tv) {
+			Value = FormatDate (this.DateValue);
 			var cell = base.GetCell (tv);
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			return cell;
 		}
- 
-		protected override void Dispose (bool disposing)
-		{
+		
+		protected override void Dispose (bool disposing) {
 			base.Dispose (disposing);
 			if (disposing){
 				if (fmt != null){
@@ -1738,32 +1747,36 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		protected DateTime GetDateWithKind (DateTime dt)
-		{
-			if (dt.Kind == DateTimeKind.Unspecified)
-				return DateTime.SpecifyKind (dt, DateTimeKind.Local);
-
+		protected DateTime? GetDateWithKind (DateTime? dt) {
+			if (!dt.HasValue) 
+				return dt;
+			
+			if (dt.Value.Kind == DateTimeKind.Unspecified)
+				return DateTime.SpecifyKind (dt.Value, DateTimeKind.Local);
+			
 			return dt;
 		}
 		
-		public virtual string FormatDate (DateTime dt)
-		{
+		public virtual string FormatDate (DateTime? dt) {
+			if (!dt.HasValue)
+				return string.Empty;
+			
 			dt = GetDateWithKind (dt);
-			return fmt.ToString (dt) + " " + dt.ToLocalTime ().ToShortTimeString ();
+			return fmt.ToString (dt) + " " + dt.Value.ToLocalTime ().ToShortTimeString ();
 		}
 		
-		public virtual UIDatePicker CreatePicker ()
-		{
+		public virtual UIDatePicker CreatePicker () {
+			var date = (DateValue.HasValue) ? DateValue.Value : DateTime.Now;
+			
 			var picker = new UIDatePicker (RectangleF.Empty){
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Mode = UIDatePickerMode.DateAndTime,
-				Date = DateValue
+				Date = date
 			};
 			return picker;
 		}
-		                                                                                                                                
-		static RectangleF PickerFrameWithSize (SizeF size)
-		{                                                                                                                                    
+		
+		static RectangleF PickerFrameWithSize (SizeF size) {                                                                                                                                    
 			var screenRect = UIScreen.MainScreen.ApplicationFrame;
 			float fY = 0, fX = 0;
 			
@@ -1783,33 +1796,35 @@ namespace MonoTouch.Dialog
 			
 			return new RectangleF (fX, fY, size.Width, size.Height);
 		}                                                                                                                                    
-
+		
 		class MyViewController : UIViewController {
 			DateTimeElement container;
+			public DialogViewController PresentingDialogController {get;set;}
 			
-			public MyViewController (DateTimeElement container)
-			{
+			public MyViewController (DateTimeElement container) {
 				this.container = container;
 			}
 			
-			public override void ViewWillDisappear (bool animated)
-			{
+			public override void ViewWillDisappear (bool animated) {
 				base.ViewWillDisappear (animated);
-				container.DateValue = container.datePicker.Date;
+				
+				// if we are clearing or cancelling, don't set the date
+				if (!container.IsCancelling && !container.IsClearing)
+					container.DateValue = container.datePicker.Date;
+				
 				if (container.DateSelected != null)
 					container.DateSelected (container);
 			}
 			
-			public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
-			{
+			public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation) {
 				base.DidRotate (fromInterfaceOrientation);
 				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (SizeF.Empty));
 			}
 			
 			public bool Autorotate { get; set; }
 			
-			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
-			{
+			[Obsolete]
+			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation) {
 				return Autorotate;
 			}
 		}
@@ -1819,28 +1834,78 @@ namespace MonoTouch.Dialog
 			var vc = new MyViewController (this) {
 				Autorotate = dvc.Autorotate
 			};
+
+			vc.PresentingDialogController = dvc;
+			
 			datePicker = CreatePicker ();
 			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
-			                            
+			
 			vc.View.BackgroundColor = UIColor.Black;
 			vc.View.AddSubview (datePicker);
+			
+			// if the date is required, then we don't want to give the user the option to cancel
+			//   or clear the date.
+			if (!this.IsRequired)
+			{
+				if (DateValue.HasValue)
+				{
+					// date has a value.  allow user to clear the selected date
+					vc.NavigationItem.RightBarButtonItem = new UIBarButtonItem("Clear", UIBarButtonItemStyle.Done, (s, e) => {
+							
+						this.IsClearing = true;
+						
+						ResetDate(dvc);
+						
+						this.IsClearing = false;
+					});
+				}
+				else
+				{
+					// date isn't set. allow user to cancel date selection
+					vc.NavigationItem.RightBarButtonItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, (s, e) => {
+							
+						this.IsCancelling = true;
+						
+						ResetDate(dvc);
+						
+						this.IsCancelling = false;
+					});
+				}
+			}
+			
 			dvc.ActivateController (vc);
+		}
+		
+		private void ResetDate(DialogViewController dvc) {
+			DateValue = null;
+			Value = string.Empty;
+			dvc.ReloadData();
+			
+			dvc.DeactivateController(true);
 		}
 	}
 	
 	public class DateElement : DateTimeElement {
-		public DateElement (string caption, DateTime date) : base (caption, date)
-		{
+		public DateElement(string caption) : base(caption) {}
+		
+		public DateElement (string caption, DateTime? date) : base (caption, date) {
 			fmt.DateStyle = NSDateFormatterStyle.Medium;
 		}
 		
-		public override string FormatDate (DateTime dt)
-		{
-			return fmt.ToString (GetDateWithKind (dt));
+		public DateElement (string caption, DateTime? date, bool isRequired) : base(caption, date, isRequired) {
+			fmt.DateStyle = NSDateFormatterStyle.Medium;
 		}
 		
-		public override UIDatePicker CreatePicker ()
-		{
+		public override string FormatDate (DateTime? dt) {
+			string formattedDate = string.Empty;
+			
+			if (dt.HasValue) 
+				formattedDate = fmt.ToString (dt.Value.ToLocalTime());
+			
+			return formattedDate;
+		}
+		
+		public override UIDatePicker CreatePicker () {
 			var picker = base.CreatePicker ();
 			picker.Mode = UIDatePickerMode.Date;
 			return picker;
@@ -1848,13 +1913,19 @@ namespace MonoTouch.Dialog
 	}
 	
 	public class TimeElement : DateTimeElement {
-		public TimeElement (string caption, DateTime date) : base (caption, date)
-		{
-		}
+		public TimeElement(string caption) : base (caption) { }
 		
-		public override string FormatDate (DateTime dt)
-		{
-			return GetDateWithKind (dt).ToLocalTime ().ToShortTimeString ();
+		public TimeElement (string caption, DateTime? date) : base (caption, date) { }
+		
+		public TimeElement (string caption, DateTime? date, bool isRequired) : base (caption, date, isRequired) { }
+		
+		public override string FormatDate (DateTime? dt) {
+			string formattedDate = string.Empty;
+			
+			if (dt.HasValue)
+				formattedDate = dt.Value.ToLocalTime ().ToShortTimeString ();
+			
+			return formattedDate;
 		}
 		
 		public override UIDatePicker CreatePicker ()
