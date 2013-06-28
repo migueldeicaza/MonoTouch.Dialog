@@ -2575,6 +2575,14 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+		/// <summary>
+		/// Useful if this rootelement leads to a new ViewController and 
+		/// not a group from which the summary would be automatically
+		/// collected.
+		/// </summary>
+		/// <value>The default summary.</value>
+		public string DefaultSummary{ get; set;}
+
 		public Section this [int idx] {
 			get {
 				return Sections [idx];
@@ -2816,7 +2824,7 @@ namespace MonoTouch.Dialog
 			NSString key = summarySection == -1 ? rkey1 : rkey2;
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
-				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
+				var style = UITableViewCellStyle.Value1;
 				
 				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
@@ -2865,6 +2873,10 @@ namespace MonoTouch.Dialog
 					if (summaryElement < s.Elements.Count && cell.DetailTextLabel != null)
 						cell.DetailTextLabel.Text = s.Elements [summaryElement].Summary ();
 			} 
+			else{
+				if(!string.IsNullOrEmpty (DefaultSummary))
+					cell.DetailTextLabel.Text = DefaultSummary;
+			}
 		le:
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			
