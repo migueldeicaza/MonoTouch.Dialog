@@ -1530,44 +1530,44 @@ namespace MonoTouch.Dialog
 				return isPassword ? passwordKey : cellkey;
 			}
 		}
-		
+
+		UITableViewCell cell;
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = tv.DequeueReusableCell (CellKey);
-			if (cell == null){
+			if (cell == null) {
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				cell.TextLabel.Font = font;
 
-				var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
-				cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+			} 
+			cell.TextLabel.Text = Caption;
 
-			} else 
-				RemoveTag (cell, 1);
-			
-			if (entry == null){
-				SizeF size = ComputeEntryPosition (tv, cell);
-				float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
-				float width = cell.ContentView.Bounds.Width - size.Width;
-				if (textalignment == UITextAlignment.Right) {
-					// Add padding if right aligned
-					width -= 10;
-				}
-				
-				entry = CreateTextField (new RectangleF (size.Width, yOffset, width, size.Height));
-				
+			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
+			cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+			SizeF size = ComputeEntryPosition (tv, cell);
+			float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
+			float width = cell.ContentView.Bounds.Width - size.Width;
+			if (textalignment == UITextAlignment.Right) {
+				// Add padding if right aligned
+				width -= 10;
+			}
+			var entryFrame = new RectangleF (size.Width, yOffset, width, size.Height);
+
+			if (entry == null) {
+				entry = CreateTextField (entryFrame);
 				entry.ValueChanged += delegate {
 					FetchValue ();
 				};
 				entry.Ended += delegate {					
 					FetchValue ();
 					if (EntryEnded != null) {
-						EntryEnded(this, null);
+						EntryEnded (this, null);
 					}
 				};
 				entry.ShouldReturn += delegate {
 					
 					if (ShouldReturn != null)
-						return ShouldReturn();
+						return ShouldReturn ();
 					
 					RootElement root = GetImmediateRootElement ();
 					EntryElement focus = null;
@@ -1600,13 +1600,13 @@ namespace MonoTouch.Dialog
 					EntryElement self = null;
 					
 					if (EntryStarted != null) {
-						EntryStarted(this, null);
+						EntryStarted (this, null);
 					}
 					
 					if (!returnKeyType.HasValue) {
 						var returnType = UIReturnKeyType.Default;
 						
-						foreach (var e in (Parent as Section).Elements){
+						foreach (var e in (Parent as Section).Elements) {
 							if (e == this)
 								self = this;
 							else if (self != null && e is EntryElement)
@@ -1618,7 +1618,10 @@ namespace MonoTouch.Dialog
 					
 					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
-			}
+				cell.ContentView.AddSubview (entry);
+			} else
+				entry.Frame = entryFrame;
+
 			if (becomeResponder){
 				entry.BecomeFirstResponder ();
 				becomeResponder = false;
@@ -1627,9 +1630,7 @@ namespace MonoTouch.Dialog
 			
 			entry.AutocapitalizationType = AutocapitalizationType;
 			entry.AutocorrectionType = AutocorrectionType;
-			
-			cell.TextLabel.Text = Caption;
-			cell.ContentView.AddSubview (entry);
+
 			return cell;
 		}
 		
@@ -1725,6 +1726,7 @@ namespace MonoTouch.Dialog
 			Value = FormatDate (DateValue);
 			var cell = base.GetCell (tv);
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+            cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			return cell;
 		}
  
@@ -1881,15 +1883,45 @@ namespace MonoTouch.Dialog
 	/// </remarks>
 	public class UIViewElement : Element, IElementSizing {
 		static int count;
+		public UIView ContainerView;
 		NSString key;
 		protected UIView View;
 		public CellFlags Flags;
-		
+		UIEdgeInsets insets;
+
+		public UIEdgeInsets Insets { 
+			get {
+				return insets;
+			}
+			set {
+				var viewFrame = View.Frame;
+				var dx = value.Left - insets.Left;
+				var dy = value.Top - insets.Top;
+				var ow = insets.Left + insets.Right;
+				var oh = insets.Top + insets.Bottom;
+				var w = value.Left + value.Right;
+				var h = value.Top + value.Bottom;
+
+				ContainerView.Frame = new RectangleF (0, 0, ContainerView.Frame.Width + w - ow, ContainerView.Frame.Height + h -oh);
+				viewFrame.X += dx;
+				viewFrame.Y += dy;
+				View.Frame = viewFrame;
+
+				insets = value;
+
+				// Height changed, notify UITableView
+				if (dy != 0 || h != oh)
+					GetContainerTableView ().ReloadData ();
+				
+			}
+		}
+
 		public enum CellFlags {
 			Transparent = 1,
 			DisableSelection = 2
 		}
-		
+
+
 		/// <summary>
 		///   Constructor
 		/// </summary>
@@ -1903,13 +1935,31 @@ namespace MonoTouch.Dialog
 		/// If this is set, then the view is responsible for painting the entire area,
 		/// otherwise the default cell paint code will be used.
 		/// </param>
-		public UIViewElement (string caption, UIView view, bool transparent) : base (caption) 
+		public UIViewElement (string caption, UIView view, bool transparent, UIEdgeInsets insets) : base (caption) 
 		{
+			this.insets = insets;
+			var oframe = view.Frame;
+			var frame = oframe;
+			frame.Width += insets.Left + insets.Right;
+			frame.Height += insets.Top + insets.Bottom;
+
+			ContainerView = new UIView (frame);
+			if ((Flags & CellFlags.Transparent) != 0)
+				ContainerView.BackgroundColor = UIColor.Clear;
+
+			if (insets.Left != 0 || insets.Top != 0)
+				view.Frame = new RectangleF (insets.Left + frame.X, insets.Top + frame.Y, frame.Width, frame.Height);
+
+			ContainerView.AddSubview (view);
 			this.View = view;
 			this.Flags = transparent ? CellFlags.Transparent : 0;
 			key = new NSString ("UIViewElement" + count++);
 		}
 		
+		public UIViewElement (string caption, UIView view, bool transparent) : this (caption, view, transparent, UIEdgeInsets.Zero)
+		{
+		}
+
 		protected override NSString CellKey {
 			get {
 				return key;
@@ -1936,14 +1986,14 @@ namespace MonoTouch.Dialog
 
 				if (Caption != null)
 					cell.TextLabel.Text = Caption;
-				cell.ContentView.AddSubview (View);
+				cell.ContentView.AddSubview (ContainerView);
 			} 
 			return cell;
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return View.Bounds.Height;
+			return ContainerView.Bounds.Height+1;
 		}
 		
 		protected override void Dispose (bool disposing)
@@ -2086,7 +2136,18 @@ namespace MonoTouch.Dialog
 			if (Parent != null)
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
-		
+
+		/// <summary>
+		/// Adds a new child RootElement to the Section. This only exists to fix a compiler breakage when the mono 3.0 mcs is used.
+		/// </summary>
+		/// <param name="element">
+		/// An element to add to the section.
+		/// </param>
+		public void Add (RootElement element)
+		{
+			Add ((Element)element);
+		}
+
 		/// <summary>
 		///    Add version that can be used with LINQ
 		/// </summary>
@@ -2189,6 +2250,23 @@ namespace MonoTouch.Dialog
 			return count;
 		}
 		
+		/// <summary>
+		/// Inserts a single RootElement into the Section using the specified animation
+		/// </summary>
+		/// <param name="idx">
+		/// The index where the elements are inserted
+		/// </param>
+		/// <param name="anim">
+		/// The animation to use
+		/// </param>
+		/// <param name="newElements">
+		/// A series of elements.
+		/// </param>
+		public void Insert (int idx, UITableViewRowAnimation anim, RootElement newElement)
+		{
+			Insert (idx, anim, (Element) newElement);
+		}
+
 		void InsertVisual (int idx, UITableViewRowAnimation anim, int count)
 		{
 			var root = Parent as RootElement;
