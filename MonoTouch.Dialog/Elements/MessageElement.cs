@@ -173,6 +173,13 @@ namespace MonoTouch.Dialog {
 			if (Tapped != null)
 				Tapped (dvc, tableView, path);
 		}
+
+		public override bool Matches (string text)
+		{
+			return Subject.ToLower ().Contains (text.ToLower ()) || 
+				Body.ToLower ().Contains (text.ToLower ()) || 
+				Sender.ToLower ().Contains (text.ToLower ());
+		}
 	}
 }
 
