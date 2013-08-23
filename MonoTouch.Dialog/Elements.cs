@@ -1916,6 +1916,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 
+		[Flags]
 		public enum CellFlags {
 			Transparent = 1,
 			DisableSelection = 2
