@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using MonoTouch.UIKit;
-using System.Drawing;
 using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
