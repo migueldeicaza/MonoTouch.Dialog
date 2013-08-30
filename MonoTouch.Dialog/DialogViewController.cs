@@ -84,6 +84,21 @@ namespace MonoTouch.Dialog
 				enableSearch = value;
 			}
 		}
+
+		bool enableScope;
+		public bool EnableScope {
+			get {
+				return enableScope;
+			}
+			set {
+				if (enableScope == value)
+					return;
+
+				if (tableView != null)
+					throw new ArgumentException ("You should set EnableScope before the controller is shown");
+				enableScope = value;
+			}
+		}
 		
 		// If set, we automatically scroll the content to avoid showing the search bar until 
 		// the user manually pulls it down.
@@ -491,7 +506,8 @@ namespace MonoTouch.Dialog
 		void SetupSearch ()
 		{
 			if (enableSearch){
-				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+				var height = (enableScope) ? 90 : 44;
+				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, height)) {
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
