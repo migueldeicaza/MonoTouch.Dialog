@@ -104,7 +104,6 @@
     <Compile Include="Section.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="RadioGroup.cs" />
-    <Compile Include="RootElement.cs" />
     <Compile Include="Elements\BaseBooleanImageElement.cs" />
     <Compile Include="Elements\BooleanElement.cs" />
     <Compile Include="Elements\BooleanImageElement.cs" />
@@ -126,6 +125,7 @@
     <Compile Include="Elements\TimeElement.cs" />
     <Compile Include="Elements\UIViewElement.cs" />
     <Compile Include="Elements\Json.cs" />
+    <Compile Include="Elements\RootElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
