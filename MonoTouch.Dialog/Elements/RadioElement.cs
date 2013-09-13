@@ -59,9 +59,14 @@ namespace MonoTouch.Dialog
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
 				root.RadioSelected = RadioIdx;
 			}
-			
+
+			if (OnSelected != null)
+				OnSelected (this, EventArgs.Empty);
+
 			base.Selected (dvc, tableView, indexPath);
 		}
+
+		public event EventHandler<EventArgs> OnSelected;
 	}
 	
 }
