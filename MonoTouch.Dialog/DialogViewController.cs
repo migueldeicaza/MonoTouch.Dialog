@@ -120,7 +120,9 @@ namespace MonoTouch.Dialog
 			if (reloading && showStatus && refreshView != null){
 				UIView.BeginAnimations ("reloadingData");
 				UIView.SetAnimationDuration (0.2);
-				TableView.ContentInset = new UIEdgeInsets (60, 0, 0, 0);
+				var tableInset = TableView.ContentInset;
+				tableInset.Top += 60;
+				TableView.ContentInset = tableInset;
 				UIView.CommitAnimations ();
 			}
 		}
@@ -143,7 +145,9 @@ namespace MonoTouch.Dialog
 			refreshView.Flip (false);
 			UIView.BeginAnimations ("doneReloading");
 			UIView.SetAnimationDuration (0.3f);
-			TableView.ContentInset = new UIEdgeInsets (0, 0, 0, 0);
+			var tableInset = TableView.ContentInset;
+			tableInset.Top -= 60;
+			TableView.ContentInset = tableInset;
 			refreshView.SetStatus (RefreshViewStatus.PullToReload);
 			UIView.CommitAnimations ();
 		}

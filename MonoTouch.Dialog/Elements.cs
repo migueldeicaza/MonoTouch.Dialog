@@ -1709,7 +1709,7 @@ namespace MonoTouch.Dialog
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
 		public event Action<DateTimeElement> DateSelected;
-		public UIColor BackgroundColor = UIColor.Black;
+		public UIColor BackgroundColor = (UIDevice.CurrentDevice.CheckSystemVersion (7, 0)) ? UIColor.White : UIColor.Black;
 		
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
