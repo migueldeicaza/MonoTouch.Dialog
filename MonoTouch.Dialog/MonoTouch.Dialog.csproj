@@ -11,6 +11,7 @@
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
     <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <MtouchSdkVersion>3.0</MtouchSdkVersion>
+    <ReleaseVersion>3.2.0.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -85,7 +86,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Elements.cs" />
     <Compile Include="DialogViewController.cs" />
     <Compile Include="Reflect.cs" />
     <Compile Include="Utilities\Graphics.cs" />
@@ -99,7 +99,33 @@
     <Compile Include="Utilities\Controls.cs" />
     <Compile Include="Utilities\GlassButton.cs" />
     <Compile Include="Utilities\LocalizationExtensions.cs" />
+    <Compile Include="IElementSizing.cs" />
+    <Compile Include="IColorizeBackground.cs" />
+    <Compile Include="Section.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="RadioGroup.cs" />
+    <Compile Include="Elements\BaseBooleanImageElement.cs" />
+    <Compile Include="Elements\BooleanElement.cs" />
+    <Compile Include="Elements\BooleanImageElement.cs" />
+    <Compile Include="Elements\BoolElement.cs" />
+    <Compile Include="Elements\CheckboxElement.cs" />
+    <Compile Include="Elements\DateElement.cs" />
+    <Compile Include="Elements\DateTimeElement.cs" />
+    <Compile Include="Elements\Element.cs" />
+    <Compile Include="Elements\EntryElement.cs" />
+    <Compile Include="Elements\FloatElement.cs" />
+    <Compile Include="Elements\HtmlElement.cs" />
+    <Compile Include="Elements\ImageElement.cs" />
+    <Compile Include="Elements\ImageStringElement.cs" />
+    <Compile Include="Elements\MultilineElement.cs" />
+    <Compile Include="Elements\RadioElement.cs" />
+    <Compile Include="Elements\StringElement.cs" />
+    <Compile Include="Elements\StyledMultilineElement.cs" />
+    <Compile Include="Elements\StyledStringElement.cs" />
+    <Compile Include="Elements\TimeElement.cs" />
+    <Compile Include="Elements\UIViewElement.cs" />
     <Compile Include="Elements\Json.cs" />
+    <Compile Include="Elements\RootElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
