@@ -1048,6 +1048,11 @@ namespace MonoTouch.Dialog
 	public class RadioElement : StringElement {
 		public string Group;
 		internal int RadioIdx;
+
+		public Action<object, EventArgs> OnSelected {
+			get;
+			set;
+		}
 		
 		public RadioElement (string caption, string group) : base (caption)
 		{
@@ -1088,7 +1093,8 @@ namespace MonoTouch.Dialog
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
 				root.RadioSelected = RadioIdx;
 			}
-			
+			if (OnSelected != null)
+				OnSelected (this, EventArgs.Empty);
 			base.Selected (dvc, tableView, indexPath);
 		}
 	}
