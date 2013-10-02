@@ -17,6 +17,7 @@ namespace MonoTouch.Dialog {
 		public DateTime Date { get; private set; }
 		public bool NewFlag  { get; private set; }
 		public int MessageCount  { get; private set; }
+		public bool CapBodyText = true;
 		
 		static CGGradient gradient;
 		
@@ -92,8 +93,14 @@ namespace MonoTouch.Dialog {
 			//UIColor.Black.SetFill ();
 			//ctx.FillRect (new RectangleF (offset, 40, bw-boxWidth, 34));
 			UIColor.Gray.SetColor ();
-			DrawString (Body, new RectangleF (offset, 40, bw-boxWidth, 34), TextFont, UILineBreakMode.TailTruncation, UITextAlignment.Left);
-			
+
+			if (CapBodyText)
+				DrawString (Body, new RectangleF (offset, 40, bw - boxWidth, GetHeight(bw - boxWidth)), TextFont, UILineBreakMode.TailTruncation, UITextAlignment.Left);
+			else {
+				DrawString (Body, new RectangleF (offset, 40, bw - boxWidth, GetHeight(bw - boxWidth)), TextFont, UILineBreakMode.WordWrap, UITextAlignment.Left);
+			}
+
+
 			if (NewFlag){
 				ctx.SaveState ();
 				ctx.AddEllipseInRect (new RectangleF (10, 32, 12, 12));
@@ -110,6 +117,17 @@ namespace MonoTouch.Dialog {
 			ctx.RestoreState ();
 #endif
 		}
+		
+		public float GetHeight (float width)
+		{
+			if(CapBodyText)
+				return 34;
+
+			float margin = 0;//UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
+			SizeF size = new SizeF (width - margin, float.MaxValue);
+			string c = (String.IsNullOrEmpty (Body)) ? " " : Body;
+			return StringSize (c, TextFont, size, UILineBreakMode.WordWrap).Height + 34;
+		}
 	}
 		
 	public class MessageElement : Element, IElementSizing {
@@ -119,13 +137,15 @@ namespace MonoTouch.Dialog {
 		public DateTime Date;
 		public bool NewFlag;
 		public int MessageCount;
+		public bool CapBodyText = true;
 		
 		class MessageCell : UITableViewCell {
 			MessageSummaryView view;
+			public bool CapBodyText = false;
 			
 			public MessageCell () : base (UITableViewCellStyle.Default, mKey)
 			{
-				view = new MessageSummaryView ();
+				view = new MessageSummaryView (){ CapBodyText = CapBodyText};
 				ContentView.Add (view);
 				Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			}
@@ -157,13 +177,24 @@ namespace MonoTouch.Dialog {
 			var cell = tv.DequeueReusableCell (mKey) as MessageCell;
 			if (cell == null)
 				cell = new MessageCell ();
+			cell.CapBodyText = CapBodyText;
 			cell.Update (this);
 			return cell;
 		}
 		
 		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			return 78;
+			if(CapBodyText)
+				return 78;
+
+			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
+			SizeF size = new SizeF (tableView.Bounds.Width - margin, float.MaxValue);
+			UIFont font = UIFont.BoldSystemFontOfSize (17);
+			string c = Body;
+			// ensure the (single-line) Value will be rendered inside the cell
+			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (c))
+				c = " ";
+			return tableView.StringSize (c, font, size, UILineBreakMode.WordWrap).Height + 40;
 		}
 		
 		public event Action<DialogViewController, UITableView, NSIndexPath> Tapped;
