@@ -304,7 +304,7 @@ namespace MonoTouch.Dialog
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
 				searchBar.ShowsCancelButton = false;
-				container.FinishSearch ();
+				//container.FinishSearch ();
 			}
 
 			public override void TextChanged (UISearchBar searchBar, string searchText)
