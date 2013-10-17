@@ -859,7 +859,7 @@ namespace MonoTouch.Dialog
 	
 		void ClearBackground (UITableViewCell cell)
 		{
-			cell.BackgroundColor = UIColor.White;
+			cell.BackgroundColor = UITableViewCell.Appearance.BackgroundColor;
 			cell.TextLabel.BackgroundColor = UIColor.Clear;
 		}
 
