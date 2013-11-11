@@ -125,7 +125,7 @@ namespace MonoTouch.Dialog.Utilities
 		static int sizer (UIImage img)
 		{
 			var cg = img.CGImage;
-			return cg.BytesPerRow * cg.Height;
+			return (int)(cg.BytesPerRow * cg.Height);
 		}
 		
 		/// <summary>

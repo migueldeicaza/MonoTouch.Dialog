@@ -87,9 +87,9 @@ namespace MonoTouch.Dialog
 			context.Clip ();
 			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
-				var topCenter = new PointF (bounds.GetMidX (), 0);
-				var midCenter = new PointF (bounds.GetMidX (), bounds.GetMidY ());
-				var bottomCenter = new PointF (bounds.GetMidX (), bounds.GetMaxY ());
+				var topCenter = new PointF ((float)bounds.GetMidX (), 0);
+				var midCenter = new PointF ((float)bounds.GetMidX (), (float)bounds.GetMidY ());
+				var bottomCenter = new PointF ((float)bounds.GetMidX (), (float)bounds.GetMaxY ());
 
 				using (var gradient = new CGGradient (cs, new float [] { 0.23f, 0.23f, 0.23f, alpha, 0.47f, 0.47f, 0.47f, alpha }, new float [] {0, 1})){
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
