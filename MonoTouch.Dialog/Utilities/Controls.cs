@@ -8,6 +8,16 @@ using MonoTouch.CoreAnimation;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
+#if !HAVE_NATIVE_TYPES
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
+
 namespace MonoTouch.Dialog
 {
 	public enum RefreshViewStatus {
@@ -56,7 +66,7 @@ namespace MonoTouch.Dialog
 		protected UILabel LastUpdateLabel, StatusLabel;
 		protected UIImageView ArrowView;		
 			
-		public RefreshTableHeaderView (RectangleF rect) : base (rect)
+		public RefreshTableHeaderView (CGRect rect) : base (rect)
 		{
 			this.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
 			
@@ -70,7 +80,7 @@ namespace MonoTouch.Dialog
 				Font = UIFont.SystemFontOfSize (13f),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = UIColor.White, 
-				ShadowOffset = new SizeF (0, 1),
+				ShadowOffset = new CGSize (0, 1),
 				BackgroundColor = this.BackgroundColor,
 				Opaque = true,
 				TextAlignment = UITextAlignment.Center,
@@ -82,7 +92,7 @@ namespace MonoTouch.Dialog
 				Font = UIFont.BoldSystemFontOfSize (14),
 				TextColor = new UIColor (0.47f, 0.50f, 0.57f, 1),
 				ShadowColor = LastUpdateLabel.ShadowColor,
-				ShadowOffset = new SizeF (0, 1),
+				ShadowOffset = new CGSize (0, 1),
 				BackgroundColor = this.BackgroundColor,
 				Opaque = true,
 				TextAlignment = UITextAlignment.Center,
@@ -111,10 +121,10 @@ namespace MonoTouch.Dialog
 			base.LayoutSubviews ();
 			var bounds = Bounds;
 			
-			LastUpdateLabel.Frame = new RectangleF (0, bounds.Height - 30, bounds.Width, 20);
-			StatusLabel.Frame = new RectangleF (0, bounds.Height-48, bounds.Width, 20);
-			ArrowView.Frame = new RectangleF (20, bounds.Height - 65, 30, 55);
-			Activity.Frame = new RectangleF (25, bounds.Height-38, 20, 20);
+			LastUpdateLabel.Frame = new CGRect (0, bounds.Height - 30, bounds.Width, 20);
+			StatusLabel.Frame = new CGRect (0, bounds.Height-48, bounds.Width, 20);
+			ArrowView.Frame = new CGRect (20, bounds.Height - 65, 30, 55);
+			Activity.Frame = new CGRect (25, bounds.Height-38, 20, 20);
 		}
 		
 		RefreshViewStatus status = (RefreshViewStatus) (-1);
@@ -138,7 +148,7 @@ namespace MonoTouch.Dialog
 			StatusLabel.Text = s;
 		}
 		
-		public override void Draw (RectangleF rect)
+		public override void Draw (CGRect rect)
 		{
 			var context = UIGraphics.GetCurrentContext ();
 			context.DrawPath (CGPathDrawingMode.FillStroke);

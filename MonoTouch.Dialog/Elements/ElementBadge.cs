@@ -16,6 +16,16 @@ using MonoTouch.CoreGraphics;
 using System.Drawing;
 using MonoTouch.Foundation;
 
+#if !HAVE_NATIVE_TYPES
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
+
 namespace MonoTouch.Dialog
 {	
 	/// <summary>
@@ -96,13 +106,13 @@ namespace MonoTouch.Dialog
 			base.Dispose (disposing);
 		}
 
-		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
-			SizeF size = new SizeF (tableView.Bounds.Width - 40, float.MaxValue);
-			float height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
+			CGSize size = new CGSize (tableView.Bounds.Width - 40, nfloat.MaxValue);
+			nfloat height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
 			
 			// Image is 57 pixels tall, add some padding
-			return Math.Max (height, 63);
+			return (nfloat)Math.Max (height, 63);
 		}
 
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
@@ -118,7 +128,7 @@ namespace MonoTouch.Dialog
 				using (var context = new CGBitmapContext (IntPtr.Zero, 57, 57, 8, 57*4, cs, CGImageAlphaInfo.PremultipliedLast)){
 					//context.ScaleCTM (0.5f, -1);
 					context.TranslateCTM (0, 0);
-					context.DrawImage (new RectangleF (0, 0, 57, 57), template.CGImage);
+					context.DrawImage (new CGRect (0, 0, 57, 57), template.CGImage);
 					context.SetFillColor (1, 1, 1, 1);
 					
 					context.SelectFont ("Helvetica", 10f, CGTextEncoding.MacRoman);

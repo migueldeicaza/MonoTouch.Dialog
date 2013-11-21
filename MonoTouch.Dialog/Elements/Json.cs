@@ -17,6 +17,17 @@ using System.Net;
 using System.Reflection;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+
+#if !HAVE_NATIVE_TYPES
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
 
 namespace MonoTouch.Dialog {
 	
@@ -32,7 +43,7 @@ namespace MonoTouch.Dialog {
 		{
 			var cvb = cell.ContentView.Bounds;
 
-			var spinner = new UIActivityIndicatorView (new RectangleF (cvb.Width-CSIZE/2, (cvb.Height-CSIZE)/2, CSIZE, CSIZE)) {
+			var spinner = new UIActivityIndicatorView (new CGRect (cvb.Width-CSIZE/2, (cvb.Height-CSIZE)/2, CSIZE, CSIZE)) {
 				Tag = SPINNER_TAG,
 				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
 			};

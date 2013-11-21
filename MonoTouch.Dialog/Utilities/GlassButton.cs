@@ -3,6 +3,16 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 using System.Drawing;
 
+#if !HAVE_NATIVE_TYPES
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
+
 namespace MonoTouch.Dialog
 {
 	
@@ -25,7 +35,7 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		/// Creates a new instance of the GlassButton using the specified dimensions
 		/// </summary>
-		public GlassButton (RectangleF frame) : base (frame)
+		public GlassButton (CGRect frame) : base (frame)
 		{
 			NormalColor = new UIColor (0.55f, 0.04f, 0.02f, 1);
 			HighlightedColor = UIColor.Black;
@@ -73,7 +83,7 @@ namespace MonoTouch.Dialog
 			return base.ContinueTracking (uitouch, uievent);
 		}
 		
-		public override void Draw (RectangleF rect)
+		public override void Draw (CGRect rect)
 		{
 			var context = UIGraphics.GetCurrentContext ();
 			var bounds = Bounds;
@@ -87,9 +97,9 @@ namespace MonoTouch.Dialog
 			context.Clip ();
 			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
-				var topCenter = new PointF ((float)bounds.GetMidX (), 0);
-				var midCenter = new PointF ((float)bounds.GetMidX (), (float)bounds.GetMidY ());
-				var bottomCenter = new PointF ((float)bounds.GetMidX (), (float)bounds.GetMaxY ());
+				var topCenter = new CGPoint ((float)bounds.GetMidX (), 0);
+				var midCenter = new CGPoint ((float)bounds.GetMidX (), (float)bounds.GetMidY ());
+				var bottomCenter = new CGPoint ((float)bounds.GetMidX (), (float)bounds.GetMaxY ());
 
 				using (var gradient = new CGGradient (cs, new float [] { 0.23f, 0.23f, 0.23f, alpha, 0.47f, 0.47f, 0.47f, alpha }, new float [] {0, 1})){
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);

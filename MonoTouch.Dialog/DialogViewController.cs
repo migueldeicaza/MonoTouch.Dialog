@@ -10,10 +10,21 @@
 // MIT X11 license
 //
 using System;
-using MonoTouch.UIKit;
-using System.Drawing;
 using System.Collections.Generic;
+
 using MonoTouch.Foundation;
+using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+
+#if !HAVE_NATIVE_TYPES
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
 
 namespace MonoTouch.Dialog
 {
@@ -170,7 +181,7 @@ namespace MonoTouch.Dialog
 			if (refreshView != null) {
 				var bounds = View.Bounds;
 				
-				refreshView.Frame = new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height);
+				refreshView.Frame = new CGRect (0, -bounds.Height, bounds.Width, bounds.Height);
 			}
 			
 			ReloadData ();
@@ -380,7 +391,7 @@ namespace MonoTouch.Dialog
 				var section = Root.Sections [sectionIdx];
 				if (section.HeaderView == null)
 					return -1;
-				return section.HeaderView.Frame.Height;
+				return (float)section.HeaderView.Frame.Height;
 			}
 
 			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
@@ -394,7 +405,7 @@ namespace MonoTouch.Dialog
 				var section = Root.Sections [sectionIdx];
 				if (section.FooterView == null)
 					return -1;
-				return section.FooterView.Frame.Height;
+				return (float)section.FooterView.Frame.Height;
 			}
 			
 			#region Pull to Refresh support
@@ -453,7 +464,7 @@ namespace MonoTouch.Dialog
 				var sizable = element as IElementSizing;
 				if (sizable == null)
 					return tableView.RowHeight;
-				return sizable.GetHeight (tableView, indexPath);
+				return (float)sizable.GetHeight (tableView, indexPath);
 			}
 		}
 			
@@ -495,7 +506,7 @@ namespace MonoTouch.Dialog
 		void SetupSearch ()
 		{
 			if (enableSearch){
-				searchBar = new UISearchBar (new RectangleF (0, 0, tableView.Bounds.Width, 44)) {
+				searchBar = new UISearchBar (new CGRect (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
@@ -523,7 +534,7 @@ namespace MonoTouch.Dialog
 			element.Selected (this, tableView, indexPath);
 		}
 		
-		public virtual UITableView MakeTableView (RectangleF bounds, UITableViewStyle style)
+		public virtual UITableView MakeTableView (CGRect bounds, UITableViewStyle style)
 		{
 			return new UITableView (bounds, style);
 		}
@@ -553,14 +564,14 @@ namespace MonoTouch.Dialog
 				// The dimensions should be large enough so that even if the user scrolls, we render the
 				// whole are with the background color.
 				var bounds = View.Bounds;
-				refreshView = MakeRefreshTableHeaderView (new RectangleF (0, -bounds.Height, bounds.Width, bounds.Height));
+				refreshView = MakeRefreshTableHeaderView (new CGRect (0, -bounds.Height, bounds.Width, bounds.Height));
 				if (reloading)
 					refreshView.SetActivity (true);
 				TableView.AddSubview (refreshView);
 			}
 		}
 		
-		public virtual RefreshTableHeaderView MakeRefreshTableHeaderView (RectangleF rect)
+		public virtual RefreshTableHeaderView MakeRefreshTableHeaderView (CGRect rect)
 		{
 			return new RefreshTableHeaderView (rect);
 		}
@@ -571,7 +582,7 @@ namespace MonoTouch.Dialog
 			if (AutoHideSearch){
 				if (enableSearch){
 					if (TableView.ContentOffset.Y < 44)
-						TableView.ContentOffset = new PointF (0, 44);
+						TableView.ContentOffset = new CGPoint (0, 44);
 				}
 			}
 			if (root == null)

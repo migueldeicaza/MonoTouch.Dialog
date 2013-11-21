@@ -25,6 +25,16 @@ using MonoTouch.Foundation;
 using MonoTouch.Dialog.Utilities;
 using MonoTouch.CoreAnimation;
 
+#if !HAVE_NATIVE_TYPES
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
+
 namespace MonoTouch.Dialog
 {
 	/// <summary>
@@ -383,7 +393,7 @@ namespace MonoTouch.Dialog
 				frame.Width -= ImageSpace+Padding;
 				label.Frame = frame;
 				
-				button.Frame = new RectangleF (full.Width-ImageSpace, -3, ImageSpace, 48);
+				button.Frame = new CGRect (full.Width-ImageSpace, -3, ImageSpace, 48);
 			}
 			
 			public void UpdateFrom (BaseBooleanImageElement newParent)
@@ -478,7 +488,7 @@ namespace MonoTouch.Dialog
 			} else
 				RemoveTag (cell, 1);
 
-			SizeF captionSize = new SizeF (0, 0);
+			CGSize captionSize = new CGSize (0, 0);
 			if (Caption != null && ShowCaption){
 				cell.TextLabel.Text = Caption;
 				captionSize = cell.TextLabel.StringSize (Caption, UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
@@ -486,7 +496,7 @@ namespace MonoTouch.Dialog
 			}
 
 			if (slider == null){
-				slider = new UISlider (new RectangleF (10f + captionSize.Width, 12f, 280f - captionSize.Width, 7f)){
+				slider = new UISlider (new CGRect (10f + captionSize.Width, 12f, 280f - captionSize.Width, 7f)){
 					BackgroundColor = UIColor.Clear,
 					MinValue = this.MinValue,
 					MaxValue = this.MaxValue,
@@ -908,10 +918,10 @@ namespace MonoTouch.Dialog
 			this.style = style;
 		}
 
-		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		public virtual nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
-			SizeF maxSize = new SizeF (tableView.Bounds.Width - margin, float.MaxValue);
+			CGSize maxSize = new CGSize (tableView.Bounds.Width - margin, float.MaxValue);
 			
 			if (this.Accessory != UITableViewCellAccessory.None)
 				maxSize.Width -= 20;
@@ -923,14 +933,14 @@ namespace MonoTouch.Dialog
 				c = " ";
 
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
-			float height = tableView.StringSize (c, captionFont, maxSize, LineBreakMode).Height;
+			var height = tableView.StringSize (c, captionFont, maxSize, LineBreakMode).Height;
 			
 			if (!String.IsNullOrEmpty (v)) {
 				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
 				if (this.style == UITableViewCellStyle.Subtitle) {
 					height += tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
 				} else {
-					float vheight = tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
+					var vheight = tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
 					if (vheight > height)
 						height = vheight;
 				}
@@ -996,7 +1006,7 @@ namespace MonoTouch.Dialog
 	///   different heights
 	/// </summary>
 	public interface IElementSizing {
-		float GetHeight (UITableView tableView, NSIndexPath indexPath);
+		nfloat GetHeight (UITableView tableView, NSIndexPath indexPath);
 	}
 	
 	/// <summary>
@@ -1032,10 +1042,10 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		public virtual float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		public virtual nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
-			SizeF size = new SizeF (tableView.Bounds.Width - margin, float.MaxValue);
+			CGSize size = new CGSize (tableView.Bounds.Width - margin, float.MaxValue);
 			UIFont font = UIFont.BoldSystemFontOfSize (17);
 			string c = Caption;
 			// ensure the (single-line) Value will be rendered inside the cell
@@ -1131,7 +1141,7 @@ namespace MonoTouch.Dialog
 	
 	public class ImageElement : Element {
 		public UIImage Value;
-		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
+		static CGRect rect = new CGRect (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ImageElement");
 		UIImage scaled;
 		UIPopoverController popover;
@@ -1151,7 +1161,7 @@ namespace MonoTouch.Dialog
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
 				using (var bit = new CGBitmapContext (IntPtr.Zero, dimx, dimy, 8, 0, cs, CGImageAlphaInfo.PremultipliedFirst)){
 					bit.SetStrokeColor (1, 0, 0, 0.5f);
-					bit.FillRect (new RectangleF (0, 0, dimx, dimy));
+					bit.FillRect (new CGRect (0, 0, dimx, dimy));
 					
 					return UIImage.FromImage (bit.ToImage ());
 				}
@@ -1160,15 +1170,15 @@ namespace MonoTouch.Dialog
 		
 		UIImage Scale (UIImage source)
 		{
-			UIGraphics.BeginImageContext (new SizeF (dimx, dimy));
+			UIGraphics.BeginImageContext (new CGSize (dimx, dimy));
 			var ctx = UIGraphics.GetCurrentContext ();
 		
 			var img = source.CGImage;
 			ctx.TranslateCTM (0, dimy);
 			if (img.Width > img.Height)
-				ctx.ScaleCTM (1, -img.Width/dimy);
+				ctx.ScaleCTM (1, (nfloat)(-img.Width/dimy));
 			else
-				ctx.ScaleCTM (img.Height/dimx, -1);
+				ctx.ScaleCTM ((nfloat)img.Height/dimx, -1);
 
 			ctx.DrawImage (rect, source.CGImage);
 			
@@ -1284,7 +1294,7 @@ namespace MonoTouch.Dialog
 			
 			switch (UIDevice.CurrentDevice.UserInterfaceIdiom){
 			case UIUserInterfaceIdiom.Pad:
-				RectangleF useRect;
+				CGRect useRect;
 				popover = new UIPopoverController (picker);
 				var cell = tableView.CellAt (path);
 				if (cell == null)
@@ -1485,7 +1495,7 @@ namespace MonoTouch.Dialog
 		// 
 		// Computes the X position for the entry by aligning all the entries in the Section
 		//
-		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
+		CGSize ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
 			Section s = Parent as Section;
 			if (s.EntryAlignment.Width != 0)
@@ -1493,7 +1503,7 @@ namespace MonoTouch.Dialog
 			
 			// If all EntryElements have a null Caption, align UITextField with the Caption
 			// offset of normal cells (at 10px).
-			SizeF max = new SizeF (-15, tv.StringSize ("M", font).Height);
+			CGSize max = new CGSize (-15, tv.StringSize ("M", font).Height);
 			foreach (var e in s.Elements){
 				var ee = e as EntryElement;
 				if (ee == null)
@@ -1505,11 +1515,11 @@ namespace MonoTouch.Dialog
 						max = size;
 				}
 			}
-			s.EntryAlignment = new SizeF (25 + Math.Min (max.Width, 160), max.Height);
+			s.EntryAlignment = new CGSize ((nfloat)(25 + Math.Min (max.Width, 160)), (nfloat)max.Height);
 			return s.EntryAlignment;
 		}
 
-		protected virtual UITextField CreateTextField (RectangleF frame)
+		protected virtual UITextField CreateTextField (CGRect frame)
 		{
 			return new UITextField (frame) {
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
@@ -1542,15 +1552,15 @@ namespace MonoTouch.Dialog
 			cell.TextLabel.Text = Caption;
 
 			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
-			cell.Frame = new RectangleF(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
-			SizeF size = ComputeEntryPosition (tv, cell);
-			float yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
-			float width = cell.ContentView.Bounds.Width - size.Width;
+			cell.Frame = new CGRect(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+			CGSize size = ComputeEntryPosition (tv, cell);
+			nfloat yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
+			nfloat width = cell.ContentView.Bounds.Width - size.Width;
 			if (textalignment == UITextAlignment.Right) {
 				// Add padding if right aligned
 				width -= 10;
 			}
-			var entryFrame = new RectangleF (size.Width, yOffset, width, size.Height);
+			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height);
 
 			if (entry == null) {
 				entry = CreateTextField (entryFrame);
@@ -1760,7 +1770,7 @@ namespace MonoTouch.Dialog
 		
 		public virtual UIDatePicker CreatePicker ()
 		{
-			var picker = new UIDatePicker (RectangleF.Empty){
+			var picker = new UIDatePicker (CGRect.Empty){
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Mode = UIDatePickerMode.DateAndTime,
 				Date = DateValue
@@ -1768,10 +1778,10 @@ namespace MonoTouch.Dialog
 			return picker;
 		}
 		                                                                                                                                
-		static RectangleF PickerFrameWithSize (SizeF size)
+		static CGRect PickerFrameWithSize (CGSize size)
 		{                                                                                                                                    
 			var screenRect = UIScreen.MainScreen.ApplicationFrame;
-			float fY = 0, fX = 0;
+			nfloat fY = 0, fX = 0;
 			
 			switch (UIApplication.SharedApplication.StatusBarOrientation){
 			case UIInterfaceOrientation.LandscapeLeft:
@@ -1787,7 +1797,7 @@ namespace MonoTouch.Dialog
 				break;
 			}
 			
-			return new RectangleF (fX, fY, size.Width, size.Height);
+			return new CGRect (fX, fY, size.Width, size.Height);
 		}                                                                                                                                    
 
 		class MyViewController : UIViewController {
@@ -1809,7 +1819,7 @@ namespace MonoTouch.Dialog
 			public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 			{
 				base.DidRotate (fromInterfaceOrientation);
-				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (SizeF.Empty));
+				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (CGSize.Empty));
 			}
 			
 			public bool Autorotate { get; set; }
@@ -1831,7 +1841,7 @@ namespace MonoTouch.Dialog
 			vc.View.AddSubview (datePicker);
 			dvc.ActivateController (vc);
 
-			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
+			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (CGSize.Empty));
 		}
 	}
 	
@@ -1928,7 +1938,7 @@ namespace MonoTouch.Dialog
 					// This trick is necessary to keep the background clear, otherwise
 					// it gets painted as black
 					//
-					cell.BackgroundView = new UIView (RectangleF.Empty) { 
+					cell.BackgroundView = new UIView (CGRect.Empty) { 
 						BackgroundColor = UIColor.Clear 
 					};
 				}
@@ -1942,7 +1952,7 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 		
-		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			return View.Bounds.Height;
 		}
@@ -1979,7 +1989,7 @@ namespace MonoTouch.Dialog
 		public List<Element> Elements = new List<Element> ();
 				
 		// X corresponds to the alignment, Y to the height of the password
-		public SizeF EntryAlignment;
+		public CGSize EntryAlignment;
 		
 		/// <summary>
 		///  Constructs a Section without header or footers.
