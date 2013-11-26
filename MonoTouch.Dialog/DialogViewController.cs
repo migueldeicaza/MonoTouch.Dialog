@@ -17,9 +17,15 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 
 #if !HAVE_NATIVE_TYPES
+#if ARCH_32
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
+#else
+using nint = global::System.Int64;
+using nuint = global::System.UInt64;
+using nfloat = global::System.Double;
+#endif
 
 using CGSize = global::System.Drawing.SizeF;
 using CGPoint = global::System.Drawing.PointF;
@@ -386,12 +392,12 @@ namespace MonoTouch.Dialog
 				return section.HeaderView;
 			}
 
-			public override float GetHeightForHeader (UITableView tableView, int sectionIdx)
+			public override nfloat GetHeightForHeader (UITableView tableView, int sectionIdx)
 			{
 				var section = Root.Sections [sectionIdx];
 				if (section.HeaderView == null)
 					return -1;
-				return (float)section.HeaderView.Frame.Height;
+				return section.HeaderView.Frame.Height;
 			}
 
 			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
@@ -400,12 +406,12 @@ namespace MonoTouch.Dialog
 				return section.FooterView;
 			}
 			
-			public override float GetHeightForFooter (UITableView tableView, int sectionIdx)
+			public override nfloat GetHeightForFooter (UITableView tableView, int sectionIdx)
 			{
 				var section = Root.Sections [sectionIdx];
 				if (section.FooterView == null)
 					return -1;
-				return (float)section.FooterView.Frame.Height;
+				return section.FooterView.Frame.Height;
 			}
 			
 			#region Pull to Refresh support
@@ -456,15 +462,15 @@ namespace MonoTouch.Dialog
 		public class SizingSource : Source {
 			public SizingSource (DialogViewController controller) : base (controller) {}
 			
-			public override float GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override nfloat GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
 			{
 				var section = Root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
 				
 				var sizable = element as IElementSizing;
 				if (sizable == null)
-					return tableView.RowHeight;
-				return (float)sizable.GetHeight (tableView, indexPath);
+					return (nfloat)tableView.RowHeight;
+				return sizable.GetHeight (tableView, indexPath);
 			}
 		}
 			
