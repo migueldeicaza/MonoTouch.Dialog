@@ -27,7 +27,7 @@ namespace MonoTouch.Dialog
 		/// <returns>
 		/// A <see cref="CGPath"/> that can be used to stroke the rounded rectangle
 		/// </returns>
-		public static CGPath MakeRoundedRectPath (CGRect rect, float radius)
+		public static CGPath MakeRoundedRectPath (CGRect rect, nfloat radius)
 		{
 			nfloat minx = rect.Left;
 			nfloat midx = rect.Left + (rect.Width)/2;
@@ -47,7 +47,7 @@ namespace MonoTouch.Dialog
 			return path;
         }
 		
-		public static void FillRoundedRect (CGContext ctx, CGRect rect, float radius)
+		public static void FillRoundedRect (CGContext ctx, CGRect rect, nfloat radius)
 		{
 				var p = GraphicsUtil.MakeRoundedRectPath (rect, radius);
 				ctx.AddPath (p);

@@ -4,9 +4,15 @@ using MonoTouch.CoreGraphics;
 using System.Drawing;
 
 #if !HAVE_NATIVE_TYPES
+#if ARCH_32
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
+#else
+using nint = global::System.Int64;
+using nuint = global::System.UInt64;
+using nfloat = global::System.Double;
+#endif
 
 using CGSize = global::System.Drawing.SizeF;
 using CGPoint = global::System.Drawing.PointF;
@@ -101,14 +107,14 @@ namespace MonoTouch.Dialog
 				var midCenter = new CGPoint ((float)bounds.GetMidX (), (float)bounds.GetMidY ());
 				var bottomCenter = new CGPoint ((float)bounds.GetMidX (), (float)bounds.GetMaxY ());
 
-				using (var gradient = new CGGradient (cs, new float [] { 0.23f, 0.23f, 0.23f, alpha, 0.47f, 0.47f, 0.47f, alpha }, new float [] {0, 1})){
+				using (var gradient = new CGGradient (cs, new nfloat [] { 0.23f, 0.23f, 0.23f, alpha, 0.47f, 0.47f, 0.47f, alpha }, new nfloat [] {0, 1})){
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
 				}
 				
 				container = GraphicsUtil.MakeRoundedRectPath (bounds.Inset (1, 1), 13);
 				context.AddPath (container);
 				context.Clip ();
-				using (var gradient = new CGGradient (cs, new float [] { 0.05f, 0.05f, 0.05f, alpha, 0.15f, 0.15f, 0.15f, alpha}, new float [] {0, 1})){
+				using (var gradient = new CGGradient (cs, new nfloat [] { 0.05f, 0.05f, 0.05f, alpha, 0.15f, 0.15f, 0.15f, alpha}, new nfloat [] {0, 1})){
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
 				}
 				
@@ -120,8 +126,7 @@ namespace MonoTouch.Dialog
 				background.SetFill ();
 				context.FillRect (nb);
 				
-				using (var gradient = new CGGradient (cs, new float [] { 1, 1, 1, .35f, 1, 1, 1, 0.06f }, new float [] { 0, 1 })){		
-					
+				using (var gradient = new CGGradient (cs, new nfloat [] { 1, 1, 1, .35f, 1, 1, 1, 0.06f }, new nfloat [] { 0, 1 })){		
 					context.DrawLinearGradient (gradient, topCenter, midCenter, 0);
 				}
 				context.SetLineWidth (2);
@@ -129,7 +134,7 @@ namespace MonoTouch.Dialog
 				context.ReplacePathWithStrokedPath ();
 				context.Clip ();
 
-				using (var gradient = new CGGradient (cs, new float [] { 1, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }, new float [] { 0, 1 })){
+				using (var gradient = new CGGradient (cs, new nfloat [] { 1, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }, new nfloat [] { 0, 1 })){
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
 				}
 			}

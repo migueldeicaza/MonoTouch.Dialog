@@ -5,9 +5,15 @@ using MonoTouch.Foundation;
 using MonoTouch.CoreGraphics;
 
 #if !HAVE_NATIVE_TYPES
+#if ARCH_32
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
+#else
+using nint = global::System.Int64;
+using nuint = global::System.UInt64;
+using nfloat = global::System.Double;
+#endif
 
 using CGSize = global::System.Drawing.SizeF;
 using CGPoint = global::System.Drawing.PointF;
@@ -33,7 +39,7 @@ namespace MonoTouch.Dialog {
 		static MessageSummaryView ()
 		{
 			using (var colorspace = CGColorSpace.CreateDeviceRGB ()){
-				gradient = new CGGradient (colorspace, new float [] { /* first */ .52f, .69f, .96f, 1, /* second */ .12f, .31f, .67f, 1 }, null); //new float [] { 0, 1 });
+				gradient = new CGGradient (colorspace, new nfloat [] { /* first */ .52f, .69f, .96f, 1, /* second */ .12f, .31f, .67f, 1 }, null); //new float [] { 0, 1 });
 			}
 		}
 		
