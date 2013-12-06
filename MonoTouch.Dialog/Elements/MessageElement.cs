@@ -33,11 +33,7 @@ namespace MonoTouch.Dialog {
 		static MessageSummaryView ()
 		{
 			using (var colorspace = CGColorSpace.CreateDeviceRGB ()){
-#if ARCH_32 || HAVE_NATIVE_TYPES
 				gradient = new CGGradient (colorspace, new nfloat [] { /* first */ .52f, .69f, .96f, 1, /* second */ .12f, .31f, .67f, 1 }, null); //new float [] { 0, 1 });
-#else
-				gradient = new CGGradient (colorspace, new double [] { /* first */ .52f, .69f, .96f, 1, /* second */ .12f, .31f, .67f, 1 }, null); //new float [] { 0, 1 });
-#endif
 			}
 		}
 		

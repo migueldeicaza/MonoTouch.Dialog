@@ -103,9 +103,9 @@ namespace MonoTouch.Dialog
 			context.Clip ();
 			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
-				var topCenter = new CGPoint ((float)bounds.GetMidX (), 0);
-				var midCenter = new CGPoint ((float)bounds.GetMidX (), (float)bounds.GetMidY ());
-				var bottomCenter = new CGPoint ((float)bounds.GetMidX (), (float)bounds.GetMaxY ());
+				var topCenter = new CGPoint (bounds.GetMidX (), 0);
+				var midCenter = new CGPoint (bounds.GetMidX (), bounds.GetMidY ());
+				var bottomCenter = new CGPoint (bounds.GetMidX (), bounds.GetMaxY ());
 
 				using (var gradient = new CGGradient (cs, new nfloat [] { 0.23f, 0.23f, 0.23f, alpha, 0.47f, 0.47f, 0.47f, alpha }, new nfloat [] {0, 1})){
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
@@ -126,7 +126,7 @@ namespace MonoTouch.Dialog
 				background.SetFill ();
 				context.FillRect (nb);
 				
-				using (var gradient = new CGGradient (cs, new nfloat [] { 1, 1, 1, .35f, 1, 1, 1, 0.06f }, new nfloat [] { 0, 1 })){		
+				using (var gradient = new CGGradient (cs, new nfloat [] { 1, 1, 1, .35f, 1, 1, 1, 0.06f }, new nfloat [] { 0, 1 })){
 					context.DrawLinearGradient (gradient, topCenter, midCenter, 0);
 				}
 				context.SetLineWidth (2);
