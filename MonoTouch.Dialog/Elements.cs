@@ -1439,7 +1439,7 @@ namespace MonoTouch.Dialog
 		UITextAlignment textalignment = UITextAlignment.Left;
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
-		bool enablesReturnKeyAutomatically;
+		bool enablesReturnKeyAutomatically = false;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
@@ -1642,7 +1642,7 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 			}
 			entry.KeyboardType = KeyboardType;
-			
+			entry.EnablesReturnKeyAutomatically = EnablesReturnKeyAutomatically;
 			entry.AutocapitalizationType = AutocapitalizationType;
 			entry.AutocorrectionType = AutocorrectionType;
 
