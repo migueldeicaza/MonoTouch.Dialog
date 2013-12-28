@@ -1377,6 +1377,20 @@ namespace MonoTouch.Dialog
 					entry.ReturnKeyType = returnKeyType.Value;
 			}
 		}
+
+		/// <summary>
+		/// The default value for this property is <c>false</c>. If you set it to <c>true</c>, the keyboard disables the return key when the text entry area contains no text. As soon as the user enters any text, the return key is automatically enabled.
+		/// </summary>
+		public bool EnablesReturnKeyAutomatically {
+			get {
+				return enablesReturnKeyAutomatically;
+			}
+			set {
+				enablesReturnKeyAutomatically = value;
+				if (entry != null)
+					entry.EnablesReturnKeyAutomatically = value;
+			}
+		}
 		
 		public UITextAutocapitalizationType AutocapitalizationType {
 			get {
@@ -1425,6 +1439,7 @@ namespace MonoTouch.Dialog
 		UITextAlignment textalignment = UITextAlignment.Left;
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
+		bool enablesReturnKeyAutomatically;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
