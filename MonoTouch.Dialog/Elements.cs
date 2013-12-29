@@ -1439,6 +1439,8 @@ namespace MonoTouch.Dialog
 
 		public bool AlignEntryWithAllSections { get; set; }
 
+		public bool NotifyChangedOnKeyStroke { get; set; }
+
 		UITextAlignment textalignment = UITextAlignment.Left;
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
@@ -1578,7 +1580,9 @@ namespace MonoTouch.Dialog
 			if (entry == null) {
 				entry = CreateTextField (entryFrame);
 				entry.EditingChanged += delegate {
-					FetchValue ();
+					if(NotifyChangedOnKeyStroke) {
+						FetchValue ();
+					}
 				};
 				entry.ValueChanged += delegate {
 					FetchValue ();
