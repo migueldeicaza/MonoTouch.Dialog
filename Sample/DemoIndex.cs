@@ -33,7 +33,11 @@ namespace Sample
 		
 		string [] GetSectionTitles ()
 		{
-			return (from section in Root select section.Caption.Substring(0,1)).ToArray ();
+			return (
+				from section in Root
+				where !String.IsNullOrEmpty(section.Caption)
+				select section.Caption.Substring(0,1)
+			).ToArray ();
 		}
 		
 		class IndexedSource : Source {
