@@ -1080,7 +1080,7 @@ namespace MonoTouch.Dialog
 
 		public virtual UITableViewCellAccessory Accessory {
 			get {
-				return Selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+				return IsSelected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
 			}
 		}
 
