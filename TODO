@@ -14,7 +14,7 @@ More Widgets:
 	DataValidationEntry
 
 StringElement
-	Optional accessory?
+	Optional accessory
 	
 BooleanElement
 	Support rendering yes/no, true/false in addition to on/off
