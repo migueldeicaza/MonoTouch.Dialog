@@ -2473,6 +2473,7 @@ namespace MonoTouch.Dialog
 		static NSString rkey1 = new NSString ("RootElement1");
 		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
+		string explicitSummary;
 		internal Group group;
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
@@ -2491,6 +2492,22 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public RootElement (string caption) : base (caption)
 		{
+			summarySection = -1;
+			Sections = new List<Section> ();
+		}
+
+		/// <summary>
+		///  Initializes a RootSection with a caption and a summary
+		/// </summary>
+		/// <param name="caption">
+		///  The caption to render.
+		/// </param>
+		/// <param name="summary">
+		///  The summary to render.
+		/// </param>
+		public RootElement (string caption, string summary) : base (caption)
+		{
+			explicitSummary = summary;
 			summarySection = -1;
 			Sections = new List<Section> ();
 		}
@@ -2817,7 +2834,7 @@ namespace MonoTouch.Dialog
 			NSString key = summarySection == -1 ? rkey1 : rkey2;
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
-				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
+				var style = summarySection == -1 && explicitSummary == null ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
 				
 				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
@@ -2861,6 +2878,9 @@ namespace MonoTouch.Dialog
 					}
 				}
 				cell.DetailTextLabel.Text = count.ToString ();
+			} else if (explicitSummary != null) {
+				if (cell.DetailTextLabel != null)
+					cell.DetailTextLabel.Text = explicitSummary;
 			} else if (summarySection != -1 && summarySection < Sections.Count){
 					var s = Sections [summarySection];
 					if (summaryElement < s.Elements.Count && cell.DetailTextLabel != null)
