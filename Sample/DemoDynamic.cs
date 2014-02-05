@@ -83,7 +83,7 @@ namespace Sample
 						new StringElement (texts [i])
 					}
 				};
-				section.Add (line);
+				section.Add ((Element) line);
 			}
 			
 			return root;

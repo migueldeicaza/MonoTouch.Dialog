@@ -56,9 +56,9 @@ namespace Sample
 					new StringElement ("Index sample", DemoIndex),
 				},
 				new Section ("Json") {
-					(sampleJson = JsonElement.FromFile ("sample.json")),
+					(Element) (sampleJson = JsonElement.FromFile ("sample.json")),
 					// Notice what happens when I close the paranthesis at the end, in the next line:
-					new JsonElement ("Load from URL", "file://" + Path.GetFullPath ("sample.json"))
+					(Element) new JsonElement ("Load from URL", "file://" + Path.GetFullPath ("sample.json"))
 				},
 				new Section ("Auto-mapped", footer){
 					new StringElement ("Reflection API", DemoReflectionApi)

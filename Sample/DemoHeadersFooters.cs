@@ -24,7 +24,7 @@ namespace Sample
 				}
 			};
 
-			section.Add (new RootElement ("Desert", new RadioGroup ("desert", 0)){
+			section.Add ((Element) new RootElement ("Desert", new RadioGroup ("desert", 0)){
 				new Section () {
 					new RadioElement ("Ice Cream", "desert"),
 					new RadioElement ("Milkshake", "desert"),
@@ -34,7 +34,7 @@ namespace Sample
 			
 			var root = new RootElement ("Headers and Footers") {
 				section,
-				new Section () { linqRoot }
+				new Section () { (Element) linqRoot }
 			};
 			var dvc = new DialogViewController (root, true);
 			navigation.PushViewController (dvc, true);
