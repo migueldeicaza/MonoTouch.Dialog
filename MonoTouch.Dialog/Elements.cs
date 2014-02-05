@@ -30,7 +30,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
-	public class Element : IDisposable {
+	public class Element : NSObject, IDisposable {
 		/// <summary>
 		///  Handle to the container object.
 		/// </summary>
@@ -704,7 +704,7 @@ namespace MonoTouch.Dialog
 	///   options and can render images or background images either from UIImage parameters 
 	///   or by downloading them from the net.
 	/// </summary>
-	public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
+    public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground, ITappableAccessory {
 		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
 		
 		public StyledStringElement (string caption) : base (caption) {}
@@ -891,7 +891,7 @@ namespace MonoTouch.Dialog
 			root.TableView.ReloadRows (new NSIndexPath [] { IndexPath }, UITableViewRowAnimation.None);
 		}	
 		
-		internal void AccessoryTap ()
+		public void AccessoryTap ()
 		{
 			NSAction tapped = AccessoryTapped;
 			if (tapped != null)
@@ -1008,6 +1008,19 @@ namespace MonoTouch.Dialog
 	public interface IColorizeBackground {
 		void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath);
 	}
+
+    /// <summary>
+    /// This interface is implemented by Elements that will have a tappable accessory
+    /// </summary>
+    public interface ITappableAccessory {
+        event NSAction AccessoryTapped;
+        
+        void AccessoryTap ();
+    }
+
+    public interface IRadioElement {
+        int RadioIdx { get; set; }
+    }
 	
 	public class MultilineElement : StringElement, IElementSizing {
 		public MultilineElement (string caption) : base (caption)
@@ -1045,9 +1058,9 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class RadioElement : StringElement {
+	public class RadioElement : StringElement, IRadioElement {
 		public string Group;
-		internal int RadioIdx;
+		public int RadioIdx { get; set; }
 		
 		public RadioElement (string caption, string group) : base (caption)
 		{
@@ -1063,10 +1076,10 @@ namespace MonoTouch.Dialog
 			var cell = base.GetCell (tv);			
 			var root = (RootElement) Parent.Parent;
 			
-			if (!(root.group is RadioGroup))
+			if (!(root.Group is RadioGroup))
 				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
 			
-			bool selected = RadioIdx == ((RadioGroup)(root.group)).Selected;
+			bool selected = RadioIdx == ((RadioGroup)(root.Group)).Selected;
 			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
 
 			return cell;
@@ -1317,9 +1330,9 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Value { 
 			get {
-				if (entry == null)
+				if (Entry == null)
 					return val;
-				var newValue = entry.Text;
+				var newValue = Entry.Text;
 				if (newValue == val)
 					return val;
 				val = newValue;
@@ -1330,8 +1343,8 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				val = value;
-				if (entry != null)
-					entry.Text = value;
+				if (Entry != null)
+					Entry.Text = value;
 			}
 		}
 		protected string val;
@@ -1357,8 +1370,8 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				keyboardType = value;
-				if (entry != null)
-					entry.KeyboardType = value;
+				if (Entry != null)
+					Entry.KeyboardType = value;
 			}
 		}
 		
@@ -1373,8 +1386,8 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				returnKeyType = value;
-				if (entry != null && returnKeyType.HasValue)
-					entry.ReturnKeyType = returnKeyType.Value;
+				if (Entry != null && returnKeyType.HasValue)
+					Entry.ReturnKeyType = returnKeyType.Value;
 			}
 		}
 		
@@ -1384,8 +1397,8 @@ namespace MonoTouch.Dialog
 			}
 			set { 
 				autocapitalizationType = value;
-				if (entry != null)
-					entry.AutocapitalizationType = value;
+				if (Entry != null)
+					Entry.AutocapitalizationType = value;
 			}
 		}
 		
@@ -1395,7 +1408,7 @@ namespace MonoTouch.Dialog
 			}
 			set { 
 				autocorrectionType = value;
-				if (entry != null)
+				if (Entry != null)
 					this.autocorrectionType = value;
 			}
 		}
@@ -1406,8 +1419,8 @@ namespace MonoTouch.Dialog
 			}
 			set { 
 				clearButtonMode = value;
-				if (entry != null)
-					entry.ClearButtonMode = value;
+				if (Entry != null)
+					Entry.ClearButtonMode = value;
 			}
 		}
 
@@ -1417,8 +1430,8 @@ namespace MonoTouch.Dialog
 			}
 			set{
 				textalignment = value;
-				if (entry != null) {
-					entry.TextAlignment = textalignment;
+				if (Entry != null) {
+					Entry.TextAlignment = textalignment;
 				}
 			}
 		}
@@ -1428,9 +1441,9 @@ namespace MonoTouch.Dialog
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
-		bool isPassword, becomeResponder;
-		UITextField entry;
-		string placeholder;
+        protected bool IsPassword, BecomeResponder;
+		protected UITextField Entry;
+		protected string PlaceHolder;
 		static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
 		public event EventHandler Changed;
@@ -1452,7 +1465,7 @@ namespace MonoTouch.Dialog
 		public EntryElement (string caption, string placeholder, string value) : base (caption)
 		{ 
 			Value = value;
-			this.placeholder = placeholder;
+			PlaceHolder = placeholder;
 		}
 		
 		/// <summary>
@@ -1473,8 +1486,8 @@ namespace MonoTouch.Dialog
 		public EntryElement (string caption, string placeholder, string value, bool isPassword) : base (caption)
 		{
 			Value = value;
-			this.isPassword = isPassword;
-			this.placeholder = placeholder;
+            IsPassword = isPassword;
+			PlaceHolder = placeholder;
 		}
 
 		public override string Summary ()
@@ -1485,7 +1498,7 @@ namespace MonoTouch.Dialog
 		// 
 		// Computes the X position for the entry by aligning all the entries in the Section
 		//
-		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
+		protected SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
 			Section s = Parent as Section;
 			if (s.EntryAlignment.Width != 0)
@@ -1513,8 +1526,8 @@ namespace MonoTouch.Dialog
 		{
 			return new UITextField (frame) {
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
-				Placeholder = placeholder ?? "",
-				SecureTextEntry = isPassword,
+				Placeholder = PlaceHolder ?? "",
+                SecureTextEntry = IsPassword,
 				Text = Value ?? "",
 				Tag = 1,
 				TextAlignment = textalignment,
@@ -1527,7 +1540,7 @@ namespace MonoTouch.Dialog
 		
 		protected override NSString CellKey {
 			get {
-				return isPassword ? passwordKey : cellkey;
+                return IsPassword ? passwordKey : cellkey;
 			}
 		}
 
@@ -1553,18 +1566,18 @@ namespace MonoTouch.Dialog
 			}
 			var entryFrame = new RectangleF (size.Width, yOffset, width, size.Height);
 
-			if (entry == null) {
-				entry = CreateTextField (entryFrame);
-				entry.ValueChanged += delegate {
+			if (Entry == null) {
+				Entry = CreateTextField (entryFrame);
+				Entry.ValueChanged += delegate {
 					FetchValue ();
 				};
-				entry.Ended += delegate {					
+				Entry.Ended += delegate {					
 					FetchValue ();
 					if (EntryEnded != null) {
 						EntryEnded (this, null);
 					}
 				};
-				entry.ShouldReturn += delegate {
+				Entry.ShouldReturn += delegate {
 					
 					if (ShouldReturn != null)
 						return ShouldReturn ();
@@ -1596,7 +1609,7 @@ namespace MonoTouch.Dialog
 					
 					return true;
 				};
-				entry.Started += delegate {
+				Entry.Started += delegate {
 					EntryElement self = null;
 					
 					if (EntryStarted != null) {
@@ -1612,38 +1625,38 @@ namespace MonoTouch.Dialog
 							else if (self != null && e is EntryElement)
 								returnType = UIReturnKeyType.Next;
 						}
-						entry.ReturnKeyType = returnType;
+						Entry.ReturnKeyType = returnType;
 					} else
-						entry.ReturnKeyType = returnKeyType.Value;
+						Entry.ReturnKeyType = returnKeyType.Value;
 					
 					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
-				cell.ContentView.AddSubview (entry);
+				cell.ContentView.AddSubview (Entry);
 			} else
-				entry.Frame = entryFrame;
+				Entry.Frame = entryFrame;
 
-			if (becomeResponder){
-				entry.BecomeFirstResponder ();
-				becomeResponder = false;
+			if (BecomeResponder){
+				Entry.BecomeFirstResponder ();
+				BecomeResponder = false;
 			}
-			entry.KeyboardType = KeyboardType;
+			Entry.KeyboardType = KeyboardType;
 			
-			entry.AutocapitalizationType = AutocapitalizationType;
-			entry.AutocorrectionType = AutocorrectionType;
+			Entry.AutocapitalizationType = AutocapitalizationType;
+			Entry.AutocorrectionType = AutocorrectionType;
 
 			return cell;
 		}
 		
 		/// <summary>
 		///  Copies the value from the UITextField in the EntryElement to the
-		//   Value property and raises the Changed event if necessary.
+		///   Value property and raises the Changed event if necessary.
 		/// </summary>
 		public void FetchValue ()
 		{
-			if (entry == null)
+			if (Entry == null)
 				return;
 
-			var newValue = entry.Text;
+			var newValue = Entry.Text;
 			if (newValue == Value)
 				return;
 			
@@ -1656,9 +1669,9 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
-				if (entry != null){
-					entry.Dispose ();
-					entry = null;
+				if (Entry != null){
+					Entry.Dispose ();
+					Entry = null;
 				}
 			}
 		}
@@ -1682,26 +1695,26 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public virtual void BecomeFirstResponder (bool animated)
 		{
-			becomeResponder = true;
+			BecomeResponder = true;
 			var tv = GetContainerTableView ();
 			if (tv == null)
 				return;
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
-			if (entry != null){
-				entry.BecomeFirstResponder ();
-				becomeResponder = false;
+			if (Entry != null){
+				Entry.BecomeFirstResponder ();
+				BecomeResponder = false;
 			}
 		}
 
 		public virtual void ResignFirstResponder (bool animated)
 		{
-			becomeResponder = false;
+			BecomeResponder = false;
 			var tv = GetContainerTableView ();
 			if (tv == null)
 				return;
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
-			if (entry != null)
-				entry.ResignFirstResponder ();
+			if (Entry != null)
+				Entry.ResignFirstResponder ();
 		}
 	}
 	
@@ -2044,7 +2057,8 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public Section (string caption) : base (caption)
 		{
-		}
+            Header = caption;
+        }
 		
 		/// <summary>
 		/// Constructs a Section with a header and a footer
@@ -2056,7 +2070,8 @@ namespace MonoTouch.Dialog
 		/// The footer to display.
 		/// </param>
 		public Section (string caption, string footer) : base (caption)
-		{
+        {
+            Header = caption;
 			Footer = footer;
 		}
 
@@ -2292,18 +2307,26 @@ namespace MonoTouch.Dialog
 		{
 			if (e == null)
 				return;
-			for (int i = Elements.Count; i > 0;){
-				i--;
-				if (Elements [i] == e){
-					RemoveRange (i, 1);
-					return;
-				}
-			}
+
+            RemoveRange (Elements.IndexOf (e), 1);
 		}
 		
-		public void Remove (int idx)
+        public void Remove (Element e, UITableViewRowAnimation anim)
+        {
+            if (e == null)
+                return;
+            
+            RemoveRange (Elements.IndexOf (e), 1, anim);
+        }
+        
+        public void Remove (int idx)
+        {
+            RemoveRange (idx, 1);
+        }
+
+        public void Remove (int idx, UITableViewRowAnimation anim)
 		{
-			RemoveRange (idx, 1);
+            RemoveRange (idx, 1, anim);
 		}
 		
 		/// <summary>
@@ -2473,7 +2496,7 @@ namespace MonoTouch.Dialog
 		static NSString rkey1 = new NSString ("RootElement1");
 		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
-		internal Group group;
+		public Group Group { get; internal set; }
 		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
@@ -2540,14 +2563,14 @@ namespace MonoTouch.Dialog
 		/// </param>
 		public RootElement (string caption, Group group) : base (caption)
 		{
-			this.group = group;
+			this.Group = group;
 		}
 		
 		internal List<Section> Sections = new List<Section> ();
 
-		internal NSIndexPath PathForRadio (int idx)
+		public NSIndexPath PathForRadio (int idx)
 		{
-			RadioGroup radio = group as RadioGroup;
+			RadioGroup radio = Group as RadioGroup;
 			if (radio == null)
 				return null;
 			
@@ -2556,7 +2579,7 @@ namespace MonoTouch.Dialog
 				uint row = 0;
 				
 				foreach (Element e in s.Elements){
-					if (!(e is RadioElement))
+					if (!(e is IRadioElement))
 						continue;
 					
 					if (current == idx){
@@ -2582,23 +2605,45 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		internal int IndexOf (Section target)
-		{
-			int idx = 0;
-			foreach (Section s in Sections){
-				if (s == target)
-					return idx;
-				idx++;
-			}
-			return -1;
-		}
+		/// <summary>
+        ///Searches for the specified section and returns the zero-based index of the first occurrance.
+        /// </summary>
+        /// <returns>The index of the section, or -1.</returns>
+        /// <param name="section">The section to find.</param>
+        public int IndexOf (Section section)
+        {
+            return Sections.IndexOf (section);
+        }
+        
+        /// <summary>
+        ///Searches for the specified section and returns the zero-based index of the first occurrance.
+        /// </summary>
+        /// <returns>The index of the section, or -1.</returns>
+        /// <param name="section">The section to find.</param>
+        /// <param name="idx">The zero-based starting index of the search.</para>
+        public int IndexOf (Section section, int idx)
+        {
+            return Sections.IndexOf (section, idx);
+        }
+        
+        /// <summary>
+        ///Searches for the specified section and returns the zero-based index of the first occurrance.
+        /// </summary>
+        /// <returns>The index of the section, or -1.</returns>
+        /// <param name="section">The section to find.</param>
+        /// <param name="idx">The zero-based starting index of the search.</para>
+        /// <param name="count">The number of elements to search.</para>
+        public int IndexOf (Section section, int idx, int count)
+        {
+            return Sections.IndexOf (section, idx, count);
+        }
 			
 		public void Prepare ()
 		{
 			int current = 0;
 			foreach (Section s in Sections){				
 				foreach (Element e in s.Elements){
-					var re = e as RadioElement;
+					var re = e as IRadioElement;
 					if (re != null)
 						re.RadioIdx = current++;
 					if (UnevenRows == false && e is IElementSizing)
@@ -2694,8 +2739,8 @@ namespace MonoTouch.Dialog
 		/// <param name="idx">
 		/// The index where the section is added <see cref="System.Int32"/>
 		/// </param>
-		/// <param name="newSections">
-		/// A <see cref="Section[]"/> list of sections to insert
+		/// <param name="section">
+		/// The section to insert
 		/// </param>
 		/// <remarks>
 		///    This inserts the specified list of sections (a params argument) into the
@@ -2800,13 +2845,13 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public int RadioSelected {
 			get {
-				var radio = group as RadioGroup;
+				var radio = Group as RadioGroup;
 				if (radio != null)
 					return radio.Selected;
 				return -1;
 			}
 			set {
-				var radio = group as RadioGroup;
+				var radio = Group as RadioGroup;
 				if (radio != null)
 					radio.Selected = value;
 			}
@@ -2824,14 +2869,14 @@ namespace MonoTouch.Dialog
 			} 
 		
 			cell.TextLabel.Text = Caption;
-			var radio = group as RadioGroup;
+			var radio = Group as RadioGroup;
 			if (radio != null){
 				int selected = radio.Selected;
 				int current = 0;
 				
 				foreach (var s in Sections){
 					foreach (var e in s.Elements){
-						if (!(e is RadioElement))
+						if (!(e is IRadioElement))
 							continue;
 						
 						if (current == selected){
@@ -2841,7 +2886,7 @@ namespace MonoTouch.Dialog
 						current++;
 					}
 				}
-			} else if (group != null){
+			} else if (Group != null){
 				int count = 0;
 				
 				foreach (var s in Sections){
