@@ -32,6 +32,7 @@ namespace MonoTouch.Dialog
 		bool pushing;
 		bool dirty;
 		bool reloading;
+        Element nestedNavigationTriggerElement;
 
 		/// <summary>
 		/// The root element displayed by the DialogViewController, the value can be changed during runtime to update the contents.
@@ -465,17 +466,32 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public void ActivateController (UIViewController controller)
 		{
-			dirty = true;
-			
-			var parent = ParentViewController;
-			var nav = parent as UINavigationController;
-			
-			// We can not push a nav controller into a nav controller
-			if (nav != null && !(controller is UINavigationController))
-				nav.PushViewController (controller, true);
-			else
-				PresentModalViewController (controller, true);
-		}
+            ActivateController(controller, null);
+        }
+
+        /// <summary>
+        /// Activates a nested view controller from the DialogViewController.
+        /// If the view controller is hosted in a UINavigationController it
+        /// will push the result.   Otherwise it will show it as a modal
+        /// dialog.
+        /// Records the element that triggered the navigation, and will
+        /// animate the deselection of that element when returning to this
+        /// DialogViewController.
+        /// </summary>
+        public void ActivateController (UIViewController controller, Element triggerElement)
+        {
+            dirty = true;
+            nestedNavigationTriggerElement = triggerElement;
+
+            var parent = ParentViewController;
+            var nav = parent as UINavigationController;
+
+            // We can not push a nav controller into a nav controller
+            if (nav != null && !(controller is UINavigationController))
+                nav.PushViewController (controller, true);
+            else
+                PresentModalViewController (controller, true);
+        }
 
 		/// <summary>
 		/// Dismisses the view controller.   It either pops or dismisses
@@ -586,6 +602,17 @@ namespace MonoTouch.Dialog
 				tableView.ReloadData ();
 				dirty = false;
 			}
+
+            if (nestedNavigationTriggerElement != null)
+            {
+                // TableView.ReloadData clears selection.
+                // Therefor reselect without animation now, then deslect animated.
+                // This allow the deselection animation to still play when navigating back.
+                var path = nestedNavigationTriggerElement.IndexPath;
+                tableView.SelectRow (path, false, UITableViewScrollPosition.None);
+                tableView.DeselectRow (path, true);
+                nestedNavigationTriggerElement = null;
+            }
 		}
 
 		public bool Pushing {
@@ -653,12 +680,14 @@ namespace MonoTouch.Dialog
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)
 		{
 			this.root = root;
+            ClearsSelectionOnViewWillAppear = false;
 		}
 		
 		public DialogViewController (UITableViewStyle style, RootElement root) : base (style)
 		{
 			Style = style;
 			this.root = root;
+            ClearsSelectionOnViewWillAppear = false;
 		}
 		
 		/// <summary>
@@ -676,6 +705,7 @@ namespace MonoTouch.Dialog
 		{
 			this.pushing = pushing;
 			this.root = root;
+            ClearsSelectionOnViewWillAppear = false;
 		}
 
 		public DialogViewController (UITableViewStyle style, RootElement root, bool pushing) : base (style)
@@ -683,10 +713,12 @@ namespace MonoTouch.Dialog
 			Style = style;
 			this.pushing = pushing;
 			this.root = root;
+            ClearsSelectionOnViewWillAppear = false;
 		}
 		public DialogViewController (IntPtr handle) : base(handle)
 		{
 			this.root = new RootElement ("");
+            ClearsSelectionOnViewWillAppear = false;
 		}
 	}
 }

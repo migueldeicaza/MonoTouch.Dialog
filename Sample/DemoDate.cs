@@ -110,7 +110,8 @@ namespace Sample
 	                    "This is very simple!")
 				}
 			}, true);
-			dvc.ActivateController (np);
+            var element = dvc.Root[path.Section][path.Row];
+            dvc.ActivateController (np,element);
 		}
 	}
 	

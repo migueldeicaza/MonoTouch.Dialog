@@ -126,7 +126,7 @@ namespace MonoTouch.Dialog {
 								Autorotate = true
 							};
 							PrepareDialogViewController (newDvc);
-							dvc.ActivateController (newDvc);
+							dvc.ActivateController (newDvc, this);
 							return;
 						}
 					} catch (Exception ee){

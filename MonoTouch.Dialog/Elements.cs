@@ -634,7 +634,7 @@ namespace MonoTouch.Dialog
 			vc.View.AutosizesSubviews = true;
 			vc.View.AddSubview (web);
 			
-			dvc.ActivateController (vc);
+			dvc.ActivateController (vc, this);
 			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
 		}
 	}
@@ -1296,7 +1296,7 @@ namespace MonoTouch.Dialog
 				
 			default:
 			case UIUserInterfaceIdiom.Phone:
-				dvc.ActivateController (picker);
+				dvc.ActivateController (picker, this);
 				break;
 			}
 			currentController = dvc;
@@ -1830,7 +1830,7 @@ namespace MonoTouch.Dialog
 			                            
 			vc.View.BackgroundColor = BackgroundColor;
 			vc.View.AddSubview (datePicker);
-			dvc.ActivateController (vc);
+			dvc.ActivateController (vc, this);
 
 			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (SizeF.Empty));
 		}
@@ -2895,10 +2895,9 @@ namespace MonoTouch.Dialog
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
 			PrepareDialogViewController (newDvc);
-			dvc.ActivateController (newDvc);
+			dvc.ActivateController (newDvc, this);
 		}
 		
 		public void Reload (Section section, UITableViewRowAnimation animation)
