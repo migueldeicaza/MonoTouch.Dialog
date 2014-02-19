@@ -19,7 +19,12 @@
 // THE SOFTWARE.
 //
 using System;
+
+#if XAMCORE_2_0
+using Foundation;
+#else
 using MonoTouch.Foundation;
+#endif
 
 namespace MonoTouch.Dialog
 {

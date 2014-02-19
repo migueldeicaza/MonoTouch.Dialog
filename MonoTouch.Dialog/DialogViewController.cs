@@ -12,9 +12,15 @@
 using System;
 using System.Collections.Generic;
 
+#if XAMCORE_2_0
+using Foundation;
+using UIKit;
+using CoreGraphics;
+#else
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
+#endif
 
 #if !HAVE_NATIVE_TYPES
 #if ARCH_32
@@ -354,7 +360,7 @@ namespace MonoTouch.Dialog
 				return Root.Sections [section].Footer;
 			}
 
-			public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 			{
 				var section = Root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];
@@ -462,7 +468,7 @@ namespace MonoTouch.Dialog
 		public class SizingSource : Source {
 			public SizingSource (DialogViewController controller) : base (controller) {}
 			
-			public override nfloat GetHeightForRow (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+			public override nfloat GetHeightForRow (UITableView tableView, NSIndexPath indexPath)
 			{
 				var section = Root.Sections [indexPath.Section];
 				var element = section.Elements [indexPath.Row];

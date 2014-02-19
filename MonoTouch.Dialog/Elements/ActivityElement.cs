@@ -1,7 +1,15 @@
 using System;
 using System.Drawing;
+
+#if XAMCORE_2_0
+using UIKit;
+using CoreGraphics;
+using Foundation;
+#else
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
+using MonoTouch.Foundation;
+#endif
 
 #if !HAVE_NATIVE_TYPES
 using nint = global::System.Int32;
@@ -41,7 +49,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		nfloat IElementSizing.GetHeight (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+		nfloat IElementSizing.GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			return base.GetHeight (tableView, indexPath)+ 8;
 		}

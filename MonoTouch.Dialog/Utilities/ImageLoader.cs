@@ -27,12 +27,19 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Security.Cryptography;
 
+#if XAMCORE_2_0
+using Foundation;
+using UIKit;
+using CoreGraphics;
+#else
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
+#endif
+
 using MonoTouch.Dialog.Utilities;
-using System.Security.Cryptography;
 
 namespace MonoTouch.Dialog.Utilities 
 {

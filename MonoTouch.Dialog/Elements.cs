@@ -18,12 +18,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
+
+#if XAMCORE_2_0
+using UIKit;
+using CoreGraphics;
+using Foundation;
+using CoreAnimation;
+#else
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
-using System.Drawing;
 using MonoTouch.Foundation;
-using MonoTouch.Dialog.Utilities;
 using MonoTouch.CoreAnimation;
+#endif
+
+using MonoTouch.Dialog.Utilities;
 
 #if !HAVE_NATIVE_TYPES
 using nint = global::System.Int32;

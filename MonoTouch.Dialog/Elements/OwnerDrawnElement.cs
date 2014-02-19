@@ -1,9 +1,17 @@
 using System;
 using System.Drawing;
+
+#if XAMCORE_2_0
+using UIKit;
+using CoreFoundation;
+using CoreGraphics;
+using Foundation;
+#else
 using MonoTouch.UIKit;
 using MonoTouch.CoreFoundation;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
+#endif
 
 #if !HAVE_NATIVE_TYPES
 using nint = global::System.Int32;

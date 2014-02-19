@@ -3,10 +3,20 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using MonoTouch.CoreGraphics;
-using MonoTouch.CoreAnimation;
-using MonoTouch.Foundation;
+
+#if XAMCORE_2_0
+using UIKit;
+using CoreGraphics;
+using Foundation;
+using CoreAnimation;
+#else
 using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+using MonoTouch.Foundation;
+using MonoTouch.CoreAnimation;
+#endif
+
+using MonoTouch.Dialog.Utilities;
 
 #if !HAVE_NATIVE_TYPES
 using nint = global::System.Int32;
