@@ -915,7 +915,7 @@ namespace MonoTouch.Dialog
 			
 			if (this.Accessory != UITableViewCellAccessory.None)
 				maxSize.Width -= 20;
-			
+
 			string c = Caption;
 			string v = Value;
 			// ensure the (multi-line) Value will be rendered inside the cell when no Caption is present
@@ -1708,6 +1708,7 @@ namespace MonoTouch.Dialog
 	public class DateTimeElement : StringElement {
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
+		public int MinuteInterval = 1;
 		public event Action<DateTimeElement> DateSelected;
 		public UIColor BackgroundColor = (UIDevice.CurrentDevice.CheckSystemVersion (7, 0)) ? UIColor.White : UIColor.Black;
 		
@@ -1764,7 +1765,8 @@ namespace MonoTouch.Dialog
 			var picker = new UIDatePicker (RectangleF.Empty){
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Mode = UIDatePickerMode.DateAndTime,
-				Date = DateValue
+				Date = DateValue,
+				MinuteInterval = MinuteInterval
 			};
 			return picker;
 		}
@@ -1869,6 +1871,7 @@ namespace MonoTouch.Dialog
 		{
 			var picker = base.CreatePicker ();
 			picker.Mode = UIDatePickerMode.Time;
+			picker.MinuteInterval = MinuteInterval;
 			return picker;
 		}
 	}
