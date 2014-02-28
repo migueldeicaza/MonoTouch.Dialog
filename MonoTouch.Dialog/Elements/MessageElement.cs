@@ -6,7 +6,7 @@ using MonoTouch.CoreGraphics;
 
 namespace MonoTouch.Dialog {
 
-	public class MessageSummaryView : UIView {
+	public partial class MessageSummaryView : UIView {
 		static UIFont SenderFont = UIFont.BoldSystemFontOfSize (19);
 		static UIFont SubjectFont = UIFont.SystemFontOfSize (14);
 		static UIFont TextFont = UIFont.SystemFontOfSize (13);

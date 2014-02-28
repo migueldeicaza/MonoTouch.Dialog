@@ -11,7 +11,7 @@ using MonoTouch.UIKit;
 
 namespace MonoTouch.Dialog
 {
-	public class LoadMoreElement : Element, IElementSizing
+	public partial class LoadMoreElement : Element, IElementSizing
 	{
 		static NSString key = new NSString ("LoadMoreElement");
 		public string NormalCaption { get; set; }

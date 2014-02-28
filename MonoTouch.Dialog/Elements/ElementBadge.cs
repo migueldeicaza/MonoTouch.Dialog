@@ -32,7 +32,7 @@ namespace MonoTouch.Dialog
 	///    render a calendar badge like the iPhone OS.   It will compose
 	///    the text on top of the image which is expected to be 57x57
 	/// </remarks>
-	public class BadgeElement : Element, IElementSizing {
+	public partial class BadgeElement : Element, IElementSizing {
 		static NSString ckey = new NSString ("badgeKey");
 		public event NSAction Tapped;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.TailTruncation;

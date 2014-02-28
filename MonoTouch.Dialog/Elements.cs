@@ -30,7 +30,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Base class for all elements in MonoTouch.Dialog
 	/// </summary>
-	public class Element : IDisposable {
+	public partial class Element : IDisposable {
 		/// <summary>
 		///  Handle to the container object.
 		/// </summary>
@@ -227,7 +227,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 
-	public abstract class BoolElement : Element {
+	public abstract partial class BoolElement : Element {
 		bool val;
 		public virtual bool Value {
 			get {
@@ -256,7 +256,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// Used to display switch on the screen.
 	/// </summary>
-	public class BooleanElement : BoolElement {
+	public partial class BooleanElement : BoolElement {
 		static NSString bkey = new NSString ("BooleanElement");
 		UISwitch sw;
 		
@@ -334,7 +334,7 @@ namespace MonoTouch.Dialog
 	/// 
 	/// A subclass only needs to implement the GetImage method.
 	/// </remarks>
-	public abstract class BaseBooleanImageElement : BoolElement {
+	public abstract partial class BaseBooleanImageElement : BoolElement {
 		static NSString key = new NSString ("BooleanImageElement");
 		
 		public class TextWithImageCellView : UITableViewCell {
@@ -420,7 +420,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class BooleanImageElement : BaseBooleanImageElement {
+	public partial class BooleanImageElement : BaseBooleanImageElement {
 		UIImage onImage, offImage;
 		
 		public BooleanImageElement (string caption, bool value, UIImage onImage, UIImage offImage) : base (caption, value)
@@ -447,7 +447,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	///  Used to display a slider on the screen.
 	/// </summary>
-	public class FloatElement : Element {
+	public partial class FloatElement : Element {
 		public bool ShowCaption;
 		public float Value;
 		public float MinValue, MaxValue;
@@ -524,7 +524,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	///  Used to display a cell that will launch a web browser when selected.
 	/// </summary>
-	public class HtmlElement : Element {
+	public partial class HtmlElement : Element {
 		NSUrl nsUrl;
 		static NSString hkey = new NSString ("HtmlElement");
 		UIWebView web;
@@ -643,7 +643,7 @@ namespace MonoTouch.Dialog
 	///   The string element can be used to render some text in a cell 
 	///   that can optionally respond to tap events.
 	/// </summary>
-	public class StringElement : Element {
+	public partial class StringElement : Element {
 		static NSString skey = new NSString ("StringElement");
 		static NSString skeyvalue = new NSString ("StringElementValue");
 		public UITextAlignment Alignment = UITextAlignment.Left;
@@ -704,7 +704,7 @@ namespace MonoTouch.Dialog
 	///   options and can render images or background images either from UIImage parameters 
 	///   or by downloading them from the net.
 	/// </summary>
-	public class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
+	public partial class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
 		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
 		
 		public StyledStringElement (string caption) : base (caption) {}
@@ -899,7 +899,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class StyledMultilineElement : StyledStringElement, IElementSizing {
+	public partial class StyledMultilineElement : StyledStringElement, IElementSizing {
 		public StyledMultilineElement (string caption) : base (caption) {}
 		public StyledMultilineElement (string caption, string value) : base (caption, value) {}
 		public StyledMultilineElement (string caption, NSAction tapped) : base (caption, tapped) {}
@@ -940,7 +940,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class ImageStringElement : StringElement {
+	public partial class ImageStringElement : StringElement {
 		static NSString skey = new NSString ("ImageStringElement");
 		UIImage image;
 		public UITableViewCellAccessory Accessory { get; set; }
@@ -1009,7 +1009,7 @@ namespace MonoTouch.Dialog
 		void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath);
 	}
 	
-	public class MultilineElement : StringElement, IElementSizing {
+	public partial class MultilineElement : StringElement, IElementSizing {
 		public MultilineElement (string caption) : base (caption)
 		{
 		}
@@ -1045,7 +1045,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class RadioElement : StringElement {
+	public partial class RadioElement : StringElement {
 		public string Group;
 		internal int RadioIdx;
 		
@@ -1093,7 +1093,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class CheckboxElement : StringElement {
+	public partial class CheckboxElement : StringElement {
 		public new bool Value;
 		public string Group;
 		
@@ -1129,7 +1129,7 @@ namespace MonoTouch.Dialog
 
 	}
 	
-	public class ImageElement : Element {
+	public partial class ImageElement : Element {
 		public UIImage Value;
 		static RectangleF rect = new RectangleF (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ImageElement");
@@ -1311,7 +1311,7 @@ namespace MonoTouch.Dialog
 	///     
 	/// The Text fields in a given section are aligned with each other.
 	/// </remarks>
-	public class EntryElement : Element {
+	public partial class EntryElement : Element {
 		/// <summary>
 		///   The value of the EntryElement
 		/// </summary>
@@ -1705,7 +1705,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class DateTimeElement : StringElement {
+	public partial class DateTimeElement : StringElement {
 		public DateTime DateValue;
 		public UIDatePicker datePicker;
 		public int MinuteInterval = 1;
@@ -1838,7 +1838,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class DateElement : DateTimeElement {
+	public partial class DateElement : DateTimeElement {
 		public DateElement (string caption, DateTime date) : base (caption, date)
 		{
 			fmt.DateStyle = NSDateFormatterStyle.Medium;
@@ -1857,7 +1857,7 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-	public class TimeElement : DateTimeElement {
+	public partial class TimeElement : DateTimeElement {
 		public TimeElement (string caption, DateTime date) : base (caption, date)
 		{
 		}
@@ -1884,7 +1884,7 @@ namespace MonoTouch.Dialog
 	///   in this case from the UIViewElement to the cell that
 	///   holds our view.
 	/// </remarks>
-	public class UIViewElement : Element, IElementSizing {
+	public partial class UIViewElement : Element, IElementSizing {
 		static int count;
 		public UIView ContainerView;
 		NSString key;
@@ -2472,7 +2472,7 @@ namespace MonoTouch.Dialog
 	///    Sections are added by calling the Add method which supports the
 	///    C# 4.0 syntax to initialize a RootElement in one pass.
 	/// </remarks>
-	public class RootElement : Element, IEnumerable, IEnumerable<Section> {
+	public partial class RootElement : Element, IEnumerable, IEnumerable<Section> {
 		static NSString rkey1 = new NSString ("RootElement1");
 		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
