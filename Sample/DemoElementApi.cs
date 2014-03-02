@@ -46,8 +46,14 @@ namespace Sample
 					}
 				},
 				new Section () {
-					new EntryElement ("Login", "Your login name", "miguel"),
-					new EntryElement ("Password", "Your password", "password", true),
+					new EntryElement ("Login", "Your login name", null)
+					{
+						EnablesReturnKeyAutomatically = true,
+					},
+					new EntryElement ("Password", "Your password", null, true)
+					{
+						EnablesReturnKeyAutomatically = true,
+					},
 					new DateElement ("Select Date", DateTime.Now),
 					new TimeElement ("Select Time", DateTime.Now),
 				},
