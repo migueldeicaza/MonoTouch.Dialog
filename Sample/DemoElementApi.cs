@@ -49,13 +49,21 @@ namespace Sample
 					new EntryElement ("Login", "Your login name", null)
 					{
 						EnablesReturnKeyAutomatically = true,
+						AlignEntryWithAllSections = true,
 					},
 					new EntryElement ("Password", "Your password", null, true)
 					{
 						EnablesReturnKeyAutomatically = true,
+						AlignEntryWithAllSections = true,
 					},
 					new DateElement ("Select Date", DateTime.Now),
 					new TimeElement ("Select Time", DateTime.Now),
+				},
+				new Section () {
+					new EntryElement ("Another Field", "Aligns with above fields", null)
+					{
+						AlignEntryWithAllSections = true,
+					},
 				},
 				new Section () {
 					CreateGeneralSection (),		
