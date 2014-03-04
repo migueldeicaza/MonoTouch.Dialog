@@ -454,6 +454,10 @@ namespace MonoTouch.Dialog
 		static NSString skey = new NSString ("FloatElement");
 		//UIImage Left, Right;
 		UISlider slider;
+
+		public FloatElement (float value) : this (null, null, value)
+		{
+		}
 		
 		public FloatElement (UIImage left, UIImage right, float value) : base (null)
 		{
@@ -484,15 +488,15 @@ namespace MonoTouch.Dialog
 				captionSize = cell.TextLabel.StringSize (Caption, UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
 				captionSize.Width += 10; // Spacing
 			}
-
 			if (slider == null){
-				slider = new UISlider (new RectangleF (10f + captionSize.Width, 12f, 280f - captionSize.Width, 7f)){
+				slider = new UISlider (new RectangleF (10f + captionSize.Width, UIDevice.CurrentDevice.CheckSystemVersion (7, 0) ? 18f : 12f, cell.ContentView.Bounds.Width - 20 - captionSize.Width, 7f)) {
 					BackgroundColor = UIColor.Clear,
 					MinValue = this.MinValue,
 					MaxValue = this.MaxValue,
 					Continuous = true,
 					Value = this.Value,
-					Tag = 1
+					Tag = 1,
+					AutoresizingMask = UIViewAutoresizing.FlexibleWidth
 				};
 				slider.ValueChanged += delegate {
 					Value = slider.Value;
@@ -1715,7 +1719,7 @@ namespace MonoTouch.Dialog
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
 			DateStyle = NSDateFormatterStyle.Short
 		};
-		
+
 		public DateTimeElement (string caption, DateTime date) : base (caption)
 		{
 			DateValue = date;
