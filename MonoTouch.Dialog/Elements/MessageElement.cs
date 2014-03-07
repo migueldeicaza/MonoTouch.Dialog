@@ -173,6 +173,18 @@ namespace MonoTouch.Dialog {
 			if (Tapped != null)
 				Tapped (dvc, tableView, path);
 		}
+
+		public override bool Matches (string text)
+		{
+			if (Sender != null && Sender.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1)
+				return true;
+			if (Body != null && Body.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1)
+				return true;
+			if (Subject != null && Subject.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1)
+				return true;
+
+			return false;
+		}
 	}
 }
 
