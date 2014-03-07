@@ -7,7 +7,7 @@ using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
-	public abstract class OwnerDrawnElement : Element, IElementSizing
+	public abstract partial class OwnerDrawnElement : Element, IElementSizing
 	{		
 		public string CellReuseIdentifier
 		{
