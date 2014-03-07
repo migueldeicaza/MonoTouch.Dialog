@@ -1381,6 +1381,20 @@ namespace MonoTouch.Dialog
 					entry.ReturnKeyType = returnKeyType.Value;
 			}
 		}
+
+		/// <summary>
+		/// The default value for this property is <c>false</c>. If you set it to <c>true</c>, the keyboard disables the return key when the text entry area contains no text. As soon as the user enters any text, the return key is automatically enabled.
+		/// </summary>
+		public bool EnablesReturnKeyAutomatically {
+			get {
+				return enablesReturnKeyAutomatically;
+			}
+			set {
+				enablesReturnKeyAutomatically = value;
+				if (entry != null)
+					entry.EnablesReturnKeyAutomatically = value;
+			}
+		}
 		
 		public UITextAutocapitalizationType AutocapitalizationType {
 			get {
@@ -1426,9 +1440,15 @@ namespace MonoTouch.Dialog
 				}
 			}
 		}
+
+		public bool AlignEntryWithAllSections { get; set; }
+
+		public bool NotifyChangedOnKeyStroke { get; set; }
+
 		UITextAlignment textalignment = UITextAlignment.Left;
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
+		bool enablesReturnKeyAutomatically = false;
 		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
 		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
@@ -1491,26 +1511,30 @@ namespace MonoTouch.Dialog
 		//
 		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
-			Section s = Parent as Section;
-			if (s.EntryAlignment.Width != 0)
-				return s.EntryAlignment;
-			
-			// If all EntryElements have a null Caption, align UITextField with the Caption
-			// offset of normal cells (at 10px).
-			SizeF max = new SizeF (-15, tv.StringSize ("M", font).Height);
-			foreach (var e in s.Elements){
-				var ee = e as EntryElement;
-				if (ee == null)
-					continue;
-				
-				if (ee.Caption != null) {
-					var size = tv.StringSize (ee.Caption, font);
-					if (size.Width > max.Width)
-						max = size;
+			float maxWidth = -15; // If all EntryElements have a null Caption, align UITextField with the Caption offset of normal cells (at 10px).
+			float maxHeight = 0;
+
+			// Determine if we should calculate accross all sections or just the current section.
+			var sections = AlignEntryWithAllSections ? (Parent.Parent as RootElement).Sections : (new[] {Parent as Section}).AsEnumerable();
+
+			foreach (Section s in sections) {
+
+				foreach (var e in s.Elements) {
+
+					var ee = e as EntryElement;
+
+					if (ee != null
+						&& !String.IsNullOrEmpty(ee.Caption)) {
+								
+						var size = tv.StringSize (ee.Caption, font);
+
+						maxWidth = Math.Max (size.Width, maxWidth);
+						maxHeight = Math.Max (size.Height, maxHeight);
+					}
 				}
 			}
-			s.EntryAlignment = new SizeF (25 + Math.Min (max.Width, 160), max.Height);
-			return s.EntryAlignment;
+
+			return new SizeF(25 + Math.Min(maxWidth, 160), maxHeight);
 		}
 
 		protected virtual UITextField CreateTextField (RectangleF frame)
@@ -1559,6 +1583,11 @@ namespace MonoTouch.Dialog
 
 			if (entry == null) {
 				entry = CreateTextField (entryFrame);
+				entry.EditingChanged += delegate {
+					if(NotifyChangedOnKeyStroke) {
+						FetchValue ();
+					}
+				};
 				entry.ValueChanged += delegate {
 					FetchValue ();
 				};
@@ -1631,7 +1660,7 @@ namespace MonoTouch.Dialog
 				becomeResponder = false;
 			}
 			entry.KeyboardType = KeyboardType;
-			
+			entry.EnablesReturnKeyAutomatically = EnablesReturnKeyAutomatically;
 			entry.AutocapitalizationType = AutocapitalizationType;
 			entry.AutocorrectionType = AutocorrectionType;
 
@@ -2035,9 +2064,6 @@ namespace MonoTouch.Dialog
 		object header, footer;
 		public List<Element> Elements = new List<Element> ();
 				
-		// X corresponds to the alignment, Y to the height of the password
-		public SizeF EntryAlignment;
-		
 		/// <summary>
 		///  Constructs a Section without header or footers.
 		/// </summary>
