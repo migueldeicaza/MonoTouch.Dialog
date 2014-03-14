@@ -23,15 +23,9 @@ using MonoTouch.CoreGraphics;
 #endif
 
 #if !HAVE_NATIVE_TYPES
-#if ARCH_32
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
-#else
-using nint = global::System.Int64;
-using nuint = global::System.UInt64;
-using nfloat = global::System.Double;
-#endif
 
 using CGSize = global::System.Drawing.SizeF;
 using CGPoint = global::System.Drawing.PointF;
