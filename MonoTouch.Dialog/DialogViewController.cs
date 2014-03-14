@@ -331,27 +331,27 @@ namespace MonoTouch.Dialog
 					element.AccessoryTap ();
 			}
 			
-			public override int RowsInSection (UITableView tableview, int section)
+			public override nint RowsInSection (UITableView tableview, nint section)
 			{
-				var s = Root.Sections [section];
+				var s = Root.Sections [(int) section];
 				var count = s.Elements.Count;
 				
 				return count;
 			}
 
-			public override int NumberOfSections (UITableView tableView)
+			public override nint NumberOfSections (UITableView tableView)
 			{
 				return Root.Sections.Count;
 			}
 
-			public override string TitleForHeader (UITableView tableView, int section)
+			public override string TitleForHeader (UITableView tableView, nint section)
 			{
-				return Root.Sections [section].Caption;
+				return Root.Sections [(int) section].Caption;
 			}
 
-			public override string TitleForFooter (UITableView tableView, int section)
+			public override string TitleForFooter (UITableView tableView, nint section)
 			{
-				return Root.Sections [section].Footer;
+				return Root.Sections [(int) section].Footer;
 			}
 
 			public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
@@ -386,29 +386,29 @@ namespace MonoTouch.Dialog
 				Container.Selected (indexPath);
 			}			
 			
-			public override UIView GetViewForHeader (UITableView tableView, int sectionIdx)
+			public override UIView GetViewForHeader (UITableView tableView, nint sectionIdx)
 			{
-				var section = Root.Sections [sectionIdx];
+				var section = Root.Sections [(int) sectionIdx];
 				return section.HeaderView;
 			}
 
-			public override nfloat GetHeightForHeader (UITableView tableView, int sectionIdx)
+			public override nfloat GetHeightForHeader (UITableView tableView, nint sectionIdx)
 			{
-				var section = Root.Sections [sectionIdx];
+				var section = Root.Sections [(int) sectionIdx];
 				if (section.HeaderView == null)
 					return -1;
 				return section.HeaderView.Frame.Height;
 			}
 
-			public override UIView GetViewForFooter (UITableView tableView, int sectionIdx)
+			public override UIView GetViewForFooter (UITableView tableView, nint sectionIdx)
 			{
-				var section = Root.Sections [sectionIdx];
+				var section = Root.Sections [(int) sectionIdx];
 				return section.FooterView;
 			}
 			
-			public override nfloat GetHeightForFooter (UITableView tableView, int sectionIdx)
+			public override nfloat GetHeightForFooter (UITableView tableView, nint sectionIdx)
 			{
-				var section = Root.Sections [sectionIdx];
+				var section = Root.Sections [(int) sectionIdx];
 				if (section.FooterView == null)
 					return -1;
 				return section.FooterView.Frame.Height;

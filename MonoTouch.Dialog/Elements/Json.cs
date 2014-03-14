@@ -504,10 +504,10 @@ namespace MonoTouch.Dialog {
 		{
 			int q = kvalue.LastIndexOf ("-");
 			string fname = kvalue;
-			float fsize = 0;
+			nfloat fsize = 0;
 			
 			if (q != -1) {
-				float.TryParse (kvalue.Substring (q+1), out fsize);
+				nfloat.TryParse (kvalue.Substring (q+1), out fsize);
 				fname = kvalue.Substring (0, q);
 			}
 			if (fsize <= 0)
