@@ -1512,7 +1512,7 @@ namespace MonoTouch.Dialog
 		SizeF ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
 			float maxWidth = -15; // If all EntryElements have a null Caption, align UITextField with the Caption offset of normal cells (at 10px).
-			float maxHeight = 0;
+			float maxHeight = font.LineHeight;
 
 			// Determine if we should calculate accross all sections or just the current section.
 			var sections = AlignEntryWithAllSections ? (Parent.Parent as RootElement).Sections : (new[] {Parent as Section}).AsEnumerable();
