@@ -502,11 +502,17 @@ namespace MonoTouch.Dialog
 		{
 			var parent = ParentViewController;
 			var nav = parent as UINavigationController;
-			
+#if XAMCORE_2_0
+			if (nav != null)
+				nav.PopViewController (animated);
+			else
+				DismissModalViewController (animated);
+#else
 			if (nav != null)
 				nav.PopViewControllerAnimated (animated);
 			else
 				DismissModalViewControllerAnimated (animated);
+#endif
 		}
 
 		void SetupSearch ()

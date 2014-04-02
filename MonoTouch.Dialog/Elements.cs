@@ -1290,8 +1290,11 @@ namespace MonoTouch.Dialog
 		{
 			Value = image;
 			scaled = Scale (image);
+#if XAMCORE_2_0
+			currentController.DismissModalViewController (true);
+#else
 			currentController.DismissModalViewControllerAnimated (true);
-			
+#endif		
 		}
 		
 		UIViewController currentController;
