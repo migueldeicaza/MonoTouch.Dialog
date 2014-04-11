@@ -565,6 +565,8 @@ namespace MonoTouch.Dialog
 			return new RefreshTableHeaderView (rect);
 		}
 
+		public event EventHandler ViewAppearing;
+
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
@@ -586,6 +588,9 @@ namespace MonoTouch.Dialog
 				tableView.ReloadData ();
 				dirty = false;
 			}
+
+			if (ViewAppearing != null)
+				ViewAppearing (this, EventArgs.Empty);
 		}
 
 		public bool Pushing {
