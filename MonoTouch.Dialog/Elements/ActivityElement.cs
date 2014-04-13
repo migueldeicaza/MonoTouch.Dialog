@@ -1,40 +1,66 @@
 using System;
 using System.Drawing;
 using MonoTouch.UIKit;
+using MonoTouch.Foundation;
 
 namespace MonoTouch.Dialog
 {
-	public partial class ActivityElement : UIViewElement, IElementSizing {
-		public ActivityElement () : base ("", new UIActivityIndicatorView (UIActivityIndicatorViewStyle.Gray), false)
-		{
-			var sbounds = UIScreen.MainScreen.Bounds;			
-			var uia = View as UIActivityIndicatorView;
-			
-			uia.StartAnimating ();
-			
-			var vbounds = View.Bounds;
-			View.Frame = new RectangleF ((sbounds.Width-vbounds.Width)/2, 4, vbounds.Width, vbounds.Height + 0);
-			View.AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin;
+	public class ActivityElement : Element {
+		public ActivityElement():base(""){
+
 		}
-		
+
+		UIActivityIndicatorView indicator;
+
 		public bool Animating {
 			get {
-				return ((UIActivityIndicatorView) View).IsAnimating;
+				return indicator.IsAnimating;
 			}
 			set {
-				var activity = View as UIActivityIndicatorView;
 				if (value)
-					activity.StartAnimating ();
+					indicator.StartAnimating ();
 				else
-					activity.StopAnimating ();
+					indicator.StopAnimating ();
 			}
 		}
-		
-		float IElementSizing.GetHeight (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
-		{
-			return base.GetHeight (tableView, indexPath)+ 8;
+
+		static NSString ikey = new NSString ("ActivityElement");
+
+		protected override NSString CellKey {
+			get {
+				return ikey;
+			}
 		}
-		
+
+		public override UITableViewCell GetCell (UITableView tv)
+		{
+			var cell = tv.DequeueReusableCell (CellKey);
+			if (cell == null){
+				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
+			}
+
+			indicator = new UIActivityIndicatorView (UIActivityIndicatorViewStyle.Gray);
+			var sbounds = tv.Frame;
+			var vbounds = indicator.Bounds;
+
+			indicator.Frame = new RectangleF((sbounds.Width-vbounds.Width)/2, 12, vbounds.Width, vbounds.Height);
+			indicator.StartAnimating ();
+
+			cell.Add (indicator);
+
+			return cell;
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing){
+				if (indicator != null){
+					indicator.Dispose ();
+					indicator = null;
+				}
+			}
+			base.Dispose (disposing);
+		}
 	}
 }
 
