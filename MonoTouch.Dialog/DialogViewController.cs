@@ -325,8 +325,8 @@ namespace MonoTouch.Dialog
 			
 			public override void AccessoryButtonTapped (UITableView tableView, NSIndexPath indexPath)
 			{
-				var section = Root.Sections [indexPath.Section];
-				var element = (section.Elements [indexPath.Row] as StyledStringElement);
+				var section = Root.Sections [(int) indexPath.Section];
+				var element = (section.Elements [(int) indexPath.Row] as StyledStringElement);
 				if (element != null)
 					element.AccessoryTap ();
 			}
@@ -356,8 +356,8 @@ namespace MonoTouch.Dialog
 
 			public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 			{
-				var section = Root.Sections [indexPath.Section];
-				var element = section.Elements [indexPath.Row];
+				var section = Root.Sections [(int) indexPath.Section];
+				var element = section.Elements [(int) indexPath.Row];
 				
 				return element.GetCell (tableView);
 			}
@@ -365,8 +365,8 @@ namespace MonoTouch.Dialog
 			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
 			{
 				if (Root.NeedColorUpdate){
-					var section = Root.Sections [indexPath.Section];
-					var element = section.Elements [indexPath.Row];
+					var section = Root.Sections [(int) indexPath.Section];
+					var element = section.Elements [(int) indexPath.Row];
 					var colorized = element as IColorizeBackground;
 					if (colorized != null)
 						colorized.WillDisplay (tableView, cell, indexPath);
@@ -464,8 +464,8 @@ namespace MonoTouch.Dialog
 			
 			public override nfloat GetHeightForRow (UITableView tableView, NSIndexPath indexPath)
 			{
-				var section = Root.Sections [indexPath.Section];
-				var element = section.Elements [indexPath.Row];
+				var section = Root.Sections [(int) indexPath.Section];
+				var element = section.Elements [(int) indexPath.Row];
 				
 				var sizable = element as IElementSizing;
 				if (sizable == null)
@@ -532,16 +532,16 @@ namespace MonoTouch.Dialog
 		
 		public virtual void Deselected (NSIndexPath indexPath)
 		{
-			var section = root.Sections [indexPath.Section];
-			var element = section.Elements [indexPath.Row];
+			var section = root.Sections [(int) indexPath.Section];
+			var element = section.Elements [(int) indexPath.Row];
 			
 			element.Deselected (this, tableView, indexPath);
 		}
 		
 		public virtual void Selected (NSIndexPath indexPath)
 		{
-			var section = root.Sections [indexPath.Section];
-			var element = section.Elements [indexPath.Row];
+			var section = root.Sections [(int) indexPath.Section];
+			var element = section.Elements [(int) indexPath.Row];
 
 			element.Selected (this, tableView, indexPath);
 		}
