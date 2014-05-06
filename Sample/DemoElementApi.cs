@@ -8,7 +8,7 @@ using MonoTouch.UIKit;
 
 namespace Sample
 {
-	public partial class AppDelegate 
+	public partial class AppDelegate
 	{		
 		public void DemoElementApi ()
 		{

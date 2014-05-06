@@ -32,6 +32,7 @@ namespace MonoTouch.Dialog
 		bool pushing;
 		bool dirty;
 		bool reloading;
+		string refreshViewDateTimeFormat;
 
 		/// <summary>
 		/// The root element displayed by the DialogViewController, the value can be changed during runtime to update the contents.
@@ -527,7 +528,19 @@ namespace MonoTouch.Dialog
 		{
 			return new UITableView (bounds, style);
 		}
-		
+
+		/// <summary>
+		/// Sets the refresh view date time format.
+		/// call the method before you push it to navigation controller
+		/// </summary>
+		/// <param name='format'>
+		/// Format.
+		/// </param>
+		public void SetRefreshViewDateTimeFormat(string format)
+		{
+			this.refreshViewDateTimeFormat = format;
+		}
+
 		public override void LoadView ()
 		{
 			tableView = MakeTableView (UIScreen.MainScreen.Bounds, Style);
@@ -562,7 +575,7 @@ namespace MonoTouch.Dialog
 		
 		public virtual RefreshTableHeaderView MakeRefreshTableHeaderView (RectangleF rect)
 		{
-			return new RefreshTableHeaderView (rect);
+			return new RefreshTableHeaderView (rect, refreshViewDateTimeFormat);
 		}
 
 		public event EventHandler ViewAppearing;
