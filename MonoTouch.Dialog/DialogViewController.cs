@@ -463,13 +463,11 @@ namespace MonoTouch.Dialog
 		/// will push the result.   Otherwise it will show it as a modal
 		/// dialog
 		/// </summary>
-		public void ActivateController (UIViewController controller)
+		public virtual void ActivateController (UIViewController controller)
 		{
 			dirty = true;
 			
-			var parent = ParentViewController;
-			var nav = parent as UINavigationController;
-			
+			UINavigationController nav = FindNavigationController ();
 			// We can not push a nav controller into a nav controller
 			if (nav != null && !(controller is UINavigationController))
 				nav.PushViewController (controller, true);
@@ -481,17 +479,29 @@ namespace MonoTouch.Dialog
 		/// Dismisses the view controller.   It either pops or dismisses
 		/// based on the kind of container we are hosted in.
 		/// </summary>
-		public void DeactivateController (bool animated)
+		public virtual void DeactivateController (bool animated)
 		{
-			var parent = ParentViewController;
-			var nav = parent as UINavigationController;
-			
+			UINavigationController nav = FindNavigationController ();
 			if (nav != null)
 				nav.PopViewControllerAnimated (animated);
 			else
 				DismissModalViewControllerAnimated (animated);
 		}
 
+		protected virtual UINavigationController FindNavigationController ()
+		{
+			UIViewController vc = ParentViewController;
+			while (vc != null) {
+				if (vc is UINavigationController)
+					return vc as UINavigationController;
+				vc = vc.ParentViewController;
+			}
+			if (NavigationController != null)
+				return NavigationController;
+
+			return null;
+		}
+		
 		void SetupSearch ()
 		{
 			if (enableSearch){
