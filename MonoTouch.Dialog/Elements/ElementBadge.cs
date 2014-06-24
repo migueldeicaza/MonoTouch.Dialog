@@ -17,6 +17,8 @@ using System.Drawing;
 using UIKit;
 using CoreGraphics;
 using Foundation;
+
+using NSAction = global::System.Action;
 #else
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;

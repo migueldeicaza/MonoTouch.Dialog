@@ -20,6 +20,8 @@ using System.Reflection;
 using Foundation;
 using UIKit;
 using CoreGraphics;
+
+using NSAction = global::System.Action;
 #else
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
