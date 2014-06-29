@@ -1539,7 +1539,7 @@ namespace MonoTouch.Dialog
 		protected virtual UITextField CreateTextField (RectangleF frame)
 		{
 			return new UITextField (frame) {
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Placeholder = placeholder ?? "",
 				SecureTextEntry = isPassword,
 				Text = Value ?? "",
