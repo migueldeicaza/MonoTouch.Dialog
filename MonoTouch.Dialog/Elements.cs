@@ -1533,7 +1533,7 @@ namespace MonoTouch.Dialog
 				}
 			}
 
-			return new SizeF(25 + Math.Min(maxWidth, 160), maxHeight);
+			return new SizeF(25 + maxWidth, maxHeight);
 		}
 
 		protected virtual UITextField CreateTextField (RectangleF frame)
