@@ -1533,13 +1533,13 @@ namespace MonoTouch.Dialog
 				}
 			}
 
-			return new SizeF(25 + Math.Min(maxWidth, 160), maxHeight);
+			return new SizeF(25 + maxWidth, maxHeight);
 		}
 
 		protected virtual UITextField CreateTextField (RectangleF frame)
 		{
 			return new UITextField (frame) {
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Placeholder = placeholder ?? "",
 				SecureTextEntry = isPassword,
 				Text = Value ?? "",
