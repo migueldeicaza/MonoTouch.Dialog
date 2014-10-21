@@ -1780,7 +1780,7 @@ namespace MonoTouch.Dialog
 		public virtual string FormatDate (DateTime dt)
 		{
 			dt = GetDateWithKind (dt);
-			return fmt.ToString (dt) + " " + dt.ToLocalTime ().ToShortTimeString ();
+			return fmt.ToString ((NSDate) dt) + " " + dt.ToLocalTime ().ToShortTimeString ();
 		}
 		
 		public virtual UIDatePicker CreatePicker ()
@@ -1788,7 +1788,7 @@ namespace MonoTouch.Dialog
 			var picker = new UIDatePicker (CGRect.Empty){
 				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
 				Mode = UIDatePickerMode.DateAndTime,
-				Date = DateValue
+				Date = (NSDate) DateValue
 			};
 			return picker;
 		}
@@ -1826,7 +1826,7 @@ namespace MonoTouch.Dialog
 			public override void ViewWillDisappear (bool animated)
 			{
 				base.ViewWillDisappear (animated);
-				container.DateValue = container.datePicker.Date;
+				container.DateValue = (DateTime) container.datePicker.Date;
 				if (container.DateSelected != null)
 					container.DateSelected (container);
 			}
@@ -1869,7 +1869,7 @@ namespace MonoTouch.Dialog
 		
 		public override string FormatDate (DateTime dt)
 		{
-			return fmt.ToString (GetDateWithKind (dt));
+			return fmt.ToString ((NSDate) GetDateWithKind (dt));
 		}
 		
 		public override UIDatePicker CreatePicker ()
