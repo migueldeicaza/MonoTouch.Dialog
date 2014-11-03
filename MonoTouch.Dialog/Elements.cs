@@ -502,7 +502,7 @@ namespace MonoTouch.Dialog
 			CGSize captionSize = new CGSize (0, 0);
 			if (Caption != null && ShowCaption){
 				cell.TextLabel.Text = Caption;
-				captionSize = cell.TextLabel.StringSize (Caption, UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
+				captionSize = Caption.StringSize (UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
 				captionSize.Width += 10; // Spacing
 			}
 
@@ -945,14 +945,14 @@ namespace MonoTouch.Dialog
 				c = " ";
 
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
-			var height = tableView.StringSize (c, captionFont, maxSize, LineBreakMode).Height;
+			var height = c.StringSize (captionFont, maxSize, LineBreakMode).Height;
 			
 			if (!String.IsNullOrEmpty (v)) {
 				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
 				if (this.style == UITableViewCellStyle.Subtitle) {
-					height += tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
+					height += v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 				} else {
-					var vheight = tableView.StringSize (v, subtitleFont, maxSize, LineBreakMode).Height;
+					var vheight = v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 					if (vheight > height)
 						height = vheight;
 				}
@@ -1063,7 +1063,7 @@ namespace MonoTouch.Dialog
 			// ensure the (single-line) Value will be rendered inside the cell
 			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (Value))
 				c = " ";
-			return tableView.StringSize (c, font, size, UILineBreakMode.WordWrap).Height + 10;
+			return c.StringSize (font, size, UILineBreakMode.WordWrap).Height + 10;
 		}
 	}
 	
@@ -1518,14 +1518,14 @@ namespace MonoTouch.Dialog
 			
 			// If all EntryElements have a null Caption, align UITextField with the Caption
 			// offset of normal cells (at 10px).
-			CGSize max = new CGSize (-15, tv.StringSize ("M", font).Height);
+			CGSize max = new CGSize (-15, "M".StringSize (font).Height);
 			foreach (var e in s.Elements){
 				var ee = e as EntryElement;
 				if (ee == null)
 					continue;
 				
 				if (ee.Caption != null) {
-					var size = tv.StringSize (ee.Caption, font);
+					var size = ee.Caption.StringSize (font);
 					if (size.Width > max.Width)
 						max = size;
 				}

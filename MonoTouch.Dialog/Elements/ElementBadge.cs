@@ -118,7 +118,7 @@ namespace MonoTouch.Dialog
 		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			CGSize size = new CGSize (tableView.Bounds.Width - 40, nfloat.MaxValue);
-			nfloat height = tableView.StringSize (Caption, Font, size, LineBreakMode).Height + 10;
+			nfloat height = Caption.StringSize (Font, size, LineBreakMode).Height + 10;
 			
 			// Image is 57 pixels tall, add some padding
 			return (nfloat)Math.Max (height, 63);
