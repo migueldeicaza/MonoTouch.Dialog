@@ -13,7 +13,7 @@ using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
 #endif
 
-#if !HAVE_NATIVE_TYPES
+#if !XAMCORE_2_0
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
