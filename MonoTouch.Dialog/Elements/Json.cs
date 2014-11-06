@@ -87,7 +87,11 @@ namespace MonoTouch.Dialog {
 			return cell;
 		}
 
+#if XAMCORE_2_0
+		class ConnectionDelegate : NSUrlConnectionDataDelegate {
+#else
 		class ConnectionDelegate : NSUrlConnectionDelegate {
+#endif
 			Action<Stream,NSError> callback;
 			NSMutableData buffer;
 
