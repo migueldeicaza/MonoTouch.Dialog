@@ -103,7 +103,7 @@ namespace MonoTouch.Dialog {
 
 			public override void ReceivedResponse(NSUrlConnection connection, NSUrlResponse response)
 			{
-				buffer.SetLength (0);
+				buffer.Length = 0;
 			}
 
 			public override void FailedWithError(NSUrlConnection connection, NSError error)
