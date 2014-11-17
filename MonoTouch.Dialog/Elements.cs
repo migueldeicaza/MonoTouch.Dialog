@@ -605,8 +605,7 @@ namespace MonoTouch.Dialog
 			}
 			
 			public bool Autorotate { get; set; }
-			
-			[Obsolete]
+
 			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 			{
 				return Autorotate;
@@ -1839,7 +1838,6 @@ namespace MonoTouch.Dialog
 			
 			public bool Autorotate { get; set; }
 			
-			[Obsolete]
 			public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 			{
 				return Autorotate;
