@@ -289,8 +289,15 @@ namespace MonoTouch.Dialog
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
 			} else
-				RemoveTag (cell, 1);
-		
+				cell.AccessoryView = null;
+			
+			if (sw.Superview != null)
+			{
+				var oldCell = sw.Superview as UITableViewCell;
+				if (oldCell != null)
+				oldCell.AccessoryView = null;
+			}
+			
 			cell.TextLabel.Text = Caption;
 			cell.AccessoryView = sw;
 
