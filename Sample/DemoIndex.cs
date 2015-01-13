@@ -8,15 +8,15 @@
 // See the source in IndexedViewController
 //
 // The reason for Source and SourceSizing derived classes is
-// that MonoTouch.Dialog will create one or the other based on
+// that Dialog will create one or the other based on
 // whether there are elements with uniform sizes or not.  This
 // imrpoves performance by avoiding expensive computations.
 //
 using System;
 using System.Drawing;
 using System.Linq;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
+using UIKit;
+using Dialog;
 using System.Collections.Generic;
 
 namespace Sample

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
+using Foundation;
+using UIKit;
+using Dialog;
 using System.IO;
 using System.Drawing;
+using Dialog;
 
 namespace Sample
 {
@@ -25,7 +26,7 @@ namespace Sample
 		UIWindow window;
 		const string footer = 
 			"These show the two sets of APIs\n" +
-			"available in MonoTouch.Dialogs";
+			"available in Dialogs";
 		
 		// This method is invoked when the application has loaded its UI and its ready to run
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)

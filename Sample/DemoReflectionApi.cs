@@ -3,9 +3,9 @@
 //
 using System;
 using System.Collections.Generic;
-using MonoTouch.Dialog;
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
+using Dialog;
+using UIKit;
+using Foundation;
 
 namespace Sample
 {

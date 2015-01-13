@@ -1,8 +1,8 @@
 using System;
 using System.Drawing;
 using System.Linq;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
+using UIKit;
+using Dialog;
 using System.Collections.Generic;
 
 namespace Sample

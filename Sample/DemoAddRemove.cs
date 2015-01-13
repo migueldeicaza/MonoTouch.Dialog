@@ -3,8 +3,8 @@
 //
 
 using System;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
+using UIKit;
+using Dialog;
 
 namespace Sample
 {
