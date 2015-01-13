@@ -1,7 +1,7 @@
 using System;
-using MonoTouch.Dialog;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Dialog;
+using Foundation;
+using UIKit;
 
 namespace Sample
 {

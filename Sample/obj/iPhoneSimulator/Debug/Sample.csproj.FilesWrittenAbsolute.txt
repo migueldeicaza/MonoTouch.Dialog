@@ -1,0 +1,17 @@
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/Xamarin.iOS,Version=v1.0.AssemblyAttribute.cs
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/ibtool/LaunchScreen.nib
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/actool/partial-info.plist
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/actool/asset-manifest.plist
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/background.png
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/caltemplate.png
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/favorite.png
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/favorited.png
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/jakub-calendar.png
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/monodevelop-32.png
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/Images/arrow.png
+/Users/bsd-mac/Projects/Dialog/Sample/bin/iPhoneSimulator/Debug/Dialog.dll
+/Users/bsd-mac/Projects/Dialog/Sample/bin/iPhoneSimulator/Debug/Dialog.dll.mdb
+/Users/bsd-mac/Projects/Dialog/Sample/bin/iPhoneSimulator/Debug/Sample.exe.mdb
+/Users/bsd-mac/Projects/Dialog/Sample/bin/iPhoneSimulator/Debug/Sample.exe
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/Sample.exe
+/Users/bsd-mac/Projects/Dialog/Sample/obj/iPhoneSimulator/Debug/Sample.exe.mdb

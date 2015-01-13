@@ -1,11 +1,9 @@
 //
-// Shows how to add/remove cells dynamically.
-//
-
+// Shows how to acells dynamicasing System;
+using  UIKit;
+using  Dialog;
+using  Foundation;
 using System;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
-using MonoTouch.Foundation;
 
 namespace Sample
 {

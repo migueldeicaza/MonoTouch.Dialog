@@ -11,9 +11,9 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using MonoTouch.UIKit;
-using MonoTouch.Dialog;
-using MonoTouch.Foundation;
+using UIKit;
+using Dialog;
+using Foundation;
 
 namespace Sample
 {

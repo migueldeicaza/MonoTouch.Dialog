@@ -1,7 +1,8 @@
 using System;
-using MonoTouch.Dialog;
-using MonoTouch.UIKit;
+using Dialog;
+using UIKit;
 using System.Drawing;
+using CoreGraphics;
 
 namespace Sample
 {
@@ -9,7 +10,7 @@ namespace Sample
 	{		
 		public void DemoInsets ()
 		{
-			var uiView = new UIViewElement ("", new UIView (new RectangleF (0, 0, 20, 20)){
+			var uiView = new UIViewElement ("", new UIView (new CGRect (0, 0, 20, 20)){
 				BackgroundColor = UIColor.Red
 			}, false);
 			

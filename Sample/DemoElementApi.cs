@@ -3,8 +3,8 @@
 //
 using System;
 using System.Linq;
-using MonoTouch.Dialog;
-using MonoTouch.UIKit;
+using Dialog;
+using UIKit;
 
 namespace Sample
 {
@@ -56,8 +56,8 @@ namespace Sample
 						EnablesReturnKeyAutomatically = true,
 						AlignEntryWithAllSections = true,
 					},
-					new DateElement ("Select Date", DateTime.Now),
-					new TimeElement ("Select Time", DateTime.Now),
+//					new DateElement ("Select Date", DateTime.Now),
+//					new TimeElement ("Select Time", DateTime.Now),
 				},
 				new Section () {
 					new EntryElement ("Another Field", "Aligns with above fields", null)
@@ -76,7 +76,7 @@ namespace Sample
 					//new RootElement ("Store"), 
 				},
 				new Section () {
-					new HtmlElement ("About", "http://monotouch.net"),
+					new HtmlElement ("About", "http://net"),
 					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day")
 				}
 			};		
