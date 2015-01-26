@@ -1,13 +1,32 @@
 using System;
 using System.Drawing;
+
+#if XAMCORE_2_0
+using UIKit;
+using CoreGraphics;
+using Foundation;
+#else
 using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
+#endif
+
+#if !XAMCORE_2_0
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
+
 
 namespace MonoTouch.Dialog
 {
 	public class ActivityElement : Element {
-		public ActivityElement():base(""){
-
+		public ActivityElement () : base ("")
+		{
 		}
 
 		UIActivityIndicatorView indicator;
@@ -43,7 +62,7 @@ namespace MonoTouch.Dialog
 			var sbounds = tv.Frame;
 			var vbounds = indicator.Bounds;
 
-			indicator.Frame = new RectangleF((sbounds.Width-vbounds.Width)/2, 12, vbounds.Width, vbounds.Height);
+			indicator.Frame = new CGRect((sbounds.Width-vbounds.Width)/2, 12, vbounds.Width, vbounds.Height);
 			indicator.StartAnimating ();
 
 			cell.Add (indicator);

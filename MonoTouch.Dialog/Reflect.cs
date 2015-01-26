@@ -13,9 +13,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using MonoTouch.UIKit;
 using System.Drawing;
+
+#if XAMCORE_2_0
+using UIKit;
+using Foundation;
+
+using NSAction = global::System.Action;
+#else
+using MonoTouch.UIKit;
 using MonoTouch.Foundation;
+#endif
 
 namespace MonoTouch.Dialog
 {

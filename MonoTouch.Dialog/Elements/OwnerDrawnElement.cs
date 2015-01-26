@@ -1,9 +1,27 @@
 using System;
 using System.Drawing;
+
+#if XAMCORE_2_0
+using UIKit;
+using CoreFoundation;
+using CoreGraphics;
+using Foundation;
+#else
 using MonoTouch.UIKit;
 using MonoTouch.CoreFoundation;
 using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
+#endif
+
+#if !XAMCORE_2_0
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
 
 namespace MonoTouch.Dialog
 {
@@ -25,7 +43,7 @@ namespace MonoTouch.Dialog
 			this.Style = style;
 		}
 		
-		public float GetHeight (UITableView tableView, NSIndexPath indexPath)
+		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			return Height(tableView.Bounds);
 		}
@@ -47,9 +65,9 @@ namespace MonoTouch.Dialog
 			return cell;
 		}	
 		
-		public abstract void Draw(RectangleF bounds, CGContext context, UIView view);
+		public abstract void Draw(CGRect bounds, CGContext context, UIView view);
 		
-		public abstract float Height(RectangleF bounds);
+		public abstract nfloat Height(CGRect bounds);
 		
 		class OwnerDrawnCell : UITableViewCell
 		{
@@ -118,7 +136,7 @@ namespace MonoTouch.Dialog
 			
 			}
 			
-			public override void Draw (RectangleF rect)
+			public override void Draw (CGRect rect)
 			{
 				CGContext context = UIGraphics.GetCurrentContext();
 				element.Draw(rect, context, this);

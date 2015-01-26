@@ -15,8 +15,28 @@ using System.IO;
 using System.Json;
 using System.Net;
 using System.Reflection;
+
+#if XAMCORE_2_0
+using Foundation;
+using UIKit;
+using CoreGraphics;
+
+using NSAction = global::System.Action;
+#else
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+#endif
+
+#if !XAMCORE_2_0
+using nint = global::System.Int32;
+using nuint = global::System.UInt32;
+using nfloat = global::System.Single;
+
+using CGSize = global::System.Drawing.SizeF;
+using CGPoint = global::System.Drawing.PointF;
+using CGRect = global::System.Drawing.RectangleF;
+#endif
 
 namespace MonoTouch.Dialog {
 	
@@ -32,7 +52,7 @@ namespace MonoTouch.Dialog {
 		{
 			var cvb = cell.ContentView.Bounds;
 
-			var spinner = new UIActivityIndicatorView (new RectangleF (cvb.Width-CSIZE/2, (cvb.Height-CSIZE)/2, CSIZE, CSIZE)) {
+			var spinner = new UIActivityIndicatorView (new CGRect (cvb.Width-CSIZE/2, (cvb.Height-CSIZE)/2, CSIZE, CSIZE)) {
 				Tag = SPINNER_TAG,
 				ActivityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray,
 			};
@@ -67,7 +87,11 @@ namespace MonoTouch.Dialog {
 			return cell;
 		}
 
+#if XAMCORE_2_0
+		class ConnectionDelegate : NSUrlConnectionDataDelegate {
+#else
 		class ConnectionDelegate : NSUrlConnectionDelegate {
+#endif
 			Action<Stream,NSError> callback;
 			NSMutableData buffer;
 
@@ -79,7 +103,7 @@ namespace MonoTouch.Dialog {
 
 			public override void ReceivedResponse(NSUrlConnection connection, NSUrlResponse response)
 			{
-				buffer.SetLength (0);
+				buffer.Length = 0;
 			}
 
 			public override void FailedWithError(NSUrlConnection connection, NSError error)
@@ -486,10 +510,10 @@ namespace MonoTouch.Dialog {
 		{
 			int q = kvalue.LastIndexOf ("-");
 			string fname = kvalue;
-			float fsize = 0;
+			nfloat fsize = 0;
 			
 			if (q != -1) {
-				float.TryParse (kvalue.Substring (q+1), out fsize);
+				nfloat.TryParse (kvalue.Substring (q+1), out fsize);
 				fname = kvalue.Substring (0, q);
 			}
 			if (fsize <= 0)
