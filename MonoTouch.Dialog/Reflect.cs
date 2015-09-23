@@ -8,6 +8,9 @@
 //
 // Code licensed under the MIT X11 license
 //
+
+#if !TVOS
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -462,3 +465,5 @@ namespace MonoTouch.Dialog
 		}
 	}
 }
+
+#endif // !TVOS
