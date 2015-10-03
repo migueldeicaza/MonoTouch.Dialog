@@ -175,7 +175,8 @@ namespace MonoTouch.Dialog
 		/// Controls whether the DialogViewController should auto rotate
 		/// </summary>
 		public bool Autorotate { get; set; }
-		
+
+#if !TVOS
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
 			return Autorotate || toInterfaceOrientation == UIInterfaceOrientation.Portrait;
@@ -194,6 +195,7 @@ namespace MonoTouch.Dialog
 			
 			ReloadData ();
 		}
+#endif
 		
 		Section [] originalSections;
 		Element [][] originalElements;
