@@ -494,8 +494,13 @@ namespace MonoTouch.Dialog
 			// We can not push a nav controller into a nav controller
 			if (nav != null && !(controller is UINavigationController))
 				nav.PushViewController (controller, true);
-			else
+			else {
+#if TVOS
+				PresentViewController (controller, true, null);
+#else
 				PresentModalViewController (controller, true);
+#endif
+			}
 		}
 
 		/// <summary>
@@ -509,8 +514,13 @@ namespace MonoTouch.Dialog
 #if XAMCORE_2_0
 			if (nav != null)
 				nav.PopViewController (animated);
-			else
+			else {
+#if TVOS
+				DismissViewController (animated, null);
+#else
 				DismissModalViewController (animated);
+#endif
+			}
 #else
 			if (nav != null)
 				nav.PopViewControllerAnimated (animated);
@@ -521,6 +531,7 @@ namespace MonoTouch.Dialog
 
 		void SetupSearch ()
 		{
+#if !TVOS
 			if (enableSearch){
 				searchBar = new UISearchBar (new CGRect (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
@@ -532,6 +543,7 @@ namespace MonoTouch.Dialog
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
 			}
+#endif
 		}
 		
 		public virtual void Deselected (NSIndexPath indexPath)
