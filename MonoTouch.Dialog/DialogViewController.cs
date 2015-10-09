@@ -607,8 +607,10 @@ namespace MonoTouch.Dialog
 				return;
 			
 			root.Prepare ();
-			
+
+#if !TVOS
 			NavigationItem.HidesBackButton = !pushing;
+#endif
 			if (root.Caption != null)
 				NavigationItem.Title = root.Caption;
 			if (dirty){
@@ -626,8 +628,10 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				pushing = value;
+#if !TVOS
 				if (NavigationItem != null)
 					NavigationItem.HidesBackButton = !pushing;
+#endif
 			}
 		}
 		
