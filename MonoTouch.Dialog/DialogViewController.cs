@@ -286,13 +286,17 @@ namespace MonoTouch.Dialog
 			
 			public override void OnEditingStarted (UISearchBar searchBar)
 			{
+#if !TVOS
 				searchBar.ShowsCancelButton = true;
+#endif
 				container.StartSearch ();
 			}
 			
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
+#if !TVOS
 				searchBar.ShowsCancelButton = false;
+#endif
 				container.FinishSearch ();
 			}
 			
@@ -303,7 +307,9 @@ namespace MonoTouch.Dialog
 			
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
+#if !TVOS
 				searchBar.ShowsCancelButton = false;
+#endif
 				container.searchBar.Text = "";
 				container.FinishSearch ();
 				searchBar.ResignFirstResponder ();
