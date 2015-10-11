@@ -928,6 +928,59 @@ namespace MonoTouch.Dialog
 				tapped ();
 		}
 	}
+
+#if TVOS
+	internal static class Helper {
+
+		static public CGSize StringSize (this string self, UIFont font)
+		{
+			// FIXME
+			return CGSize.Empty;
+		}
+
+		static public CGSize StringSize (this string self, UIFont font, CGSize size, UILineBreakMode mode)
+		{
+			// FIXME
+			return size;
+		}
+
+		static public CGSize StringSize (this NSString self, UIFont font, CGSize size, UILineBreakMode mode)
+		{
+			// FIXME
+			return size;
+		}
+
+		static public CGSize StringSize (this NSString self, UIFont font, float width, UILineBreakMode mode)
+		{
+			// FIXME
+			return new CGSize (width, 0);
+		}
+
+		static public CGSize DrawString (this string self, CGRect rect, UIFont font)
+		{
+			// FIXME
+		return rect.Size;
+		}
+
+		static public CGSize DrawString (this NSString self, CGRect rect, UIFont font, UILineBreakMode mode)
+		{
+			// FIXME
+			return rect.Size;
+		}
+
+		static public CGSize DrawString (this string self, CGPoint point, float width, UIFont font, UILineBreakMode mode)
+		{
+			// FIXME
+			return new CGSize (width, 0);
+		}
+
+		static public CGSize DrawString (this string self, CGRect rect, UIFont font, UILineBreakMode mode, UITextAlignment alignment)
+		{
+			// FIXME
+			return rect.Size;
+		}
+	}
+#endif
 	
 	public partial class StyledMultilineElement : StyledStringElement, IElementSizing {
 		public StyledMultilineElement (string caption) : base (caption) {}
