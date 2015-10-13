@@ -305,15 +305,15 @@ namespace MonoTouch.Dialog
 				container.PerformFilter (searchText ?? "");
 			}
 			
+#if !TVOS
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
-#if !TVOS
 				searchBar.ShowsCancelButton = false;
-#endif
 				container.searchBar.Text = "";
 				container.FinishSearch ();
 				searchBar.ResignFirstResponder ();
 			}
+#endif
 			
 			public override void SearchButtonClicked (UISearchBar searchBar)
 			{
