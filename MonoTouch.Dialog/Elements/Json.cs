@@ -50,7 +50,9 @@ namespace MonoTouch.Dialog {
 		const int SPINNER_TAG = 1000;
 		public string Url;
 		bool loading;
-		
+
+		public static DateTimeKind DateKind { get; set; } = DateTimeKind.Unspecified;
+
 		UIActivityIndicatorView StartSpinner (UITableViewCell cell)
 		{
 			var cvb = cell.ContentView.Bounds;
@@ -721,15 +723,53 @@ namespace MonoTouch.Dialog {
 			
 			return new CheckboxElement (caption, value, group);
 		}
-		
+
+		static DateTime GetDateWithKind (DateTime dt, DateTimeKind parsedKind)
+		{
+			// First we check if the given date has a specified Kind, we just return the same date if found.
+			if (dt.Kind != DateTimeKind.Unspecified)
+				return dt;
+
+			// If not found then we check if we were able to parse a DateTimeKind from the parsedKind param
+			else if (parsedKind != DateTimeKind.Unspecified)
+				return DateTime.SpecifyKind (dt, parsedKind);
+
+			// If no DateTimeKind from the parsedKind param was found then we check our global property from JsonElement.DateKind
+			else if (JsonElement.DateKind != DateTimeKind.Unspecified)
+				return DateTime.SpecifyKind (dt, JsonElement.DateKind);
+
+			// If none of the above is found then we just defaut to local
+			else
+				return DateTime.SpecifyKind (dt, DateTimeKind.Local);
+		}
+
 		static Element LoadDateTime (JsonObject json, string type)
 		{
 			var caption = GetString (json, "caption");
 			var date = GetString (json, "value");
+			var kind = GetString (json, "kind");
 			DateTime datetime;
-			
+			DateTimeKind dateKind;
+
 			if (!DateTime.TryParse (date, out datetime))
 				return null;
+
+			if (kind != null) {
+				switch (kind.ToLowerInvariant ()) {
+				case "local":
+					dateKind = DateTimeKind.Local;
+					break;
+				case "utc":
+					dateKind = DateTimeKind.Utc;
+					break;
+				default:
+					dateKind = DateTimeKind.Unspecified;
+					break;
+				}
+			} else
+				dateKind = DateTimeKind.Unspecified;
+
+			datetime = GetDateWithKind (datetime, dateKind);
 
 			switch (type){
 			case "date":
