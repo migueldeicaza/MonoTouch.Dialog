@@ -934,26 +934,32 @@ namespace MonoTouch.Dialog
 
 		static public CGSize StringSize (this string self, UIFont font)
 		{
-			// FIXME
-			return CGSize.Empty;
+			return ((NSString) self).GetSizeUsingAttributes (new UIStringAttributes () {
+				Font = font,
+			});
 		}
 
 		static public CGSize StringSize (this string self, UIFont font, CGSize size, UILineBreakMode mode)
 		{
-			// FIXME
-			return size;
+			// FIXME: use GetBoundingRect instead
+			return ((NSString) self).GetSizeUsingAttributes (new UIStringAttributes () {
+				Font = font,
+			});
 		}
 
 		static public CGSize StringSize (this NSString self, UIFont font, CGSize size, UILineBreakMode mode)
 		{
-			// FIXME
-			return size;
+			return self.GetSizeUsingAttributes (new UIStringAttributes () {
+				Font = font,
+			});
 		}
 
 		static public CGSize StringSize (this NSString self, UIFont font, float width, UILineBreakMode mode)
 		{
-			// FIXME
-			return new CGSize (width, 0);
+			// FIXME: use GetBoundingRect instead
+			return self.GetSizeUsingAttributes (new UIStringAttributes () {
+				Font = font,
+			});
 		}
 
 		static public CGSize DrawString (this string self, CGRect rect, UIFont font)
