@@ -140,7 +140,7 @@ namespace MonoTouch.Dialog {
 			loading = true;
 
 			var request = new NSUrlRequest (new NSUrl (Url), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 60);
-			var connection = new NSUrlConnection (request, new ConnectionDelegate ((data,error) => {
+			/*var connection = */new NSUrlConnection (request, new ConnectionDelegate ((data,error) => {
 				loading = false;
 				spinner.StopAnimating ();
 				spinner.RemoveFromSuperview ();
