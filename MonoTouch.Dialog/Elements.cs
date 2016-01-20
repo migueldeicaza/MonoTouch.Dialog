@@ -977,56 +977,75 @@ namespace MonoTouch.Dialog
 
 		static public CGSize StringSize (this string self, UIFont font)
 		{
-			return ((NSString) self).GetSizeUsingAttributes (new UIStringAttributes () {
+			using (var str = (NSString) self) {
+				return str.GetSizeUsingAttributes (new UIStringAttributes ()
+				{
+					Font = font,
+				});
+			}
+		}
+
+		static public CGSize StringSize (this string self, UIFont font, CGSize constrainedToSize, UILineBreakMode lineBreakMode)
+		{
+			using (var str = (NSString) self) {
+				return StringSize (str, font, constrainedToSize, lineBreakMode);
+			}
+		}
+
+		static public CGSize StringSize (this NSString self, UIFont font, CGSize constrainedToSize, UILineBreakMode lineBreakMode)
+		{
+			return self.GetBoundingRect (constrainedToSize, NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			{
 				Font = font,
-			});
+				ParagraphStyle = new NSMutableParagraphStyle ()
+				{
+					LineBreakMode = lineBreakMode,
+				},
+			}, null).Size;
 		}
 
-		static public CGSize StringSize (this string self, UIFont font, CGSize size, UILineBreakMode mode)
+		static public CGSize StringSize (this NSString self, UIFont font, float forWidth, UILineBreakMode lineBreakMode)
 		{
-			// FIXME: use GetBoundingRect instead
-			return ((NSString) self).GetSizeUsingAttributes (new UIStringAttributes () {
-				Font = font,
-			});
+			return StringSize (self, font, new CGSize (forWidth, nfloat.MaxValue), lineBreakMode);
 		}
 
-		static public CGSize StringSize (this NSString self, UIFont font, CGSize size, UILineBreakMode mode)
+		static public void DrawString (this string self, CGRect rect, UIFont font)
 		{
-			return self.GetSizeUsingAttributes (new UIStringAttributes () {
-				Font = font,
-			});
+			using (var str = (NSString) self) {
+				NSStringDrawing.DrawString (str, rect, new UIStringAttributes ()
+				{
+					Font = font,
+				});
+			}
 		}
 
-		static public CGSize StringSize (this NSString self, UIFont font, float width, UILineBreakMode mode)
+		static public void DrawString (this string self, CGPoint point, float width, UIFont font, UILineBreakMode lineBreakMode)
 		{
-			// FIXME: use GetBoundingRect instead
-			return self.GetSizeUsingAttributes (new UIStringAttributes () {
-				Font = font,
-			});
+			using (var str = (NSString) self) {
+				NSStringDrawing.DrawString (str, point, new UIStringAttributes ()
+				{
+					Font = font,
+					ParagraphStyle = new NSMutableParagraphStyle ()
+					{
+						LineBreakMode = lineBreakMode,
+					},
+				});
+			}
 		}
 
-		static public CGSize DrawString (this string self, CGRect rect, UIFont font)
+		static public void DrawString (this string self, CGRect rect, UIFont font, UILineBreakMode lineBreakMode, UITextAlignment alignment)
 		{
-			// FIXME
-		return rect.Size;
-		}
-
-		static public CGSize DrawString (this NSString self, CGRect rect, UIFont font, UILineBreakMode mode)
-		{
-			// FIXME
-			return rect.Size;
-		}
-
-		static public CGSize DrawString (this string self, CGPoint point, float width, UIFont font, UILineBreakMode mode)
-		{
-			// FIXME
-			return new CGSize (width, 0);
-		}
-
-		static public CGSize DrawString (this string self, CGRect rect, UIFont font, UILineBreakMode mode, UITextAlignment alignment)
-		{
-			// FIXME
-			return rect.Size;
+			using (var str = (NSString) self) {
+				NSStringDrawing.DrawString (str, rect, new UIStringAttributes ()
+				{
+					Font = font,
+					ParagraphStyle = new NSMutableParagraphStyle ()
+					{
+						LineBreakMode = lineBreakMode,
+						Alignment = alignment,
+					},
+				});
+			}
 		}
 	}
 #endif
