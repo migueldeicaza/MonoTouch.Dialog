@@ -1735,7 +1735,11 @@ namespace MonoTouch.Dialog
 				// Add padding if right aligned
 				width -= 10;
 			}
+#if __TVOS__
+			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height + 20 /* FIXME: figure out something better than adding a magic number */);
+#else
 			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height);
+#endif
 
 			if (entry == null) {
 				entry = CreateTextField (entryFrame);
