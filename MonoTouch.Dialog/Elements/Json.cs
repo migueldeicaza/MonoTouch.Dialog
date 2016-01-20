@@ -520,8 +520,13 @@ namespace MonoTouch.Dialog {
 				nfloat.TryParse (kvalue.Substring (q+1), out fsize);
 				fname = kvalue.Substring (0, q);
 			}
-			if (fsize <= 0)
+			if (fsize <= 0) {
+#if __TVOS__
+				fsize = UIFont.SystemFontOfSize (12).PointSize;
+#else
 				fsize = UIFont.SystemFontSize;
+#endif // __TVOS__
+			}
 
 			var f = UIFont.FromName (fname, fsize);
 			if (f == null)
