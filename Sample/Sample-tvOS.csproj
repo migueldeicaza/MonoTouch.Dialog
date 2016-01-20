@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <XIPlatform>tvOS</XIPlatform>
+    <ProjectGuid>{506BE053-0EEC-40DB-9753-8B622A8D2363}</ProjectGuid>
+    <ProjectTypeGuids>{06FA79CB-D6CD-4721-BB4B-1BD202089C55};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'iPhoneSimulator' ">
+    <MtouchArch>x86_64</MtouchArch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'iPhone' ">
+    <MtouchArch>ARM64</MtouchArch>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Xamarin.TVOS" />
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog-tvOS.csproj">
+      <Project>{BA2F4057-1BDA-4E26-92A0-9FF95F627156}</Project>
+      <Name>MonoTouch.Dialog-tvOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info-tvOS.plist">
+      <LogicalName>Info.plist</LogicalName>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="DemoElementApi.cs" />
+    <Compile Include="DemoReflectionApi.cs" />
+    <Compile Include="DemoDynamic.cs" />
+    <Compile Include="DemoAddRemove.cs" />
+    <Compile Include="DemoDate.cs" />
+    <Compile Include="DemoHeadersFooters.cs" />
+    <Compile Include="DemoLoadMore.cs" />
+    <Compile Include="DemoEditing.cs" />
+    <Compile Include="DemoOwnerDrawnElement.cs" />
+    <Compile Include="DemoStyled.cs" />
+    <Compile Include="DemoRefresh.cs" />
+    <Compile Include="DemoContainerStyle.cs" />
+    <Compile Include="DemoIndex.cs" />
+    <Compile Include="DemoEditingAdvanced.cs" />
+    <Compile Include="DemoInsets.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="monodevelop-32.png" />
+    <Content Include="caltemplate.png" />
+    <Content Include="jakub-calendar.png" />
+    <Content Include="favorite.png" />
+    <Content Include="favorited.png" />
+    <Content Include="background.png" />
+    <Content Include="sample.json" />
+  </ItemGroup>
+  <Import Project="Sample.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.CSharp.targets" />
+</Project>
