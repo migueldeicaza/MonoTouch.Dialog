@@ -15,7 +15,11 @@
 using System;
 using System.Drawing;
 using System.Linq;
+#if __UNIFIED__
+using UIKit;
+#else
 using MonoTouch.UIKit;
+#endif
 using MonoTouch.Dialog;
 using System.Collections.Generic;
 
@@ -48,11 +52,13 @@ namespace Sample
 	            this.parent = parent;
 	        }
 	
+#if !__TVOS__
 	        public override string[] SectionIndexTitles (UITableView tableView)
 	        {
 				var j = parent.GetSectionTitles ();
 				return j;
 	        }
+#endif
 	    }
 
 		class SizingIndexedSource : Source {
@@ -63,11 +69,13 @@ namespace Sample
 	            this.parent = parent;
 	        }
 	
+#if !__TVOS__
 	        public override string[] SectionIndexTitles (UITableView tableView)
 	        {
 				var j = parent.GetSectionTitles ();
 				return j;
 	        }
+#endif // !__TVOS__
 	    }
 
 		public override Source CreateSizingSource (bool unevenRows)

@@ -1,6 +1,10 @@
 using System;
 using System.IO;
+#if __UNIFIED__
+using UIKit;
+#else
 using MonoTouch.UIKit;
+#endif
 using MonoTouch.Dialog;
 using MonoTouch.Dialog.Utilities;
 using System.Threading;
@@ -36,8 +40,9 @@ namespace Sample
 			};
 			var sse = new StyledStringElement ("DetailDisclosureIndicator") { Accessory = UITableViewCellAccessory.DetailDisclosureButton };
 			sse.AccessoryTapped += delegate {
-				var alert = new UIAlertView ("Accessory", "Accessory clicked!", null, "Ok");
-				alert.Show ();
+				var alertController = UIAlertController.Create ("Accessory", "Accessory clicked", UIAlertControllerStyle.Alert);
+				alertController.AddAction (UIAlertAction.Create ("Ok", UIAlertActionStyle.Default, (obj) => { }));
+				window.RootViewController.PresentViewController (alertController, true, () => { });
 			};
 			var root = new RootElement("Styled Elements") {
 				new Section ("Image icon"){

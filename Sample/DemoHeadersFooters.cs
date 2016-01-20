@@ -1,7 +1,11 @@
 using System;
 using System.Drawing;
 using System.Linq;
+#if __UNIFIED__
+using UIKit;
+#else
 using MonoTouch.UIKit;
+#endif
 using MonoTouch.Dialog;
 
 namespace Sample
@@ -12,7 +16,9 @@ namespace Sample
 		{
 			var section = new Section () { 
 				HeaderView = new UIImageView (UIImage.FromFile ("caltemplate.png")),
+#if !__TVOS__
 				FooterView = new UISwitch (new RectangleF (0, 0, 80, 30)),
+#endif // !__TVOS__
 			};
 			
 			// Fill in some data 

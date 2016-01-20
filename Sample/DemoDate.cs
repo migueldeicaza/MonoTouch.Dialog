@@ -3,9 +3,14 @@
 //
 
 using System;
+#if __UNIFIED__
+using UIKit;
+using Foundation;
+#else
 using MonoTouch.UIKit;
-using MonoTouch.Dialog;
 using MonoTouch.Foundation;
+#endif
+using MonoTouch.Dialog;
 
 namespace Sample
 {

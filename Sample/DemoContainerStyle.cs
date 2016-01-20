@@ -1,7 +1,11 @@
 using System;
 using System.Drawing;
 using System.Linq;
+#if __UNIFIED__
+using UIKit;
+#else
 using MonoTouch.UIKit;
+#endif
 using MonoTouch.Dialog;
 using System.Collections.Generic;
 

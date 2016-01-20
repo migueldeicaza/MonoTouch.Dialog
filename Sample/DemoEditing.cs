@@ -1,6 +1,11 @@
 using System;
+#if __UNIFIED__
+using UIKit;
+using Foundation;
+#else
 using MonoTouch.UIKit;
 using MonoTouch.Foundation;
+#endif
 using MonoTouch.Dialog;
 using System.Threading;
 

@@ -1,10 +1,24 @@
 using System;
 using System.Drawing;
+#if __UNIFIED__
+using CoreFoundation;
+using CoreGraphics;
+using UIKit;
+using Foundation;
+
+using RectangleF = CoreGraphics.CGRect;
+using PointF = CoreGraphics.CGPoint;
+using SizeF = CoreGraphics.CGSize;
+#else
 using MonoTouch.CoreFoundation;
 using MonoTouch.CoreGraphics;
 using MonoTouch.UIKit;
-using MonoTouch.Dialog;
 using MonoTouch.Foundation;
+
+using nfloat = System.Single;
+#endif
+
+using MonoTouch.Dialog;
 
 namespace Sample
 {
@@ -60,9 +74,9 @@ namespace Sample
 			CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB();
 			gradient = new CGGradient(
 			    colorSpace,
-			    new float[] { 0.95f, 0.95f, 0.95f, 1, 
+			    new nfloat[] { 0.95f, 0.95f, 0.95f, 1, 
 							  0.85f, 0.85f, 0.85f, 1},
-				new float[] { 0, 1 } );
+				new nfloat[] { 0, 1 } );
 		}
 		
 		public string Subject
@@ -102,29 +116,51 @@ namespace Sample
 			context.DrawLinearGradient (gradient, new PointF (bounds.Left, bounds.Top), new PointF (bounds.Left, bounds.Bottom), CGGradientDrawingOptions.DrawsAfterEndLocation);
 			
 			UIColor.Black.SetColor ();
-			view.DrawString(this.From, new RectangleF(10, 5, bounds.Width/2, 10 ), fromFont, UILineBreakMode.TailTruncation);
+			((NSString) From).DrawString (new RectangleF (10, 5, bounds.Width / 2, 10 ), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			{
+				Font = fromFont,
+			}, null);
 			
 			UIColor.Brown.SetColor ();
-			view.DrawString(this.Sent, new RectangleF(bounds.Width/2, 5, (bounds.Width/2) - 10, 10 ), dateFont, UILineBreakMode.TailTruncation, UITextAlignment.Right);
+			((NSString) Sent).DrawString (new RectangleF (bounds.Width / 2, 5, (bounds.Width / 2) - 10, 10), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			{
+				Font = dateFont,
+				ParagraphStyle = new NSMutableParagraphStyle ()
+				{
+					Alignment = UITextAlignment.Right,
+				},
+			}, null);
 			
 			UIColor.DarkGray.SetColor();
-			view.DrawString(this.Subject, new RectangleF(10, 30, bounds.Width - 20, TextHeight(bounds) ), subjectFont, UILineBreakMode.WordWrap);
+			((NSString) Subject).DrawString (new RectangleF (10, 30, bounds.Width - 20, TextHeight (bounds)), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			{
+				Font = subjectFont,
+				ParagraphStyle = new NSMutableParagraphStyle ()
+				{
+					LineBreakMode = UILineBreakMode.WordWrap,
+				},
+			}, null);
 		}
 		
-		public override float Height (RectangleF bounds)
+		public override nfloat Height (RectangleF bounds)
 		{
 			var height = 40.0f + TextHeight (bounds);
 			return height;
 		}
 		
-		private float TextHeight (RectangleF bounds)
+		private nfloat TextHeight (RectangleF bounds)
 		{
-			SizeF size;
 			using (NSString str = new NSString (this.Subject))
 			{
-				size = str.StringSize (subjectFont, new SizeF (bounds.Width - 20, 1000), UILineBreakMode.WordWrap);
-			}			
-			return size.Height;
+				return str.GetBoundingRect (new SizeF (bounds.Width - 20, 1000), NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+				{
+					Font = subjectFont,
+					ParagraphStyle = new NSMutableParagraphStyle ()
+					{
+						LineBreakMode = UILineBreakMode.WordWrap,	
+					},
+				}, null).Height;
+			}
 		}
 		
 		public override string ToString ()
