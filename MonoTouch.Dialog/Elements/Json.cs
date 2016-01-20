@@ -9,8 +9,6 @@
 // TODO: Json to load entire view controllers
 //
 
-#if !__TVOS__
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -859,6 +857,3 @@ namespace MonoTouch.Dialog {
 		}
 	}
 }
-
-#endif // !__TVOS__
-

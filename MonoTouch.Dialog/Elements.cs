@@ -273,13 +273,14 @@ namespace MonoTouch.Dialog
 		}		
 	}
 	
-#if !__TVOS__
 	/// <summary>
 	/// Used to display switch on the screen.
 	/// </summary>
 	public partial class BooleanElement : BoolElement {
 		static NSString bkey = new NSString ("BooleanElement");
+#if !__TVOS__
 		UISwitch sw;
+#endif // !__TVOS__
 		
 		public BooleanElement (string caption, bool value) : base (caption, value)
 		{  }
@@ -294,6 +295,9 @@ namespace MonoTouch.Dialog
 		}
 		public override UITableViewCell GetCell (UITableView tv)
 		{
+#if __TVOS__
+			var cell = ConfigCell (base.GetCell (tv));
+#else
 			if (sw == null){
 				sw = new UISwitch (){
 					BackgroundColor = UIColor.Clear,
@@ -315,17 +319,36 @@ namespace MonoTouch.Dialog
 		
 			cell.TextLabel.Text = Caption;
 			cell.AccessoryView = sw;
-
+#endif // !__TVOS__
 			return cell;
 		}
-		
+
+#if __TVOS__
+		UITableViewCell ConfigCell (UITableViewCell cell)
+		{
+			cell.Accessory = Value ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			cell.TextLabel.Text = Caption;
+			return cell;
+		}
+
+		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+		{
+			Value = !Value;
+			var cell = tableView.CellAt (path);
+			ConfigCell (cell);
+			base.Selected (dvc, tableView, path);
+		}
+#endif // !__TVOS__
+
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
+#if !__TVOS__
 				if (sw != null){
 					sw.Dispose ();
 					sw = null;
 				}
+#endif // !__TVOS__
 			}
 		}
 		
@@ -335,12 +358,15 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				 base.Value = value;
+#if __TVOS__
+				// Not sure what to do here
+#else
 				if (sw != null)
 					sw.On = value;
+#endif  // !__TVOS__
 			}
 		}
 	}
-#endif // !__TVOS__
 	
 	/// <summary>
 	///  This class is used to render a string + a state in the form
@@ -466,7 +492,6 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-#if !__TVOS__
 	/// <summary>
 	///  Used to display a slider on the screen.
 	/// </summary>
@@ -476,7 +501,10 @@ namespace MonoTouch.Dialog
 		public float MinValue, MaxValue;
 		static NSString skey = new NSString ("FloatElement");
 		//UIImage Left, Right;
+#if !__TVOS__
+		// There is no UISlider in tvOS, so make this read-only for now.
 		UISlider slider;
+#endif // !__TVOS__
 
 		public FloatElement (float value) : this (null, null, value)
 		{
@@ -505,6 +533,12 @@ namespace MonoTouch.Dialog
 			} else
 				RemoveTag (cell, 1);
 
+#if __TVOS__
+			if (Caption != null && ShowCaption)
+				cell.TextLabel.Text = Caption;
+
+			cell.DetailTextLabel.Text = string.Format ("[{0}...{2}]: {1}]", MinValue, Value, MaxValue);
+#else
 			CGSize captionSize = new CGSize (0, 0);
 			if (Caption != null && ShowCaption){
 				cell.TextLabel.Text = Caption;
@@ -529,6 +563,7 @@ namespace MonoTouch.Dialog
 			}
 			
 			cell.ContentView.AddSubview (slider);
+#endif // __TVOS__
 			return cell;
 		}
 
@@ -540,23 +575,26 @@ namespace MonoTouch.Dialog
 		protected override void Dispose (bool disposing)
 		{
 			if (disposing){
+#if !__TVOS__
 				if (slider != null){
 					slider.Dispose ();
 					slider = null;
 				}
+#endif // !__TVOS__
 			}
 		}		
 	}
-#endif // !__TVOS__
 
-#if !__TVOS__
 	/// <summary>
 	///  Used to display a cell that will launch a web browser when selected.
 	/// </summary>
 	public partial class HtmlElement : Element {
 		NSUrl nsUrl;
 		static NSString hkey = new NSString ("HtmlElement");
+#if !__TVOS__
+		// There is no UIWebView in tvOS, so we can't launch anything.
 		UIWebView web;
+#endif // !__TVOS__
 		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
@@ -597,15 +635,20 @@ namespace MonoTouch.Dialog
 
 		static bool NetworkActivity {
 			set {
+#if !__TVOS__
 				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = value;
+#endif // !__TVOS__
 			}
 		}
 		
+#if !__TVOS__
 		// We use this class to dispose the web control when it is not
 		// in use, as it could be a bit of a pig, and we do not want to
 		// wait for the GC to kick-in.
 		class WebViewController : UIViewController {
+#pragma warning disable 414
 			HtmlElement container;
+#pragma warning restore 414
 			
 			public WebViewController (HtmlElement container) : base ()
 			{
@@ -666,8 +709,8 @@ namespace MonoTouch.Dialog
 			dvc.ActivateController (vc);
 			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
 		}
-	}
 #endif // !__TVOS__
+	}
 
 	/// <summary>
 	///   The string element can be used to render some text in a cell 
@@ -1218,16 +1261,19 @@ namespace MonoTouch.Dialog
 
 	}
 	
-#if !__TVOS__
 	public partial class ImageElement : Element {
 		public UIImage Value;
 		static CGRect rect = new CGRect (0, 0, dimx, dimy);
 		static NSString ikey = new NSString ("ImageElement");
 		UIImage scaled;
+
+		// There's no UIImagePickerController in tvOS (and I couldn't find any suitable replacement either).
+#if !__TVOS__
 		UIPopoverController popover;
 		
 		// Apple leaks this one, so share across all.
 		static UIImagePickerController picker;
+#endif // !__TVOS__
 		
 		// Height for rows
 		const int dimx = 48;
@@ -1338,6 +1384,7 @@ namespace MonoTouch.Dialog
 			base.Dispose (disposing);
 		}
 
+#if !__TVOS__
 		class MyDelegate : UIImagePickerControllerDelegate {
 			ImageElement container;
 			UITableView table;
@@ -1394,8 +1441,8 @@ namespace MonoTouch.Dialog
 			}
 			currentController = dvc;
 		}
-	}
 #endif // !__TVOS__
+	}
 	
 	/// <summary>
 	/// An element that can be used to enter text.
@@ -1828,12 +1875,16 @@ namespace MonoTouch.Dialog
 		}
 	}
 	
-#if !__TVOS__
 	public partial class DateTimeElement : StringElement {
 		public DateTime DateValue;
+		// There's no UIDatePicker for tvOS, so this is a read-only element for now
+#if !__TVOS__
 		public UIDatePicker datePicker;
+#endif
 		public int MinuteInterval = 1;
+#pragma warning disable 67 // The event 'X' is never used
 		public event Action<DateTimeElement> DateSelected;
+#pragma warning restore 67
 		public UIColor BackgroundColor = (UIDevice.CurrentDevice.CheckSystemVersion (7, 0)) ? UIColor.White : UIColor.Black;
 		
 		protected internal NSDateFormatter fmt = new NSDateFormatter () {
@@ -1863,10 +1914,12 @@ namespace MonoTouch.Dialog
 					fmt.Dispose ();
 					fmt = null;
 				}
+#if !__TVOS__
 				if (datePicker != null){
 					datePicker.Dispose ();
 					datePicker = null;
 				}
+#endif // !__TVOS__
 			}
 		}
 		
@@ -1884,6 +1937,7 @@ namespace MonoTouch.Dialog
 			return fmt.ToString ((NSDate) dt) + " " + dt.ToLocalTime ().ToShortTimeString ();
 		}
 		
+#if !__TVOS__
 		public virtual UIDatePicker CreatePicker ()
 		{
 			var picker = new UIDatePicker (CGRect.Empty){
@@ -1960,6 +2014,7 @@ namespace MonoTouch.Dialog
 
 			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (CGSize.Empty));
 		}
+#endif // !__TVOS__                                                                                                                     
 	}
 	
 	public partial class DateElement : DateTimeElement {
@@ -1973,12 +2028,14 @@ namespace MonoTouch.Dialog
 			return fmt.ToString ((NSDate) GetDateWithKind (dt));
 		}
 		
+#if !__TVOS__
 		public override UIDatePicker CreatePicker ()
 		{
 			var picker = base.CreatePicker ();
 			picker.Mode = UIDatePickerMode.Date;
 			return picker;
 		}
+#endif // !__TVOS__
 	}
 	
 	public partial class TimeElement : DateTimeElement {
@@ -1991,6 +2048,7 @@ namespace MonoTouch.Dialog
 			return GetDateWithKind (dt).ToLocalTime ().ToShortTimeString ();
 		}
 		
+#if !__TVOS__
 		public override UIDatePicker CreatePicker ()
 		{
 			var picker = base.CreatePicker ();
@@ -1998,8 +2056,8 @@ namespace MonoTouch.Dialog
 			picker.MinuteInterval = MinuteInterval;
 			return picker;
 		}
-	}
 #endif // !__TVOS__
+	}
 	
 	/// <summary>
 	///   This element can be used to insert an arbitrary UIView

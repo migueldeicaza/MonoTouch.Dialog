@@ -537,7 +537,10 @@ namespace MonoTouch.Dialog
 
 		void SetupSearch ()
 		{
-#if !__TVOS__
+#if __TVOS__
+			// Can't create a UISearchBar in tvOS, you can only use one from a UISearchController,
+			// which require bigger changes, so just skip this for now.
+#else
 			if (enableSearch){
 				searchBar = new UISearchBar (new CGRect (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
