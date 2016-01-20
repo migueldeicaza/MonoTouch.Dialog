@@ -160,8 +160,9 @@ namespace MonoTouch.Dialog {
 						Console.WriteLine (ee);
 					}
 				}
-				var alert = new UIAlertView ("Error", "Unable to download data", null, "Ok");
-				alert.Show ();
+				var alertController = UIAlertController.Create ("Error", "Unable to download data", UIAlertControllerStyle.Alert);
+				alertController.AddAction (UIAlertAction.Create ("Ok", UIAlertActionStyle.Default, (obj) => { }));
+				UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController (alertController, true, () => { });
 			}));
 		}
 
