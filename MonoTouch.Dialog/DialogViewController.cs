@@ -176,7 +176,7 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public bool Autorotate { get; set; }
 
-#if !TVOS
+#if !__TVOS__
 		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
 		{
 			return Autorotate || toInterfaceOrientation == UIInterfaceOrientation.Portrait;
@@ -286,7 +286,7 @@ namespace MonoTouch.Dialog
 			
 			public override void OnEditingStarted (UISearchBar searchBar)
 			{
-#if !TVOS
+#if !__TVOS__
 				searchBar.ShowsCancelButton = true;
 #endif
 				container.StartSearch ();
@@ -294,7 +294,7 @@ namespace MonoTouch.Dialog
 			
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
-#if !TVOS
+#if !__TVOS__
 				searchBar.ShowsCancelButton = false;
 #endif
 				container.FinishSearch ();
@@ -305,7 +305,7 @@ namespace MonoTouch.Dialog
 				container.PerformFilter (searchText ?? "");
 			}
 			
-#if !TVOS
+#if !__TVOS__
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
 				searchBar.ShowsCancelButton = false;
@@ -501,7 +501,7 @@ namespace MonoTouch.Dialog
 			if (nav != null && !(controller is UINavigationController))
 				nav.PushViewController (controller, true);
 			else {
-#if TVOS
+#if __TVOS__
 				PresentViewController (controller, true, null);
 #else
 				PresentModalViewController (controller, true);
@@ -521,7 +521,7 @@ namespace MonoTouch.Dialog
 			if (nav != null)
 				nav.PopViewController (animated);
 			else {
-#if TVOS
+#if __TVOS__
 				DismissViewController (animated, null);
 #else
 				DismissModalViewController (animated);
@@ -537,7 +537,7 @@ namespace MonoTouch.Dialog
 
 		void SetupSearch ()
 		{
-#if !TVOS
+#if !__TVOS__
 			if (enableSearch){
 				searchBar = new UISearchBar (new CGRect (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
@@ -626,7 +626,7 @@ namespace MonoTouch.Dialog
 			
 			root.Prepare ();
 
-#if !TVOS
+#if !__TVOS__
 			NavigationItem.HidesBackButton = !pushing;
 #endif
 			if (root.Caption != null)
@@ -646,7 +646,7 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				pushing = value;
-#if !TVOS
+#if !__TVOS__
 				if (NavigationItem != null)
 					NavigationItem.HidesBackButton = !pushing;
 #endif
