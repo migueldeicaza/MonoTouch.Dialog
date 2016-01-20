@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using UIKit;
 using CoreGraphics;
 using Foundation;
@@ -35,7 +35,7 @@ using MonoTouch.CoreAnimation;
 
 using MonoTouch.Dialog.Utilities;
 
-#if !XAMCORE_2_0
+#if !__UNIFIED__
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
@@ -1361,7 +1361,7 @@ namespace MonoTouch.Dialog
 		{
 			Value = image;
 			scaled = Scale (image);
-#if XAMCORE_2_0
+#if __UNIFIED__
 			currentController.DismissModalViewController (true);
 #else
 			currentController.DismissModalViewControllerAnimated (true);

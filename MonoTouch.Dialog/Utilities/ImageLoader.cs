@@ -29,7 +29,7 @@ using System.Text;
 using System.Threading;
 using System.Security.Cryptography;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using Foundation;
 using UIKit;
 using CoreGraphics;

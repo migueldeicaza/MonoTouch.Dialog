@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using UIKit;
 using CoreFoundation;
 using CoreGraphics;
@@ -13,7 +13,7 @@ using MonoTouch.CoreGraphics;
 using MonoTouch.Foundation;
 #endif
 
-#if !XAMCORE_2_0
+#if !__UNIFIED__
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;

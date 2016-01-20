@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using UIKit;
 using CoreGraphics;
 using Foundation;
@@ -18,7 +18,7 @@ using MonoTouch.CoreAnimation;
 
 using MonoTouch.Dialog.Utilities;
 
-#if !XAMCORE_2_0
+#if !__UNIFIED__
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;

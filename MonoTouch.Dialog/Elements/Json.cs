@@ -19,7 +19,7 @@ using System.Json;
 using System.Net;
 using System.Reflection;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using Foundation;
 using UIKit;
 using CoreGraphics;
@@ -31,7 +31,7 @@ using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
 #endif
 
-#if !XAMCORE_2_0
+#if !__UNIFIED__
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;
@@ -92,7 +92,7 @@ namespace MonoTouch.Dialog {
 			return cell;
 		}
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 		class ConnectionDelegate : NSUrlConnectionDataDelegate {
 #else
 		class ConnectionDelegate : NSUrlConnectionDelegate {

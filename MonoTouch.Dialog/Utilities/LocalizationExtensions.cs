@@ -20,7 +20,7 @@
 //
 using System;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using Foundation;
 #else
 using MonoTouch.Foundation;

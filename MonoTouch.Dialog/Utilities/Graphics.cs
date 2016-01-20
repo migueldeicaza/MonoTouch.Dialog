@@ -1,12 +1,12 @@
 using System;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using CoreGraphics;
 #else
 using MonoTouch.CoreGraphics;
 #endif
 
-#if !XAMCORE_2_0
+#if !__UNIFIED__
 using nint = global::System.Int32;
 using nuint = global::System.UInt32;
 using nfloat = global::System.Single;

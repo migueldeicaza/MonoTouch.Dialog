@@ -18,7 +18,7 @@ using System.Reflection;
 using System.Text;
 using System.Drawing;
 
-#if XAMCORE_2_0
+#if __UNIFIED__
 using UIKit;
 using Foundation;
 
