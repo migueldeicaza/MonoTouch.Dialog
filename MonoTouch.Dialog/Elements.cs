@@ -1971,29 +1971,7 @@ namespace MonoTouch.Dialog
 			};
 			return picker;
 		}
-		                                                                                                                                
-		static CGRect PickerFrameWithSize (CGSize size)
-		{                                                                                                                                    
-			var screenRect = UIScreen.MainScreen.ApplicationFrame;
-			nfloat fY = 0, fX = 0;
-			
-			switch (UIApplication.SharedApplication.StatusBarOrientation){
-			case UIInterfaceOrientation.LandscapeLeft:
-			case UIInterfaceOrientation.LandscapeRight:
-				fX = (screenRect.Height - size.Width) /2;
-				fY = (screenRect.Width - size.Height) / 2 -17;
-				break;
-				
-			case UIInterfaceOrientation.Portrait:
-			case UIInterfaceOrientation.PortraitUpsideDown:
-				fX = (screenRect.Width - size.Width) / 2;
-				fY = (screenRect.Height - size.Height) / 2 - 25;
-				break;
-			}
-			
-			return new CGRect (fX, fY, size.Width, size.Height);
-		}                                                                                                                                    
-
+		                                                                                                                                                                                                                                                            
 		class MyViewController : UIViewController {
 			DateTimeElement container;
 			
@@ -2013,7 +1991,7 @@ namespace MonoTouch.Dialog
 			public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 			{
 				base.DidRotate (fromInterfaceOrientation);
-				container.datePicker.Frame = PickerFrameWithSize (container.datePicker.SizeThatFits (CGSize.Empty));
+				container.datePicker.Center = this.View.Center;
 			}
 			
 			public bool Autorotate { get; set; }
@@ -2035,7 +2013,7 @@ namespace MonoTouch.Dialog
 			vc.View.AddSubview (datePicker);
 			dvc.ActivateController (vc);
 
-			datePicker.Frame = PickerFrameWithSize (datePicker.SizeThatFits (CGSize.Empty));
+			datePicker.Center = vc.View.Center;
 		}
 #endif // !__TVOS__                                                                                                                     
 	}
