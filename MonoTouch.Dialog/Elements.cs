@@ -1812,8 +1812,7 @@ namespace MonoTouch.Dialog
 					tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, true);
 				};
 				cell.ContentView.AddSubview (entry);
-			} else
-				entry.Frame = entryFrame;
+			}
 
 			if (becomeResponder){
 				entry.BecomeFirstResponder ();
