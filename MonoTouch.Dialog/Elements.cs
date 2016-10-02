@@ -1964,7 +1964,7 @@ namespace MonoTouch.Dialog
 		public virtual UIDatePicker CreatePicker ()
 		{
 			var picker = new UIDatePicker (CGRect.Empty){
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
+				AutoresizingMask = UIViewAutoresizing.FlexibleMargins,
 				Mode = UIDatePickerMode.DateAndTime,
 				Date = (NSDate) GetDateWithKind(DateValue),
 				MinuteInterval = MinuteInterval
