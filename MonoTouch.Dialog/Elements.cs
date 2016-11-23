@@ -1729,8 +1729,8 @@ namespace MonoTouch.Dialog
 			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
 			cell.Frame = new CGRect(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
 			CGSize size = ComputeEntryPosition (tv, cell);
-			nfloat yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
-			nfloat width = cell.ContentView.Bounds.Width - size.Width;
+			nfloat yOffset = (cell.Frame.Height - size.Height) / 2 - 1;
+			nfloat width = cell.Frame.Width - size.Width;
 			if (textalignment == UITextAlignment.Right) {
 				// Add padding if right aligned
 				width -= 10;
