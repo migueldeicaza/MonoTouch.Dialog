@@ -2619,6 +2619,12 @@ namespace MonoTouch.Dialog
 			
 			return cell;
 		}
+
+		public virtual UITableViewCell CustomizeCell(UITableViewCell source, NSIndexPath indexPath)
+		{
+			return source;
+		}
+
 	}
 	
 	/// <summary>

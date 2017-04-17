@@ -369,7 +369,7 @@ namespace MonoTouch.Dialog
 				var section = Root.Sections [(int) indexPath.Section];
 				var element = section.Elements [(int) indexPath.Row];
 				
-				return element.GetCell (tableView);
+				return section.CustomizeCell(element.GetCell (tableView), indexPath);
 			}
 			
 			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
