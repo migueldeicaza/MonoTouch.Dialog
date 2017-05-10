@@ -44,7 +44,9 @@ namespace MonoTouch.Dialog
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
 		public event Action<NSIndexPath> OnSelection;
+#if !__TVOS__
 		UISearchBar searchBar;
+#endif
 		UITableView tableView;
 		RefreshTableHeaderView refreshView;
 		RootElement root;
@@ -208,7 +210,9 @@ namespace MonoTouch.Dialog
 			if (originalSections != null)
 				return;
 			
+#if !__TVOS__
 			searchBar.BecomeFirstResponder ();
+#endif
 			originalSections = Root.Sections.ToArray ();
 			originalElements = new Element [originalSections.Length][];
 			for (int i = 0; i < originalSections.Length; i++)
@@ -226,7 +230,9 @@ namespace MonoTouch.Dialog
 			Root.Sections = new List<Section> (originalSections);
 			originalSections = null;
 			originalElements = null;
+#if !__TVOS__
 			searchBar.ResignFirstResponder ();
+#endif
 			ReloadData ();
 		}
 		
