@@ -62,6 +62,8 @@ namespace Sample
 					},
 					new DateElement ("Select Date", DateTime.Now),
 					new TimeElement ("Select Time", DateTime.Now),
+					new DateElement ("Date (Optional)", null, false),
+					new TimeElement ("Time (Optional)", null, false),
 				},
 				new Section () {
 					new EntryElement ("Another Field", "Aligns with above fields", null)

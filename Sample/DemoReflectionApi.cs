@@ -80,6 +80,9 @@ namespace Sample
 		
 		[Time]
 		public DateTime Alarm;
+
+		[Date]
+		public DateTime? Expiry;
 	}
 	
 	public partial class AppDelegate 
