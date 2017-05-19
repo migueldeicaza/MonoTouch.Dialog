@@ -245,6 +245,11 @@ namespace MonoTouch.Dialog
 				return false;
 			return Caption.IndexOf (text, StringComparison.CurrentCultureIgnoreCase) != -1;
 		}
+
+		/// <summary>
+		/// User-defined data associated with this Element
+		/// </summary>
+		public object Tag;
 	}
 
 	public abstract partial class BoolElement : Element {
