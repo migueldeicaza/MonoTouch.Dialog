@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTouch.Dialog-Unified", "MonoTouch.Dialog\MonoTouch.Dialog-Unified.csproj", "{2B7FBE6D-3AD0-4805-9E09-4EBA09C0932C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTouch.Dialog-iOS", "MonoTouch.Dialog\MonoTouch.Dialog-iOS.csproj", "{2B7FBE6D-3AD0-4805-9E09-4EBA09C0932C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample-Unified", "Sample\Sample-Unified.csproj", "{537D8794-6B9D-4B8A-BD91-BA1B285BD124}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample-iOS", "Sample\Sample-iOS.csproj", "{537D8794-6B9D-4B8A-BD91-BA1B285BD124}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MonoTouch.Dialog", "MonoTouch.Dialog\MonoTouch.Dialog.shproj", "{E63B2E4B-68CF-4108-80AC-2C00533B12EE}"
 EndProject

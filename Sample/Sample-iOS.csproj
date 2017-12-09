@@ -89,9 +89,9 @@
     <Reference Include="System.Json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog-Unified.csproj">
+    <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog-iOS.csproj">
       <Project>{2B7FBE6D-3AD0-4805-9E09-4EBA09C0932C}</Project>
-      <Name>MonoTouch.Dialog-Unified</Name>
+      <Name>MonoTouch.Dialog-iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
