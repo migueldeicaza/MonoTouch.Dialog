@@ -1,25 +1,9 @@
 using System;
 using System.Drawing;
 
-#if __UNIFIED__
 using UIKit;
 using Foundation;
 using CoreGraphics;
-#else
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-using MonoTouch.CoreGraphics;
-#endif
-
-#if !__UNIFIED__
-using nint = global::System.Int32;
-using nuint = global::System.UInt32;
-using nfloat = global::System.Single;
-
-using CGSize = global::System.Drawing.SizeF;
-using CGPoint = global::System.Drawing.PointF;
-using CGRect = global::System.Drawing.RectangleF;
-#endif
 
 namespace MonoTouch.Dialog {
 

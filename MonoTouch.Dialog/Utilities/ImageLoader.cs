@@ -29,15 +29,9 @@ using System.Text;
 using System.Threading;
 using System.Security.Cryptography;
 
-#if __UNIFIED__
 using Foundation;
 using UIKit;
 using CoreGraphics;
-#else
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-#endif
 
 using MonoTouch.Dialog.Utilities;
 

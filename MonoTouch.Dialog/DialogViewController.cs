@@ -12,27 +12,10 @@
 using System;
 using System.Collections.Generic;
 
-#if __UNIFIED__
 using Foundation;
 using UIKit;
 using CoreGraphics;
-
 using NSAction = global::System.Action;
-#else
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-#endif
-
-#if !__UNIFIED__
-using nint = global::System.Int32;
-using nuint = global::System.UInt32;
-using nfloat = global::System.Single;
-
-using CGSize = global::System.Drawing.SizeF;
-using CGPoint = global::System.Drawing.PointF;
-using CGRect = global::System.Drawing.RectangleF;
-#endif
 
 namespace MonoTouch.Dialog
 {
@@ -524,7 +507,6 @@ namespace MonoTouch.Dialog
 		{
 			var parent = ParentViewController;
 			var nav = parent as UINavigationController;
-#if __UNIFIED__
 			if (nav != null)
 				nav.PopViewController (animated);
 			else {
@@ -534,12 +516,6 @@ namespace MonoTouch.Dialog
 				DismissModalViewController (animated);
 #endif
 			}
-#else
-			if (nav != null)
-				nav.PopViewControllerAnimated (animated);
-			else
-				DismissModalViewControllerAnimated (animated);
-#endif
 		}
 
 		void SetupSearch ()

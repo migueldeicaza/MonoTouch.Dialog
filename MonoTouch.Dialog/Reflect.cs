@@ -16,15 +16,10 @@ using System.Reflection;
 using System.Text;
 using System.Drawing;
 
-#if __UNIFIED__
 using UIKit;
 using Foundation;
 
 using NSAction = global::System.Action;
-#else
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-#endif
 
 namespace MonoTouch.Dialog
 {

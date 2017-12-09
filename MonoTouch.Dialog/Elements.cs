@@ -19,31 +19,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 
-#if __UNIFIED__
 using UIKit;
 using CoreGraphics;
 using Foundation;
 using CoreAnimation;
-
-using NSAction = global::System.Action;
-#else
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
-using MonoTouch.CoreAnimation;
-#endif
-
 using MonoTouch.Dialog.Utilities;
 
-#if !__UNIFIED__
-using nint = global::System.Int32;
-using nuint = global::System.UInt32;
-using nfloat = global::System.Single;
-
-using CGSize = global::System.Drawing.SizeF;
-using CGPoint = global::System.Drawing.PointF;
-using CGRect = global::System.Drawing.RectangleF;
-#endif
+using NSAction = global::System.Action;
 
 namespace MonoTouch.Dialog
 {
@@ -1427,11 +1409,7 @@ namespace MonoTouch.Dialog
 		{
 			Value = image;
 			scaled = Scale (image);
-#if __UNIFIED__
 			currentController.DismissModalViewController (true);
-#else
-			currentController.DismissModalViewControllerAnimated (true);
-#endif		
 		}
 		
 		UIViewController currentController;
