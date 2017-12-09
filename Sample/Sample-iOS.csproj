@@ -90,7 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoTouch.Dialog\MonoTouch.Dialog-iOS.csproj">
-      <Project>{2B7FBE6D-3AD0-4805-9E09-4EBA09C0932C}</Project>
+      <Project>{00F6EBFF-0EBD-4103-A36A-0EDD985351A6}</Project>
       <Name>MonoTouch.Dialog-iOS</Name>
     </ProjectReference>
   </ItemGroup>
@@ -123,6 +123,9 @@
     <Content Include="favorited.png" />
     <Content Include="background.png" />
     <Content Include="sample.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="LaunchScreen.storyboard" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
