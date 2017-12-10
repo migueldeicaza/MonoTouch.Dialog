@@ -1,23 +1,9 @@
 using System;
 using System.Drawing;
-#if __UNIFIED__
 using CoreFoundation;
 using CoreGraphics;
 using UIKit;
 using Foundation;
-
-using RectangleF = CoreGraphics.CGRect;
-using PointF = CoreGraphics.CGPoint;
-using SizeF = CoreGraphics.CGSize;
-#else
-using MonoTouch.CoreFoundation;
-using MonoTouch.CoreGraphics;
-using MonoTouch.UIKit;
-using MonoTouch.Foundation;
-
-using nfloat = System.Single;
-#endif
-
 using MonoTouch.Dialog;
 
 namespace Sample
@@ -109,22 +95,22 @@ namespace Sample
 		}
 
 		const int cellPadding = 10;
-		public override void Draw (RectangleF bounds, CGContext context, UIView view)
+		public override void Draw (CGRect bounds, CGContext context, UIView view)
 		{
 			UIColor.White.SetFill ();
 			context.FillRect (bounds);
 			
-			context.DrawLinearGradient (gradient, new PointF (bounds.Left, bounds.Top), new PointF (bounds.Left, bounds.Bottom), CGGradientDrawingOptions.DrawsAfterEndLocation);
+			context.DrawLinearGradient (gradient, new CGPoint (bounds.Left, bounds.Top), new CGPoint (bounds.Left, bounds.Bottom), CGGradientDrawingOptions.DrawsAfterEndLocation);
 			
 			UIColor.Red.SetColor ();
 			nfloat captionHeight = TextHeight (bounds, From, fromFont);
-			((NSString) From).DrawString (new RectangleF (10, 5, bounds.Width / 2, captionHeight), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			((NSString) From).DrawString (new CGRect (10, 5, bounds.Width / 2, captionHeight), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 			{
 				Font = fromFont,
 			}, null)
 			;
 			UIColor.Yellow.SetColor ();
-			((NSString) Sent).DrawString (new RectangleF (bounds.Width / 2, 5, (bounds.Width / 2) - 10, 10), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			((NSString) Sent).DrawString (new CGRect (bounds.Width / 2, 5, (bounds.Width / 2) - 10, 10), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 			{
 				Font = dateFont,
 				ParagraphStyle = new NSMutableParagraphStyle ()
@@ -134,7 +120,7 @@ namespace Sample
 			}, null);
 			
 			UIColor.Green.SetColor();
-			((NSString) Subject).DrawString (new RectangleF (10, cellPadding + captionHeight, bounds.Width - 20, TextHeight (bounds, Subject, subjectFont)), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			((NSString) Subject).DrawString (new CGRect (10, cellPadding + captionHeight, bounds.Width - 20, TextHeight (bounds, Subject, subjectFont)), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 			{
 				Font = subjectFont,
 				ParagraphStyle = new NSMutableParagraphStyle ()
@@ -144,17 +130,17 @@ namespace Sample
 			}, null);
 		}
 		
-		public override nfloat Height (RectangleF bounds)
+		public override nfloat Height (CGRect bounds)
 		{
 			var height = TextHeight (bounds, From, fromFont) + TextHeight (bounds, Subject, subjectFont) + cellPadding * 2;
 			return height;
 		}
 		
-		private nfloat TextHeight (RectangleF bounds, string text, UIFont font)
+		private nfloat TextHeight (CGRect bounds, string text, UIFont font)
 		{
 			using (NSString str = new NSString (text))
 			{
-				return str.GetBoundingRect (new SizeF (bounds.Width - 20, 1000), NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+				return str.GetBoundingRect (new CGSize (bounds.Width - 20, 1000), NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 				{
 					Font = font,
 					ParagraphStyle = new NSMutableParagraphStyle ()

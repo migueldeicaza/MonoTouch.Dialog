@@ -9,6 +9,8 @@
     <RootNamespace>MonoTouch.Dialog</RootNamespace>
     <AssemblyName>MonoTouch.Dialog</AssemblyName>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
@@ -71,11 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\arrow.png">
-      <LogicalName>arrow.png</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="MonoTouch.Dialog.projitems" Label="Shared" Condition="Exists('MonoTouch.Dialog.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

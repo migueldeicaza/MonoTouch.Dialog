@@ -4,11 +4,7 @@
 using System;
 using System.Linq;
 using MonoTouch.Dialog;
-#if __UNIFIED__
 using UIKit;
-#else
-using MonoTouch.UIKit;
-#endif
 
 namespace Sample
 {

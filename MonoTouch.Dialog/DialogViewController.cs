@@ -4,10 +4,6 @@
 // Author:
 //   Miguel de Icaza
 //
-// Code to support pull-to-refresh based on Martin Bowling's TweetTableView
-// which is based in turn in EGOTableViewPullRefresh code which was created
-// by Devin Doty and is Copyrighted 2009 enormego and released under the
-// MIT X11 license
 //
 using System;
 using System.Collections.Generic;
@@ -31,7 +27,6 @@ namespace MonoTouch.Dialog
 		UISearchBar searchBar;
 #endif
 		UITableView tableView;
-		RefreshTableHeaderView refreshView;
 		RootElement root;
 		bool pushing;
 		bool dirty;
@@ -117,18 +112,8 @@ namespace MonoTouch.Dialog
 				return;
 			
 			reloading = true;
-			if (refreshView != null)
-				refreshView.SetActivity (true);
 			refreshRequested (this, EventArgs.Empty);
 
-			if (reloading && showStatus && refreshView != null){
-				UIView.BeginAnimations ("reloadingData");
-				UIView.SetAnimationDuration (0.2);
-				var tableInset = TableView.ContentInset;
-				tableInset.Top += 60;
-				TableView.ContentInset = tableInset;
-				UIView.CommitAnimations ();
-			}
 		}
 		
 		/// <summary>
@@ -136,24 +121,12 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public void ReloadComplete ()
 		{
-			if (refreshView != null)
-				refreshView.LastUpdate = DateTime.Now;
 			if (!reloading)
 				return;
 
 			reloading = false;
-			if (refreshView == null)
-				return;
-			
-			refreshView.SetActivity (false);
-			refreshView.Flip (false);
-			UIView.BeginAnimations ("doneReloading");
-			UIView.SetAnimationDuration (0.3f);
-			var tableInset = TableView.ContentInset;
-			tableInset.Top -= 60;
-			TableView.ContentInset = tableInset;
-			refreshView.SetStatus (RefreshViewStatus.PullToReload);
-			UIView.CommitAnimations ();
+
+			RefreshControl.EndRefreshing ();
 		}
 		
 		/// <summary>
@@ -172,12 +145,6 @@ namespace MonoTouch.Dialog
 			base.DidRotate (fromInterfaceOrientation);
 			
 			//Fixes the RefreshView's size if it is shown during rotation
-			if (refreshView != null) {
-				var bounds = View.Bounds;
-				
-				refreshView.Frame = new CGRect (0, -bounds.Height, bounds.Width, bounds.Height);
-			}
-			
 			ReloadData ();
 		}
 #endif
@@ -412,48 +379,23 @@ namespace MonoTouch.Dialog
 				if (section.FooterView == null)
 					return -1;
 				return section.FooterView.Frame.Height;
-			}
-			
-			#region Pull to Refresh support
-			public override void Scrolled (UIScrollView scrollView)
+			}			
+
+			public override void Scrolled (UIScrollView scrollView) 
 			{
-				if (!checkForRefresh)
-					return;
-				if (Container.reloading)
-					return;
-				var view  = Container.refreshView;
-				if (view == null)
-					return;
 				
-				var point = Container.TableView.ContentOffset;
-				
-				if (view.IsFlipped && point.Y > -yboundary && point.Y < 0){
-					view.Flip (true);
-					view.SetStatus (RefreshViewStatus.PullToReload);
-				} else if (!view.IsFlipped && point.Y < -yboundary){
-					view.Flip (true);
-					view.SetStatus (RefreshViewStatus.ReleaseToReload);
-				}
 			}
-			
+
 			public override void DraggingStarted (UIScrollView scrollView)
 			{
-				checkForRefresh = true;
+				
 			}
-			
+
 			public override void DraggingEnded (UIScrollView scrollView, bool willDecelerate)
 			{
-				if (Container.refreshView == null)
-					return;
-				
-				checkForRefresh = false;
-				if (Container.TableView.ContentOffset.Y > -yboundary)
-					return;
-				Container.TriggerRefresh (true);
 			}
-			#endregion
 		}
-		
+
 		//
 		// Performance trick, if we expose GetHeightForRow, the UITableView will
 		// probe *every* row for its size;   Avoid this by creating a separate
@@ -577,25 +519,18 @@ namespace MonoTouch.Dialog
 				return;
 			root.TableView = tableView;
 		}
-		
+
 		void ConfigureTableView ()
 		{
-			if (refreshRequested != null){
-				// The dimensions should be large enough so that even if the user scrolls, we render the
-				// whole are with the background color.
-				var bounds = View.Bounds;
-				refreshView = MakeRefreshTableHeaderView (new CGRect (0, -bounds.Height, bounds.Width, bounds.Height));
-				if (reloading)
-					refreshView.SetActivity (true);
-				TableView.AddSubview (refreshView);
+#if !__TVOS__
+			if (refreshRequested != null) {
+				RefreshControl = new UIRefreshControl ();
+				RefreshControl.AddTarget ((sender,args)=> TriggerRefresh (), UIControlEvent.ValueChanged);
+				return;
 			}
+#endif
 		}
 		
-		public virtual RefreshTableHeaderView MakeRefreshTableHeaderView (CGRect rect)
-		{
-			return new RefreshTableHeaderView (rect);
-		}
-
 		public event EventHandler ViewAppearing;
 
 		public override void ViewWillAppear (bool animated)
