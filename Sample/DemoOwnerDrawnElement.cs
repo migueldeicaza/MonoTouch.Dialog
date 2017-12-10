@@ -107,7 +107,8 @@ namespace Sample
 				return date.ToShortDateString ();			
 			}
 		}
-		
+
+		const int cellPadding = 10;
 		public override void Draw (RectangleF bounds, CGContext context, UIView view)
 		{
 			UIColor.White.SetFill ();
@@ -115,13 +116,14 @@ namespace Sample
 			
 			context.DrawLinearGradient (gradient, new PointF (bounds.Left, bounds.Top), new PointF (bounds.Left, bounds.Bottom), CGGradientDrawingOptions.DrawsAfterEndLocation);
 			
-			UIColor.Black.SetColor ();
-			((NSString) From).DrawString (new RectangleF (10, 5, bounds.Width / 2, 10 ), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			UIColor.Red.SetColor ();
+			nfloat captionHeight = TextHeight (bounds, From, fromFont);
+			((NSString) From).DrawString (new RectangleF (10, 5, bounds.Width / 2, captionHeight), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 			{
 				Font = fromFont,
-			}, null);
-			
-			UIColor.Brown.SetColor ();
+			}, null)
+			;
+			UIColor.Yellow.SetColor ();
 			((NSString) Sent).DrawString (new RectangleF (bounds.Width / 2, 5, (bounds.Width / 2) - 10, 10), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 			{
 				Font = dateFont,
@@ -131,8 +133,8 @@ namespace Sample
 				},
 			}, null);
 			
-			UIColor.DarkGray.SetColor();
-			((NSString) Subject).DrawString (new RectangleF (10, 30, bounds.Width - 20, TextHeight (bounds)), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
+			UIColor.Green.SetColor();
+			((NSString) Subject).DrawString (new RectangleF (10, cellPadding + captionHeight, bounds.Width - 20, TextHeight (bounds, Subject, subjectFont)), NSStringDrawingOptions.TruncatesLastVisibleLine | NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 			{
 				Font = subjectFont,
 				ParagraphStyle = new NSMutableParagraphStyle ()
@@ -144,17 +146,17 @@ namespace Sample
 		
 		public override nfloat Height (RectangleF bounds)
 		{
-			var height = 40.0f + TextHeight (bounds);
+			var height = TextHeight (bounds, From, fromFont) + TextHeight (bounds, Subject, subjectFont) + cellPadding * 2;
 			return height;
 		}
 		
-		private nfloat TextHeight (RectangleF bounds)
+		private nfloat TextHeight (RectangleF bounds, string text, UIFont font)
 		{
-			using (NSString str = new NSString (this.Subject))
+			using (NSString str = new NSString (text))
 			{
 				return str.GetBoundingRect (new SizeF (bounds.Width - 20, 1000), NSStringDrawingOptions.UsesLineFragmentOrigin, new UIStringAttributes ()
 				{
-					Font = subjectFont,
+					Font = font,
 					ParagraphStyle = new NSMutableParagraphStyle ()
 					{
 						LineBreakMode = UILineBreakMode.WordWrap,	
