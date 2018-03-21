@@ -9,5 +9,13 @@
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
+	<key>CFBundleName</key>
+	<string>SampleTV</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.sample.monotouchdialogtv</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
 </dict>
 </plist>

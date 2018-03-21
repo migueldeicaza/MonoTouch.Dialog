@@ -126,7 +126,9 @@ namespace MonoTouch.Dialog
 
 			reloading = false;
 
+#if !__TVOS__
 			RefreshControl.EndRefreshing ();
+#endif
 		}
 		
 		/// <summary>

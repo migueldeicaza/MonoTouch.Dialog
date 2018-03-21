@@ -70,11 +70,6 @@
   <ItemGroup>
     <Folder Include="Images\" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\arrow.png">
-      <LogicalName>arrow.png</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
   <Import Project="MonoTouch.Dialog.projitems" Label="Shared" Condition="Exists('MonoTouch.Dialog.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\TVOS\Xamarin.TVOS.CSharp.targets" />
 </Project>
