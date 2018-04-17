@@ -126,6 +126,7 @@ namespace MonoTouch.Dialog
 	public class BindingContext : IDisposable {
 		public RootElement Root;
 		Dictionary<Element,MemberAndInstance> mappings;
+		Dictionary<StringElement, Action> handlerMappings;
 			
 		class MemberAndInstance {
 			public MemberAndInstance (MemberInfo mi, object o)
@@ -198,6 +199,7 @@ namespace MonoTouch.Dialog
 				throw new ArgumentNullException ("o");
 			
 			mappings = new Dictionary<Element,MemberAndInstance> ();
+			handlerMappings = new Dictionary<StringElement, NSAction> ();
 			
 			Root = new RootElement (title);
 			Populate (callbacks, o, Root);
@@ -295,8 +297,11 @@ namespace MonoTouch.Dialog
 							selement.Alignment = align.Alignment;
 					}
 					
-					if (invoke != null)
-						((StringElement) element).Tapped += invoke;
+					if (invoke != null) {
+						var strElement = (StringElement) element;
+						strElement.Tapped += invoke;
+						handlerMappings.Add (strElement, invoke);
+					}
 				} else if (mType == typeof (float)){
 					var floatElement = new FloatElement (null, null, (float) GetValue (mi, o));
 					floatElement.Caption = caption;
@@ -414,6 +419,11 @@ namespace MonoTouch.Dialog
 		protected virtual void Dispose (bool disposing)
 		{
 			if (disposing){
+				// Dispose any [OnTap] handler associated to its element
+				foreach (var strElement in handlerMappings)
+					strElement.Key.Tapped -= strElement.Value;
+				handlerMappings = null;
+
 				foreach (var element in mappings.Keys){
 					element.Dispose ();
 				}
