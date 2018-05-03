@@ -329,14 +329,13 @@ namespace MonoTouch.Dialog
 		
 		public class Source : UITableViewSource {
 			const float yboundary = 65;
-			WeakReference<DialogViewController> container;
-			protected DialogViewController Container => container.TryGetTarget (out var result) ? result : null;
+			[Weak] protected DialogViewController Container;
 			protected RootElement Root;
 			bool checkForRefresh;
 			
 			public Source (DialogViewController container)
 			{
-				this.container = new WeakReference<DialogViewController> (container);
+				Container = container;
 				Root = container.root;
 			}
 			
