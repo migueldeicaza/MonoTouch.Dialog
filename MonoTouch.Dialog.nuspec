@@ -16,7 +16,7 @@
         <tags>xamarin,ios,mac,xamarin.ios,xamarin.tvos,dialog</tags>
     </metadata>
     <files>
-        <file src="MonoTouch.Dialog/bin/iPhone/Release/MonoTouch.Dialog.dll" target="lib/XamariniOS10" />
-        <file src="./MonoTouch.Dialog/bin/tv/Release/MonoTouch.Dialog.dll" target="lib/XamarintvOS10" />
+        <file src="MonoTouch.Dialog/bin/iPhoneSimulator/Release/MonoTouch.Dialog.dll" target="lib/XamariniOS10" />
+        <file src="./MonoTouch.Dialog/bin/tvSimulator/Release/MonoTouch.Dialog.dll" target="lib/XamarintvOS10" />
     </files>
 </package>
