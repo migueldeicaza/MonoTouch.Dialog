@@ -84,27 +84,34 @@ namespace Sample
 		
 		RootElement CreateSoundSection ()
 		{
-			return new RootElement ("Sounds"){
+			return new RootElement ("Sounds") {
 				new Section ("Silent") {
 					new BooleanElement ("Vibrate", true),
 				},
 				new Section ("Ring") {
 					new BooleanElement ("Vibrate", true),
 					new FloatElement (null, null, 0.8f),
-					new RootElement ("Ringtone", new RadioGroup (0)){
-						new Section ("Custom"){
+					new RootElement ("Ringtone", new RadioGroup (0) { 
+						SelectionChanged = 
+							new Action<int> ((int obj) => { 
+								using (var msg = new UIAlertView ("RadioGroup",string.Format("you selected : {0}", obj), null, "Ok")){
+									msg.Show ();
+								}
+							})
+					}) {
+						new Section ("Custom") {
 							new RadioElement ("Circus Music"),
 							new RadioElement ("True Blood"),
 						},
-						new Section ("Standard"){
+						new Section ("Standard") {
 							from n in "Marimba,Alarm,Ascending,Bark,Xylophone".Split (',')
-								select (Element) new RadioElement (n)
+							select (Element)new RadioElement (n)
 						}
 					},
-					new RootElement ("New Text Message", new RadioGroup (3)){
-						new Section (){
+					new RootElement ("New Text Message", new RadioGroup (3)) {
+						new Section () {
 							from n in "None,Tri-tone,Chime,Glass,Horn,Bell,Eletronic".Split (',')
-								select (Element) new RadioElement (n)
+							select (Element)new RadioElement (n)
 						}
 					},
 					new BooleanElement ("New Voice Mail", false),
