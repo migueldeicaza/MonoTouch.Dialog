@@ -1194,16 +1194,28 @@ namespace MonoTouch.Dialog
 
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			var cell = base.GetCell (tv);			
-			var root = (RootElement) Parent.Parent;
-			
-			if (!(root.group is RadioGroup))
-				throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
-			
-			bool selected = RadioIdx == ((RadioGroup)(root.group)).Selected;
-			cell.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			var cell = base.GetCell (tv);	
+					
+			cell.Accessory = Accessory;
 
 			return cell;
+		}
+
+		public bool IsSelected {
+			get {
+				var root = (RootElement)Parent.Parent;
+
+				if (!(root.group is RadioGroup))
+					throw new Exception ("The RootElement's Group is null or is not a RadioGroup");
+
+				return RadioIdx == ((RadioGroup)(root.group)).Selected;
+			}
+		}
+
+		public virtual UITableViewCellAccessory Accessory {
+			get {
+				return IsSelected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
+			}
 		}
 
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
