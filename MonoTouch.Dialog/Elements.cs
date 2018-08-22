@@ -97,7 +97,17 @@ namespace MonoTouch.Dialog
 		{
 			return new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 		}
-		
+
+		/// <summary>
+		/// Gets a UITableViewCell for this element. Can be overridden, but if you 
+		/// customize the style or contents of the cell you must also override the CellKey 
+		/// property in your derived class.
+		/// </summary>
+		public virtual UITableViewCell GetCell(UITableView tv, NSIndexPath indexPath)
+		{
+			return GetCell(tv);
+		}
+
 		static protected void RemoveTag (UITableViewCell cell, int tag)
 		{
 			var viewToRemove = cell.ContentView.ViewWithTag (tag);
