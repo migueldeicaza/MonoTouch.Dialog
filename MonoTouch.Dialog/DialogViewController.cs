@@ -216,7 +216,8 @@ namespace MonoTouch.Dialog
 						if (newSection == null){
 							newSection = new Section (section.Header, section.Footer){
 								FooterView = section.FooterView,
-								HeaderView = section.HeaderView
+								HeaderView = section.HeaderView,
+								Caption = section.Caption
 							};
 							newSections.Add (newSection);
 						}
@@ -226,7 +227,9 @@ namespace MonoTouch.Dialog
 			}
 			
 			Root.Sections = newSections;
-			
+
+			newSections.ForEach(s => s.Parent = Root);
+
 			ReloadData ();
 		}
 		
@@ -252,6 +255,7 @@ namespace MonoTouch.Dialog
 			
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
+                container.searchBar.Text = "";
 #if !__TVOS__
 				searchBar.ShowsCancelButton = false;
 #endif

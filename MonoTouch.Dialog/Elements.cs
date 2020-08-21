@@ -1181,7 +1181,7 @@ namespace MonoTouch.Dialog
 	
 	public partial class RadioElement : StringElement {
 		public string Group;
-		internal int RadioIdx;
+		internal int? RadioIdx;
 		
 		public RadioElement (string caption, string group) : base (caption)
 		{
@@ -1220,7 +1220,7 @@ namespace MonoTouch.Dialog
 				cell = tableView.CellAt (indexPath);
 				if (cell != null)
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
-				root.RadioSelected = RadioIdx;
+				root.RadioSelected = RadioIdx.Value;
 			}
 			
 			base.Selected (dvc, tableView, indexPath);
@@ -2593,9 +2593,20 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class RadioGroup : Group {
 		int selected;
-		public virtual int Selected {
+
+		public event NSAction SelectedChanged;
+
+		public virtual int Selected
+		{
 			get { return selected; }
-			set { selected = value; }
+			set
+			{
+				if (selected != value)
+				{
+					selected = value;
+					SelectedChanged?.Invoke();
+				}
+			}
 		}
 		
 		public RadioGroup (string key, int selected) : base (key)
@@ -2639,7 +2650,8 @@ namespace MonoTouch.Dialog
 		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
 		internal Group group;
-		public bool UnevenRows;
+        private bool searchable;
+        public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
 		
@@ -2654,10 +2666,14 @@ namespace MonoTouch.Dialog
 		/// <param name="caption">
 		///  The caption to render.
 		/// </param>
-		public RootElement (string caption) : base (caption)
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement (string caption, bool searchable = false) : base (caption)
 		{
 			summarySection = -1;
 			Sections = new List<Section> ();
+			this.searchable = searchable;
 		}
 
 		/// <summary>
@@ -2687,10 +2703,14 @@ namespace MonoTouch.Dialog
 		/// <param name="element">
 		/// The element index inside the section that contains the summary for this RootSection.
 		/// </param>
-		public 	RootElement (string caption, int section, int element) : base (caption)
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement (string caption, int section, int element, bool searchable = false) : base (caption)
 		{
 			summarySection = section;
 			summaryElement = element;
+			this.searchable = searchable;
 		}
 		
 		/// <summary>
@@ -2703,9 +2723,13 @@ namespace MonoTouch.Dialog
 		/// The group that contains the checkbox or radio information.  This is used to display
 		/// the summary information when a RootElement is rendered inside a section.
 		/// </param>
-		public RootElement (string caption, Group group) : base (caption)
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement (string caption, Group group, bool searchable = false) : base (caption)
 		{
 			this.group = group;
+			this.searchable = searchable;
 		}
 		
 		internal List<Section> Sections = new List<Section> ();
@@ -2716,19 +2740,19 @@ namespace MonoTouch.Dialog
 			if (radio == null)
 				return null;
 			
-			uint current = 0, section = 0;
+			uint section = 0;
 			foreach (Section s in Sections){
 				uint row = 0;
 				
 				foreach (Element e in s.Elements){
-					if (!(e is RadioElement))
+					var element = e as RadioElement;
+					if (element == null)
 						continue;
 					
-					if (current == idx){
+					if (element.RadioIdx == idx){
 						return NSIndexPath.Create(section, row); 
 					}
 					row++;
-					current++;
 				}
 				section++;
 			}
@@ -2764,8 +2788,10 @@ namespace MonoTouch.Dialog
 			foreach (Section s in Sections){				
 				foreach (Element e in s.Elements){
 					var re = e as RadioElement;
-					if (re != null)
+					if (re != null && !re.RadioIdx.HasValue)
+					{
 						re.RadioIdx = current++;
+					}
 					if (UnevenRows == false && e is IElementSizing)
 						UnevenRows = true;
 					if (NeedColorUpdate == false && e is IColorizeBackground)
@@ -2977,6 +3003,24 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public event NSAction RadioSelectedChanged
+		{
+			add
+			{
+				if (group is RadioGroup radio)
+				{
+					radio.SelectedChanged += value;
+				}
+			}
+			remove
+			{
+				if (group is RadioGroup radio)
+				{
+					radio.SelectedChanged -= value;
+				}
+			}
+		}
+
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			NSString key = summarySection == -1 ? rkey1 : rkey2;
@@ -2989,49 +3033,10 @@ namespace MonoTouch.Dialog
 			} 
 		
 			cell.TextLabel.Text = Caption;
-			var radio = group as RadioGroup;
-			if (radio != null){
-				int selected = radio.Selected;
-				int current = 0;
-				
-				foreach (var s in Sections){
-					foreach (var e in s.Elements){
-						if (!(e is RadioElement))
-							continue;
-						
-						if (current == selected){
-							cell.DetailTextLabel.Text = e.Summary ();
-							goto le;
-						}
-						current++;
-					}
-				}
-			} else if (group != null){
-				int count = 0;
-				
-				foreach (var s in Sections){
-					foreach (var e in s.Elements){
-						var ce = e as CheckboxElement;
-						if (ce != null){
-							if (ce.Value)
-								count++;
-							continue;
-						}
-						var be = e as BoolElement;
-						if (be != null){
-							if (be.Value)
-								count++;
-							continue;
-						}
-					}
-				}
-				cell.DetailTextLabel.Text = count.ToString ();
-			} else if (summarySection != -1 && summarySection < Sections.Count){
-					var s = Sections [summarySection];
-					if (summaryElement < s.Elements.Count && cell.DetailTextLabel != null)
-						cell.DetailTextLabel.Text = s.Elements [summaryElement].Summary ();
-			} 
-		le:
+			if (cell.DetailTextLabel != null)
+			{
+				cell.DetailTextLabel.Text = Summary();
+			}
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			
 			return cell;
@@ -3054,7 +3059,8 @@ namespace MonoTouch.Dialog
 				return createOnSelected (this);
 			
 			return new DialogViewController (this, true) {
-				Autorotate = true
+				Autorotate = true,
+				EnableSearch = searchable
 			};
 		}
 		
@@ -3065,8 +3071,65 @@ namespace MonoTouch.Dialog
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
 		}
-		
-		public void Reload (Section section, UITableViewRowAnimation animation)
+
+        public override string Summary()
+        {
+			if (group is RadioGroup radio)
+			{
+				int selected = radio.Selected;
+				int current = 0;
+
+				foreach (var s in Sections)
+				{
+					foreach (var e in s.Elements)
+					{
+						if (!(e is RadioElement))
+							continue;
+
+						if (current == selected)
+						{
+							return e.Summary();
+						}
+						current++;
+					}
+				}
+			}
+			else if (group != null)
+			{
+				int count = 0;
+
+				foreach (var s in Sections)
+				{
+					foreach (var e in s.Elements)
+					{
+                        if (e is CheckboxElement ce)
+                        {
+                            if (ce.Value)
+                                count++;
+                            continue;
+                        }
+                        if (e is BoolElement be)
+                        {
+                            if (be.Value)
+                                count++;
+                            continue;
+                        }
+                    }
+				}
+				return count.ToString();
+			}
+			else if (summarySection != -1 && summarySection < Sections.Count)
+			{
+				var s = Sections[summarySection];
+				if (summaryElement < s.Elements.Count)
+				{
+					return s.Elements[summaryElement].Summary();
+				}
+			}
+            return base.Summary();
+        }
+
+        public void Reload (Section section, UITableViewRowAnimation animation)
 		{
 			if (section == null)
 				throw new ArgumentNullException ("section");
