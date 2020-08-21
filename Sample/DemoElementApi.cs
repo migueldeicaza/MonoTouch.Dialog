@@ -15,7 +15,12 @@ namespace Sample
 			var root = CreateRoot ();
 				
 			var dv = new DialogViewController (root, true);
-			navigation.PushViewController (dv, true);				
+
+			var nav = new UINavigationController(dv);
+			nav.SetNavigationBarHidden(false, true);
+			nav.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+			nav.ModalTransitionStyle = UIModalTransitionStyle.CoverVertical;
+			navigation.PresentViewController(nav, true, null);
 		}
 
 		RootElement CreateRoot ()
