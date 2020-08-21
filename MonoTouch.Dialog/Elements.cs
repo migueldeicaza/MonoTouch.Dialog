@@ -263,7 +263,9 @@ namespace MonoTouch.Dialog
 #if !__TVOS__
 		UISwitch sw;
 #endif // !__TVOS__
-		
+
+		static UIFont font = UIFont.BoldSystemFontOfSize(17);
+
 		public BooleanElement (string caption, bool value) : base (caption, value)
 		{  }
 		
@@ -296,6 +298,7 @@ namespace MonoTouch.Dialog
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				cell.TextLabel.Font = font;
 			} else
 				RemoveTag (cell, 1);
 		
@@ -2654,7 +2657,8 @@ namespace MonoTouch.Dialog
         public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
-		
+		static UIFont font = UIFont.BoldSystemFontOfSize(17);
+
 		// This is used to indicate that we need the DVC to dispatch calls to
 		// WillDisplayCell so we can prepare the color of the cell before 
 		// display
@@ -3030,6 +3034,7 @@ namespace MonoTouch.Dialog
 				
 				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.TextLabel.Font = font;
 			} 
 		
 			cell.TextLabel.Text = Caption;
