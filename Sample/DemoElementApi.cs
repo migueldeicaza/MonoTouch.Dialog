@@ -82,7 +82,9 @@ namespace Sample
 				},
 				new Section () {
 					new HtmlElement ("About", "http://monotouch.net"),
-					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day")
+					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day"),
+					new StyledMultilineElement ("Min Height", "Test") { BackgroundColor = UIColor.White },
+					new StyledMultilineElement ("Max Height Max Height Max", "Lomo church-key irony put a bird on it diy fanny pack gluten-free kale chips shoreditch.") { BackgroundColor = UIColor.White }
 				}
 			};		
 		}
