@@ -742,7 +742,7 @@ namespace MonoTouch.Dialog
 
 		public override string Summary ()
 		{
-			return Caption;
+			return Value ?? Caption;
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
