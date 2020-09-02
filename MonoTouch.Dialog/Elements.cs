@@ -911,7 +911,7 @@ namespace MonoTouch.Dialog
 			if (cell.DetailTextLabel != null){
 				cell.DetailTextLabel.Lines = Lines;
 				cell.DetailTextLabel.LineBreakMode = LineBreakMode;
-				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (17);
 				cell.DetailTextLabel.TextColor = (extraInfo == null || extraInfo.DetailColor == null) ? UIColor.Gray : extraInfo.DetailColor;
 			}
 		}	
@@ -1060,20 +1060,22 @@ namespace MonoTouch.Dialog
 				c = " ";
 
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
-			var height = c.StringSize (captionFont, maxSize, LineBreakMode).Height;
+			var captionSize = c.StringSize(captionFont, maxSize, LineBreakMode);
+			var height = captionSize.Height;
 			
 			if (!String.IsNullOrEmpty (v)) {
-				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (17);
 				if (this.style == UITableViewCellStyle.Subtitle) {
 					height += v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 				} else {
+					maxSize.Width -= captionSize.Width;
 					var vheight = v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 					if (vheight > height)
 						height = vheight;
 				}
 			}
 			
-			return height + 10;
+			return (nfloat)Math.Max(height + 10, 43);
 		}
 	}
 	
