@@ -2659,6 +2659,7 @@ namespace MonoTouch.Dialog
         public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
+		public string Value;
 		static UIFont font = UIFont.BoldSystemFontOfSize(17);
 
 		// This is used to indicate that we need the DVC to dispatch calls to
@@ -2680,6 +2681,23 @@ namespace MonoTouch.Dialog
 			summarySection = -1;
 			Sections = new List<Section> ();
 			this.searchable = searchable;
+		}
+
+		/// <summary>
+		///  Initializes a RootSection with a caption
+		/// </summary>
+		/// <param name="caption">
+		///  The caption to render.
+		/// </param>
+		/// <param name="value">
+		///  The value to render.
+		/// </param>
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement(string caption, string value, bool searchable = false) : this(caption, searchable)
+		{
+			Value = value;
 		}
 
 		/// <summary>
@@ -2712,11 +2730,10 @@ namespace MonoTouch.Dialog
 		/// <param name="searchable">
 		/// Turn on Search for elements.
 		/// </param>
-		public RootElement (string caption, int section, int element, bool searchable = false) : base (caption)
+		public RootElement (string caption, int section, int element, bool searchable = false) : this (caption, searchable)
 		{
 			summarySection = section;
 			summaryElement = element;
-			this.searchable = searchable;
 		}
 		
 		/// <summary>
@@ -2732,10 +2749,9 @@ namespace MonoTouch.Dialog
 		/// <param name="searchable">
 		/// Turn on Search for elements.
 		/// </param>
-		public RootElement (string caption, Group group, bool searchable = false) : base (caption)
+		public RootElement (string caption, Group group, bool searchable = false) : this (caption, searchable)
 		{
 			this.group = group;
-			this.searchable = searchable;
 		}
 		
 		internal List<Section> Sections = new List<Section> ();
@@ -3029,10 +3045,11 @@ namespace MonoTouch.Dialog
 
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			NSString key = summarySection == -1 ? rkey1 : rkey2;
+			var summarized = summarySection != -1 || group != null || Value != null;
+			var key = summarized ? rkey2 : rkey1;
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
-				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
+				var style = summarized ? UITableViewCellStyle.Value1 : UITableViewCellStyle.Default;
 				
 				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
@@ -3109,19 +3126,19 @@ namespace MonoTouch.Dialog
 				{
 					foreach (var e in s.Elements)
 					{
-                        if (e is CheckboxElement ce)
-                        {
-                            if (ce.Value)
-                                count++;
-                            continue;
-                        }
-                        if (e is BoolElement be)
-                        {
-                            if (be.Value)
-                                count++;
-                            continue;
-                        }
-                    }
+						if (e is CheckboxElement ce)
+						{
+							if (ce.Value)
+								count++;
+							continue;
+						}
+						if (e is BoolElement be)
+						{
+							if (be.Value)
+								count++;
+							continue;
+						}
+					}
 				}
 				return count.ToString();
 			}
@@ -3132,6 +3149,10 @@ namespace MonoTouch.Dialog
 				{
 					return s.Elements[summaryElement].Summary();
 				}
+			}
+			else if (Value != null)
+			{
+				return Value;
 			}
             return base.Summary();
         }
