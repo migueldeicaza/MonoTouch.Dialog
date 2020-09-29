@@ -763,12 +763,13 @@ namespace MonoTouch.Dialog
 	///   options and can render images or background images either from UIImage parameters 
 	///   or by downloading them from the net.
 	/// </summary>
-	public partial class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
-		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
-		
-		public StyledStringElement (string caption) : base (caption) {}
-		public StyledStringElement (string caption, NSAction tapped) : base (caption, tapped) {}
-		public StyledStringElement (string caption, string value) : base (caption, value) 
+	public partial class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground
+	{
+		static NSString[] skey = { new NSString(".1"), new NSString(".2"), new NSString(".3"), new NSString(".4"), new NSString(".5") };
+
+		public StyledStringElement(string caption) : base(caption) { }
+		public StyledStringElement(string caption, NSAction tapped) : base(caption, tapped) { }
+		public StyledStringElement(string caption, string value) : base(caption, value)
 		{
 			style = UITableViewCellStyle.Value1;	
 		}
@@ -779,11 +780,15 @@ namespace MonoTouch.Dialog
 		
 		protected UITableViewCellStyle style;
 		public event NSAction AccessoryTapped;
-		public UIFont Font;
-		public UIFont SubtitleFont;
+		private UIFont font;
+		private UIFont subtitleFont;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 0;
+		/// <summary>
+		/// Used to center the Image when Caption is also centered.
+		/// </summary>
+		public bool IsImageCentered;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
 		// To keep the size down for a StyleStringElement, we put all the image information
@@ -855,21 +860,76 @@ namespace MonoTouch.Dialog
 				extraInfo.BackgroundColor = null;
 			}
 		}
-			
-		protected virtual string GetKey (int style)
+
+		public UIFont SubtitleFont
+		{
+			get
+			{
+				if (subtitleFont == null)
+				{
+					subtitleFont = UIFont.SystemFontOfSize(17);
+				}
+				return subtitleFont;
+			}
+			set => subtitleFont = value;
+		}
+		public UIFont Font
+		{
+			get
+			{
+				if (font == null)
+				{
+					font = UIFont.BoldSystemFontOfSize(17);
+				}
+				return font;
+			}
+			set => font = value;
+		}
+
+        public class UICenteredImageTableViewCell : UITableViewCell
+        {
+			public UICenteredImageTableViewCell(StyledStringElement element, UITableViewCellStyle style, string reuseIdentifier)
+				: base(style, reuseIdentifier)
+			{
+				Element = element;
+			}
+
+            public StyledStringElement Element { get; }
+
+            public override void LayoutSubviews()
+            {
+                base.LayoutSubviews();
+
+				var captionSize = Element.Caption.StringSize(Element.Font, TextLabel.Bounds.Size, Element.LineBreakMode).Width;
+				var x = (ContentView.Bounds.Size.Width - captionSize) / 2 - 6;
+				ImageView.Center = new CGPoint(x, ContentView.Bounds.Size.Height / 2);
+			}
+        }
+
+        protected virtual string GetKey (int style)
 		{
 			return skey [style];
 		}
-		
-		public override UITableViewCell GetCell (UITableView tv)
+
+		public override UITableViewCell GetCell(UITableView tv)
 		{
-			var key = GetKey ((int) style);
-			var cell = tv.DequeueReusableCell (key);
-			if (cell == null){
-				cell = new UITableViewCell (style, key);
+			bool centeredImage = false;
+			if ((extraInfo?.Image != null || extraInfo?.Uri != null)
+				&& IsImageCentered
+				&& Alignment == UITextAlignment.Center)
+			{
+				centeredImage = true;
+			}
+			var key = GetKey(centeredImage ? 4 : (int)style);
+			var cell = tv.DequeueReusableCell(key);
+			if (cell == null)
+			{
+				cell = centeredImage
+					? new UICenteredImageTableViewCell(this, style, key)
+					: new UITableViewCell(style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
-			PrepareCell (cell);
+			PrepareCell(cell);
 			return cell;
 		}
 		
@@ -880,7 +940,7 @@ namespace MonoTouch.Dialog
 			tl.Text = Caption;
 			tl.TextAlignment = Alignment;
 			tl.TextColor = TextColor ?? UIColor.Black;
-			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
+			tl.Font = Font;
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = Lines;	
 			
@@ -1059,12 +1119,12 @@ namespace MonoTouch.Dialog
 			if (String.IsNullOrEmpty (c))
 				c = " ";
 
-			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
+			var captionFont = Font;
 			var captionSize = c.StringSize(captionFont, maxSize, LineBreakMode);
 			var height = captionSize.Height;
 			
 			if (!String.IsNullOrEmpty (v)) {
-				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (17);
+				var subtitleFont = SubtitleFont;
 				if (this.style == UITableViewCellStyle.Subtitle) {
 					height += v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 				} else {
