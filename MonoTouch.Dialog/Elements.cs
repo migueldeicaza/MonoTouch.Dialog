@@ -2459,24 +2459,23 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		public int Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
+		public int Insert(int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
 		{
 			if (newElements == null)
 				return 0;
 
 			int pos = idx;
 			int count = 0;
-			foreach (var e in newElements){
-				Elements.Insert (pos++, e);
+			foreach (var e in newElements)
+			{
+				Elements.Insert(pos++, e);
 				e.Parent = this;
 				count++;
 			}
 			var root = Parent as RootElement;
-			if (root != null && root.TableView != null){				
-				if (anim == UITableViewRowAnimation.None)
-					root.TableView.ReloadData ();
-				else
-					InsertVisual (idx, anim, pos-idx);
+			if (root?.TableView != null)
+			{
+				InsertVisual(idx, anim, count);
 			}
 			return count;
 		}
@@ -2502,7 +2501,7 @@ namespace MonoTouch.Dialog
 		{
 			var root = Parent as RootElement;
 			
-			if (root == null || root.TableView == null)
+			if (root?.TableView == null)
 				return;
 			
 			int sidx = root.IndexOf (this);
