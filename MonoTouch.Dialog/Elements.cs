@@ -921,7 +921,7 @@ namespace MonoTouch.Dialog
 				centeredImage = true;
 			}
 			var key = GetKey(centeredImage ? 4 : (int)style);
-			var cell = tv.DequeueReusableCell(key);
+			var cell = centeredImage ? null : tv.DequeueReusableCell(key);
 			if (cell == null)
 			{
 				cell = centeredImage
