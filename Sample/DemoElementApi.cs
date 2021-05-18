@@ -15,7 +15,12 @@ namespace Sample
 			var root = CreateRoot ();
 				
 			var dv = new DialogViewController (root, true);
-			navigation.PushViewController (dv, true);				
+
+			var nav = new UINavigationController(dv);
+			nav.SetNavigationBarHidden(false, true);
+			nav.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
+			nav.ModalTransitionStyle = UIModalTransitionStyle.CoverVertical;
+			navigation.PresentViewController(nav, true, null);
 		}
 
 		RootElement CreateRoot ()
@@ -77,7 +82,9 @@ namespace Sample
 				},
 				new Section () {
 					new HtmlElement ("About", "http://monotouch.net"),
-					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day")
+					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day"),
+					new StyledMultilineElement ("Min Height", "Test") { BackgroundColor = UIColor.White },
+					new StyledMultilineElement ("Max Height Max Height Max", "Lomo church-key irony put a bird on it diy fanny pack gluten-free kale chips shoreditch.") { BackgroundColor = UIColor.White }
 				}
 			};		
 		}
@@ -91,7 +98,7 @@ namespace Sample
 				new Section ("Ring") {
 					new BooleanElement ("Vibrate", true),
 					new FloatElement (null, null, 0.8f),
-					new RootElement ("Ringtone", new RadioGroup (0)){
+					new RootElement ("Ringtone", new RadioGroup (0), true){
 						new Section ("Custom"){
 							new RadioElement ("Circus Music"),
 							new RadioElement ("True Blood"),

@@ -17,7 +17,7 @@ namespace Sample
 			var small = image.Scale (new SizeF (32, 32));
 			
 			var imageIcon = new StyledStringElement ("Local image icon") {
-				Image = small
+				Image = small, Alignment = UITextAlignment.Center, IsImageCentered = true
 			};
 			var backgroundImage = new StyledStringElement ("Image downloaded") {
 				BackgroundUri = new Uri ("http://www.google.com/images/logos/ps_logo2.png")

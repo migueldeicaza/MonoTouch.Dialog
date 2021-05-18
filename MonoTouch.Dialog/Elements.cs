@@ -263,7 +263,9 @@ namespace MonoTouch.Dialog
 #if !__TVOS__
 		UISwitch sw;
 #endif // !__TVOS__
-		
+
+		static UIFont font = UIFont.BoldSystemFontOfSize(17);
+
 		public BooleanElement (string caption, bool value) : base (caption, value)
 		{  }
 		
@@ -296,6 +298,7 @@ namespace MonoTouch.Dialog
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+				cell.TextLabel.Font = font;
 			} else
 				RemoveTag (cell, 1);
 		
@@ -739,7 +742,7 @@ namespace MonoTouch.Dialog
 
 		public override string Summary ()
 		{
-			return Caption;
+			return Value ?? Caption;
 		}
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath indexPath)
@@ -760,12 +763,13 @@ namespace MonoTouch.Dialog
 	///   options and can render images or background images either from UIImage parameters 
 	///   or by downloading them from the net.
 	/// </summary>
-	public partial class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground {
-		static NSString [] skey = { new NSString (".1"), new NSString (".2"), new NSString (".3"), new NSString (".4") };
-		
-		public StyledStringElement (string caption) : base (caption) {}
-		public StyledStringElement (string caption, NSAction tapped) : base (caption, tapped) {}
-		public StyledStringElement (string caption, string value) : base (caption, value) 
+	public partial class StyledStringElement : StringElement, IImageUpdated, IColorizeBackground
+	{
+		static NSString[] skey = { new NSString(".1"), new NSString(".2"), new NSString(".3"), new NSString(".4"), new NSString(".5") };
+
+		public StyledStringElement(string caption) : base(caption) { }
+		public StyledStringElement(string caption, NSAction tapped) : base(caption, tapped) { }
+		public StyledStringElement(string caption, string value) : base(caption, value)
 		{
 			style = UITableViewCellStyle.Value1;	
 		}
@@ -776,11 +780,15 @@ namespace MonoTouch.Dialog
 		
 		protected UITableViewCellStyle style;
 		public event NSAction AccessoryTapped;
-		public UIFont Font;
-		public UIFont SubtitleFont;
+		private UIFont font;
+		private UIFont subtitleFont;
 		public UIColor TextColor;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.WordWrap;
 		public int Lines = 0;
+		/// <summary>
+		/// Used to center the Image when Caption is also centered.
+		/// </summary>
+		public bool IsImageCentered;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		
 		// To keep the size down for a StyleStringElement, we put all the image information
@@ -852,21 +860,76 @@ namespace MonoTouch.Dialog
 				extraInfo.BackgroundColor = null;
 			}
 		}
-			
-		protected virtual string GetKey (int style)
+
+		public UIFont SubtitleFont
+		{
+			get
+			{
+				if (subtitleFont == null)
+				{
+					subtitleFont = UIFont.SystemFontOfSize(17);
+				}
+				return subtitleFont;
+			}
+			set => subtitleFont = value;
+		}
+		public UIFont Font
+		{
+			get
+			{
+				if (font == null)
+				{
+					font = UIFont.BoldSystemFontOfSize(17);
+				}
+				return font;
+			}
+			set => font = value;
+		}
+
+        public class UICenteredImageTableViewCell : UITableViewCell
+        {
+			public UICenteredImageTableViewCell(StyledStringElement element, UITableViewCellStyle style, string reuseIdentifier)
+				: base(style, reuseIdentifier)
+			{
+				Element = element;
+			}
+
+            public StyledStringElement Element { get; }
+
+            public override void LayoutSubviews()
+            {
+                base.LayoutSubviews();
+
+				var captionSize = Element.Caption.StringSize(Element.Font, TextLabel.Bounds.Size, Element.LineBreakMode).Width;
+				var x = (ContentView.Bounds.Size.Width - captionSize) / 2 - 6;
+				ImageView.Center = new CGPoint(x, ContentView.Bounds.Size.Height / 2);
+			}
+        }
+
+        protected virtual string GetKey (int style)
 		{
 			return skey [style];
 		}
-		
-		public override UITableViewCell GetCell (UITableView tv)
+
+		public override UITableViewCell GetCell(UITableView tv)
 		{
-			var key = GetKey ((int) style);
-			var cell = tv.DequeueReusableCell (key);
-			if (cell == null){
-				cell = new UITableViewCell (style, key);
+			bool centeredImage = false;
+			if ((extraInfo?.Image != null || extraInfo?.Uri != null)
+				&& IsImageCentered
+				&& Alignment == UITextAlignment.Center)
+			{
+				centeredImage = true;
+			}
+			var key = GetKey(centeredImage ? 4 : (int)style);
+			var cell = centeredImage ? null : tv.DequeueReusableCell(key);
+			if (cell == null)
+			{
+				cell = centeredImage
+					? new UICenteredImageTableViewCell(this, style, key)
+					: new UITableViewCell(style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
 			}
-			PrepareCell (cell);
+			PrepareCell(cell);
 			return cell;
 		}
 		
@@ -877,7 +940,7 @@ namespace MonoTouch.Dialog
 			tl.Text = Caption;
 			tl.TextAlignment = Alignment;
 			tl.TextColor = TextColor ?? UIColor.Black;
-			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
+			tl.Font = Font;
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = Lines;	
 			
@@ -908,7 +971,7 @@ namespace MonoTouch.Dialog
 			if (cell.DetailTextLabel != null){
 				cell.DetailTextLabel.Lines = Lines;
 				cell.DetailTextLabel.LineBreakMode = LineBreakMode;
-				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (17);
 				cell.DetailTextLabel.TextColor = (extraInfo == null || extraInfo.DetailColor == null) ? UIColor.Gray : extraInfo.DetailColor;
 			}
 		}	
@@ -1056,21 +1119,23 @@ namespace MonoTouch.Dialog
 			if (String.IsNullOrEmpty (c))
 				c = " ";
 
-			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
-			var height = c.StringSize (captionFont, maxSize, LineBreakMode).Height;
+			var captionFont = Font;
+			var captionSize = c.StringSize(captionFont, maxSize, LineBreakMode);
+			var height = captionSize.Height;
 			
 			if (!String.IsNullOrEmpty (v)) {
-				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+				var subtitleFont = SubtitleFont;
 				if (this.style == UITableViewCellStyle.Subtitle) {
 					height += v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 				} else {
+					maxSize.Width -= captionSize.Width;
 					var vheight = v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
 					if (vheight > height)
 						height = vheight;
 				}
 			}
 			
-			return height + 10;
+			return (nfloat)Math.Max(height + 10, 43);
 		}
 	}
 	
@@ -1181,7 +1246,7 @@ namespace MonoTouch.Dialog
 	
 	public partial class RadioElement : StringElement {
 		public string Group;
-		internal int RadioIdx;
+		internal int? RadioIdx;
 		
 		public RadioElement (string caption, string group) : base (caption)
 		{
@@ -1220,7 +1285,7 @@ namespace MonoTouch.Dialog
 				cell = tableView.CellAt (indexPath);
 				if (cell != null)
 					cell.Accessory = UITableViewCellAccessory.Checkmark;
-				root.RadioSelected = RadioIdx;
+				root.RadioSelected = RadioIdx.Value;
 			}
 			
 			base.Selected (dvc, tableView, indexPath);
@@ -2394,24 +2459,23 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		public int Insert (int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
+		public int Insert(int idx, UITableViewRowAnimation anim, IEnumerable<Element> newElements)
 		{
 			if (newElements == null)
 				return 0;
 
 			int pos = idx;
 			int count = 0;
-			foreach (var e in newElements){
-				Elements.Insert (pos++, e);
+			foreach (var e in newElements)
+			{
+				Elements.Insert(pos++, e);
 				e.Parent = this;
 				count++;
 			}
 			var root = Parent as RootElement;
-			if (root != null && root.TableView != null){				
-				if (anim == UITableViewRowAnimation.None)
-					root.TableView.ReloadData ();
-				else
-					InsertVisual (idx, anim, pos-idx);
+			if (root?.TableView != null)
+			{
+				InsertVisual(idx, anim, count);
 			}
 			return count;
 		}
@@ -2437,7 +2501,7 @@ namespace MonoTouch.Dialog
 		{
 			var root = Parent as RootElement;
 			
-			if (root == null || root.TableView == null)
+			if (root?.TableView == null)
 				return;
 			
 			int sidx = root.IndexOf (this);
@@ -2593,20 +2657,32 @@ namespace MonoTouch.Dialog
 	/// </summary>
 	public class RadioGroup : Group {
 		int selected;
-		public virtual int Selected {
+
+		public event NSAction SelectedChanged;
+
+		public virtual int Selected
+		{
 			get { return selected; }
-			set { selected = value; }
+			set
+			{
+				if (selected != value)
+				{
+					selected = value;
+					SelectedChanged?.Invoke();
+				}
+			}
 		}
-		
-		public RadioGroup (string key, int selected) : base (key)
+
+		public string NotSelectedCaption { get; set; }
+
+		public RadioGroup(string key, int selected, string notSelectedCaption = null) : base(key)
 		{
 			this.selected = selected;
+			NotSelectedCaption = notSelectedCaption;
 		}
-		
-		public RadioGroup (int selected) : base (null)
-		{
-			this.selected = selected;
-		}
+
+		public RadioGroup(int selected, string notSelectedCaption = null) : this(null, selected, notSelectedCaption)
+		{ }
 	}
 	
 	/// <summary>
@@ -2639,10 +2715,13 @@ namespace MonoTouch.Dialog
 		static NSString rkey2 = new NSString ("RootElement2");
 		int summarySection, summaryElement;
 		internal Group group;
-		public bool UnevenRows;
+        private bool searchable;
+        public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
-		
+		public string Value;
+		static UIFont font = UIFont.BoldSystemFontOfSize(17);
+
 		// This is used to indicate that we need the DVC to dispatch calls to
 		// WillDisplayCell so we can prepare the color of the cell before 
 		// display
@@ -2654,10 +2733,31 @@ namespace MonoTouch.Dialog
 		/// <param name="caption">
 		///  The caption to render.
 		/// </param>
-		public RootElement (string caption) : base (caption)
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement (string caption, bool searchable = false) : base (caption)
 		{
 			summarySection = -1;
 			Sections = new List<Section> ();
+			this.searchable = searchable;
+		}
+
+		/// <summary>
+		///  Initializes a RootSection with a caption
+		/// </summary>
+		/// <param name="caption">
+		///  The caption to render.
+		/// </param>
+		/// <param name="value">
+		///  The value to render.
+		/// </param>
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement(string caption, string value, bool searchable = false) : this(caption, searchable)
+		{
+			Value = value;
 		}
 
 		/// <summary>
@@ -2687,7 +2787,10 @@ namespace MonoTouch.Dialog
 		/// <param name="element">
 		/// The element index inside the section that contains the summary for this RootSection.
 		/// </param>
-		public 	RootElement (string caption, int section, int element) : base (caption)
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement (string caption, int section, int element, bool searchable = false) : this (caption, searchable)
 		{
 			summarySection = section;
 			summaryElement = element;
@@ -2703,7 +2806,10 @@ namespace MonoTouch.Dialog
 		/// The group that contains the checkbox or radio information.  This is used to display
 		/// the summary information when a RootElement is rendered inside a section.
 		/// </param>
-		public RootElement (string caption, Group group) : base (caption)
+		/// <param name="searchable">
+		/// Turn on Search for elements.
+		/// </param>
+		public RootElement (string caption, Group group, bool searchable = false) : this (caption, searchable)
 		{
 			this.group = group;
 		}
@@ -2716,19 +2822,19 @@ namespace MonoTouch.Dialog
 			if (radio == null)
 				return null;
 			
-			uint current = 0, section = 0;
+			uint section = 0;
 			foreach (Section s in Sections){
 				uint row = 0;
 				
 				foreach (Element e in s.Elements){
-					if (!(e is RadioElement))
+					var element = e as RadioElement;
+					if (element == null)
 						continue;
 					
-					if (current == idx){
+					if (element.RadioIdx == idx){
 						return NSIndexPath.Create(section, row); 
 					}
 					row++;
-					current++;
 				}
 				section++;
 			}
@@ -2764,8 +2870,10 @@ namespace MonoTouch.Dialog
 			foreach (Section s in Sections){				
 				foreach (Element e in s.Elements){
 					var re = e as RadioElement;
-					if (re != null)
+					if (re != null && !re.RadioIdx.HasValue)
+					{
 						re.RadioIdx = current++;
+					}
 					if (UnevenRows == false && e is IElementSizing)
 						UnevenRows = true;
 					if (NeedColorUpdate == false && e is IColorizeBackground)
@@ -2977,61 +3085,42 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
+		public event NSAction RadioSelectedChanged
+		{
+			add
+			{
+				if (group is RadioGroup radio)
+				{
+					radio.SelectedChanged += value;
+				}
+			}
+			remove
+			{
+				if (group is RadioGroup radio)
+				{
+					radio.SelectedChanged -= value;
+				}
+			}
+		}
+
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			NSString key = summarySection == -1 ? rkey1 : rkey2;
+			var summarized = summarySection != -1 || group != null || Value != null;
+			var key = summarized ? rkey2 : rkey1;
 			var cell = tv.DequeueReusableCell (key);
 			if (cell == null){
-				var style = summarySection == -1 ? UITableViewCellStyle.Default : UITableViewCellStyle.Value1;
+				var style = summarized ? UITableViewCellStyle.Value1 : UITableViewCellStyle.Default;
 				
 				cell = new UITableViewCell (style, key);
 				cell.SelectionStyle = UITableViewCellSelectionStyle.Blue;
+				cell.TextLabel.Font = font;
 			} 
 		
 			cell.TextLabel.Text = Caption;
-			var radio = group as RadioGroup;
-			if (radio != null){
-				int selected = radio.Selected;
-				int current = 0;
-				
-				foreach (var s in Sections){
-					foreach (var e in s.Elements){
-						if (!(e is RadioElement))
-							continue;
-						
-						if (current == selected){
-							cell.DetailTextLabel.Text = e.Summary ();
-							goto le;
-						}
-						current++;
-					}
-				}
-			} else if (group != null){
-				int count = 0;
-				
-				foreach (var s in Sections){
-					foreach (var e in s.Elements){
-						var ce = e as CheckboxElement;
-						if (ce != null){
-							if (ce.Value)
-								count++;
-							continue;
-						}
-						var be = e as BoolElement;
-						if (be != null){
-							if (be.Value)
-								count++;
-							continue;
-						}
-					}
-				}
-				cell.DetailTextLabel.Text = count.ToString ();
-			} else if (summarySection != -1 && summarySection < Sections.Count){
-					var s = Sections [summarySection];
-					if (summaryElement < s.Elements.Count && cell.DetailTextLabel != null)
-						cell.DetailTextLabel.Text = s.Elements [summaryElement].Summary ();
-			} 
-		le:
+			if (cell.DetailTextLabel != null)
+			{
+				cell.DetailTextLabel.Text = Summary();
+			}
 			cell.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			
 			return cell;
@@ -3054,7 +3143,8 @@ namespace MonoTouch.Dialog
 				return createOnSelected (this);
 			
 			return new DialogViewController (this, true) {
-				Autorotate = true
+				Autorotate = true,
+				EnableSearch = searchable
 			};
 		}
 		
@@ -3065,8 +3155,74 @@ namespace MonoTouch.Dialog
 			PrepareDialogViewController (newDvc);
 			dvc.ActivateController (newDvc);
 		}
-		
-		public void Reload (Section section, UITableViewRowAnimation animation)
+
+        public override string Summary()
+        {
+			if (group is RadioGroup radio)
+			{
+				int selected = radio.Selected;
+				int current = 0;
+
+				foreach (var s in Sections)
+				{
+					foreach (var e in s.Elements)
+					{
+						if (!(e is RadioElement))
+							continue;
+
+						if (current == selected)
+						{
+							return e.Summary();
+						}
+						current++;
+					}
+				}
+
+				if (radio.NotSelectedCaption != null)
+				{
+					return radio.NotSelectedCaption;
+				}
+			}
+			else if (group != null)
+			{
+				int count = 0;
+
+				foreach (var s in Sections)
+				{
+					foreach (var e in s.Elements)
+					{
+						if (e is CheckboxElement ce)
+						{
+							if (ce.Value)
+								count++;
+							continue;
+						}
+						if (e is BoolElement be)
+						{
+							if (be.Value)
+								count++;
+							continue;
+						}
+					}
+				}
+				return count.ToString();
+			}
+			else if (summarySection != -1 && summarySection < Sections.Count)
+			{
+				var s = Sections[summarySection];
+				if (summaryElement < s.Elements.Count)
+				{
+					return s.Elements[summaryElement].Summary();
+				}
+			}
+			else if (Value != null)
+			{
+				return Value;
+			}
+            return base.Summary();
+        }
+
+        public void Reload (Section section, UITableViewRowAnimation animation)
 		{
 			if (section == null)
 				throw new ArgumentNullException ("section");
