@@ -2672,16 +2672,17 @@ namespace MonoTouch.Dialog
 				}
 			}
 		}
-		
-		public RadioGroup (string key, int selected) : base (key)
+
+		public string NotSelectedCaption { get; set; }
+
+		public RadioGroup(string key, int selected, string notSelectedCaption = null) : base(key)
 		{
 			this.selected = selected;
+			NotSelectedCaption = notSelectedCaption;
 		}
-		
-		public RadioGroup (int selected) : base (null)
-		{
-			this.selected = selected;
-		}
+
+		public RadioGroup(int selected, string notSelectedCaption = null) : this(null, selected, notSelectedCaption)
+		{ }
 	}
 	
 	/// <summary>
@@ -3175,6 +3176,11 @@ namespace MonoTouch.Dialog
 						}
 						current++;
 					}
+				}
+
+				if (radio.NotSelectedCaption != null)
+				{
+					return radio.NotSelectedCaption;
 				}
 			}
 			else if (group != null)
