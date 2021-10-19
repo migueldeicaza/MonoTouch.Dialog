@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MonoTouch.Dialog</RootNamespace>
+    <AssemblyName>MonoTouch.Dialog</AssemblyName>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <RootDirectory>$(MSBuildThisFileDirectory)/../</RootDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(RootDirectory)Elements.cs" />
+    <Compile Include="$(RootDirectory)DialogViewController.cs" />
+    <Compile Include="$(RootDirectory)Reflect.cs" />
+    <Compile Include="$(RootDirectory)Utilities\Graphics.cs" />
+    <Compile Include="$(RootDirectory)OldElements\LoadMoreElement.cs" />
+    <Compile Include="$(RootDirectory)Utilities\ImageLoader.cs" />
+    <Compile Include="$(RootDirectory)Utilities\LRUCache.cs" />
+    <Compile Include="$(RootDirectory)Elements\MessageElement.cs" />
+    <Compile Include="$(RootDirectory)Elements\OwnerDrawnElement.cs" />
+    <Compile Include="$(RootDirectory)Elements\ActivityElement.cs" />
+    <Compile Include="$(RootDirectory)Elements\ElementBadge.cs" />
+    <Compile Include="$(RootDirectory)Utilities\Controls.cs" />
+    <Compile Include="$(RootDirectory)Utilities\GlassButton.cs" />
+    <Compile Include="$(RootDirectory)Utilities\LocalizationExtensions.cs" />
+    <Compile Include="$(RootDirectory)Elements\Json.cs" />
+  </ItemGroup>
+</Project>

@@ -9,6 +9,7 @@
 // TODO: Json to load entire view controllers
 //
 
+#if !NET // This code needs to be migrated to use System.Text.Json in .NET
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -847,3 +848,4 @@ namespace MonoTouch.Dialog {
 		}
 	}
 }
+#endif // !NET
