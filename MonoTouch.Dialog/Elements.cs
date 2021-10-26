@@ -23,6 +23,7 @@ using UIKit;
 using CoreGraphics;
 using Foundation;
 using CoreAnimation;
+using ObjCRuntime;
 using MonoTouch.Dialog.Utilities;
 
 using NSAction = global::System.Action;

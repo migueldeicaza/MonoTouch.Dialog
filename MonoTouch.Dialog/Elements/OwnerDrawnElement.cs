@@ -5,6 +5,7 @@ using UIKit;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
+using ObjCRuntime;
 
 namespace MonoTouch.Dialog
 {

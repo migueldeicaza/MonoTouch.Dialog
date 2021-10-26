@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Foundation;
 using UIKit;
 using CoreGraphics;
+using ObjCRuntime;
 using NSAction = global::System.Action;
 
 namespace MonoTouch.Dialog
