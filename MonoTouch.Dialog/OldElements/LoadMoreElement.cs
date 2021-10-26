@@ -10,6 +10,7 @@ using CoreFoundation;
 using Foundation;
 using UIKit;
 using CoreGraphics;
+using ObjCRuntime;
 
 namespace MonoTouch.Dialog
 {
