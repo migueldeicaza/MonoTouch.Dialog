@@ -574,10 +574,10 @@ namespace MonoTouch.Dialog
 	public partial class HtmlElement : Element {
 		NSUrl nsUrl;
 		static NSString hkey = new NSString ("HtmlElement");
-#if !__TVOS__
+#if !__TVOS__ && !__MACCATALYST__
 		// There is no UIWebView in tvOS, so we can't launch anything.
 		UIWebView web;
-#endif // !__TVOS__
+#endif // !__TVOS__ && !__MACCATALYST__
 		
 		public HtmlElement (string caption, string url) : base (caption)
 		{
@@ -624,7 +624,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-#if !__TVOS__
+#if !__TVOS__ && !__MACCATALYST__
 		// We use this class to dispose the web control when it is not
 		// in use, as it could be a bit of a pig, and we do not want to
 		// wait for the GC to kick-in.
@@ -692,7 +692,7 @@ namespace MonoTouch.Dialog
 			dvc.ActivateController (vc);
 			web.LoadRequest (NSUrlRequest.FromUrl (nsUrl));
 		}
-#endif // !__TVOS__
+#endif // !__TVOS__ && !__MACCATALYST__
 	}
 
 	/// <summary>
