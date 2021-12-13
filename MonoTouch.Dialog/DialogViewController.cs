@@ -285,7 +285,6 @@ namespace MonoTouch.Dialog
 			WeakReference<DialogViewController> container;
 			protected DialogViewController Container => container.TryGetTarget (out var result) ? result : null;
 			protected RootElement Root;
-			bool checkForRefresh;
 			
 			public Source (DialogViewController container)
 			{
