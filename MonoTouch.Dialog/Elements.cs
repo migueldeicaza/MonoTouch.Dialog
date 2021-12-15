@@ -1400,11 +1400,20 @@ namespace MonoTouch.Dialog
 				this.path = path;
 			}
 			
+#if !NET
 			public override void FinishedPickingImage (UIImagePickerController picker, UIImage image, NSDictionary editingInfo)
 			{
 				container.Picked (image);
 				table.ReloadRows (new NSIndexPath [] { path }, UITableViewRowAnimation.None);
 			}
+#else
+			public override void FinishedPickingMedia (UIImagePickerController picker, NSDictionary info)
+			{
+				var image = (UIImage) (info [UIImagePickerController.OriginalImage] ?? info [UIImagePickerController.EditedImage]);
+				container.Picked (image);
+				table.ReloadRows (new NSIndexPath [] { path }, UITableViewRowAnimation.None);
+			}
+#endif
 		}
 		
 		void Picked (UIImage image)
