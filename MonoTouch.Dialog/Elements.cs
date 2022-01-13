@@ -1645,6 +1645,11 @@ namespace MonoTouch.Dialog
 
 		public bool NotifyChangedOnKeyStroke { get; set; }
 
+		/// <summary>
+		/// Show space char in the end of right aligned entry input.
+		/// </summary>
+		public bool VisibleSpaceEnding { get; set; }
+
 		UITextAlignment textalignment = UITextAlignment.Left;
 		UIKeyboardType keyboardType = UIKeyboardType.Default;
 		UIReturnKeyType? returnKeyType = null;
@@ -1788,8 +1793,15 @@ namespace MonoTouch.Dialog
 			if (entry == null) {
 				entry = CreateTextField (entryFrame);
 				entry.EditingChanged += delegate {
-					if(NotifyChangedOnKeyStroke) {
-						FetchValue ();
+					if (VisibleSpaceEnding 
+						&& textalignment == UITextAlignment.Right
+						&& entry.Text.EndsWith(' '))
+                    {
+						entry.Text = entry.Text.Substring(0, entry.Text.Length - 1) + '\u00a0';
+                    }
+					if (NotifyChangedOnKeyStroke) 
+					{
+						FetchValue();
 					}
 				};
 				entry.ValueChanged += delegate {
@@ -1872,7 +1884,7 @@ namespace MonoTouch.Dialog
 		
 		/// <summary>
 		///  Copies the value from the UITextField in the EntryElement to the
-		//   Value property and raises the Changed event if necessary.
+		///  Value property and raises the Changed event if necessary.
 		/// </summary>
 		public void FetchValue ()
 		{
@@ -1880,6 +1892,10 @@ namespace MonoTouch.Dialog
 				return;
 
 			var newValue = entry.Text;
+            if (VisibleSpaceEnding)
+            {
+				newValue = newValue.Replace('\u00a0', ' ');
+            }
 			if (newValue == Value)
 				return;
 			
