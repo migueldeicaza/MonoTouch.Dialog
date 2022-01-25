@@ -365,7 +365,11 @@ namespace MonoTouch.Dialog
 			{
 				var section = Root.Sections [(int) sectionIdx];
 				if (section.HeaderView == null)
+#if NET6_0 && !NET7_0
+					return new NFloat (-1);
+#else
 					return -1;
+#endif
 				return section.HeaderView.Frame.Height;
 			}
 
@@ -379,7 +383,11 @@ namespace MonoTouch.Dialog
 			{
 				var section = Root.Sections [(int) sectionIdx];
 				if (section.FooterView == null)
+#if NET6_0 && !NET7_0
+					return new NFloat (-1);
+#else
 					return -1;
+#endif
 				return section.FooterView.Frame.Height;
 			}			
 
@@ -469,7 +477,11 @@ namespace MonoTouch.Dialog
 			// which require bigger changes, so just skip this for now.
 #else
 			if (enableSearch){
+#if NET6_0 && !NET7_0
+				searchBar = new UISearchBar (new CGRect (new NFloat (0), new NFloat (0), tableView.Bounds.Width, new NFloat (44))) {
+#else
 				searchBar = new UISearchBar (new CGRect (0, 0, tableView.Bounds.Width, 44)) {
+#endif
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
@@ -540,7 +552,11 @@ namespace MonoTouch.Dialog
 			base.ViewWillAppear (animated);
 			if (AutoHideSearch){
 				if (enableSearch){
+#if NET6_0 && !NET7_0
+					if (TableView.ContentOffset.Y.Value < 44)
+#else
 					if (TableView.ContentOffset.Y < 44)
+#endif
 						TableView.ContentOffset = new CGPoint (0, 44);
 				}
 			}

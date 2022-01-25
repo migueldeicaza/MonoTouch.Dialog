@@ -64,7 +64,11 @@ namespace MonoTouch.Dialog
 		public UIFont Font {
 			get {
 				if (font == null)
+#if NET6_0 && !NET7_0
+					font = UIFont.FromName ("Helvetica", new NFloat (17f));
+#else
 					font = UIFont.FromName ("Helvetica", 17f);
+#endif
 				return font;
 			}
 			set {
@@ -102,11 +106,20 @@ namespace MonoTouch.Dialog
 
 		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
+#if NET6_0 && !NET7_0
+			CGSize size = new CGSize (new NFloat (tableView.Bounds.Width.Value - 40), NFloatHelpers.MaxValue);
+			nfloat height = new NFloat (Caption.StringSize (Font, size, LineBreakMode).Height.Value + 10);
+#else
 			CGSize size = new CGSize (tableView.Bounds.Width - 40, nfloat.MaxValue);
 			nfloat height = Caption.StringSize (Font, size, LineBreakMode).Height + 10;
+#endif
 			
 			// Image is 57 pixels tall, add some padding
+#if NET6_0 && !NET7_0
+			return new NFloat (Math.Max (height.Value, 63));
+#else
 			return (nfloat)Math.Max (height, 63);
+#endif
 		}
 
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
@@ -131,21 +144,37 @@ namespace MonoTouch.Dialog
 					var start = context.TextPosition.X;					
 					context.SetTextDrawingMode (CGTextDrawingMode.Invisible);
 					context.ShowText (smallText);
+#if NET6_0 && !NET7_0
+					var width = new NFloat (context.TextPosition.X.Value - start.Value);
+#else
 					var width = context.TextPosition.X - start;
+#endif
 					
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
+#if NET6_0 && !NET7_0
+					context.ShowTextAtPoint ((57-(float) width.Value)/2, 46, smallText);
+#else
 					context.ShowTextAtPoint ((57-width)/2, 46, smallText);
+#endif
 					
 					// The big string
 					context.SelectFont ("Helvetica-Bold", 32, CGTextEncoding.MacRoman);					
 					start = context.TextPosition.X;
 					context.SetTextDrawingMode (CGTextDrawingMode.Invisible);
 					context.ShowText (bigText);
+#if NET6_0 && !NET7_0
+					width = new NFloat (context.TextPosition.X.Value - start.Value);
+#else
 					width = context.TextPosition.X - start;
+#endif
 					
 					context.SetFillColor (0, 0, 0, 1);
 					context.SetTextDrawingMode (CGTextDrawingMode.Fill);
+#if NET6_0 && !NET7_0
+					context.ShowTextAtPoint ((57-(float) width.Value)/2, 9, bigText);
+#else
 					context.ShowTextAtPoint ((57-width)/2, 9, bigText);
+#endif
 					
 					context.StrokePath ();
 				

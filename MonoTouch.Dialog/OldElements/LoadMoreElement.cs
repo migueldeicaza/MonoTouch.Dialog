@@ -30,8 +30,11 @@ namespace MonoTouch.Dialog
 		public LoadMoreElement () : base ("")
 		{
 		}
-		
+#if NET6_0 && !NET7_0
+		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped) : this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (new NFloat (16)), UIColor.Black)
+#else
 		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped) : this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (16), UIColor.Black)
+#endif
 		{
 		}
 		
@@ -84,7 +87,11 @@ namespace MonoTouch.Dialog
 			}
 			caption.BackgroundColor = UIColor.Clear;
 			caption.TextColor = TextColor ?? UIColor.Black;
+#if NET6_0 && !NET7_0
+			caption.Font = Font ?? UIFont.BoldSystemFontOfSize (new NFloat (16));
+#else
 			caption.Font = Font ?? UIFont.BoldSystemFontOfSize (16);
+#endif
 			caption.TextAlignment = Alignment;
 			Layout (cell, activityIndicator, caption);
 			return cell;
@@ -131,7 +138,11 @@ namespace MonoTouch.Dialog
 		
 		CGSize GetTextSize (string text)
 		{
+#if NET6_0 && !NET7_0
+			return new NSString (text).StringSize (Font, (float)UIScreen.MainScreen.Bounds.Width.Value, UILineBreakMode.TailTruncation);
+#else
 			return new NSString (text).StringSize (Font, (float)UIScreen.MainScreen.Bounds.Width, UILineBreakMode.TailTruncation);
+#endif
 		}
 		
 		const int pad = 10;
@@ -139,7 +150,11 @@ namespace MonoTouch.Dialog
 		
 		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
+#if NET6_0 && !NET7_0
+			return new NFloat (Height ?? GetTextSize (Animating ? LoadingCaption : NormalCaption).Height.Value + 2*pad);
+#else
 			return Height ?? GetTextSize (Animating ? LoadingCaption : NormalCaption).Height + 2*pad;
+#endif
 		}
 		
 		void Layout (UITableViewCell cell, UIActivityIndicatorView activityIndicator, UILabel caption)
@@ -149,9 +164,17 @@ namespace MonoTouch.Dialog
 			var size = GetTextSize (Animating ? LoadingCaption : NormalCaption);
 			
 			if (!activityIndicator.Hidden)
+#if NET6_0 && !NET7_0
+				activityIndicator.Frame = new CGRect (new NFloat ((sbounds.Width.Value-size.Width.Value)/2-isize*2), new NFloat (pad), new NFloat (isize), new NFloat (isize));
+#else
 				activityIndicator.Frame = new CGRect ((sbounds.Width-size.Width)/2-isize*2, pad, isize, isize);
+#endif
 
+#if NET6_0 && !NET7_0
+			caption.Frame = new CGRect (new NFloat (10), new NFloat (pad), new NFloat (sbounds.Width.Value-20), new NFloat (size.Height.Value));
+#else
 			caption.Frame = new CGRect (10, pad, sbounds.Width-20, size.Height);
+#endif
 		}
 		
 		public UITextAlignment Alignment { 

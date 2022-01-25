@@ -370,7 +370,11 @@ namespace MonoTouch.Dialog
 		
 		public class TextWithImageCellView : UITableViewCell {
 			const int fontSize = 17;
+#if NET6_0 && !NET7_0
+			static UIFont font = UIFont.BoldSystemFontOfSize (new NFloat (fontSize));
+#else
 			static UIFont font = UIFont.BoldSystemFontOfSize (fontSize);
+#endif
 			BaseBooleanImageElement parent;
 			UILabel label;
 			UIButton button;
@@ -408,13 +412,24 @@ namespace MonoTouch.Dialog
 				base.LayoutSubviews ();
 				var full = ContentView.Bounds;
 				var frame = full;
+#if NET6_0 && !NET7_0
+				frame.Height = new NFloat (22);
+				frame.X = new NFloat (Padding);
+				frame.Y = new NFloat ((full.Height.Value-frame.Height.Value)/2);
+				frame.Width = new NFloat (frame.Width.Value - ImageSpace+Padding);
+#else
 				frame.Height = 22;
 				frame.X = Padding;
 				frame.Y = (full.Height-frame.Height)/2;
 				frame.Width -= ImageSpace+Padding;
+#endif
 				label.Frame = frame;
 				
+#if NET6_0 && !NET7_0
+				button.Frame = new CGRect (new NFloat (full.Width.Value-ImageSpace), new NFloat (-3), new NFloat (ImageSpace), new NFloat (48));
+#else
 				button.Frame = new CGRect (full.Width-ImageSpace, -3, ImageSpace, 48);
+#endif
 			}
 			
 			public void UpdateFrom (BaseBooleanImageElement newParent)
@@ -526,10 +541,18 @@ namespace MonoTouch.Dialog
 			if (Caption != null && ShowCaption){
 				cell.TextLabel.Text = Caption;
 				captionSize = Caption.StringSize (UIFont.FromName (cell.TextLabel.Font.Name, UIFont.LabelFontSize));
+#if NET6_0 && !NET7_0
+				captionSize.Width = new NFloat (captionSize.Width.Value + 10); // Spacing
+#else
 				captionSize.Width += 10; // Spacing
+#endif
 			}
 			if (slider == null){
+#if NET6_0 && !NET7_0
+				slider = new UISlider (new CGRect (new NFloat (10f + captionSize.Width.Value), new NFloat (UIDevice.CurrentDevice.CheckSystemVersion (7, 0) ? 18f : 12f), new NFloat (cell.ContentView.Bounds.Width.Value - 20 - captionSize.Width.Value), new NFloat (7f))) {
+#else
 				slider = new UISlider (new CGRect (10f + captionSize.Width, UIDevice.CurrentDevice.CheckSystemVersion (7, 0) ? 18f : 12f, cell.ContentView.Bounds.Width - 20 - captionSize.Width, 7f)) {
+#endif
 					BackgroundColor = UIColor.Clear,
 					MinValue = this.MinValue,
 					MaxValue = this.MaxValue,
@@ -878,7 +901,11 @@ namespace MonoTouch.Dialog
 			tl.Text = Caption;
 			tl.TextAlignment = Alignment;
 			tl.TextColor = TextColor ?? UIColor.Black;
+#if NET6_0 && !NET7_0
+			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (new NFloat (17));
+#else
 			tl.Font = Font ?? UIFont.BoldSystemFontOfSize (17);
+#endif
 			tl.LineBreakMode = LineBreakMode;
 			tl.Lines = Lines;	
 			
@@ -909,7 +936,11 @@ namespace MonoTouch.Dialog
 			if (cell.DetailTextLabel != null){
 				cell.DetailTextLabel.Lines = Lines;
 				cell.DetailTextLabel.LineBreakMode = LineBreakMode;
+#if NET6_0 && !NET7_0
+				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (new NFloat (14));
+#else
 				cell.DetailTextLabel.Font = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+#endif
 				cell.DetailTextLabel.TextColor = (extraInfo == null || extraInfo.DetailColor == null) ? UIColor.Gray : extraInfo.DetailColor;
 			}
 		}	
@@ -990,7 +1021,11 @@ namespace MonoTouch.Dialog
 
 		static public CGSize StringSize (this NSString self, UIFont font, float forWidth, UILineBreakMode lineBreakMode)
 		{
+#if NET6_0 && !NET7_0
+			return StringSize (self, font, new CGSize (new NFloat (forWidth), NFloatHelpers.MaxValue), lineBreakMode);
+#else
 			return StringSize (self, font, new CGSize (forWidth, nfloat.MaxValue), lineBreakMode);
+#endif
 		}
 
 		static public void DrawString (this string self, CGRect rect, UIFont font)
@@ -1046,10 +1081,18 @@ namespace MonoTouch.Dialog
 		public virtual nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
+#if NET6_0 && !NET7_0
+			CGSize maxSize = new CGSize (new NFloat (tableView.Bounds.Width.Value - margin), new NFloat (float.MaxValue));
+#else
 			CGSize maxSize = new CGSize (tableView.Bounds.Width - margin, float.MaxValue);
+#endif
 			
 			if (this.Accessory != UITableViewCellAccessory.None)
+#if NET6_0 && !NET7_0
+				maxSize.Width = new NFloat (maxSize.Width.Value - 20);
+#else
 				maxSize.Width -= 20;
+#endif
 
 			string c = Caption;
 			string v = Value;
@@ -1057,21 +1100,41 @@ namespace MonoTouch.Dialog
 			if (String.IsNullOrEmpty (c))
 				c = " ";
 
+#if NET6_0 && !NET7_0
+			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (new NFloat (17));
+#else
 			var captionFont = Font ?? UIFont.BoldSystemFontOfSize (17);
+#endif
 			var height = c.StringSize (captionFont, maxSize, LineBreakMode).Height;
 			
 			if (!String.IsNullOrEmpty (v)) {
+#if NET6_0 && !NET7_0
+				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (new NFloat (14));
+#else
 				var subtitleFont = SubtitleFont ?? UIFont.SystemFontOfSize (14);
+#endif
 				if (this.style == UITableViewCellStyle.Subtitle) {
+#if NET6_0 && !NET7_0
+					height = new NFloat (height.Value + v.StringSize (subtitleFont, maxSize, LineBreakMode).Height.Value);
+#else
 					height += v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
+#endif
 				} else {
 					var vheight = v.StringSize (subtitleFont, maxSize, LineBreakMode).Height;
+#if NET6_0 && !NET7_0
+					if (vheight.Value > height.Value)
+#else
 					if (vheight > height)
+#endif
 						height = vheight;
 				}
 			}
 			
+#if NET6_0 && !NET7_0
+			return new NFloat (height.Value + 10);
+#else
 			return height + 10;
+#endif
 		}
 	}
 	
@@ -1170,13 +1233,21 @@ namespace MonoTouch.Dialog
 		public virtual nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			float margin = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? 40f : 110f;
+#if NET6_0 && !NET7_0
+			CGSize size = new CGSize (new NFloat (tableView.Bounds.Width.Value - margin), new NFloat (float.MaxValue));
+#else
 			CGSize size = new CGSize (tableView.Bounds.Width - margin, float.MaxValue);
+#endif
 			UIFont font = UIFont.BoldSystemFontOfSize (17);
 			string c = Caption;
 			// ensure the (single-line) Value will be rendered inside the cell
 			if (String.IsNullOrEmpty (c) && !String.IsNullOrEmpty (Value))
 				c = " ";
+#if NET6_0 && !NET7_0
+			return new NFloat (c.StringSize (font, size, UILineBreakMode.WordWrap).Height.Value + 10);
+#else
 			return c.StringSize (font, size, UILineBreakMode.WordWrap).Height + 10;
+#endif
 		}
 	}
 	
@@ -1305,9 +1376,17 @@ namespace MonoTouch.Dialog
 			var img = source.CGImage;
 			ctx.TranslateCTM (0, dimy);
 			if (img.Width > img.Height)
+#if NET6_0 && !NET7_0
+				ctx.ScaleCTM (1, -img.Width/dimy);
+#else
 				ctx.ScaleCTM (1, (nfloat)(-img.Width/dimy));
+#endif
 			else
+#if NET6_0 && !NET7_0
+				ctx.ScaleCTM (img.Height/dimx, -1);
+#else
 				ctx.ScaleCTM ((nfloat)img.Height/dimx, -1);
+#endif
 
 			ctx.DrawImage (rect, source.CGImage);
 			
@@ -1656,7 +1735,11 @@ namespace MonoTouch.Dialog
 		//
 		CGSize ComputeEntryPosition (UITableView tv, UITableViewCell cell)
 		{
+#if NET6_0 && !NET7_0
+			nfloat maxWidth = new NFloat (-15); // If all EntryElements have a null Caption, align UITextField with the Caption offset of normal cells (at 10px).
+#else
 			nfloat maxWidth = -15; // If all EntryElements have a null Caption, align UITextField with the Caption offset of normal cells (at 10px).
+#endif
 			nfloat maxHeight = font.LineHeight;
 
 			// Determine if we should calculate accross all sections or just the current section.
@@ -1673,13 +1756,22 @@ namespace MonoTouch.Dialog
 								
 						var size = ee.Caption.StringSize (font);
 
+#if NET6_0 && !NET7_0
+						maxWidth = new NFloat (Math.Max (size.Width.Value, maxWidth.Value));
+						maxHeight = new NFloat (Math.Max (size.Height.Value, maxHeight.Value));
+#else
 						maxWidth = (nfloat) Math.Max (size.Width, maxWidth);
 						maxHeight = (nfloat) Math.Max (size.Height, maxHeight);
+#endif
 					}
 				}
 			}
 
+#if NET6_0 && !NET7_0
+			return new CGSize (new NFloat (25 + Math.Min (maxWidth.Value, 160)), maxHeight);
+#else
 			return new CGSize (25 + (nfloat) Math.Min (maxWidth, 160), maxHeight);
+#endif
 		}
 
 		protected virtual UITextField CreateTextField (CGRect frame)
@@ -1716,16 +1808,33 @@ namespace MonoTouch.Dialog
 			cell.TextLabel.Text = Caption;
 
 			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
+#if NET6_0 && !NET7_0
+			cell.Frame = new CGRect(cell.Frame.X, cell.Frame.Y, new NFloat (tv.Frame.Width.Value-offset), cell.Frame.Height);
+#else
 			cell.Frame = new CGRect(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
+#endif
 			CGSize size = ComputeEntryPosition (tv, cell);
+#if NET6_0 && !NET7_0
+			nfloat yOffset = new NFloat ((cell.ContentView.Bounds.Height.Value - size.Height.Value) / 2 - 1);
+			nfloat width = new NFloat (cell.ContentView.Bounds.Width.Value - size.Width.Value);
+#else
 			nfloat yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
 			nfloat width = cell.ContentView.Bounds.Width - size.Width;
+#endif
 			if (textalignment == UITextAlignment.Right) {
 				// Add padding if right aligned
+#if NET6_0 && !NET7_0
+				width = new NFloat (width.Value - 10);
+#else
 				width -= 10;
+#endif
 			}
 #if __TVOS__
+#if NET6_0 && !NET7_0
+			var entryFrame = new CGRect (size.Width, yOffset, width, new NFloat (size.Height.Value + 20) /* FIXME: figure out something better than adding a magic number */);
+#else
 			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height + 20 /* FIXME: figure out something better than adding a magic number */);
+#endif
 #else
 			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height);
 #endif
@@ -2070,22 +2179,41 @@ namespace MonoTouch.Dialog
 			}
 			set {
 				var viewFrame = View.Frame;
+#if NET6_0 && !NET7_0
+				var dx = new NFloat (value.Left.Value - insets.Left.Value);
+				var dy = new NFloat (value.Top.Value - insets.Top.Value);
+				var ow = new NFloat (insets.Left.Value + insets.Right.Value);
+				var oh = new NFloat (insets.Top.Value + insets.Bottom.Value);
+				var w = new NFloat (value.Left.Value + value.Right.Value);
+				var h = new NFloat (value.Top.Value + value.Bottom.Value);
+#else
 				var dx = value.Left - insets.Left;
 				var dy = value.Top - insets.Top;
 				var ow = insets.Left + insets.Right;
 				var oh = insets.Top + insets.Bottom;
 				var w = value.Left + value.Right;
 				var h = value.Top + value.Bottom;
+#endif
 
+#if NET6_0 && !NET7_0
+				ContainerView.Frame = new CGRect (new NFloat (0), new NFloat (0), new NFloat (ContainerView.Frame.Width.Value + w.Value - ow.Value), new NFloat (ContainerView.Frame.Height.Value + h.Value -oh.Value));
+				viewFrame.X = new NFloat (viewFrame.X.Value + dx.Value);
+				viewFrame.Y = new NFloat (viewFrame.Y.Value + dy.Value);
+#else
 				ContainerView.Frame = new CGRect (0, 0, ContainerView.Frame.Width + w - ow, ContainerView.Frame.Height + h -oh);
 				viewFrame.X += dx;
 				viewFrame.Y += dy;
+#endif
 				View.Frame = viewFrame;
 
 				insets = value;
 
 				// Height changed, notify UITableView
+#if NET6_0 && !NET7_0
+				if (dy.Value != 0 || h.Value != oh.Value)
+#else
 				if (dy != 0 || h != oh)
+#endif
 					GetContainerTableView ().ReloadData ();
 				
 			}
@@ -2116,15 +2244,25 @@ namespace MonoTouch.Dialog
 			this.insets = insets;
 			var oframe = view.Frame;
 			var frame = oframe;
+#if NET6_0 && !NET7_0
+			frame.Width = new NFloat (frame.Width.Value + insets.Left.Value + insets.Right.Value);
+			frame.Height = new NFloat (frame.Height.Value + insets.Top.Value + insets.Bottom.Value);
+#else
 			frame.Width += insets.Left + insets.Right;
 			frame.Height += insets.Top + insets.Bottom;
+#endif
 
 			ContainerView = new UIView (frame);
 			if ((Flags & CellFlags.Transparent) != 0)
 				ContainerView.BackgroundColor = UIColor.Clear;
 
+#if NET6_0 && !NET7_0
+			if (insets.Left.Value != 0 || insets.Top.Value != 0)
+				view.Frame = new CGRect (new NFloat (insets.Left.Value + frame.X.Value), new NFloat (insets.Top.Value + frame.Y.Value), new NFloat (frame.Width.Value), new NFloat (frame.Height.Value));
+#else
 			if (insets.Left != 0 || insets.Top != 0)
 				view.Frame = new CGRect (insets.Left + frame.X, insets.Top + frame.Y, frame.Width, frame.Height);
+#endif
 
 			ContainerView.AddSubview (view);
 			this.View = view;
@@ -2169,7 +2307,11 @@ namespace MonoTouch.Dialog
 		
 		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
+#if NET6_0 && !NET7_0
+			return new NFloat (ContainerView.Bounds.Height.Value+1);
+#else
 			return ContainerView.Bounds.Height+1;
+#endif
 		}
 		
 		protected override void Dispose (bool disposing)

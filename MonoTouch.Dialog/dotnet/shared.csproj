@@ -23,5 +23,6 @@
     <Compile Include="$(RootDirectory)Utilities\GlassButton.cs" />
     <Compile Include="$(RootDirectory)Utilities\LocalizationExtensions.cs" />
     <Compile Include="$(RootDirectory)Elements\Json.cs" />
+    <Compile Include="$(RootDirectory)..\..\..\tests\common\DotNetGlobals.cs" />
   </ItemGroup>
 </Project>

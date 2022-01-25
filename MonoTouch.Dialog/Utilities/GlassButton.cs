@@ -31,7 +31,11 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public GlassButton (CGRect frame) : base (frame)
 		{
+#if NET6_0 && !NET7_0
+			NormalColor = new UIColor (new NFloat (0.55f), new NFloat (0.04f), new NFloat (0.02f), new NFloat (1));
+#else
 			NormalColor = new UIColor (0.55f, 0.04f, 0.02f, 1);
+#endif
 			HighlightedColor = UIColor.Black;
 			DisabledColor = UIColor.Gray;
 		}
@@ -91,18 +95,30 @@ namespace MonoTouch.Dialog
 			context.Clip ();
 			
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
+#if NET6_0 && !NET7_0
+				var topCenter = new CGPoint (bounds.GetMidX (), new NFloat (0));
+#else
 				var topCenter = new CGPoint (bounds.GetMidX (), 0);
+#endif
 				var midCenter = new CGPoint (bounds.GetMidX (), bounds.GetMidY ());
 				var bottomCenter = new CGPoint (bounds.GetMidX (), bounds.GetMaxY ());
 
+#if NET6_0 && !NET7_0
+				using (var gradient = new CGGradient (cs, new nfloat [] { new NFloat (0.23f), new NFloat (0.23f), new NFloat (0.23f), new NFloat (alpha), new NFloat (0.47f), new NFloat (0.47f), new NFloat (0.47f), new NFloat (alpha) }, new nfloat [] {new NFloat (0), new NFloat (1)})){
+#else
 				using (var gradient = new CGGradient (cs, new nfloat [] { 0.23f, 0.23f, 0.23f, alpha, 0.47f, 0.47f, 0.47f, alpha }, new nfloat [] {0, 1})){
+#endif
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
 				}
 				
 				container = GraphicsUtil.MakeRoundedRectPath (bounds.Inset (1, 1), 13);
 				context.AddPath (container);
 				context.Clip ();
+#if NET6_0 && !NET7_0
+				using (var gradient = new CGGradient (cs, new nfloat [] { new NFloat (0.05f), new NFloat (0.05f), new NFloat (0.05f), new NFloat (alpha), new NFloat (0.15f), new NFloat (0.15f), new NFloat (0.15f), new NFloat (alpha) }, new nfloat [] {new NFloat (0), new NFloat (1)})){
+#else
 				using (var gradient = new CGGradient (cs, new nfloat [] { 0.05f, 0.05f, 0.05f, alpha, 0.15f, 0.15f, 0.15f, alpha}, new nfloat [] {0, 1})){
+#endif
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
 				}
 				
@@ -114,7 +130,11 @@ namespace MonoTouch.Dialog
 				background.SetFill ();
 				context.FillRect (nb);
 				
+#if NET6_0 && !NET7_0
+				using (var gradient = new CGGradient (cs, new nfloat [] { new NFloat (1), new NFloat (1), new NFloat (1), new NFloat (.35f), new NFloat (1), new NFloat (1), new NFloat (1), new NFloat (0.06f) }, new nfloat [] { new NFloat (0), new NFloat (1) })){
+#else
 				using (var gradient = new CGGradient (cs, new nfloat [] { 1, 1, 1, .35f, 1, 1, 1, 0.06f }, new nfloat [] { 0, 1 })){
+#endif
 					context.DrawLinearGradient (gradient, topCenter, midCenter, 0);
 				}
 				context.SetLineWidth (2);
@@ -122,7 +142,11 @@ namespace MonoTouch.Dialog
 				context.ReplacePathWithStrokedPath ();
 				context.Clip ();
 
+#if NET6_0 && !NET7_0
+				using (var gradient = new CGGradient (cs, new nfloat [] { new NFloat (1), new NFloat (1), new NFloat (1), new NFloat (0.5f), new NFloat (0.5f), new NFloat (0.5f), new NFloat (0.5f), new NFloat (0.5f) }, new nfloat [] { new NFloat (0), new NFloat (1) })){
+#else
 				using (var gradient = new CGGradient (cs, new nfloat [] { 1, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }, new nfloat [] { 0, 1 })){
+#endif
 					context.DrawLinearGradient (gradient, topCenter, bottomCenter, 0);
 				}
 			}

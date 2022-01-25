@@ -22,10 +22,18 @@ namespace MonoTouch.Dialog
 		public static CGPath MakeRoundedRectPath (CGRect rect, nfloat radius)
 		{
 			nfloat minx = rect.Left;
+#if NET6_0 && !NET7_0
+			nfloat midx = new NFloat (rect.Left.Value + (rect.Width.Value)/2);
+#else
 			nfloat midx = rect.Left + (rect.Width)/2;
+#endif
 			nfloat maxx = rect.Right;
 			nfloat miny = rect.Top;
+#if NET6_0 && !NET7_0
+			nfloat midy = new NFloat (rect.Y.Value+rect.Size.Height.Value/2);
+#else
 			nfloat midy = rect.Y+rect.Size.Height/2;
+#endif
 			nfloat maxy = rect.Bottom;
 
 			var path = new CGPath ();
@@ -39,12 +47,26 @@ namespace MonoTouch.Dialog
 			return path;
         }
 		
+#if NET6_0 && !NET7_0
+		public static CGPath MakeRoundedRectPath (CGRect rect, float radius)
+		{
+			return MakeRoundedRectPath (rect, new NFloat (radius));
+		}
+#endif
+
 		public static void FillRoundedRect (CGContext ctx, CGRect rect, nfloat radius)
 		{
 				var p = GraphicsUtil.MakeRoundedRectPath (rect, radius);
 				ctx.AddPath (p);
 				ctx.FillPath ();
 		}
+
+#if NET6_0 && !NET7_0
+		public static void FillRoundedRect (CGContext ctx, CGRect rect, float radius)
+		{
+				FillRoundedRect (ctx, rect, new NFloat (radius));
+		}
+#endif
 
 		public static CGPath MakeRoundedPath (float size, float radius)
 		{

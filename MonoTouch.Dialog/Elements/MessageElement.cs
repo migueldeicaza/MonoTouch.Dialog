@@ -9,10 +9,17 @@ using ObjCRuntime;
 namespace MonoTouch.Dialog {
 
 	public partial class MessageSummaryView : UIView {
+#if NET6_0 && !NET7_0
+		static UIFont SenderFont = UIFont.BoldSystemFontOfSize (new NFloat (19));
+		static UIFont SubjectFont = UIFont.SystemFontOfSize (new NFloat (14));
+		static UIFont TextFont = UIFont.SystemFontOfSize (new NFloat (13));
+		static UIFont CountFont = UIFont.BoldSystemFontOfSize (new NFloat (13));
+#else
 		static UIFont SenderFont = UIFont.BoldSystemFontOfSize (19);
 		static UIFont SubjectFont = UIFont.SystemFontOfSize (14);
 		static UIFont TextFont = UIFont.SystemFontOfSize (13);
 		static UIFont CountFont = UIFont.BoldSystemFontOfSize (13);
+#endif
 		public string Sender { get; private set; }
 		public string Body { get; private set; }
 		public string Subject { get; private set; }
@@ -25,7 +32,11 @@ namespace MonoTouch.Dialog {
 		static MessageSummaryView ()
 		{
 			using (var colorspace = CGColorSpace.CreateDeviceRGB ()){
+#if NET6_0 && !NET7_0
+				gradient = new CGGradient (colorspace, new nfloat [] { /* first */ new NFloat (.52f), new NFloat (.69f), new NFloat (.96f), new NFloat (1), /* second */ new NFloat (.12f), new NFloat (.31f), new NFloat (.67f), new NFloat (1) }, null); //new float [] { 0, 1 });
+#else
 				gradient = new CGGradient (colorspace, new nfloat [] { /* first */ .52f, .69f, .96f, 1, /* second */ .12f, .31f, .67f, 1 }, null); //new float [] { 0, 1 });
+#endif
 			}
 		}
 		
@@ -55,18 +66,39 @@ namespace MonoTouch.Dialog {
 			if (MessageCount > 0){
 				var ms = MessageCount.ToString ();
 				ssize = ms.StringSize (CountFont);
+#if NET6_0 && !NET7_0
+				boxWidth = new NFloat (Math.Min (22 + ssize.Width.Value, 18));
+				var crect = new CGRect (new NFloat (Bounds.Width.Value-20-boxWidth.Value), new NFloat (32), boxWidth, new NFloat (16));
+#else
 				boxWidth = (nfloat)Math.Min (22 + ssize.Width, 18);
 				var crect = new CGRect (Bounds.Width-20-boxWidth, 32, boxWidth, 16);
+#endif
 				
 				UIColor.Gray.SetFill ();
+#if NET6_0 && !NET7_0
+				GraphicsUtil.FillRoundedRect (ctx, crect, new NFloat (3));
+#else
 				GraphicsUtil.FillRoundedRect (ctx, crect, 3);
+#endif
 				UIColor.White.SetColor ();
+#if NET6_0 && !NET7_0
+				crect.X = new NFloat (crect.X.Value + 5);
+#else
 				crect.X += 5;
+#endif
 				ms.DrawString (crect, CountFont);
 				
+#if NET6_0 && !NET7_0
+				boxWidth = new NFloat (boxWidth.Value + padright);
+#else
 				boxWidth += padright;
+#endif
 			} else
+#if NET6_0 && !NET7_0
+				boxWidth = new NFloat (0);
+#else
 				boxWidth = 0;
+#endif
 			
 			UIColor.FromRGB (36, 112, 216).SetColor ();
 			var diff = DateTime.Now - Date;
@@ -81,20 +113,38 @@ namespace MonoTouch.Dialog {
 			else
 				label = Date.ToShortDateString ();
 			ssize = label.StringSize (SubjectFont);
+#if NET6_0 && !NET7_0
+			nfloat dateSize = new NFloat (ssize.Width.Value + padright + 5);
+			label.DrawString (new CGRect (new NFloat (Bounds.Width.Value-dateSize.Value), new NFloat (6), dateSize, new NFloat (14)), SubjectFont, UILineBreakMode.Clip, UITextAlignment.Left);
+#else
 			nfloat dateSize = ssize.Width + padright + 5;
 			label.DrawString (new CGRect (Bounds.Width-dateSize, 6, dateSize, 14), SubjectFont, UILineBreakMode.Clip, UITextAlignment.Left);
+#endif
 			
 			const int offset = 33;
+#if NET6_0 && !NET7_0
+			nfloat bw = new NFloat (Bounds.Width.Value-offset);
+#else
 			nfloat bw = Bounds.Width-offset;
+#endif
 			
 			UIColor.Black.SetColor ();
+#if NET6_0 && !NET7_0
+			Sender.DrawString (new CGPoint (offset, 2), (float)(bw.Value-dateSize.Value), SenderFont, UILineBreakMode.TailTruncation);
+			Subject.DrawString (new CGPoint (offset, 23), (float)(bw.Value-offset-boxWidth.Value), SubjectFont, UILineBreakMode.TailTruncation);
+#else
 			Sender.DrawString (new CGPoint (offset, 2), (float)(bw-dateSize), SenderFont, UILineBreakMode.TailTruncation);
 			Subject.DrawString (new CGPoint (offset, 23), (float)(bw-offset-boxWidth), SubjectFont, UILineBreakMode.TailTruncation);
+#endif
 			
 			//UIColor.Black.SetFill ();
 			//ctx.FillRect (new CGRect (offset, 40, bw-boxWidth, 34));
 			UIColor.Gray.SetColor ();
+#if NET6_0 && !NET7_0
+			Body.DrawString (new CGRect (new NFloat (offset), new NFloat (40), new NFloat (bw.Value-boxWidth.Value), new NFloat (34)), TextFont, UILineBreakMode.TailTruncation, UITextAlignment.Left);
+#else
 			Body.DrawString (new CGRect (offset, 40, bw-boxWidth, 34), TextFont, UILineBreakMode.TailTruncation, UITextAlignment.Left);
+#endif
 			
 			if (NewFlag){
 				ctx.SaveState ();
@@ -165,7 +215,11 @@ namespace MonoTouch.Dialog {
 		
 		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
+#if NET6_0 && !NET7_0
+			return new NFloat (78);
+#else
 			return 78;
+#endif
 		}
 		
 		public event Action<DialogViewController, UITableView, NSIndexPath> Tapped;
