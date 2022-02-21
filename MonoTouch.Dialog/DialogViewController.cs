@@ -89,6 +89,8 @@ namespace MonoTouch.Dialog
 		public bool AutoHideSearch { get; set; }
 		
 		public string SearchPlaceholder { get; set; }
+
+		public string SearchLabel { get; set; }
 			
 		/// <summary>
 		/// Invoke this method to trigger a data refresh.   
@@ -477,8 +479,52 @@ namespace MonoTouch.Dialog
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
-					searchBar.Placeholder = this.SearchPlaceholder;
-				tableView.TableHeaderView = searchBar;					
+				{
+					searchBar.Placeholder = SearchPlaceholder;
+				}
+				if (SearchLabel != null)
+				{
+					UIView view = searchBar;
+					try
+					{
+						var root = searchBar.Subviews[0];
+						var parent = root.Subviews[1];
+						var field = (UISearchTextField)parent.Subviews[0];
+
+						var dy = 20;
+						var rf = root.Frame;
+						rf.Y = dy;
+						root.Frame = rf;
+
+						var font = UIFont.BoldSystemFontOfSize(17);
+						var f = parent.Frame;
+						var x1 = 20;
+						var x2 = 30;
+						var w = SearchLabel.StringSize(font).Width;
+						parent.Frame = new CGRect(f.X + w + x1 + x2, f.Y, f.Width - w, f.Height);
+
+						field.LeftView = null; // hides search icon
+						field.BackgroundColor = UIColor.White;
+
+						var label = new UILabel(new CGRect(f.X + x1, f.Y, w, f.Height))
+						{
+							Text = SearchLabel,
+							Font = font
+						};
+						root.Add(label);
+
+						var sf = searchBar.Frame;
+						sf.Height += dy;
+						view = new UIView(sf) { searchBar };
+					}
+					catch { }
+
+					tableView.TableHeaderView = view;
+				}
+				else
+				{
+					tableView.TableHeaderView = searchBar;
+				}
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;

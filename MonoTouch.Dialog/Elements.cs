@@ -3168,10 +3168,16 @@ namespace MonoTouch.Dialog
 			
 			return new DialogViewController (this, true) {
 				Autorotate = true,
-				EnableSearch = searchable
+				EnableSearch = searchable,
+				SearchPlaceholder = SearchPlaceholder,
+				SearchLabel = SearchLabel,
 			};
 		}
 		
+		public string SearchPlaceholder { get; set; }
+
+		public string SearchLabel { get; set; }
+
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			tableView.DeselectRow (path, false);
