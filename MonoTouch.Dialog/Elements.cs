@@ -2893,7 +2893,7 @@ namespace MonoTouch.Dialog
 			foreach (Section s in Sections){				
 				foreach (Element e in s.Elements){
 					var re = e as RadioElement;
-					if (re != null && !re.RadioIdx.HasValue)
+					if (re != null)
 					{
 						re.RadioIdx = current++;
 					}
