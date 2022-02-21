@@ -3148,13 +3148,16 @@ namespace MonoTouch.Dialog
 			
 			return cell;
 		}
-		
+
+		public Action<DialogViewController> PrepareDialogViewControllerCallback { get; set; }
+
 		/// <summary>
 		///    This method does nothing by default, but gives a chance to subclasses to
 		///    customize the UIViewController before it is presented
 		/// </summary>
-		protected virtual void PrepareDialogViewController (UIViewController dvc)
+		protected virtual void PrepareDialogViewController(DialogViewController dvc)
 		{
+			PrepareDialogViewControllerCallback?.Invoke(dvc);
 		}
 		
 		/// <summary>
@@ -3181,7 +3184,10 @@ namespace MonoTouch.Dialog
 		{
 			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
-			PrepareDialogViewController (newDvc);
+			if (newDvc is DialogViewController ndvc)
+			{
+				PrepareDialogViewController(ndvc);
+			}
 			dvc.ActivateController (newDvc);
 		}
 
