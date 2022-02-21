@@ -48,14 +48,6 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Caption;
 
-        private string title;
-
-		/// <summary>
-		/// The title for DialogViewController. <see cref="Caption"/> is default Title.
-		/// </summary>
-		public string Title { get => !string.IsNullOrEmpty(title) ? title : Caption; set => title = value; }
-
-
 		/// <summary>
 		///  Initializes the element with the given caption.
 		/// </summary>
@@ -2837,7 +2829,14 @@ namespace MonoTouch.Dialog
 		{
 			this.group = group;
 		}
-		
+
+		private string title;
+
+		/// <summary>
+		/// The title for DialogViewController. <see cref="Caption"/> is default Title.
+		/// </summary>
+		public string Title { get => !string.IsNullOrEmpty(title) ? title : Caption; set => title = value; }
+
 		internal List<Section> Sections = new List<Section> ();
 
 		internal NSIndexPath PathForRadio (int idx)
