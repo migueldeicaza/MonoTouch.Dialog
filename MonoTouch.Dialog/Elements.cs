@@ -47,7 +47,15 @@ namespace MonoTouch.Dialog
 		///  The caption to display for this given element
 		/// </summary>
 		public string Caption;
-		
+
+        private string title;
+
+		/// <summary>
+		/// The title for DialogViewController. <see cref="Caption"/> is default Title.
+		/// </summary>
+		public string Title { get => !string.IsNullOrEmpty(title) ? title : Caption; set => title = value; }
+
+
 		/// <summary>
 		///  Initializes the element with the given caption.
 		/// </summary>

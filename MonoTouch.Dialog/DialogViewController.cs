@@ -556,8 +556,8 @@ namespace MonoTouch.Dialog
 #if !__TVOS__
 			NavigationItem.HidesBackButton = !pushing;
 #endif
-			if (root.Caption != null)
-				NavigationItem.Title = root.Caption;
+			if (root.Title != null)
+				NavigationItem.Title = root.Title;
 			if (dirty){
 				tableView.ReloadData ();
 				dirty = false;
@@ -601,8 +601,8 @@ namespace MonoTouch.Dialog
 			if (root == null)
 				return;
 			
-			if(root.Caption != null) 
-				NavigationItem.Title = root.Caption;
+			if(root.Title != null) 
+				NavigationItem.Title = root.Title;
 			
 			root.Prepare ();
 			if (tableView != null){
