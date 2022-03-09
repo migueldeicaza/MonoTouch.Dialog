@@ -1519,26 +1519,38 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		///   The value of the EntryElement
 		/// </summary>
-		public string Value { 
-			get {
+		public virtual string Value
+		{
+			get
+			{
 				if (entry == null)
+				{
 					return val;
+				}
 				var newValue = entry.Text;
 				if (newValue == val)
+				{
 					return val;
+				}
 				val = newValue;
-
-				if (Changed != null)
-					Changed (this, EventArgs.Empty);
+				OnChanged();
 				return val;
 			}
-			set {
+			set
+			{
 				val = value;
 				if (entry != null)
+				{
 					entry.Text = value;
+				}
 			}
 		}
 		protected string val;
+
+		protected void OnChanged()
+        {
+			Changed?.Invoke(this, EventArgs.Empty);
+        }
 
 		/// <summary>
 		/// The key used for reusable UITableViewCells.
@@ -1555,7 +1567,7 @@ namespace MonoTouch.Dialog
 		/// this to use this for numeric input, email addressed,
 		/// urls, phones.
 		/// </summary>
-		public UIKeyboardType KeyboardType {
+		public virtual UIKeyboardType KeyboardType {
 			get {
 				return keyboardType;
 			}
@@ -1565,13 +1577,13 @@ namespace MonoTouch.Dialog
 					entry.KeyboardType = value;
 			}
 		}
-		
+
 		/// <summary>
 		/// The type of Return Key that is displayed on the
 		/// keyboard, you can change this to use this for
 		/// Done, Return, Save, etc. keys on the keyboard
 		/// </summary>
-		public UIReturnKeyType? ReturnKeyType {
+		public virtual UIReturnKeyType? ReturnKeyType {
 			get {
 				return returnKeyType;
 			}
@@ -1585,7 +1597,7 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		/// The default value for this property is <c>false</c>. If you set it to <c>true</c>, the keyboard disables the return key when the text entry area contains no text. As soon as the user enters any text, the return key is automatically enabled.
 		/// </summary>
-		public bool EnablesReturnKeyAutomatically {
+		public virtual bool EnablesReturnKeyAutomatically {
 			get {
 				return enablesReturnKeyAutomatically;
 			}
@@ -1595,8 +1607,8 @@ namespace MonoTouch.Dialog
 					entry.EnablesReturnKeyAutomatically = value;
 			}
 		}
-		
-		public UITextAutocapitalizationType AutocapitalizationType {
+
+		public virtual UITextAutocapitalizationType AutocapitalizationType {
 			get {
 				return autocapitalizationType;	
 			}
@@ -1606,19 +1618,19 @@ namespace MonoTouch.Dialog
 					entry.AutocapitalizationType = value;
 			}
 		}
-		
-		public UITextAutocorrectionType AutocorrectionType { 
+
+		public virtual UITextAutocorrectionType AutocorrectionType { 
 			get { 
 				return autocorrectionType;
 			}
 			set { 
 				autocorrectionType = value;
 				if (entry != null)
-					this.autocorrectionType = value;
+					entry.AutocorrectionType = value;
 			}
 		}
-		
-		public UITextFieldViewMode ClearButtonMode { 
+
+		public virtual UITextFieldViewMode ClearButtonMode { 
 			get { 
 				return clearButtonMode;
 			}
@@ -1629,7 +1641,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 
-		public UITextAlignment TextAlignment {
+		public virtual UITextAlignment TextAlignment {
 			get {
 				return textalignment;
 			}
@@ -1650,17 +1662,18 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public bool VisibleSpaceEnding { get; set; }
 
-		UITextAlignment textalignment = UITextAlignment.Left;
-		UIKeyboardType keyboardType = UIKeyboardType.Default;
-		UIReturnKeyType? returnKeyType = null;
-		bool enablesReturnKeyAutomatically = false;
-		UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
-		UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
+		protected UITextAlignment textalignment = UITextAlignment.Left;
+		protected UIKeyboardType keyboardType = UIKeyboardType.Default;
+		protected UIReturnKeyType? returnKeyType = null;
+		protected bool enablesReturnKeyAutomatically = false;
+		protected UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationType.Sentences;
+		protected UITextAutocorrectionType autocorrectionType = UITextAutocorrectionType.Default;
 		UITextFieldViewMode clearButtonMode = UITextFieldViewMode.Never;
-		bool isPassword, becomeResponder;
+		protected bool isPassword;
+		protected bool becomeResponder;
 		UITextField entry;
 		string placeholder;
-		static UIFont font = UIFont.BoldSystemFontOfSize (17);
+		protected static UIFont font = UIFont.BoldSystemFontOfSize (17);
 
 		public event EventHandler Changed;
 		public event Func<bool> ShouldReturn;
@@ -1711,87 +1724,106 @@ namespace MonoTouch.Dialog
 			return Value;
 		}
 
+		protected const float MaxEntryLabelWidth = 160;
+		protected const float EntryLabelXOffset = 42;
+
 		// 
 		// Computes the X position for the entry by aligning all the entries in the Section
 		//
-		CGSize ComputeEntryPosition (UITableView tv, UITableViewCell cell)
+		protected virtual CGSize ComputeEntryPosition(UITableViewCell cell)
 		{
-			nfloat maxWidth = -15; // If all EntryElements have a null Caption, align UITextField with the Caption offset of normal cells (at 10px).
+			nfloat maxWidth = 10 - EntryLabelXOffset; // If all EntryElements have a null Caption, align UITextField with the Caption offset of normal cells (at 10px).
 			nfloat maxHeight = font.LineHeight;
 
 			// Determine if we should calculate accross all sections or just the current section.
-			var sections = AlignEntryWithAllSections ? (Parent.Parent as RootElement).Sections : (new[] {Parent as Section}).AsEnumerable();
+			var sections = AlignEntryWithAllSections ? (Parent.Parent as RootElement).Sections : (new[] { Parent as Section }).AsEnumerable();
 
-			foreach (Section s in sections) {
-
-				foreach (var e in s.Elements) {
-
-					var ee = e as EntryElement;
-
-					if (ee != null
-						&& !String.IsNullOrEmpty(ee.Caption)) {
-								
-						var size = ee.Caption.StringSize (font);
-
-						maxWidth = (nfloat) Math.Max (size.Width, maxWidth);
-						maxHeight = (nfloat) Math.Max (size.Height, maxHeight);
-					}
-				}
+			foreach (var s in sections)
+			{
+				foreach (var e in s.Elements)
+				{
+                    if (e is EntryElement ee
+                        && !string.IsNullOrEmpty(ee.Caption))
+                    {
+                        var size = ee.Caption.StringSize(font);
+                        maxWidth = (nfloat)Math.Max(size.Width, maxWidth);
+                        maxHeight = (nfloat)Math.Max(size.Height, maxHeight);
+                    }
+                }
 			}
 
-			return new CGSize (25 + (nfloat) Math.Min (maxWidth, 160), maxHeight);
-		}
-
-		protected virtual UITextField CreateTextField (CGRect frame)
-		{
-			return new UITextField (frame) {
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
-				Placeholder = placeholder ?? "",
-				SecureTextEntry = isPassword,
-				Text = Value ?? "",
-				Tag = 1,
-				TextAlignment = textalignment,
-				ClearButtonMode = ClearButtonMode
-			};
+			return new CGSize(EntryLabelXOffset + (nfloat)Math.Min(maxWidth, MaxEntryLabelWidth), maxHeight);
 		}
 
 		static readonly NSString passwordKey = new NSString ("EntryElement+Password");
 		static readonly NSString cellkey = new NSString ("EntryElement");
 		
-		protected override NSString CellKey {
-			get {
+		protected override NSString CellKey
+		{
+			get
+			{
 				return isPassword ? passwordKey : cellkey;
 			}
 		}
 
-		UITableViewCell cell;
-		public override UITableViewCell GetCell (UITableView tv)
+		protected class EntryCell : UITableViewCell
 		{
-			if (cell == null) {
-				cell = new UITableViewCell (UITableViewCellStyle.Default, CellKey);
-				cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-				cell.TextLabel.Font = font;
+			public UITextField Entry;
+			readonly EntryElement Element;
 
-			} 
+			public EntryCell(EntryElement element, string key) : base(UITableViewCellStyle.Default, key)
+			{
+				Element = element;
+
+				Entry = new UITextField()
+				{
+					AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleLeftMargin,
+					Placeholder = element.placeholder ?? "",
+					SecureTextEntry = element.isPassword,
+					Text = element.Value ?? "",
+					Tag = 1,
+					TextAlignment = element.textalignment,
+					ClearButtonMode = element.ClearButtonMode
+				};
+				ContentView.AddSubview(Entry);
+
+				SelectionStyle = UITableViewCellSelectionStyle.None;
+				TextLabel.Font = font;
+			}
+
+			public override void LayoutSubviews()
+			{
+				base.LayoutSubviews();
+
+				var size = Element.ComputeEntryPosition(this);
+
+				var f = TextLabel.Frame;
+				f.Y = (44 - font.LineHeight) / 2;
+				f.Height = font.LineHeight;
+				f.Width = size.Width - EntryLabelXOffset + 5;
+				TextLabel.Frame = f;
+
+				var yOffset = (ContentView.Bounds.Height - size.Height) / 2;
+				var width = ContentView.Bounds.Width - size.Width;
+				if (Element.textalignment == UITextAlignment.Right)
+				{
+					width -= 10;
+				}
+				Entry.Frame = new CGRect(size.Width, yOffset, width, size.Height);
+			}
+		}
+
+		private EntryCell cell;
+		public override UITableViewCell GetCell(UITableView tv)
+		{
+			if (cell == null)
+			{
+				cell = new EntryCell(this, CellKey);
+			}
 			cell.TextLabel.Text = Caption;
 
-			var offset = (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone) ? 20 : 90;
-			cell.Frame = new CGRect(cell.Frame.X, cell.Frame.Y, tv.Frame.Width-offset, cell.Frame.Height);
-			CGSize size = ComputeEntryPosition (tv, cell);
-			nfloat yOffset = (cell.ContentView.Bounds.Height - size.Height) / 2 - 1;
-			nfloat width = cell.ContentView.Bounds.Width - size.Width;
-			if (textalignment == UITextAlignment.Right) {
-				// Add padding if right aligned
-				width -= 10;
-			}
-#if __TVOS__
-			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height + 20 /* FIXME: figure out something better than adding a magic number */);
-#else
-			var entryFrame = new CGRect (size.Width, yOffset, width, size.Height);
-#endif
-
 			if (entry == null) {
-				entry = CreateTextField (entryFrame);
+				entry = cell.Entry;
 				entry.EditingChanged += delegate {
 					if (VisibleSpaceEnding 
 						&& textalignment == UITextAlignment.Right
@@ -1881,28 +1913,31 @@ namespace MonoTouch.Dialog
 
 			return cell;
 		}
-		
+
 		/// <summary>
 		///  Copies the value from the UITextField in the EntryElement to the
 		///  Value property and raises the Changed event if necessary.
 		/// </summary>
-		public void FetchValue ()
+		public virtual void FetchValue()
 		{
 			if (entry == null)
+			{
 				return;
+			}
 
 			var newValue = entry.Text;
-            if (VisibleSpaceEnding)
-            {
-				newValue = newValue.Replace('\u00a0', ' ');
-            }
+			if (VisibleSpaceEnding)
+			{
+				newValue = newValue?.Replace('\u00a0', ' ');
+			}
 			if (newValue == Value)
+			{
 				return;
-			
+			}
+
 			Value = newValue;
-			
-			if (Changed != null)
-				Changed (this, EventArgs.Empty);
+
+			OnChanged();
 		}
 		
 		protected override void Dispose (bool disposing)

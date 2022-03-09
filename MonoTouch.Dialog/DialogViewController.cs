@@ -613,7 +613,16 @@ namespace MonoTouch.Dialog
 				ViewAppearing (this, EventArgs.Empty);
 		}
 
-		public bool Pushing {
+		public event EventHandler ViewDoingLayoutSubviews;
+
+		public override void ViewDidLayoutSubviews()
+        {
+            base.ViewDidLayoutSubviews();
+
+			ViewDoingLayoutSubviews?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool Pushing {
 			get {
 				return pushing;
 			}
