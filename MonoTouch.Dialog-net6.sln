@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTouch.Dialog", "MonoTouch.Dialog\dotnet\iOS\MonoTouch.Dialog.csproj", "{43BD8A99-DECC-44C2-A5AF-C9C8753B6FEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTouch.Dialog", "MonoTouch.Dialog\dotnet\MacCatalyst\MonoTouch.Dialog.csproj", "{E1291F45-B334-4FA4-A2D0-1296FF1A3A76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "iOS", "iOS", "{5BEA86AF-F4A8-4D9D-945A-32041165C60D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tvOS", "tvOS", "{04A66D25-E89A-435D-8E6B-FAC23FAFD930}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Catalyst", "Catalyst", "{E58D5969-C54B-4FDA-B38E-F9897622E442}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Net6-maccatalyst", "Sample.Net6-maccatalyst\Sample.Net6-maccatalyst.csproj", "{CDC8CE08-FF98-4898-A617-1B27AC48DF97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Net6-ios", "Sample.Net6-ios\Sample.Net6-ios.csproj", "{4DBA8A6E-D5D8-4C39-B8CF-EF433625D16B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Net6-tvos", "Sample.Net6-tvos\Sample.Net6-tvos.csproj", "{B5E8EE4D-B972-4CBA-87EB-71EEFA3944FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoTouch.Dialog", "MonoTouch.Dialog\dotnet\tvOS\MonoTouch.Dialog.csproj", "{035A68E6-A4B2-4602-A153-7A1FA1EEDF6C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43BD8A99-DECC-44C2-A5AF-C9C8753B6FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43BD8A99-DECC-44C2-A5AF-C9C8753B6FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43BD8A99-DECC-44C2-A5AF-C9C8753B6FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43BD8A99-DECC-44C2-A5AF-C9C8753B6FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1291F45-B334-4FA4-A2D0-1296FF1A3A76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1291F45-B334-4FA4-A2D0-1296FF1A3A76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1291F45-B334-4FA4-A2D0-1296FF1A3A76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1291F45-B334-4FA4-A2D0-1296FF1A3A76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDC8CE08-FF98-4898-A617-1B27AC48DF97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDC8CE08-FF98-4898-A617-1B27AC48DF97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDC8CE08-FF98-4898-A617-1B27AC48DF97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC8CE08-FF98-4898-A617-1B27AC48DF97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DBA8A6E-D5D8-4C39-B8CF-EF433625D16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DBA8A6E-D5D8-4C39-B8CF-EF433625D16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DBA8A6E-D5D8-4C39-B8CF-EF433625D16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DBA8A6E-D5D8-4C39-B8CF-EF433625D16B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5E8EE4D-B972-4CBA-87EB-71EEFA3944FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5E8EE4D-B972-4CBA-87EB-71EEFA3944FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5E8EE4D-B972-4CBA-87EB-71EEFA3944FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5E8EE4D-B972-4CBA-87EB-71EEFA3944FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{035A68E6-A4B2-4602-A153-7A1FA1EEDF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{035A68E6-A4B2-4602-A153-7A1FA1EEDF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{035A68E6-A4B2-4602-A153-7A1FA1EEDF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{035A68E6-A4B2-4602-A153-7A1FA1EEDF6C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E1291F45-B334-4FA4-A2D0-1296FF1A3A76} = {E58D5969-C54B-4FDA-B38E-F9897622E442}
+		{43BD8A99-DECC-44C2-A5AF-C9C8753B6FEE} = {5BEA86AF-F4A8-4D9D-945A-32041165C60D}
+		{035A68E6-A4B2-4602-A153-7A1FA1EEDF6C} = {04A66D25-E89A-435D-8E6B-FAC23FAFD930}
+	EndGlobalSection
+EndGlobal

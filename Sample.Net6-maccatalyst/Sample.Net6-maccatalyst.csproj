@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-maccatalyst</TargetFramework>
+    <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
+    <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+  </PropertyGroup>
+    <ItemGroup>
+    <ProjectReference Include="..\MonoTouch.Dialog\dotnet\MacCatalyst\MonoTouch.Dialog.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Controllers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="monodevelop-32.png" />
+    <Content Include="caltemplate.png" />
+    <Content Include="jakub-calendar.png" />
+    <Content Include="favorite.png" />
+    <Content Include="favorited.png" />
+    <Content Include="background.png" />
+    <Content Include="sample.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Sample\DemoElementApi.cs">
+      <Link>Controllers\DemoElementApi.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoDynamic.cs">
+      <Link>Controllers\DemoDynamic.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoAddRemove.cs">
+      <Link>Controllers\DemoAddRemove.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoContainerStyle.cs">
+      <Link>Controllers\DemoContainerStyle.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoDate.cs">
+      <Link>Controllers\DemoDate.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoEditing.cs">
+      <Link>Controllers\DemoEditing.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoEditingAdvanced.cs">
+      <Link>Controllers\DemoEditingAdvanced.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoHeadersFooters.cs">
+      <Link>Controllers\DemoHeadersFooters.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoIndex.cs">
+      <Link>Controllers\DemoIndex.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoInsets.cs">
+      <Link>Controllers\DemoInsets.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoLoadMore.cs">
+      <Link>Controllers\DemoLoadMore.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoOwnerDrawnElement.cs">
+      <Link>Controllers\DemoOwnerDrawnElement.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoReflectionApi.cs">
+      <Link>Controllers\DemoReflectionApi.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoRefresh.cs">
+      <Link>Controllers\DemoRefresh.cs</Link>
+    </Compile>
+    <Compile Include="..\Sample\DemoStyled.cs">
+      <Link>Controllers\DemoStyled.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
