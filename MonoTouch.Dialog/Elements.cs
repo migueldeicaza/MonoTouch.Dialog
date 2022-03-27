@@ -1658,6 +1658,11 @@ namespace MonoTouch.Dialog
 		public bool NotifyChangedOnKeyStroke { get; set; }
 
 		/// <summary>
+		/// Add a toolbar with Done button to hide keyboard on iPhone.
+		/// </summary>
+		public bool HideKeyboardWithDoneButton { get; set; }
+
+		/// <summary>
 		/// Show space char in the end of right aligned entry input.
 		/// </summary>
 		public bool VisibleSpaceEnding { get; set; }
@@ -1902,16 +1907,38 @@ namespace MonoTouch.Dialog
 				cell.ContentView.AddSubview (entry);
 			}
 
-			if (becomeResponder){
-				entry.BecomeFirstResponder ();
-				becomeResponder = false;
-			}
+			entry.InputAccessoryView = GetEntryToolbar(tv);
 			entry.KeyboardType = KeyboardType;
 			entry.EnablesReturnKeyAutomatically = EnablesReturnKeyAutomatically;
 			entry.AutocapitalizationType = AutocapitalizationType;
 			entry.AutocorrectionType = AutocorrectionType;
 
+			if (becomeResponder)
+			{
+				entry.BecomeFirstResponder();
+				becomeResponder = false;
+			}
+
 			return cell;
+		}
+
+		protected virtual UIToolbar GetEntryToolbar(UITableView tv)
+		{
+			if (!HideKeyboardWithDoneButton
+				|| UIDevice.CurrentDevice.UserInterfaceIdiom != UIUserInterfaceIdiom.Phone)
+			{
+				return null;
+			}
+
+			var toolbar = new UIToolbar()
+			{
+				Frame = new CGRect(0, 0, tv.Frame.Width, 30)
+			};
+			var flexSpace = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
+			var doneBtn = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, (s, e) => tv.EndEditing(true));
+			toolbar.SetItems(new UIBarButtonItem[] { flexSpace, doneBtn }, false);
+			toolbar.SizeToFit();
+			return toolbar;
 		}
 
 		/// <summary>
@@ -1974,8 +2001,8 @@ namespace MonoTouch.Dialog
 			if (tv == null)
 				return;
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
-			if (entry != null){
-				entry.BecomeFirstResponder ();
+			if (GetResponder() != null){
+				GetResponder().BecomeFirstResponder ();
 				becomeResponder = false;
 			}
 		}
@@ -1987,9 +2014,14 @@ namespace MonoTouch.Dialog
 			if (tv == null)
 				return;
 			tv.ScrollToRow (IndexPath, UITableViewScrollPosition.Middle, animated);
-			if (entry != null)
-				entry.ResignFirstResponder ();
+			if (GetResponder() != null)
+				GetResponder().ResignFirstResponder ();
 		}
+
+		protected virtual UIResponder GetResponder()
+        {
+			return entry;
+        }
 	}
 	
 	public partial class DateTimeElement : StringElement {
