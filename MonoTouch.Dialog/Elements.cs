@@ -1528,7 +1528,7 @@ namespace MonoTouch.Dialog
 					return val;
 				}
 				var newValue = entry.Text;
-				if (newValue == val)
+				if (newValue == val || val == null && newValue == "")
 				{
 					return val;
 				}
