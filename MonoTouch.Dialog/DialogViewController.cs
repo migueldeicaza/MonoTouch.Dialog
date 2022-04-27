@@ -250,7 +250,10 @@ namespace MonoTouch.Dialog
 			public override void OnEditingStarted (UISearchBar searchBar)
 			{
 #if !__TVOS__
-				searchBar.ShowsCancelButton = true;
+				if (container.SearchLabel == null)
+				{
+					searchBar.ShowsCancelButton = true;
+				}
 #endif
 				container.StartSearch ();
 			}
@@ -501,10 +504,14 @@ namespace MonoTouch.Dialog
 						var x1 = 20;
 						var x2 = 30;
 						var w = SearchLabel.StringSize(font).Width;
-						parent.Frame = new CGRect(f.X + w + x1 + x2, f.Y, f.Width - w, f.Height);
+						parent.Frame = new CGRect(f.X + w + x1 + x2, f.Y, f.Width - (w + x1 + x2), f.Height);
 
 						field.LeftView = null; // hides search icon
 						field.BackgroundColor = UIColor.White;
+						field.InputAccessoryView = EntryElement.GetHideKeyboardToolbar(tableView);
+						var ff = field.Frame;
+						ff.Width -= w + x1 + x2;
+						field.Frame = ff;
 
 						var label = new UILabel(new CGRect(f.X + x1, f.Y, w, f.Height))
 						{

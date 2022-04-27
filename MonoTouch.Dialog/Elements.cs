@@ -1923,23 +1923,32 @@ namespace MonoTouch.Dialog
 		}
 
 		protected virtual UIToolbar GetEntryToolbar(UITableView tv)
-		{
-			if (!HideKeyboardWithDoneButton
-				|| UIDevice.CurrentDevice.UserInterfaceIdiom != UIUserInterfaceIdiom.Phone)
+        {
+            if (!HideKeyboardWithDoneButton)
+            {
+                return null;
+            }
+
+            return GetHideKeyboardToolbar(tv);
+        }
+
+        public static UIToolbar GetHideKeyboardToolbar(UITableView tv)
+        {
+			if (UIDevice.CurrentDevice.UserInterfaceIdiom != UIUserInterfaceIdiom.Phone)
 			{
 				return null;
 			}
 
-			var toolbar = new UIToolbar()
-			{
-				Frame = new CGRect(0, 0, tv.Frame.Width, 30)
-			};
-			var flexSpace = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
-			var doneBtn = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, (s, e) => tv.EndEditing(true));
-			toolbar.SetItems(new UIBarButtonItem[] { flexSpace, doneBtn }, false);
-			toolbar.SizeToFit();
-			return toolbar;
-		}
+            var toolbar = new UIToolbar()
+            {
+                Frame = new CGRect(0, 0, tv.Frame.Width, 30)
+            };
+            var flexSpace = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace);
+            var doneBtn = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, (s, e) => tv.EndEditing(true));
+            toolbar.SetItems(new UIBarButtonItem[] { flexSpace, doneBtn }, false);
+            toolbar.SizeToFit();
+            return toolbar;
+        }
 
 		/// <summary>
 		///  Copies the value from the UITextField in the EntryElement to the
