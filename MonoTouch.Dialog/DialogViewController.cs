@@ -216,7 +216,9 @@ namespace MonoTouch.Dialog
 				for (int eidx = 0; eidx < elements.Length; eidx++){
 					if (elements [eidx].Matches (text)){
 						if (newSection == null){
-							newSection = new Section (section.Header, section.Footer){
+							newSection = new Section (section.Header, section.Footer)
+							{
+								SearchFiltered = true,
 								FooterView = section.FooterView,
 								HeaderView = section.HeaderView,
 								Caption = section.Caption

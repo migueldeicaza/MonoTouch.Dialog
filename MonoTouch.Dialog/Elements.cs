@@ -2352,7 +2352,9 @@ namespace MonoTouch.Dialog
 				
 		// X corresponds to the alignment, Y to the height of the password
 		public CGSize EntryAlignment;
-		
+
+		public bool SearchFiltered;
+
 		/// <summary>
 		///  Constructs a Section without header or footers.
 		/// </summary>
@@ -2441,7 +2443,15 @@ namespace MonoTouch.Dialog
 				footer = value;
 			}
 		}
-		
+
+		void OnElementsChanged()
+		{
+			if (!SearchFiltered && Parent is RootElement root)
+			{
+				root.Prepare(true);
+			}
+		}
+
 		/// <summary>
 		/// Adds a new child Element to the Section
 		/// </summary>
@@ -2455,7 +2465,9 @@ namespace MonoTouch.Dialog
 			
 			Elements.Add (element);
 			element.Parent = this;
-			
+
+			OnElementsChanged();
+
 			if (Parent != null)
 				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
 		}
@@ -2542,6 +2554,9 @@ namespace MonoTouch.Dialog
 				Elements.Insert (pos++, e);
 				e.Parent = this;
 			}
+
+			OnElementsChanged();
+
 			var root = Parent as RootElement;
 			if (Parent != null && root.TableView != null){
 				if (anim == UITableViewRowAnimation.None)
@@ -2564,6 +2579,9 @@ namespace MonoTouch.Dialog
 				e.Parent = this;
 				count++;
 			}
+
+			OnElementsChanged();
+
 			var root = Parent as RootElement;
 			if (root?.TableView != null)
 			{
@@ -2666,7 +2684,9 @@ namespace MonoTouch.Dialog
 				count = Elements.Count-start;
 			
 			Elements.RemoveRange (start, count);
-			
+
+			OnElementsChanged();
+
 			if (root == null || root.TableView == null)
 				return;
 			
@@ -2962,14 +2982,15 @@ namespace MonoTouch.Dialog
 			}
 			return -1;
 		}
-			
-		public void Prepare ()
+
+		public void Prepare(bool refreshRadioIndexes = false)
 		{
 			int current = 0;
-			foreach (Section s in Sections){				
-				foreach (Element e in s.Elements){
-					var re = e as RadioElement;
-					if (re != null)
+			foreach (Section s in Sections)
+			{
+				foreach (Element e in s.Elements)
+				{
+					if (e is RadioElement re && (refreshRadioIndexes || !re.RadioIdx.HasValue))
 					{
 						re.RadioIdx = current++;
 					}
