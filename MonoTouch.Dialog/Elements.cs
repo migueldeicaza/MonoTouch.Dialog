@@ -3293,20 +3293,15 @@ namespace MonoTouch.Dialog
 			if (group is RadioGroup radio)
 			{
 				int selected = radio.Selected;
-				int current = 0;
-
+				Prepare();
 				foreach (var s in Sections)
 				{
 					foreach (var e in s.Elements)
 					{
-						if (!(e is RadioElement))
-							continue;
-
-						if (current == selected)
+						if (e is RadioElement re && re.RadioIdx == selected)
 						{
 							return e.Summary();
 						}
-						current++;
 					}
 				}
 
