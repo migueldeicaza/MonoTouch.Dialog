@@ -2458,18 +2458,25 @@ namespace MonoTouch.Dialog
 		/// <param name="element">
 		/// An element to add to the section.
 		/// </param>
-		public void Add (Element element)
+		/// <param name="animate">
+		/// Should action be animated on UI.
+		/// </param>
+		public void Add(Element element, bool animate = true)
 		{
 			if (element == null)
+			{
 				return;
-			
-			Elements.Add (element);
+			}
+
+			Elements.Add(element);
 			element.Parent = this;
 
 			OnElementsChanged();
 
-			if (Parent != null)
-				InsertVisual (Elements.Count-1, UITableViewRowAnimation.None, 1);
+			if (animate && Parent != null)
+			{
+				InsertVisual(Elements.Count - 1, UITableViewRowAnimation.None, 1);
+			}
 		}
 
 		/// <summary>
@@ -2796,7 +2803,7 @@ namespace MonoTouch.Dialog
 		public RadioGroup(int selected, string notSelectedCaption = null) : this(null, selected, notSelectedCaption)
 		{ }
 	}
-	
+
 	/// <summary>
 	///    RootElements are responsible for showing a full configuration page.
 	/// </summary>
@@ -2823,12 +2830,12 @@ namespace MonoTouch.Dialog
 	///    C# 4.0 syntax to initialize a RootElement in one pass.
 	/// </remarks>
 	public partial class RootElement : Element, IEnumerable, IEnumerable<Section> {
-		static NSString rkey1 = new NSString ("RootElement1");
-		static NSString rkey2 = new NSString ("RootElement2");
+		static NSString rkey1 = new NSString("RootElement1");
+		static NSString rkey2 = new NSString("RootElement2");
 		int summarySection, summaryElement;
 		internal Group group;
-        private bool searchable;
-        public bool UnevenRows;
+		private bool searchable;
+		public bool UnevenRows;
 		public Func<RootElement, UIViewController> createOnSelected;
 		public UITableView TableView;
 		public string Value;
@@ -2838,7 +2845,7 @@ namespace MonoTouch.Dialog
 		// WillDisplayCell so we can prepare the color of the cell before 
 		// display
 		public bool NeedColorUpdate;
-		
+
 		/// <summary>
 		///  Initializes a RootSection with a caption
 		/// </summary>
@@ -2848,10 +2855,10 @@ namespace MonoTouch.Dialog
 		/// <param name="searchable">
 		/// Turn on Search for elements.
 		/// </param>
-		public RootElement (string caption, bool searchable = false) : base (caption)
+		public RootElement(string caption, bool searchable = false) : base(caption)
 		{
 			summarySection = -1;
-			Sections = new List<Section> ();
+			Sections = new List<Section>();
 			this.searchable = searchable;
 		}
 
@@ -2880,13 +2887,13 @@ namespace MonoTouch.Dialog
 		/// <param name="caption">
 		///  The caption to render.
 		/// </param>
-		public RootElement (string caption, Func<RootElement, UIViewController> createOnSelected) : base (caption)
+		public RootElement(string caption, Func<RootElement, UIViewController> createOnSelected) : base(caption)
 		{
 			summarySection = -1;
 			this.createOnSelected = createOnSelected;
-			Sections = new List<Section> ();
+			Sections = new List<Section>();
 		}
-		
+
 		/// <summary>
 		///   Initializes a RootElement with a caption with a summary fetched from the specified section and leement
 		/// </summary>
@@ -2902,12 +2909,12 @@ namespace MonoTouch.Dialog
 		/// <param name="searchable">
 		/// Turn on Search for elements.
 		/// </param>
-		public RootElement (string caption, int section, int element, bool searchable = false) : this (caption, searchable)
+		public RootElement(string caption, int section, int element, bool searchable = false) : this(caption, searchable)
 		{
 			summarySection = section;
 			summaryElement = element;
 		}
-		
+
 		/// <summary>
 		/// Initializes a RootElement that renders the summary based on the radio settings of the contained elements. 
 		/// </summary>
@@ -2921,7 +2928,7 @@ namespace MonoTouch.Dialog
 		/// <param name="searchable">
 		/// Turn on Search for elements.
 		/// </param>
-		public RootElement (string caption, Group group, bool searchable = false) : this (caption, searchable)
+		public RootElement(string caption, Group group, bool searchable = false) : this(caption, searchable)
 		{
 			this.group = group;
 		}
@@ -2933,7 +2940,31 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public string Title { get => !string.IsNullOrEmpty(title) ? title : Caption; set => title = value; }
 
-		internal List<Section> Sections = new List<Section> ();
+		internal List<Section> Sections { get; set; } = new List<Section>();
+
+		private List<Section> sectionsOriginal;
+
+		internal List<Section> SectionsOriginal { get => sectionsOriginal ?? Sections; set => sectionsOriginal = value; }
+
+		internal List<Section> SectionsSearchFiltered
+		{
+			set
+			{
+				if (value is null)
+				{
+					Sections = SectionsOriginal;
+					SectionsOriginal = null;
+				}
+				else
+				{
+					if (sectionsOriginal is null)
+					{
+						SectionsOriginal = Sections;
+					}
+					Sections = value;
+				}
+			}
+		}
 
 		internal NSIndexPath PathForRadio (int idx)
 		{
@@ -2986,18 +3017,22 @@ namespace MonoTouch.Dialog
 		public void Prepare(bool refreshRadioIndexes = false)
 		{
 			int current = 0;
-			foreach (Section s in Sections)
+			foreach (var s in SectionsOriginal)
 			{
-				foreach (Element e in s.Elements)
+				foreach (var e in s.Elements)
 				{
 					if (e is RadioElement re && (refreshRadioIndexes || !re.RadioIdx.HasValue))
 					{
 						re.RadioIdx = current++;
 					}
 					if (UnevenRows == false && e is IElementSizing)
+					{
 						UnevenRows = true;
+					}
 					if (NeedColorUpdate == false && e is IColorizeBackground)
+					{
 						NeedColorUpdate = true;
+					}
 				}
 			}
 		}
@@ -3276,8 +3311,8 @@ namespace MonoTouch.Dialog
 		public string SearchPlaceholder { get; set; }
 
 		public string SearchLabel { get; set; }
-
-		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
+        
+        public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
 			tableView.DeselectRow (path, false);
 			var newDvc = MakeViewController ();
@@ -3294,7 +3329,7 @@ namespace MonoTouch.Dialog
 			{
 				int selected = radio.Selected;
 				Prepare();
-				foreach (var s in Sections)
+				foreach (var s in SectionsOriginal)
 				{
 					foreach (var e in s.Elements)
 					{

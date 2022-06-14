@@ -152,94 +152,100 @@ namespace MonoTouch.Dialog
 			ReloadData ();
 		}
 #endif
-		
-		Section [] originalSections;
-		Element [][] originalElements;
-		
+
+		bool SearchFiltered;
+
 		/// <summary>
 		/// Allows caller to programatically activate the search bar and start the search process
 		/// </summary>
-		public void StartSearch ()
+		public void StartSearch()
 		{
-			if (originalSections != null)
+			if (SearchFiltered)
+			{
 				return;
-			
+			}
+
 #if !__TVOS__
-			searchBar.BecomeFirstResponder ();
+			searchBar.BecomeFirstResponder();
 #endif
-			originalSections = Root.Sections.ToArray ();
-			originalElements = new Element [originalSections.Length][];
-			for (int i = 0; i < originalSections.Length; i++)
-				originalElements [i] = originalSections [i].Elements.ToArray ();
+			SearchFiltered = true;
 		}
-		
+
 		/// <summary>
 		/// Allows the caller to programatically stop searching.
 		/// </summary>
-		public virtual void FinishSearch ()
+		public virtual void FinishSearch()
 		{
-			if (originalSections == null)
+			if (!SearchFiltered)
+			{
 				return;
-			
-			Root.Sections = new List<Section> (originalSections);
-			originalSections = null;
-			originalElements = null;
+			}
+
+			Root.SectionsSearchFiltered = null;
+			SearchFiltered = false;
 #if !__TVOS__
-			searchBar.ResignFirstResponder ();
+			searchBar.ResignFirstResponder();
 #endif
-			ReloadData ();
+			ReloadData();
 		}
-		
-		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
+
+		public delegate void SearchTextEventHandler(object sender, SearchChangedEventArgs args);
 		public event SearchTextEventHandler SearchTextChanged;
-		
-		public virtual void OnSearchTextChanged (string text)
+
+		public virtual void OnSearchTextChanged(string text)
 		{
-			if (SearchTextChanged != null)
-				SearchTextChanged (this, new SearchChangedEventArgs (text));
-		}
-		                                     
-		public void PerformFilter (string text)
+            SearchTextChanged?.Invoke(this, new SearchChangedEventArgs(text));
+        }
+
+		public void PerformFilter(string text)
 		{
-			if (originalSections == null)
+			if (!SearchFiltered)
+			{
 				return;
-			
-			OnSearchTextChanged (text);
-			
-			var newSections = new List<Section> ();
-			
-			for (int sidx = 0; sidx < originalSections.Length; sidx++){
+			}
+
+			OnSearchTextChanged(text);
+
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				Root.SectionsSearchFiltered = null;
+				ReloadData();
+				return;
+			}
+
+			var newSections = new List<Section>();
+
+			foreach (var section in Root.SectionsOriginal)
+			{
 				Section newSection = null;
-				var section = originalSections [sidx];
-				Element [] elements = originalElements [sidx];
-				
-				for (int eidx = 0; eidx < elements.Length; eidx++){
-					if (elements [eidx].Matches (text)){
-						if (newSection == null){
-							newSection = new Section (section.Header, section.Footer)
+
+				foreach (var element in section.Elements)
+				{
+					if (element.Matches(text))
+					{
+						if (newSection == null)
+						{
+							newSection = new Section(section.Header, section.Footer)
 							{
 								SearchFiltered = true,
 								FooterView = section.FooterView,
 								HeaderView = section.HeaderView,
-								Caption = section.Caption
+								Caption = section.Caption,
+								Parent = Root
 							};
-							newSections.Add (newSection);
+							newSections.Add(newSection);
 						}
-						newSection.Add (elements [eidx]);
+						newSection.Add(element, false);
 					}
 				}
 			}
-			
-			Root.Sections = newSections;
 
-			newSections.ForEach(s => s.Parent = Root);
+			Root.SectionsSearchFiltered = newSections;
 
-			ReloadData ();
+			ReloadData();
 		}
-		
-		public virtual void SearchButtonClicked (string text)
-		{
-		}
+
+		public virtual void SearchButtonClicked(string text) { }
 			
 		class SearchDelegate : UISearchBarDelegate {
 			DialogViewController container;
