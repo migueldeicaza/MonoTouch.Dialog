@@ -89,6 +89,8 @@ namespace MonoTouch.Dialog
 		public bool AutoHideSearch { get; set; }
 		
 		public string SearchPlaceholder { get; set; }
+
+		public string SearchLabel { get; set; }
 			
 		/// <summary>
 		/// Invoke this method to trigger a data refresh.   
@@ -150,89 +152,100 @@ namespace MonoTouch.Dialog
 			ReloadData ();
 		}
 #endif
-		
-		Section [] originalSections;
-		Element [][] originalElements;
-		
+
+		bool SearchFiltered;
+
 		/// <summary>
 		/// Allows caller to programatically activate the search bar and start the search process
 		/// </summary>
-		public void StartSearch ()
+		public void StartSearch()
 		{
-			if (originalSections != null)
+			if (SearchFiltered)
+			{
 				return;
-			
+			}
+
 #if !__TVOS__
-			searchBar.BecomeFirstResponder ();
+			searchBar.BecomeFirstResponder();
 #endif
-			originalSections = Root.Sections.ToArray ();
-			originalElements = new Element [originalSections.Length][];
-			for (int i = 0; i < originalSections.Length; i++)
-				originalElements [i] = originalSections [i].Elements.ToArray ();
+			SearchFiltered = true;
 		}
-		
+
 		/// <summary>
 		/// Allows the caller to programatically stop searching.
 		/// </summary>
-		public virtual void FinishSearch ()
+		public virtual void FinishSearch()
 		{
-			if (originalSections == null)
+			if (!SearchFiltered)
+			{
 				return;
-			
-			Root.Sections = new List<Section> (originalSections);
-			originalSections = null;
-			originalElements = null;
+			}
+
+			Root.SectionsSearchFiltered = null;
+			SearchFiltered = false;
 #if !__TVOS__
-			searchBar.ResignFirstResponder ();
+			searchBar.ResignFirstResponder();
 #endif
-			ReloadData ();
+			ReloadData();
 		}
-		
-		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
+
+		public delegate void SearchTextEventHandler(object sender, SearchChangedEventArgs args);
 		public event SearchTextEventHandler SearchTextChanged;
-		
-		public virtual void OnSearchTextChanged (string text)
+
+		public virtual void OnSearchTextChanged(string text)
 		{
-			if (SearchTextChanged != null)
-				SearchTextChanged (this, new SearchChangedEventArgs (text));
-		}
-		                                     
-		public void PerformFilter (string text)
+            SearchTextChanged?.Invoke(this, new SearchChangedEventArgs(text));
+        }
+
+		public void PerformFilter(string text)
 		{
-			if (originalSections == null)
+			if (!SearchFiltered)
+			{
 				return;
-			
-			OnSearchTextChanged (text);
-			
-			var newSections = new List<Section> ();
-			
-			for (int sidx = 0; sidx < originalSections.Length; sidx++){
+			}
+
+			OnSearchTextChanged(text);
+
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				Root.SectionsSearchFiltered = null;
+				ReloadData();
+				return;
+			}
+
+			var newSections = new List<Section>();
+
+			foreach (var section in Root.SectionsOriginal)
+			{
 				Section newSection = null;
-				var section = originalSections [sidx];
-				Element [] elements = originalElements [sidx];
-				
-				for (int eidx = 0; eidx < elements.Length; eidx++){
-					if (elements [eidx].Matches (text)){
-						if (newSection == null){
-							newSection = new Section (section.Header, section.Footer){
+
+				foreach (var element in section.Elements)
+				{
+					if (element.Matches(text))
+					{
+						if (newSection == null)
+						{
+							newSection = new Section(section.Header, section.Footer)
+							{
+								SearchFiltered = true,
 								FooterView = section.FooterView,
-								HeaderView = section.HeaderView
+								HeaderView = section.HeaderView,
+								Caption = section.Caption,
+								Parent = Root
 							};
-							newSections.Add (newSection);
+							newSections.Add(newSection);
 						}
-						newSection.Add (elements [eidx]);
+						newSection.Add(element, false);
 					}
 				}
 			}
-			
-			Root.Sections = newSections;
-			
-			ReloadData ();
+
+			Root.SectionsSearchFiltered = newSections;
+
+			ReloadData();
 		}
-		
-		public virtual void SearchButtonClicked (string text)
-		{
-		}
+
+		public virtual void SearchButtonClicked(string text) { }
 			
 		class SearchDelegate : UISearchBarDelegate {
 			DialogViewController container;
@@ -245,13 +258,17 @@ namespace MonoTouch.Dialog
 			public override void OnEditingStarted (UISearchBar searchBar)
 			{
 #if !__TVOS__
-				searchBar.ShowsCancelButton = true;
+				if (container.SearchLabel == null)
+				{
+					searchBar.ShowsCancelButton = true;
+				}
 #endif
 				container.StartSearch ();
 			}
 			
 			public override void OnEditingStopped (UISearchBar searchBar)
 			{
+                container.searchBar.Text = "";
 #if !__TVOS__
 				searchBar.ShowsCancelButton = false;
 #endif
@@ -473,8 +490,56 @@ namespace MonoTouch.Dialog
 					Delegate = new SearchDelegate (this)
 				};
 				if (SearchPlaceholder != null)
-					searchBar.Placeholder = this.SearchPlaceholder;
-				tableView.TableHeaderView = searchBar;					
+				{
+					searchBar.Placeholder = SearchPlaceholder;
+				}
+				if (SearchLabel != null)
+				{
+					UIView view = searchBar;
+					try
+					{
+						var root = searchBar.Subviews[0];
+						var parent = root.Subviews[1];
+						var field = (UISearchTextField)parent.Subviews[0];
+
+						var dy = 20;
+						var rf = root.Frame;
+						rf.Y = dy;
+						root.Frame = rf;
+
+						var font = UIFont.BoldSystemFontOfSize(17);
+						var f = parent.Frame;
+						var x1 = 20;
+						var x2 = 30;
+						var w = SearchLabel.StringSize(font).Width;
+						parent.Frame = new CGRect(f.X + w + x1 + x2, f.Y, f.Width - (w + x1 + x2), f.Height);
+
+						field.LeftView = null; // hides search icon
+						field.BackgroundColor = UIColor.White;
+						field.InputAccessoryView = EntryElement.GetHideKeyboardToolbar(tableView);
+						var ff = field.Frame;
+						ff.Width -= w + x1 + x2;
+						field.Frame = ff;
+
+						var label = new UILabel(new CGRect(f.X + x1, f.Y, w, f.Height))
+						{
+							Text = SearchLabel,
+							Font = font
+						};
+						root.Add(label);
+
+						var sf = searchBar.Frame;
+						sf.Height += dy;
+						view = new UIView(sf) { searchBar };
+					}
+					catch { }
+
+					tableView.TableHeaderView = view;
+				}
+				else
+				{
+					tableView.TableHeaderView = searchBar;
+				}
 			} else {
 				// Does not work with current Monotouch, will work with 3.0
 				// tableView.TableHeaderView = null;
@@ -552,8 +617,8 @@ namespace MonoTouch.Dialog
 #if !__TVOS__
 			NavigationItem.HidesBackButton = !pushing;
 #endif
-			if (root.Caption != null)
-				NavigationItem.Title = root.Caption;
+			if (root.Title != null)
+				NavigationItem.Title = root.Title;
 			if (dirty){
 				tableView.ReloadData ();
 				dirty = false;
@@ -563,7 +628,16 @@ namespace MonoTouch.Dialog
 				ViewAppearing (this, EventArgs.Empty);
 		}
 
-		public bool Pushing {
+		public event EventHandler ViewDoingLayoutSubviews;
+
+		public override void ViewDidLayoutSubviews()
+        {
+            base.ViewDidLayoutSubviews();
+
+			ViewDoingLayoutSubviews?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool Pushing {
 			get {
 				return pushing;
 			}
@@ -597,8 +671,8 @@ namespace MonoTouch.Dialog
 			if (root == null)
 				return;
 			
-			if(root.Caption != null) 
-				NavigationItem.Title = root.Caption;
+			if(root.Title != null) 
+				NavigationItem.Title = root.Title;
 			
 			root.Prepare ();
 			if (tableView != null){

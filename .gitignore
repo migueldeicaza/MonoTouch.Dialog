@@ -1,5 +1,8 @@
 *~
 *.userprefs
+*.user
+*.suo
 *.pidb
+.vs
 
 .DS_Store
