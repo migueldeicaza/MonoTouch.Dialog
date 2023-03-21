@@ -454,10 +454,10 @@ namespace MonoTouch.Dialog
 					SetValue (mi, obj, ((ImageElement) element).Value);
 				else if (element is RootElement){
 					var re = element as RootElement;
-					if (re.group as MemberRadioGroup != null){
+					if (re.group is MemberRadioGroup) {
 						var group = re.group as MemberRadioGroup;
 						SetValue (group.mi, obj, re.RadioSelected);
-					} else if (re.group as RadioGroup != null){
+					} else if (re.group is RadioGroup) {
 						var mType = GetTypeForMember (mi);
 						var fi = mType.GetFields (BindingFlags.Public | BindingFlags.Static) [re.RadioSelected];
 						
