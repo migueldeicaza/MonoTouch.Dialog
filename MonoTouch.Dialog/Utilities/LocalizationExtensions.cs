@@ -33,7 +33,7 @@ namespace MonoTouch.Dialog
 		{
 			if (String.IsNullOrEmpty (text))
 				return text;
-			return NSBundle.MainBundle.LocalizedString (text, String.Empty, String.Empty);
+			return NSBundle.MainBundle.GetLocalizedString(text);
 		}
 	}
 }
