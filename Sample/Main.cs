@@ -9,11 +9,11 @@ using System.Drawing;
 
 namespace Sample
 {
-	public class Application
+	public static class Application
 	{
 		static void Main (string[] args)
 		{
-			UIApplication.Main (args, null, "AppDelegate");
+			UIApplication.Main(args, null, typeof(AppDelegate));
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace Sample
 			// On iOS5 we use the new window.RootViewController, on older versions, we add the subview
 			window = new UIWindow (UIScreen.MainScreen.Bounds);
 			window.MakeKeyAndVisible ();
-            if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
+			if (UIDevice.CurrentDevice.CheckSystemVersion (5, 0))
 				window.RootViewController = navigation;	
 			else
 				window.AddSubview (navigation.View);
