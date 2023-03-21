@@ -8,14 +8,14 @@ using UIKit;
 
 namespace Sample
 {
-	public partial class AppDelegate 
-	{		
+	public partial class AppDelegate
+	{
 		public void DemoElementApi ()
 		{
 			var root = CreateRoot ();
-				
+
 			var dv = new DialogViewController (root, true);
-			navigation.PushViewController (dv, true);				
+			navigation.PushViewController (dv, true);
 		}
 
 		RootElement CreateRoot ()
@@ -66,7 +66,7 @@ namespace Sample
 					},
 				},
 				new Section () {
-					CreateGeneralSection (),		
+					CreateGeneralSection (),
 					//new RootElement ("Mail, Contacts, Calendars"),
 					//new RootElement ("Phone"),
 					//new RootElement ("Safari"),
@@ -79,44 +79,48 @@ namespace Sample
 					new HtmlElement ("About", "http://monotouch.net"),
 					new MultilineElement ("Remember to eat\nfruits and vegetables\nevery day")
 				}
-			};		
+			};
 		}
-		
+
 		RootElement CreateSoundSection ()
 		{
-			return new RootElement ("Sounds"){
-				new Section ("Silent") {
-					new BooleanElement ("Vibrate", true),
+			Section standardSection = new Section("Standard");
+			standardSection.AddAll(
+				from n in "Marimba,Alarm,Ascending,Bark,Xylophone".Split(',')
+					select (Element) new RadioElement(n));
+
+			Section messageSection = new Section();
+			messageSection.AddAll(
+				from n in "None,Tri-tone,Chime,Glass,Horn,Bell,Eletronic".Split(',')
+					select (Element) new RadioElement(n));
+
+			return new RootElement("Sounds") {
+				new Section("Silent") {
+					new BooleanElement("Vibrate", true),
 				},
-				new Section ("Ring") {
-					new BooleanElement ("Vibrate", true),
-					new FloatElement (null, null, 0.8f),
-					new RootElement ("Ringtone", new RadioGroup (0)){
-						new Section ("Custom"){
-							new RadioElement ("Circus Music"),
-							new RadioElement ("True Blood"),
+				new Section("Ring") {
+					new BooleanElement("Vibrate", true),
+					new FloatElement(null, null, 0.8f),
+					new RootElement("Ringtone", new RadioGroup(0)) {
+						new Section("Custom"){
+							new RadioElement("Circus Music"),
+							new RadioElement("True Blood"),
 						},
-						new Section ("Standard"){
-							from n in "Marimba,Alarm,Ascending,Bark,Xylophone".Split (',')
-								select (Element) new RadioElement (n)
-						}
+						standardSection
 					},
-					new RootElement ("New Text Message", new RadioGroup (3)){
-						new Section (){
-							from n in "None,Tri-tone,Chime,Glass,Horn,Bell,Eletronic".Split (',')
-								select (Element) new RadioElement (n)
-						}
+					new RootElement("New Text Message", new RadioGroup(3)) {
+						messageSection
 					},
-					new BooleanElement ("New Voice Mail", false),
-					new BooleanElement ("New Mail", false),
-					new BooleanElement ("Sent Mail", true),
-					new BooleanElement ("Calendar Alerts", true),
-					new BooleanElement ("Lock Sounds", true),
-					new BooleanElement ("Keyboard Clicks", false)
+					new BooleanElement("New Voice Mail", false),
+					new BooleanElement("New Mail", false),
+					new BooleanElement("Sent Mail", true),
+					new BooleanElement("Calendar Alerts", true),
+					new BooleanElement("Lock Sounds", true),
+					new BooleanElement("Keyboard Clicks", false)
 				}
 			};
 		}
-		
+
 		public RootElement CreateGeneralSection ()
 		{
 			return new RootElement ("General") {
@@ -261,6 +265,5 @@ namespace Sample
 				}
 			};
 		}
-	
 	}
 }

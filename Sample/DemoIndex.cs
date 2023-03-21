@@ -30,7 +30,7 @@ namespace Sample
 			SearchPlaceholder = "Find item";
 			AutoHideSearch = true;
 		}
-		
+
 		string [] GetSectionTitles ()
 		{
 			return (
@@ -39,7 +39,7 @@ namespace Sample
 				select section.Caption.Substring(0,1)
 			).ToArray ();
 		}
-		
+
 		class IndexedSource : Source {
         	IndexedViewController parent;
 
@@ -47,7 +47,7 @@ namespace Sample
 	        {
 	            this.parent = parent;
 	        }
-	
+
 #if !__TVOS__
 	        public override string[] SectionIndexTitles (UITableView tableView)
 	        {
@@ -64,7 +64,7 @@ namespace Sample
 	        {
 	            this.parent = parent;
 	        }
-	
+
 #if !__TVOS__
 	        public override string[] SectionIndexTitles (UITableView tableView)
 	        {
@@ -82,22 +82,26 @@ namespace Sample
 	        	return new IndexedSource (this);
 	    }
 	}
-	
+
 	public partial class AppDelegate
 	{
-		public void DemoIndex () 
+		public void DemoIndex()
 		{
-			var root = new RootElement ("Container Style") {
-				from sh in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
-				    select new Section (sh + " - Section") {
-					   from filler in "12345" 
-						select (Element) new StringElement (sh + " - " + filler)
+			IEnumerable<Section> sections() {
+				foreach (var sh in "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+					var section = new Section(sh + " - Section");
+					section.AddAll(
+						from filler in "12345"
+							select (Element) new StringElement(sh + " - " + filler));
+					yield return section;
 				}
-			};
+			}
+
+
+			var root = new RootElement("Container Style");
+			root.Add(sections());
 			var dvc = new IndexedViewController (root, true);
 			navigation.PushViewController (dvc, true);
 		}
-
 	}
 }
-
