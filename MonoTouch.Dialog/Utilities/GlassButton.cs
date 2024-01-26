@@ -1,11 +1,7 @@
 using System;
-using System.Drawing;
 
 using UIKit;
 using CoreGraphics;
-using Foundation;
-using CoreAnimation;
-using ObjCRuntime;
 
 namespace MonoTouch.Dialog
 {
@@ -13,7 +9,7 @@ namespace MonoTouch.Dialog
 	/// <summary>
 	/// GlassButton is a glossy/glass button.   User code can use either
 	/// targets or can subscribe to the Tapped event.  Colors are customized
-	/// by asssigning to the NormalColor, HighlightedColor and DisabledColor
+	/// by assigning to the NormalColor, HighlightedColor and DisabledColor
 	/// properties
 	/// </summary>
 	public class GlassButton : UIButton {
@@ -24,7 +20,7 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		/// Invoked when the user touches 
 		/// </summary>
-		public event Action<GlassButton> Tapped;
+		public event Action<GlassButton>? Tapped;
 				
 		/// <summary>
 		/// Creates a new instance of the GlassButton using the specified dimensions
@@ -49,28 +45,28 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		public override bool BeginTracking (UITouch uitouch, UIEvent uievent)
+		public override bool BeginTracking (UITouch uitouch, UIEvent? uievent)
 		{
 			SetNeedsDisplay ();
 			pressed = true;
 			return base.BeginTracking (uitouch, uievent);
 		}
 		
-		public override void EndTracking (UITouch uitouch, UIEvent uievent)
+		public override void EndTracking (UITouch uitouch, UIEvent? uievent)
 		{
-			if (pressed && Enabled){
-				if (Tapped != null)
-					Tapped (this);
+			if (pressed && Enabled)
+			{
+				Tapped?.Invoke (this);
 			}
 			pressed = false;
 			SetNeedsDisplay ();
 			base.EndTracking (uitouch, uievent);
 		}
 		
-		public override bool ContinueTracking (UITouch uitouch, UIEvent uievent)
+		public override bool ContinueTracking (UITouch uitouch, UIEvent? uievent)
 		{
-			var touch = uievent.AllTouches.AnyObject as UITouch;
-			if (Bounds.Contains (touch.LocationInView (this)))
+			var touch = uievent?.AllTouches.AnyObject as UITouch;
+			if (touch is not null && Bounds.Contains (touch.LocationInView (this)))
 				pressed = true;
 			else
 				pressed = false;

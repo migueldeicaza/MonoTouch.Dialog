@@ -3,25 +3,21 @@
 // sample code for new elements. 
 //
 using System;
-using System.Drawing;
-using System.Threading;
-
-using CoreFoundation;
+using System.Diagnostics;
 using Foundation;
 using UIKit;
 using CoreGraphics;
-using ObjCRuntime;
 
 namespace MonoTouch.Dialog
 {
-	public partial class LoadMoreElement : Element, IElementSizing
+	public class LoadMoreElement : Element, IElementSizing
 	{
 		static NSString key = new NSString ("LoadMoreElement");
-		public string NormalCaption { get; set; }
-		public string LoadingCaption { get; set; }
-		public UIColor TextColor { get; set; }
-		public UIColor BackgroundColor { get; set; }
-		public event Action<LoadMoreElement> Tapped = null;
+		public string? NormalCaption { get; set; }
+		public string? LoadingCaption { get; set; }
+		public UIColor? TextColor { get; set; }
+		public UIColor? BackgroundColor { get; set; }
+		public event Action<LoadMoreElement>? Tapped;
 		public UIFont Font;
 		public float? Height;
 		UITextAlignment alignment = UITextAlignment.Center;
@@ -29,26 +25,29 @@ namespace MonoTouch.Dialog
 		
 		public LoadMoreElement () : base ("")
 		{
+			Font = UIFont.BoldSystemFontOfSize(16);
 		}
 		
-		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped) : this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (16), UIColor.Black)
+		public LoadMoreElement (string? normalCaption, string? loadingCaption, Action<LoadMoreElement>? tapped) 
+			: this (normalCaption, loadingCaption, tapped, UIFont.BoldSystemFontOfSize (16), UIColor.Black)
 		{
 		}
 		
-		public LoadMoreElement (string normalCaption, string loadingCaption, Action<LoadMoreElement> tapped, UIFont font, UIColor textColor) : base ("")
+		public LoadMoreElement (string? normalCaption, string? loadingCaption, Action<LoadMoreElement>? tapped, UIFont? font, UIColor? textColor) 
+			: base ("")
 		{
 			NormalCaption = normalCaption;
 			LoadingCaption = loadingCaption;
 			Tapped += tapped;
-			Font = font;
+			Font = font ?? UIFont.BoldSystemFontOfSize(16);
 			TextColor = textColor;
 		}
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
 			var cell = tv.DequeueReusableCell (key);
-			UIActivityIndicatorView activityIndicator;
-			UILabel caption;
+			UIActivityIndicatorView? activityIndicator;
+			UILabel? caption;
 			
 			if (cell == null){
 				cell = new UITableViewCell (UITableViewCellStyle.Default, key);
@@ -64,11 +63,15 @@ namespace MonoTouch.Dialog
 				};
 				cell.ContentView.AddSubview (caption);
 				cell.ContentView.AddSubview (activityIndicator);
-			} else {
-				activityIndicator = cell.ContentView.ViewWithTag (1) as UIActivityIndicatorView;
-				caption = cell.ContentView.ViewWithTag (2) as UILabel;
+			} else
+			{
+				activityIndicator = cell.ContentView.ViewWithTag(1) as UIActivityIndicatorView;
+				caption =  cell.ContentView.ViewWithTag (2) as UILabel;
 			}
-			if (Animating){
+			
+			Trace.Assert(activityIndicator is not null && caption is not null);
+			
+			if (Animating) {
 				caption.Text = LoadingCaption;
 				activityIndicator.Hidden = false;
 				activityIndicator.StartAnimating ();
@@ -84,7 +87,7 @@ namespace MonoTouch.Dialog
 			}
 			caption.BackgroundColor = UIColor.Clear;
 			caption.TextColor = TextColor ?? UIColor.Black;
-			caption.Font = Font ?? UIFont.BoldSystemFontOfSize (16);
+			caption.Font = Font;
 			caption.TextAlignment = Alignment;
 			Layout (cell, activityIndicator, caption);
 			return cell;
@@ -103,7 +106,10 @@ namespace MonoTouch.Dialog
 					return;
 				var activityIndicator = cell.ContentView.ViewWithTag (1) as UIActivityIndicatorView;
 				var caption = cell.ContentView.ViewWithTag (2) as UILabel;
-				if (value){
+
+				Trace.Assert(activityIndicator is not null && caption is not null);
+				
+				if (value) {
 					caption.Text = LoadingCaption;
 					activityIndicator.Hidden = false;
 					activityIndicator.StartAnimating ();
@@ -129,7 +135,7 @@ namespace MonoTouch.Dialog
 			}
 		}
 		
-		CGSize GetTextSize (string text)
+		CGSize GetTextSize (string? text)
 		{
 			return new NSString (text).StringSize (Font, (float)UIScreen.MainScreen.Bounds.Width, UILineBreakMode.TailTruncation);
 		}

@@ -7,12 +7,10 @@
 //
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using Foundation;
 using UIKit;
 using CoreGraphics;
-using ObjCRuntime;
-using NSAction = global::System.Action;
 
 namespace MonoTouch.Dialog
 {
@@ -23,12 +21,12 @@ namespace MonoTouch.Dialog
 	public class DialogViewController : UITableViewController
 	{
 		public UITableViewStyle Style = UITableViewStyle.Grouped;
-		public event Action<NSIndexPath> OnSelection;
+		public event Action<NSIndexPath>? OnSelection;
 #if !__TVOS__
-		UISearchBar searchBar;
+		UISearchBar? searchBar;
 #endif
-		UITableView tableView;
-		RootElement root;
+		UITableView? tableView;
+		RootElement? root;
 		bool pushing;
 		bool dirty;
 		bool reloading;
@@ -36,23 +34,23 @@ namespace MonoTouch.Dialog
 		/// <summary>
 		/// The root element displayed by the DialogViewController, the value can be changed during runtime to update the contents.
 		/// </summary>
-		public RootElement Root {
+		public RootElement? Root {
 			get {
 				return root;
 			}
 			set {
 				if (root == value)
 					return;
-				if (root != null)
-					root.Dispose ();
-				
+				root?.Dispose ();
+
 				root = value;
-				root.TableView = tableView;		
+				if (root != null)
+					root.TableView = tableView;		
 				ReloadData ();
 			}
 		} 
 
-		EventHandler refreshRequested;
+		EventHandler? refreshRequested;
 		/// <summary>
 		/// If you assign a handler to this event before the view is shown, the
 		/// DialogViewController will have support for pull-to-refresh UI.
@@ -89,7 +87,7 @@ namespace MonoTouch.Dialog
 		// the user manually pulls it down.
 		public bool AutoHideSearch { get; set; }
 		
-		public string SearchPlaceholder { get; set; }
+		public string? SearchPlaceholder { get; set; }
 			
 		/// <summary>
 		/// Invoke this method to trigger a data refresh.   
@@ -106,6 +104,8 @@ namespace MonoTouch.Dialog
 		
 		void TriggerRefresh (bool showStatus)
 		{
+			_ = showStatus;
+			
 			if (refreshRequested == null)
 				return;
 
@@ -114,7 +114,6 @@ namespace MonoTouch.Dialog
 			
 			reloading = true;
 			refreshRequested (this, EventArgs.Empty);
-
 		}
 		
 		/// <summary>
@@ -128,7 +127,7 @@ namespace MonoTouch.Dialog
 			reloading = false;
 
 #if !__TVOS__
-			RefreshControl.EndRefreshing ();
+			RefreshControl?.EndRefreshing ();
 #endif
 		}
 		
@@ -152,19 +151,19 @@ namespace MonoTouch.Dialog
 		}
 #endif
 		
-		Section [] originalSections;
-		Element [][] originalElements;
+		Section []? originalSections;
+		Element [][]? originalElements;
 		
 		/// <summary>
 		/// Allows caller to programatically activate the search bar and start the search process
 		/// </summary>
 		public void StartSearch ()
 		{
-			if (originalSections != null)
+			if (Root is null || originalSections is not null)
 				return;
 			
 #if !__TVOS__
-			searchBar.BecomeFirstResponder ();
+			searchBar?.BecomeFirstResponder ();
 #endif
 			originalSections = Root.Sections.ToArray ();
 			originalElements = new Element [originalSections.Length][];
@@ -177,30 +176,29 @@ namespace MonoTouch.Dialog
 		/// </summary>
 		public virtual void FinishSearch ()
 		{
-			if (originalSections == null)
+			if (Root is null || originalSections is null)
 				return;
 			
 			Root.Sections = new List<Section> (originalSections);
 			originalSections = null;
 			originalElements = null;
 #if !__TVOS__
-			searchBar.ResignFirstResponder ();
+			searchBar?.ResignFirstResponder ();
 #endif
 			ReloadData ();
 		}
 		
 		public delegate void SearchTextEventHandler (object sender, SearchChangedEventArgs args);
-		public event SearchTextEventHandler SearchTextChanged;
+		public event SearchTextEventHandler? SearchTextChanged;
 		
 		public virtual void OnSearchTextChanged (string text)
 		{
-			if (SearchTextChanged != null)
-				SearchTextChanged (this, new SearchChangedEventArgs (text));
+			SearchTextChanged?.Invoke (this, new SearchChangedEventArgs (text));
 		}
 		                                     
 		public void PerformFilter (string text)
 		{
-			if (originalSections == null)
+			if (originalSections is null || originalElements is null || Root is null)
 				return;
 			
 			OnSearchTextChanged (text);
@@ -208,7 +206,7 @@ namespace MonoTouch.Dialog
 			var newSections = new List<Section> ();
 			
 			for (int sidx = 0; sidx < originalSections.Length; sidx++){
-				Section newSection = null;
+				Section? newSection = null;
 				var section = originalSections [sidx];
 				Element [] elements = originalElements [sidx];
 				
@@ -261,12 +259,14 @@ namespace MonoTouch.Dialog
 			
 			public override void TextChanged (UISearchBar searchBar, string searchText)
 			{
-				container.PerformFilter (searchText ?? "");
+				container.PerformFilter (searchText);
 			}
 			
 #if !__TVOS__
 			public override void CancelButtonClicked (UISearchBar searchBar)
 			{
+				Trace.Assert(container.searchBar is not null);
+
 				searchBar.ShowsCancelButton = false;
 				container.searchBar.Text = "";
 				container.FinishSearch ();
@@ -276,27 +276,27 @@ namespace MonoTouch.Dialog
 			
 			public override void SearchButtonClicked (UISearchBar searchBar)
 			{
-				container.SearchButtonClicked (searchBar.Text);
+				container.SearchButtonClicked (searchBar.Text ?? "");
 			}
 		}
 		
 		public class Source : UITableViewSource {
 			const float yboundary = 65;
 			WeakReference<DialogViewController> container;
-			protected DialogViewController Container => container.TryGetTarget (out var result) ? result : null;
+			protected DialogViewController? Container => container.TryGetTarget (out var result) ? result : null;
 			protected RootElement Root;
 			
 			public Source (DialogViewController container)
 			{
+				Trace.Assert(container.root is not null);
 				this.container = new WeakReference<DialogViewController> (container);
 				Root = container.root;
 			}
 			
 			public override void AccessoryButtonTapped (UITableView tableView, NSIndexPath indexPath)
 			{
-				var section = Root.Sections [(int) indexPath.Section];
-				var element = (section.Elements [(int) indexPath.Row] as StyledStringElement);
-				if (element != null)
+				var section = Root.Sections [indexPath.Section];
+				if (section.Elements [indexPath.Row] is StyledStringElement element)
 					element.AccessoryTap ();
 			}
 			
@@ -313,20 +313,20 @@ namespace MonoTouch.Dialog
 				return Root.Sections.Count;
 			}
 
-			public override string TitleForHeader (UITableView tableView, nint section)
+			public override string? TitleForHeader (UITableView tableView, nint section)
 			{
 				return Root.Sections [(int) section].Caption;
 			}
 
-			public override string TitleForFooter (UITableView tableView, nint section)
+			public override string? TitleForFooter (UITableView tableView, nint section)
 			{
 				return Root.Sections [(int) section].Footer;
 			}
 
 			public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 			{
-				var section = Root.Sections [(int) indexPath.Section];
-				var element = section.Elements [(int) indexPath.Row];
+				var section = Root.Sections [indexPath.Section];
+				var element = section.Elements [indexPath.Row];
 				
 				return element.GetCell (tableView);
 			}
@@ -334,28 +334,29 @@ namespace MonoTouch.Dialog
 			public override void WillDisplay (UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
 			{
 				if (Root.NeedColorUpdate){
-					var section = Root.Sections [(int) indexPath.Section];
-					var element = section.Elements [(int) indexPath.Row];
+					var section = Root.Sections [indexPath.Section];
+					var element = section.Elements [indexPath.Row];
 					var colorized = element as IColorizeBackground;
-					if (colorized != null)
-						colorized.WillDisplay (tableView, cell, indexPath);
+					colorized?.WillDisplay (tableView, cell, indexPath);
 				}
 			}
 			
 			public override void RowDeselected (UITableView tableView, NSIndexPath indexPath)
 			{
-				Container.Deselected (indexPath);
+				Container?.Deselected (indexPath);
 			}
 			
 			public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 			{
+				if (Container is null) 
+					return;
 				var onSelection = Container.OnSelection;
 				if (onSelection != null)
 					onSelection (indexPath);
 				Container.Selected (indexPath);
 			}			
 			
-			public override UIView GetViewForHeader (UITableView tableView, nint sectionIdx)
+			public override UIView? GetViewForHeader (UITableView tableView, nint sectionIdx)
 			{
 				var section = Root.Sections [(int) sectionIdx];
 				return section.HeaderView;
@@ -369,7 +370,7 @@ namespace MonoTouch.Dialog
 				return section.HeaderView.Frame.Height;
 			}
 
-			public override UIView GetViewForFooter (UITableView tableView, nint sectionIdx)
+			public override UIView? GetViewForFooter (UITableView tableView, nint sectionIdx)
 			{
 				var section = Root.Sections [(int) sectionIdx];
 				return section.FooterView;
@@ -408,12 +409,12 @@ namespace MonoTouch.Dialog
 			
 			public override nfloat GetHeightForRow (UITableView tableView, NSIndexPath indexPath)
 			{
-				var section = Root.Sections [(int) indexPath.Section];
-				var element = section.Elements [(int) indexPath.Row];
+				var section = Root.Sections [indexPath.Section];
+				var element = section.Elements [indexPath.Row];
 				
 				var sizable = element as IElementSizing;
 				if (sizable == null)
-					return (nfloat)tableView.RowHeight;
+					return tableView.RowHeight;
 				return sizable.GetHeight (tableView, indexPath);
 			}
 		}
@@ -469,6 +470,7 @@ namespace MonoTouch.Dialog
 			// which require bigger changes, so just skip this for now.
 #else
 			if (enableSearch){
+				Trace.Assert(tableView is not null);
 				searchBar = new UISearchBar (new CGRect (0, 0, tableView.Bounds.Width, 44)) {
 					Delegate = new SearchDelegate (this)
 				};
@@ -484,16 +486,20 @@ namespace MonoTouch.Dialog
 		
 		public virtual void Deselected (NSIndexPath indexPath)
 		{
-			var section = root.Sections [(int) indexPath.Section];
-			var element = section.Elements [(int) indexPath.Row];
+			Trace.Assert(root is not null && tableView is not null);
+			
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
 			
 			element.Deselected (this, tableView, indexPath);
 		}
 		
 		public virtual void Selected (NSIndexPath indexPath)
 		{
-			var section = root.Sections [(int) indexPath.Section];
-			var element = section.Elements [(int) indexPath.Row];
+			Trace.Assert(root is not null && tableView is not null);
+			
+			var section = root.Sections [indexPath.Section];
+			var element = section.Elements [indexPath.Row];
 
 			element.Selected (this, tableView, indexPath);
 		}
@@ -528,12 +534,11 @@ namespace MonoTouch.Dialog
 			if (refreshRequested != null) {
 				RefreshControl = new UIRefreshControl ();
 				RefreshControl.AddTarget ((sender,args)=> TriggerRefresh (), UIControlEvent.ValueChanged);
-				return;
 			}
 #endif
 		}
 		
-		public event EventHandler ViewAppearing;
+		public event EventHandler? ViewAppearing;
 
 		public override void ViewWillAppear (bool animated)
 		{
@@ -555,12 +560,11 @@ namespace MonoTouch.Dialog
 			if (root.Caption != null)
 				NavigationItem.Title = root.Caption;
 			if (dirty){
-				tableView.ReloadData ();
+				tableView?.ReloadData ();
 				dirty = false;
 			}
 
-			if (ViewAppearing != null)
-				ViewAppearing (this, EventArgs.Empty);
+			ViewAppearing?.Invoke (this, EventArgs.Empty);
 		}
 
 		public bool Pushing {
@@ -581,11 +585,11 @@ namespace MonoTouch.Dialog
 			return unevenRows ? new SizingSource (this) : new Source (this);
 		}
 		
-		Source TableSource;
+		Source? TableSource;
 		
 		void UpdateSource ()
 		{
-			if (root == null)
+			if (root == null || tableView == null)
 				return;
 			
 			TableSource = CreateSizingSource (root.UnevenRows);
@@ -608,10 +612,10 @@ namespace MonoTouch.Dialog
 			dirty = false;
 		}
 		
-		public event EventHandler ViewDisappearing;
+		public event EventHandler? ViewDisappearing;
 		
 		[Obsolete ("Use the ViewDisappearing event instead")]
-		public event EventHandler ViewDissapearing {
+		public event EventHandler? ViewDissapearing {
 			add {
 				ViewDisappearing += value;
 			}
@@ -623,8 +627,7 @@ namespace MonoTouch.Dialog
 		public override void ViewWillDisappear (bool animated)
 		{
 			base.ViewWillDisappear (animated);
-			if (ViewDisappearing != null)
-				ViewDisappearing (this, EventArgs.Empty);
+			ViewDisappearing?.Invoke (this, EventArgs.Empty);
 		}
 		
 		public DialogViewController (RootElement root) : base (UITableViewStyle.Grouped)

@@ -1,7 +1,4 @@
-using System;
-
 using CoreGraphics;
-using ObjCRuntime;
 
 namespace MonoTouch.Dialog
 {

@@ -1,15 +1,11 @@
-using System;
-using System.Drawing;
-
+using System.Diagnostics.CodeAnalysis;
 using UIKit;
-using CoreFoundation;
 using CoreGraphics;
 using Foundation;
-using ObjCRuntime;
 
 namespace MonoTouch.Dialog
 {
-	public abstract partial class OwnerDrawnElement : Element, IElementSizing
+	public abstract class OwnerDrawnElement : Element, IElementSizing
 	{		
 		public string CellReuseIdentifier
 		{
@@ -34,7 +30,7 @@ namespace MonoTouch.Dialog
 		
 		public override UITableViewCell GetCell (UITableView tv)
 		{
-			OwnerDrawnCell cell = tv.DequeueReusableCell(this.CellReuseIdentifier) as OwnerDrawnCell;
+			OwnerDrawnCell? cell = tv.DequeueReusableCell(this.CellReuseIdentifier) as OwnerDrawnCell;
 			
 			if (cell == null)
 			{
@@ -55,17 +51,18 @@ namespace MonoTouch.Dialog
 		
 		class OwnerDrawnCell : UITableViewCell
 		{
-			OwnerDrawnCellView view;
+			OwnerDrawnCellView? view;
 			
 			public OwnerDrawnCell(OwnerDrawnElement element, UITableViewCellStyle style, string cellReuseIdentifier) : base(style, cellReuseIdentifier)
 			{
 				Element = element;
 			}
 			
-			public OwnerDrawnElement Element
+			[DisallowNull]
+			public OwnerDrawnElement? Element
 			{
 				get {
-					return view.Element;
+					return view?.Element;
 				}
 				set {
 					if (view == null)
@@ -85,14 +82,15 @@ namespace MonoTouch.Dialog
 			public void Update()
 			{
 				SetNeedsDisplay();
-				view.SetNeedsDisplay();
+				view?.SetNeedsDisplay();
 			}		
 	
 			public override void LayoutSubviews()
 			{
 				base.LayoutSubviews();
-				
-				view.Frame = ContentView.Bounds;
+
+				if (view is not null) 
+					view.Frame = ContentView.Bounds;
 			}
 		}
 		

@@ -26,28 +26,34 @@
 // 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MonoTouch.Dialog.Utilities {
 	
-public class LRUCache<TKey, TValue> where TValue : class, IDisposable  {
+public class LRUCache<TKey, TValue>
+	where TKey : notnull
+	where TValue : class?, IDisposable? 
+	
+{
 	Dictionary<TKey, LinkedListNode <TValue>> dict;
 	Dictionary<LinkedListNode<TValue>, TKey> revdict;
 	LinkedList<TValue> list;
 	int entryLimit, sizeLimit, currentSize;
-	Func<TValue,int> slotSizeFunc;
+	Func<TValue,int>? slotSizeFunc;
 	
 	public LRUCache (int entryLimit) : this (entryLimit, 0, null)
 	{
 	}
 		
-	public LRUCache (int entryLimit, int sizeLimit, Func<TValue,int> slotSizer)
+	public LRUCache (int entryLimit, int sizeLimit, Func<TValue,int>? slotSizer)
 	{
 		list = new LinkedList<TValue> ();
 		dict = new Dictionary<TKey, LinkedListNode<TValue>> ();
 		revdict = new Dictionary<LinkedListNode<TValue>, TKey> ();
 		
 		if (sizeLimit != 0 && slotSizer == null)
-			throw new ArgumentNullException ("If sizeLimit is set, the slotSizer must be provided");
+			throw new ArgumentNullException (nameof(slotSizer), "If sizeLimit is set, the slotSizer must be provided");
 		
 		this.entryLimit = entryLimit;
 		this.sizeLimit = sizeLimit;
@@ -57,23 +63,24 @@ public class LRUCache<TKey, TValue> where TValue : class, IDisposable  {
 	void Evict ()
 	{
 		var last = list.Last;
+		Trace.Assert(last is not null);
 		var key = revdict [last];
 		
 		if (sizeLimit > 0){
-			int size = slotSizeFunc (last.Value);
+			int size = slotSizeFunc!(last.Value);
 			currentSize -= size;
 		}
 		
 		dict.Remove (key);
 		revdict.Remove (last);
 		list.RemoveLast ();
-		last.Value.Dispose ();
+		last.Value!.Dispose ();
 	}
 
 	public void Purge ()
 	{
 		foreach (var element in list)
-			element.Dispose ();
+			element!.Dispose ();
 		
 		dict.Clear ();
 		revdict.Clear ();
@@ -81,9 +88,10 @@ public class LRUCache<TKey, TValue> where TValue : class, IDisposable  {
 		currentSize = 0;
 	}
 
-	public TValue this [TKey key] {
+	[DisallowNull]
+	public TValue? this [TKey key] {
 		get {
-			LinkedListNode<TValue> node;
+			LinkedListNode<TValue>? node;
 			
 			if (dict.TryGetValue (key, out node)){
 				list.Remove (node);
@@ -95,12 +103,12 @@ public class LRUCache<TKey, TValue> where TValue : class, IDisposable  {
 		}
 
 		set {
-			LinkedListNode<TValue> node;
-			int size = sizeLimit > 0 ? slotSizeFunc (value) : 0;
+			LinkedListNode<TValue>? node;
+			int size = sizeLimit > 0 ? slotSizeFunc! (value) : 0;
 			
 			if (dict.TryGetValue (key, out node)){
 				if (sizeLimit > 0 && node.Value != null){
-					int repSize = slotSizeFunc (node.Value);
+					int repSize = slotSizeFunc! (node.Value);
 					currentSize -= repSize;
 					currentSize += size;
 				}

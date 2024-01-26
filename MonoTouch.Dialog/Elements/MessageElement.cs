@@ -1,21 +1,19 @@
 using System;
-using System.Drawing;
 
 using UIKit;
 using Foundation;
 using CoreGraphics;
-using ObjCRuntime;
 
 namespace MonoTouch.Dialog {
 
-	public partial class MessageSummaryView : UIView {
+	public class MessageSummaryView : UIView {
 		static UIFont SenderFont = UIFont.BoldSystemFontOfSize (19);
 		static UIFont SubjectFont = UIFont.SystemFontOfSize (14);
 		static UIFont TextFont = UIFont.SystemFontOfSize (13);
 		static UIFont CountFont = UIFont.BoldSystemFontOfSize (13);
-		public string Sender { get; private set; }
-		public string Body { get; private set; }
-		public string Subject { get; private set; }
+		public string? Sender { get; private set; }
+		public string? Body { get; private set; }
+		public string? Subject { get; private set; }
 		public DateTime Date { get; private set; }
 		public bool NewFlag  { get; private set; }
 		public int MessageCount  { get; private set; }
@@ -31,10 +29,10 @@ namespace MonoTouch.Dialog {
 		
 		public MessageSummaryView ()
 		{
-			BackgroundColor = UIColor.White;
+			base.BackgroundColor = UIColor.White;
 		}
 		
-		public void Update (string sender, string body, string subject, DateTime date, bool newFlag, int messageCount)
+		public void Update (string? sender, string? body, string? subject, DateTime date, bool newFlag, int messageCount)
 		{
 			Sender = sender;
 			Body = body;
@@ -116,8 +114,10 @@ namespace MonoTouch.Dialog {
 		
 	public class MessageElement : Element, IElementSizing {
 		static NSString mKey = new NSString ("MessageElement");
-		
-		public string Sender, Body, Subject;
+
+		public string? Sender;
+		public string? Body;
+		public string? Subject;
 		public DateTime Date;
 		public bool NewFlag;
 		public int MessageCount;
@@ -128,8 +128,8 @@ namespace MonoTouch.Dialog {
 			public MessageCell () : base (UITableViewCellStyle.Default, mKey)
 			{
 				view = new MessageSummaryView ();
-				ContentView.Add (view);
-				Accessory = UITableViewCellAccessory.DisclosureIndicator;
+				base.ContentView.Add (view);
+				base.Accessory = UITableViewCellAccessory.DisclosureIndicator;
 			}
 			
 			public void Update (MessageElement me)
@@ -168,12 +168,11 @@ namespace MonoTouch.Dialog {
 			return 78;
 		}
 		
-		public event Action<DialogViewController, UITableView, NSIndexPath> Tapped;
+		public event Action<DialogViewController, UITableView, NSIndexPath>? Tapped;
 		
 		public override void Selected (DialogViewController dvc, UITableView tableView, NSIndexPath path)
 		{
-			if (Tapped != null)
-				Tapped (dvc, tableView, path);
+			Tapped?.Invoke (dvc, tableView, path);
 		}
 
 		public override bool Matches (string text)

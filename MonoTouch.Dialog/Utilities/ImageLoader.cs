@@ -22,18 +22,14 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Security.Cryptography;
 
 using Foundation;
 using UIKit;
-using CoreGraphics;
-
-using MonoTouch.Dialog.Utilities;
 
 namespace MonoTouch.Dialog.Utilities 
 {
@@ -95,7 +91,7 @@ namespace MonoTouch.Dialog.Utilities
 		///    change the behavior.   This property is lazyly computed, the first time
 		///    an image is requested.
 		/// </summary>
-		public static ImageLoader DefaultLoader;
+		public static ImageLoader? DefaultLoader;
 		
 		static ImageLoader ()
 		{
@@ -126,6 +122,7 @@ namespace MonoTouch.Dialog.Utilities
 		static int sizer (UIImage img)
 		{
 			var cg = img.CGImage;
+			Trace.Assert(cg is not null);
 			return (int)(cg.BytesPerRow * cg.Height);
 		}
 		
@@ -178,7 +175,7 @@ namespace MonoTouch.Dialog.Utilities
 		/// <returns>
 		/// If the image has already been downloaded, or is in the cache, this will return the image as a UIImage.
 		/// </returns>
-		public static UIImage DefaultRequestImage (Uri uri, IImageUpdated notify)
+		public static UIImage? DefaultRequestImage (Uri uri, IImageUpdated notify)
 		{
 			if (DefaultLoader == null)
 				DefaultLoader = new ImageLoader (50, 4*1024*1024);
@@ -197,9 +194,9 @@ namespace MonoTouch.Dialog.Utilities
 		/// <returns>
 		/// If the image has already been downloaded, or is in the cache, this will return the image as a UIImage.
 		/// </returns>
-		public UIImage RequestImage (Uri uri, IImageUpdated notify)
+		public UIImage? RequestImage (Uri uri, IImageUpdated notify)
 		{
-			UIImage ret;
+			UIImage? ret;
 			
 			lock (cache){
 				ret = cache [uri];
@@ -262,13 +259,10 @@ namespace MonoTouch.Dialog.Utilities
 		static bool Download (Uri uri)
 		{
 			try {
-				NSUrlResponse response;
-				NSError error;
-				
 				var target =  PicDir + md5 (uri.AbsoluteUri);
-				var req = new NSUrlRequest (new NSUrl (uri.AbsoluteUri.ToString ()), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
-				var data = NSUrlConnection.SendSynchronousRequest (req, out response, out error);
-				return data.Save (target, true, out error);
+				var req = new NSUrlRequest (new NSUrl (uri.AbsoluteUri), NSUrlRequestCachePolicy.UseProtocolCachePolicy, 120);
+				var data = NSUrlConnection.SendSynchronousRequest (req, out _, out _);
+				return data.Save (target, true, out _);
 			} catch (Exception e) {
 				Console.WriteLine ("Problem with {0} {1}", uri, e);
 				return false;
@@ -289,13 +283,12 @@ namespace MonoTouch.Dialog.Utilities
 			Interlocked.Decrement (ref picDownloaders);
 		}
 		
-		static void _StartPicDownload (Uri uri)
+		static void _StartPicDownload (Uri uriToDownload)
 		{
+			Uri? uri = uriToDownload;
 			do {
-				bool downloaded = false;
-				
 				//System.Threading.Thread.Sleep (5000);
-				downloaded = Download (uri);
+				bool downloaded = Download (uri);
 				//if (!downloaded)
 				//	Console.WriteLine ("Error fetching picture for {0} to {1}", uri, target);
 				
@@ -315,11 +308,11 @@ namespace MonoTouch.Dialog.Utilities
 					// Try to get more jobs.
 					if (requestQueue.Count > 0){
 						uri = requestQueue.Pop ();
-						if (uri == null){
-							Console.Error.WriteLine ("Dropping request {0} because url is null", uri);
-							pendingRequests.Remove (uri);
-							uri = null;
-						}
+						// if (uri == null){
+						// 	Console.Error.WriteLine ("Dropping request {0} because url is null", uri);
+						// 	pendingRequests.Remove (uri);
+						// 	uri = null;
+						// }
 					} else {
 						//Util.Log ("Leaving because requestQueue.Count = {0} NOTE: {1}", requestQueue.Count, pendingRequests.Count);
 						uri = null;

@@ -1,6 +1,3 @@
-using System;
-using System.Drawing;
-
 using UIKit;
 using CoreGraphics;
 using Foundation;
@@ -12,17 +9,17 @@ namespace MonoTouch.Dialog
 		{
 		}
 
-		UIActivityIndicatorView indicator;
+		UIActivityIndicatorView? indicator;
 
 		public bool Animating {
 			get {
-				return indicator.IsAnimating;
+				return indicator != null ? indicator.IsAnimating : false;
 			}
 			set {
 				if (value)
-					indicator.StartAnimating ();
+					indicator?.StartAnimating ();
 				else
-					indicator.StopAnimating ();
+					indicator?.StopAnimating ();
 			}
 		}
 

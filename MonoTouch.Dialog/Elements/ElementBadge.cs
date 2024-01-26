@@ -9,16 +9,12 @@
 // Code licensed under the MIT X11 license
 //
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
 
 using UIKit;
 using CoreGraphics;
 using Foundation;
-using ObjCRuntime;
 
-using NSAction = global::System.Action;
+using NSAction = System.Action;
 
 namespace MonoTouch.Dialog
 {	
@@ -36,27 +32,24 @@ namespace MonoTouch.Dialog
 	///    render a calendar badge like the iPhone OS.   It will compose
 	///    the text on top of the image which is expected to be 57x57
 	/// </remarks>
-	public partial class BadgeElement : Element, IElementSizing {
+	public class BadgeElement : Element, IElementSizing {
 		static NSString ckey = new NSString ("badgeKey");
-		public event NSAction Tapped;
+		public event NSAction? Tapped;
 		public UILineBreakMode LineBreakMode = UILineBreakMode.TailTruncation;
 		public UIViewContentMode ContentMode = UIViewContentMode.Left;
 		public int Lines = 1;
 		public UITableViewCellAccessory Accessory = UITableViewCellAccessory.None;
 		UIImage image;
-		UIFont font;
+		UIFont? font;
 	
 		public BadgeElement (UIImage badgeImage, string cellText)
 			: this (badgeImage, cellText, null)
 		{
 		}
 
-		public BadgeElement (UIImage badgeImage, string cellText, NSAction tapped) : base (cellText)
+		public BadgeElement (UIImage badgeImage, string cellText, NSAction? tapped) : base (cellText)
 		{
-			if (badgeImage == null)
-				throw new ArgumentNullException ("badgeImage");
-			
-			image = badgeImage;
+			image = badgeImage ?? throw new ArgumentNullException (nameof(badgeImage));
 			if (tapped != null)
 				Tapped += tapped;
 		}		
@@ -95,11 +88,6 @@ namespace MonoTouch.Dialog
 			return cell;
 		}
 
-		protected override void Dispose (bool disposing)
-		{
-			base.Dispose (disposing);
-		}
-
 		public nfloat GetHeight (UITableView tableView, NSIndexPath indexPath)
 		{
 			CGSize size = new CGSize (tableView.Bounds.Width - 40, nfloat.MaxValue);
@@ -116,7 +104,7 @@ namespace MonoTouch.Dialog
 			tableView.DeselectRow (path, true);
 		}
 		
-		public static UIImage MakeCalendarBadge (UIImage template, string smallText, string bigText)
+		public static UIImage? MakeCalendarBadge (UIImage template, string smallText, string bigText)
 		{
 			using (var cs = CGColorSpace.CreateDeviceRGB ()){
 				using (var context = new CGBitmapContext (IntPtr.Zero, 57, 57, 8, 57*4, cs, CGImageAlphaInfo.PremultipliedLast)){
@@ -148,8 +136,9 @@ namespace MonoTouch.Dialog
 					context.ShowTextAtPoint ((57-width)/2, 9, bigText);
 					
 					context.StrokePath ();
-				
-					return UIImage.FromImage (context.ToImage ());
+
+					var image = context.ToImage();
+					return image is not null ? UIImage.FromImage (image) : null;
 				}
 			}
 		}
